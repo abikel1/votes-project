@@ -1,0 +1,18 @@
+const mongoose = require('mongoose');
+
+const groupSchema = new mongoose.Schema({
+  name: { type: String, required: true },
+  description: { type: String },
+  createdBy: { type: String, required: true },
+  creationDate: { type: Date, default: Date.now },
+  endDate: { type: Date, required: true },
+  candidates: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Candidate' }], // כאן הקישור
+  maxWinners: { type: Number, default: 1 },
+  shareLink: { type: String },
+  votes: [{ type: String }],
+  participants: [{ type: String }]
+});
+
+const Group = mongoose.model('Group', groupSchema);
+
+module.exports = Group;
