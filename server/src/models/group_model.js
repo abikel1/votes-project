@@ -6,7 +6,7 @@ const groupSchema = new mongoose.Schema({
   createdBy: { type: String, required: true },
   creationDate: { type: Date, default: Date.now },
   endDate: { type: Date, required: true },
-  candidates: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Candidate' }], // כאן הקישור
+  candidates: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Candidate' }],
   maxWinners: { type: Number, default: 1 },
   shareLink: { type: String },
   votes: [{ type: String }],
@@ -14,5 +14,4 @@ const groupSchema = new mongoose.Schema({
 });
 
 const Group = mongoose.model('Group', groupSchema);
-
 module.exports = Group;
