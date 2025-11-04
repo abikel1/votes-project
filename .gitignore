@@ -4,6 +4,7 @@ server/node_modules/
 client/node_modules/
 
 # Env
+server/.env/
 .env
 .env.*
 
