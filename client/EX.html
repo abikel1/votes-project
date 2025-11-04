@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="he">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>מערכת קלפי</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 30px 20px;
+    }
+
+    .title {
+      color: white;
+      font-size: 2em;
+      margin-bottom: 30px;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    }
+
+    .container {
+      display: flex;
+      gap: 40px;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: flex-start;
+    }
+
+    /* מגש הפתקים */
+    .ballot-tray {
+      background: linear-gradient(145deg, #2c5282, #3b6ba8);
+      border-radius: 15px;
+      padding: 25px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+      border: 3px solid #4a7bb8;
+    }
+
+    .tray-title {
+      color: white;
+      text-align: center;
+      font-size: 1.3em;
+      margin-bottom: 20px;
+      font-weight: bold;
+    }
+
+    .ballots-grid {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 12px;
+      max-width: 700px;
+    }
+
+    .ballot-card {
+      background: white;
+      padding: 15px 10px;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border: 2px solid #e0e0e0;
+      position: relative;
+    }
+
+    .ballot-card:hover {
+      transform: translateY(-5px) scale(1.05);
+      box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+      border-color: #0055ff;
+    }
+
+    .ballot-card.selected {
+      background: #e3f2fd;
+      border-color: #1976d2;
+      animation: pulse 0.5s ease;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+    }
+
+    .party-letter {
+      font-size: 2.5em;
+      font-weight: bold;
+      text-align: center;
+      color: #1a1a1a;
+      margin-bottom: 8px;
+    }
+
+    .party-name {
+      font-size: 0.75em;
+      text-align: center;
+      color: #555;
+      line-height: 1.3;
+    }
+
+    /* תיבת הקלפי */
+    .ballot-box-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .ballot-box {
+      width: 280px;
+      height: 320px;
+      background: linear-gradient(145deg, #4a90e2, #357abd);
+      border-radius: 10px;
+      box-shadow: 0 25px 70px rgba(0,0,0,0.4);
+      position: relative;
+      border: 4px solid #2c5f9e;
+    }
+
+    /* סמל המדינה */
+    .emblem {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 120px;
+      height: 120px;
+      opacity: 0.3;
+    }
+
+    .menorah {
+      fill: white;
+    }
+
+    /* פתח הקלפי */
+    .ballot-slot {
+      position: absolute;
+      top: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 200px;
+      height: 20px;
+      background: linear-gradient(180deg, #1a3a5a 0%, #0a1a2a 100%);
+      border-radius: 3px;
+      box-shadow: inset 0 3px 10px rgba(0,0,0,0.8),
+                  0 2px 4px rgba(0,0,0,0.3);
+      border: 2px solid #0d2744;
+    }
+
+    .slot-inner {
+      width: 100%;
+      height: 100%;
+      background: #000;
+      border-radius: 2px;
+      box-shadow: inset 0 2px 8px rgba(0,0,0,0.9);
+    }
+
+    /* פתק מעופף */
+    .flying-ballot {
+      position: fixed;
+      background: white;
+      padding: 15px 10px;
+      border-radius: 8px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+      border: 2px solid #1976d2;
+      pointer-events: none;
+      z-index: 1000;
+      opacity: 0;
+    }
+
+    .flying-ballot .party-letter {
+      font-size: 2em;
+      margin-bottom: 5px;
+    }
+
+    .flying-ballot .party-name {
+      font-size: 0.7em;
+    }
+
+    /* כפתור הצבעה */
+    .vote-button {
+      background: linear-gradient(145deg, #4caf50, #45a049);
+      color: white;
+      border: none;
+      padding: 15px 40px;
+      font-size: 1.2em;
+      font-weight: bold;
+      border-radius: 10px;
+      cursor: pointer;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+      transition: all 0.3s ease;
+      font-family: Arial, sans-serif;
+    }
+
+    .vote-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(0,0,0,0.4);
+      background: linear-gradient(145deg, #45a049, #3d8b40);
+    }
+
+    .vote-button:active {
+      transform: translateY(0);
+    }
+
+    .vote-button:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
+
+    /* הודעת הצבעה */
+    .vote-message {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0);
+      background: white;
+      padding: 40px 60px;
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+      text-align: center;
+      z-index: 2000;
+      transition: transform 0.4s ease;
+    }
+
+    .vote-message.show {
+      transform: translate(-50%, -50%) scale(1);
+    }
+
+    .vote-message h2 {
+      color: #4caf50;
+      font-size: 2em;
+      margin-bottom: 15px;
+    }
+
+    .vote-message p {
+      color: #555;
+      font-size: 1.2em;
+    }
+
+    .overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.7);
+      z-index: 1999;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+
+    .overlay.show {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    @media (max-width: 768px) {
+      .ballots-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+      
+      .container {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1 class="title">🗳️ מערכת הצבעה דיגיטלית</h1>
+
+  <div class="container">
+    <!-- מגש הפתקים -->
+    <div class="ballot-tray">
+      <div class="tray-title">מגש פתקי ההצבעה</div>
+      <div class="ballots-grid" id="ballotsGrid"></div>
+    </div>
+
+    <!-- תיבת הקלפי -->
+    <div class="ballot-box-container">
+      <div class="ballot-box" id="ballotBox">
+        <div class="ballot-slot">
+          <div class="slot-inner"></div>
+        </div>
+        <svg class="emblem" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+          <g class="menorah">
+            <!-- מנורה -->
+            <rect x="47" y="70" width="6" height="25" />
+            <rect x="40" y="85" width="20" height="3" />
+            <!-- נרות -->
+            <circle cx="20" cy="40" r="3" />
+            <line x1="20" y1="43" x2="20" y2="70" stroke="white" stroke-width="2" />
+            <circle cx="30" cy="30" r="3" />
+            <line x1="30" y1="33" x2="30" y2="70" stroke="white" stroke-width="2" />
+            <circle cx="40" cy="25" r="3" />
+            <line x1="40" y1="28" x2="40" y2="70" stroke="white" stroke-width="2" />
+            <circle cx="50" cy="20" r="3" />
+            <line x1="50" y1="23" x2="50" y2="70" stroke="white" stroke-width="2" />
+            <circle cx="60" cy="25" r="3" />
+            <line x1="60" y1="28" x2="60" y2="70" stroke="white" stroke-width="2" />
+            <circle cx="70" cy="30" r="3" />
+            <line x1="70" y1="33" x2="70" y2="70" stroke="white" stroke-width="2" />
+            <circle cx="80" cy="40" r="3" />
+            <line x1="80" y1="43" x2="80" y2="70" stroke="white" stroke-width="2" />
+          </g>
+        </svg>
+      </div>
+      <button class="vote-button" id="voteButton" disabled>הצבע</button>
+    </div>
+  </div>
+
+  <!-- פתק מעופף -->
+  <div class="flying-ballot" id="flyingBallot">
+    <div class="party-letter" id="flyingLetter"></div>
+    <div class="party-name" id="flyingName"></div>
+  </div>
+
+  <!-- הודעה והצללה -->
+  <div class="overlay" id="overlay"></div>
+  <div class="vote-message" id="voteMessage">
+    <h2>✓ הצבעתך נקלטה בהצלחה!</h2>
+    <p>תודה על השתתפותך בבחירות</p>
+  </div>
+
+  <script>
+    const parties = [
+      { letter: 'ב', name: 'חבית הרורד\nברואטיאלה אייליה שוו' },
+      { letter: 'ד', name: 'כחול - אדמשו\nבראטטוצט אביא מאר משחז' },
+      { letter: 'פה', name: 'יש עתיד\nבראוטוצט אביא לבנ' },
+      { letter: 'מחל', name: 'הליכוד\nבראוטוצט בנימין נתניהו' },
+      { letter: 'נק', name: 'יש כחון\nבראוטוצט בשאות שחייב' },
+      { letter: 'ל', name: 'ישראל ביתנו\nבראוטוצט אבינדיר ליברמן' },
+      { letter: 'ט', name: 'העודות הדודה\nבראוטוצט בוזלט מארפור' },
+      { letter: 'מרץ', name: 'מרצ\nהשמאל של ישראל' },
+      { letter: 'יב', name: 'אתדב מור ברארת\nבראוטוצט רב זהארא' },
+      { letter: 'יע', name: 'צע השמה' },
+      { letter: 'עם', name: 'העודקא הערבית\nבמאודוצת' },
+      { letter: 'נע', name: 'הציומצס החרדשסס\nבראוטוצט נחים מרנולט' },
+      { letter: 'ג', name: 'יחדות הדודה המגה\nאדוצת ישראל - דגל הדודה' },
+      { letter: 'זר', name: 'העוצמה הירודסת\nבראוטוצט סבאו חגאס' },
+      { letter: 'יד', name: 'מוקלגא הודודה\nבראוטוצט מגאסוס עיס מקה' },
+      { letter: 'נל', name: 'נרום - נחד בעבור\nיהודד בוגורר' },
+      { letter: 'דז', name: 'קול ב -\nבראוטוצט מומרט ההמאס' },
+      { letter: 'ג', name: 'יחדות הדודה והגקה\nאדוצת ישראל - דגל הדודה' }
+    ];
+
+    let selectedBallot = null;
+    const grid = document.getElementById('ballotsGrid');
+    const voteBtn = document.getElementById('voteButton');
+    const flyingBallot = document.getElementById('flyingBallot');
+    const overlay = document.getElementById('overlay');
+    const voteMessage = document.getElementById('voteMessage');
+    const ballotBox = document.getElementById('ballotBox');
+
+    // יצירת פתקים
+    parties.forEach((party, idx) => {
+      const card = document.createElement('div');
+      card.className = 'ballot-card';
+      card.innerHTML = `
+        <div class="party-letter">${party.letter}</div>
+        <div class="party-name">${party.name}</div>
+      `;
+      card.addEventListener('click', () => selectBallot(idx, card));
+      grid.appendChild(card);
+    });
+
+    function selectBallot(idx, el) {
+      document.querySelectorAll('.ballot-card').forEach(c => c.classList.remove('selected'));
+      el.classList.add('selected');
+      selectedBallot = idx;
+      voteBtn.disabled = false;
+    }
+
+    voteBtn.addEventListener('click', () => {
+      if (selectedBallot === null) return;
+
+      const party = parties[selectedBallot];
+      const cards = document.querySelectorAll('.ballot-card');
+      const selectedCard = cards[selectedBallot];
+      const rect = selectedCard.getBoundingClientRect();
+      const boxRect = ballotBox.getBoundingClientRect();
+
+      // הצגת פתק מעופף
+      flyingBallot.style.left = rect.left + 'px';
+      flyingBallot.style.top = rect.top + 'px';
+      flyingBallot.style.width = rect.width + 'px';
+      document.getElementById('flyingLetter').textContent = party.letter;
+      document.getElementById('flyingName').textContent = party.name;
+      flyingBallot.style.opacity = '1';
+
+      // אנימציה לתיבה
+      setTimeout(() => {
+        flyingBallot.style.transition = 'all 1s cubic-bezier(0.34, 1.56, 0.64, 1)';
+        flyingBallot.style.left = (boxRect.left + boxRect.width / 2 - rect.width / 2) + 'px';
+        flyingBallot.style.top = (boxRect.top + 30) + 'px';
+        flyingBallot.style.transform = 'scale(0.8) rotateX(90deg)';
+      }, 100);
+
+      // הצגת הודעת הצלחה
+      setTimeout(() => {
+        flyingBallot.style.opacity = '0';
+        overlay.classList.add('show');
+        voteMessage.classList.add('show');
+        
+        setTimeout(() => {
+          overlay.classList.remove('show');
+          voteMessage.classList.remove('show');
+          selectedBallot = null;
+          voteBtn.disabled = true;
+          cards.forEach(c => c.classList.remove('selected'));
+          flyingBallot.style.transition = 'none';
+          flyingBallot.style.transform = 'scale(1) rotateX(0)';
+        }, 2500);
+      }, 1100);
+    });
+  </script>
+</body>
+</html>
