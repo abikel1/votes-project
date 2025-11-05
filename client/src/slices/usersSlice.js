@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import http from '../../api/http';
+import http from '../api/http';
 
 export const fetchUsers = createAsyncThunk('users/fetchAll', async (_, thunkAPI) => {
     try {

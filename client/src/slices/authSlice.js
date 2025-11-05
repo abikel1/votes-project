@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import http from '../../api/http';
+import http from '../api/http';
 
 // אתחול טוקן מה-localStorage
 const initialToken = localStorage.getItem('token');
