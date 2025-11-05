@@ -1,7 +1,7 @@
+// server/src/models/user_model.js
 const mongoose = require('mongoose');
 
 const userSchema = new mongoose.Schema({
-    id: { type: String, required: true, unique: true },       // UUID / Firebase UID
     name: { type: String, required: true, trim: true },
     email: {
         type: String, required: true, unique: true,
@@ -13,7 +13,6 @@ const userSchema = new mongoose.Schema({
         type: String, trim: true,
         match: [/^[\d+\-\s()]{6,20}$/, 'Invalid phone number']
     },
-    // תוספת מינימלית לאימות: נשמר מוצפן ולא נשלף כברירת מחדל
     passwordHash: { type: String, required: true, select: false },
 
     joinedGroups: [{ type: String }],
@@ -24,7 +23,7 @@ const userSchema = new mongoose.Schema({
     versionKey: false,
 });
 
+// שמרו רק את אינדקס האימייל
 // userSchema.index({ email: 1 }, { unique: true });
-// userSchema.index({ id: 1 }, { unique: true });
 
 module.exports = mongoose.model('User', userSchema);

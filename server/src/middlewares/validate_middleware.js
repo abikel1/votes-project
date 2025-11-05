@@ -1,3 +1,4 @@
+// server/src/middlewares/validate_middleware.js
 const Joi = require('joi');
 
 exports.validate = (schema) => (req, res, next) => {
@@ -9,7 +10,7 @@ exports.validate = (schema) => (req, res, next) => {
 
 exports.schemas = {
     register: Joi.object({
-        id: Joi.string().min(3).required(),
+        // ❌ אל תשימי id כאן
         name: Joi.string().min(2).max(120).required(),
         email: Joi.string().email().required(),
         address: Joi.string().allow('', null),
