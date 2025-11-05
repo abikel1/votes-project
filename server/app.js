@@ -2,8 +2,10 @@
 //app
 const express = require('express');
 const cors = require('cors');
+
 const userRoutes = require('./src/routes/user_routes');
 const candidateRoutes = require('./src/routes/candidate_routes');
+const groupRoutes = require('./src/routes/group_routes'); // 👈 הוספה
 
 const app = express();
 
@@ -13,7 +15,8 @@ app.use(express.json());
 
 // Routes
 app.use('/api/users', userRoutes);
-app.use("/api/candidates", candidateRoutes);
+app.use('/api/candidates', candidateRoutes);
+app.use('/api/groups', groupRoutes); // 👈 הוספה
 
 // Root check
 app.get('/', (req, res) => res.send('API is running...'));
