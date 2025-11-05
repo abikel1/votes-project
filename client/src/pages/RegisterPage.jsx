@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { register } from '../features/auth/authSlice';
+import { register } from '../slices/authSlice';
 
 export default function RegisterPage() {
     const dispatch = useDispatch();

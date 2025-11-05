@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchMe } from '../features/auth/authSlice';
+import { fetchMe } from '../slices/authSlice';
 
 export default function ProfilePage() {
   const dispatch = useDispatch();
