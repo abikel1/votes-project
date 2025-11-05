@@ -1,7 +1,7 @@
 import NavBar from './components/NavBar/NavBar.jsx';
 import HomeRoute from './pages/Home/HomePage.jsx';
 import LoginPage from './pages/LoginPage.jsx';
-import RegisterPage from './pages/RegisterPage.jsx';
+import RegisterPage from './pages/Register/RegisterPage.jsx';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 
 export default function App() {
