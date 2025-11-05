@@ -1,13 +1,13 @@
 const mongoose = require('mongoose');
 
 const voteSchema = new mongoose.Schema({
-  userId: { type: String, required: true },                      // מזהה המשתמש שהצביע
-  groupId: { type: mongoose.Schema.Types.ObjectId, ref: 'Group', required: true },  // קישור לקבוצה
-  candidateId: { type: mongoose.Schema.Types.ObjectId, ref: 'Candidate', required: true }, // קישור למועמד
-  timestamp: { type: Date, default: Date.now }                   // זמן ההצבעה
-});
+  userId:      { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  groupId:     { type: mongoose.Schema.Types.ObjectId, ref: 'Group', required: true },
+  candidateId: { type: mongoose.Schema.Types.ObjectId, ref: 'Candidate', required: true },
+  timestamp:   { type: Date, default: Date.now },
+}, { timestamps: true });
 
-// יצירת המודל
-const Vote = mongoose.model('Vote', voteSchema);
+// הצבעה אחת לכל משתמש בכל קבוצה
+voteSchema.index({ userId: 1, groupId: 1 }, { unique: true });
 
-module.exports = Vote;
+module.exports = mongoose.model('Vote', voteSchema);
