@@ -5,7 +5,9 @@ const cors = require('cors');
 
 const userRoutes = require('./src/routes/user_routes');
 const candidateRoutes = require('./src/routes/candidate_routes');
-const groupRoutes = require('./src/routes/group_routes'); // 👈 הוספה
+const groupRoutes = require('./src/routes/group_routes'); 
+const voteRoutes = require('./src/routes/vote_routes');
+
 
 const app = express();
 
@@ -16,7 +18,9 @@ app.use(express.json());
 // Routes
 app.use('/api/users', userRoutes);
 app.use('/api/candidates', candidateRoutes);
-app.use('/api/groups', groupRoutes); // 👈 הוספה
+app.use('/api/groups', groupRoutes);
+app.use('/api/votes', voteRoutes);
+
 
 // Root check
 app.get('/', (req, res) => res.send('API is running...'));
