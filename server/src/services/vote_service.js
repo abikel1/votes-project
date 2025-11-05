@@ -130,5 +130,36 @@ async function deleteVoteService(voteData) {
   }
 }
 
-module.exports = { createVoteService, deleteVoteService };
+// מחזיר את כל ההצבעות עבור מועמד מסוים בתוך קבוצה מסוימת
+async function getVotesByCandidateInGroupService({ candidateId, groupId }) {
+  const isId = (v) => mongoose.isValidObjectId(v);
+  if (!candidateId || !groupId) {
+    throw new Error('Missing required fields (candidateId, groupId)');
+  }
+  if (!isId(candidateId) || !isId(groupId)) {
+    throw new Error('Invalid IDs format');
+  }
+
+  // ודא שמועמד וקבוצה קיימים
+  const [group, candidate] = await Promise.all([
+    Group.findById(groupId).lean(),
+    Candidate.findById(candidateId).lean(),
+  ]);
+  if (!group) throw new Error('Group not found');
+  if (!candidate) throw new Error('Candidate not found');
+
+  // ודא שהמועמד שייך לקבוצה (לפי candidate.groupId)
+  if (!candidate.groupId || candidate.groupId.toString() !== groupId.toString()) {
+    throw new Error('Candidate does not belong to this group');
+  }
+
+  // שליפת ההצבעות (אפשר גם populate למידע על המשתמש שהצביע)
+  const votes = await Vote.find({ candidateId, groupId })
+    // .populate('userId', 'name email') // אם תרצי מידע על המשתמשים – בטלי הערה
+    .lean();
+
+  return votes; // מערך של הצבעות
+}
+
+module.exports = { createVoteService, deleteVoteService, getVotesByCandidateInGroupService };
 

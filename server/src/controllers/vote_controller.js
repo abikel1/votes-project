@@ -1,4 +1,4 @@
-const { createVoteService, deleteVoteService  } = require('../services/vote_service');
+const { createVoteService, deleteVoteService , getVotesByCandidateInGroupService } = require('../services/vote_service');
 
 async function createVote(req, res) {
   try {
@@ -23,5 +23,15 @@ async function deleteVote(req, res) {
     res.status(500).json({ message: 'Error deleting vote' });
   }
 }
-
-module.exports = { createVote, deleteVote };
+async function getVotesByCandidateInGroup(req, res) {
+  try {
+    // מקבל מה-Query: /api/votes/by-candidate?candidateId=...&groupId=...
+    const { candidateId, groupId } = req.query;
+    const votes = await getVotesByCandidateInGroupService({ candidateId, groupId });
+    res.status(200).json(votes);
+  } catch (err) {
+    console.error('❌ Error getting votes by candidate in group:', err);
+    res.status(500).json({ message: 'Error getting votes by candidate in group' });
+  }
+}
+module.exports = { createVote, deleteVote, getVotesByCandidateInGroup };
