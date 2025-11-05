@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchUsers } from '../features/users/usersSlice';
+import { fetchUsers } from '../slices/usersSlice';
 
 export default function UsersPage() {
   const dispatch = useDispatch();
