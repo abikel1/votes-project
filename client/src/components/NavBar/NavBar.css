@@ -1,0 +1,74 @@
+/* מוודאים שכל המידות כוללות padding ו-border */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  padding-top: 60px;  /* דוחף את התוכן מתחת לסרגל */
+  overflow-x: hidden;  /* מונע חיתוך אופקי */
+}
+
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;       /* רוחב מלא של חלון הצפייה */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: #003366;
+  padding: 0 20px;
+  height: 60px;
+  color: white;
+  font-family: Arial, sans-serif;
+  z-index: 1000;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+
+/* דחיפת התוכן מתחת לסרגל */
+body {
+  padding-top: 60px;  /* בגובה הסרגל */
+}
+
+.site-name {
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.links {
+    direction: rtl;
+  display: flex;
+  gap: 15px; /* רווח בין הקישורים */
+}
+
+.links a {
+  color: white;
+  text-decoration: none;
+  font-size: 16px;
+  transition: color 0.3s;
+}
+
+.links a:hover {
+  color: #00ccff; /* אפקט מעבר */
+}
+
+.profile {
+  background-color: #0055aa;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 18px;
+  transition: background-color 0.3s;
+}
+
+.profile:hover {
+  background-color: #0077dd;
+}

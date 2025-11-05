@@ -1,0 +1,10 @@
+const express = require('express');
+const router = express.Router();
+const { createVote, deleteVote, getVotesByCandidateInGroup } = require('../controllers/vote_controller');
+
+router.post('/create', createVote);
+router.delete('/delete', deleteVote);
+router.get('/by-candidate', getVotesByCandidateInGroup); // ?candidateId=&groupId=
+
+
+module.exports = router;
