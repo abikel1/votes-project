@@ -1,5 +1,7 @@
-// server/src/middlewares/validate_middleware.js
 const Joi = require('joi');
+
+const stripComma = (j) =>
+    j.custom((v) => (typeof v === 'string' ? v.replace(/[,\s]+$/, '') : v));
 
 exports.validate = (schema) => (req, res, next) => {
     const { error, value } = schema.validate(req.body, { abortEarly: false, stripUnknown: true });
@@ -10,15 +12,14 @@ exports.validate = (schema) => (req, res, next) => {
 
 exports.schemas = {
     register: Joi.object({
-        // ❌ אל תשימי id כאן
-        name: Joi.string().min(2).max(120).required(),
-        email: Joi.string().email().required(),
-        address: Joi.string().allow('', null),
-        phone: Joi.string().pattern(/^[\d+\-\s()]{6,20}$/).allow('', null),
+        name: stripComma(Joi.string().trim().min(2).max(120).required()),
+        email: stripComma(Joi.string().trim().email().required()),
+        address: stripComma(Joi.string().trim().allow('', null)),
+        phone: stripComma(Joi.string().trim().pattern(/^[\d+\-\s()]{6,20}$/).allow('', null)),
         password: Joi.string().min(6).required(),
     }),
     login: Joi.object({
-        email: Joi.string().email().required(),
+        email: Joi.string().trim().email().required(),
         password: Joi.string().required(),
     }),
 };

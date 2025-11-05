@@ -1,4 +1,3 @@
-// server/src/models/user_model.js
 const mongoose = require('mongoose');
 
 const userSchema = new mongoose.Schema({
@@ -13,6 +12,7 @@ const userSchema = new mongoose.Schema({
         type: String, trim: true,
         match: [/^[\d+\-\s()]{6,20}$/, 'Invalid phone number']
     },
+    // נשמר מוצפן, ולא נשלף כברירת מחדל
     passwordHash: { type: String, required: true, select: false },
 
     joinedGroups: [{ type: String }],
@@ -23,7 +23,8 @@ const userSchema = new mongoose.Schema({
     versionKey: false,
 });
 
-// שמרו רק את אינדקס האימייל
+// אם פעם היה אינדקס על id, השורה הבאה תדאג שלא קיים יותר.
+// נשאיר רק ייחוד על email
 // userSchema.index({ email: 1 }, { unique: true });
 
 module.exports = mongoose.model('User', userSchema);

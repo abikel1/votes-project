@@ -1,4 +1,3 @@
-// server/src/services/user_service.js
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user_model');
@@ -19,13 +18,15 @@ async function register({ name, email, address, phone, password }) {
     const passwordHash = await bcrypt.hash(password, 12);
 
     const user = await User.create({
-        // ❌ אין id ידני
         name, email, address, phone, passwordHash,
         joinedGroups: [], createdGroups: [], voteHistory: [],
     });
 
+    // 👉 אוטו-לוגין: מחזירים טוקן אחרי רישום. אם לא רוצים – החזירי רק `safe`
+    const token = jwt.sign({ sub: user._id.toString() }, JWT_SECRET, { expiresIn: JWT_EXPIRES });
+
     const { passwordHash: _pwd, ...safe } = user.toObject();
-    return safe; // מכיל גם _id
+    return { token, user: safe };
 }
 
 async function login({ email, password }) {
@@ -43,20 +44,14 @@ async function login({ email, password }) {
         throw err;
     }
 
-    // 👉 מזהה המשתמש יהיה ה-ObjectId
-    const token = jwt.sign(
-        { sub: user._id.toString() },
-        JWT_SECRET,
-        { expiresIn: JWT_EXPIRES }
-    );
+    const token = jwt.sign({ sub: user._id.toString() }, JWT_SECRET, { expiresIn: JWT_EXPIRES });
 
     const { passwordHash: _pwd, ...safe } = user.toObject();
     return { token, user: safe };
 }
 
 async function getProfile(userIdFromToken) {
-    // 👉 חיפוש לפי _id שהגיע מה-JWT
-    const user = await User.findById(userIdFromToken);
+    const user = await User.findById(userIdFromToken).select('-passwordHash');
     if (!user) {
         const err = new Error('User not found');
         err.status = 404;
@@ -65,15 +60,8 @@ async function getProfile(userIdFromToken) {
     return user;
 }
 
-// ✅ פונקציה שמחזירה את כל המשתמשים (ללא סיסמאות)
 async function listUsers() {
     return User.find({}, { passwordHash: 0 }).lean();
 }
 
-
-module.exports = {
-    register,
-    login,
-    getProfile,
-    listUsers,
-};
+module.exports = { register, login, getProfile, listUsers };

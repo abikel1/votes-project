@@ -1,10 +1,9 @@
-// server/src/controllers/user_controller.js
 const userService = require('../services/user_service');
 
 exports.register = async (req, res) => {
     try {
-        const safe = await userService.register(req.body);
-        res.status(201).json(safe);
+        const result = await userService.register(req.body);
+        res.status(201).json(result);
     } catch (err) {
         res.status(err.status || 500).json({ message: err.message || 'Server error' });
     }
@@ -28,7 +27,6 @@ exports.getProfile = async (req, res) => {
     }
 };
 
-// ✅ חדש: כל המשתמשים
 exports.listUsers = async (req, res) => {
     try {
         const users = await userService.listUsers();
@@ -37,4 +35,3 @@ exports.listUsers = async (req, res) => {
         res.status(err.status || 500).json({ message: err.message || 'Server error' });
     }
 };
-
