@@ -81,4 +81,54 @@ async function createVoteService(voteData) {
   }
 }
 
-module.exports = { createVoteService };
+
+// מחיקת הצבעה קיימת (לפי userId+groupId) + עדכון מונה קולות של המועמד בטרנזקציה
+async function deleteVoteService(voteData) {
+  const { userId, groupId } = voteData || {};
+  const isId = (v) => mongoose.isValidObjectId(v);
+
+  if (!userId || !groupId) {
+    throw new Error('Missing required fields (userId, groupId)');
+  }
+  if (!isId(userId) || !isId(groupId)) {
+    throw new Error('Invalid IDs format');
+  }
+
+  // מאתרים את ההצבעה
+  const vote = await Vote.findOne({ userId, groupId }).lean();
+  if (!vote) {
+    throw new Error('Vote not found');
+  }
+
+  // טרנזקציה: מוחקים את ההצבעה ומפחיתים 1 מהמועמד שהצביעו לו
+  const session = await mongoose.startSession();
+  try {
+    let deleted = null;
+
+    await session.withTransaction(async () => {
+      // מחיקה
+      const delRes = await Vote.deleteOne({ _id: vote._id }, { session });
+      if (delRes.deletedCount !== 1) {
+        throw new Error('Failed to delete vote');
+      }
+      deleted = vote;
+
+      // הפחתת מונה קולות של המועמד (אם קיים)
+      if (vote.candidateId) {
+        await Candidate.updateOne(
+          { _id: vote.candidateId },
+          { $inc: { votesCount: -1 } },
+          { session }
+        );
+      }
+    });
+
+    console.log('🗑️ Vote deleted:', deleted);
+    return deleted; // מחזיר את ההצבעה שנמחקה
+  } finally {
+    session.endSession();
+  }
+}
+
+module.exports = { createVoteService, deleteVoteService };
+
