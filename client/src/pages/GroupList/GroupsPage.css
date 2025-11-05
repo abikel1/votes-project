@@ -1,0 +1,168 @@
+/* גריד כללי של הכרטיסים */
+.groups-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px;
+}
+
+/* כותרות/עטיפה */
+.page-wrap {
+    padding: 16px;
+}
+
+.page-title {
+    margin-bottom: 16px;
+}
+
+/* כרטיס */
+.group-card {
+    border: 1px solid #e6e6e6;
+    border-radius: 14px;
+    padding: 14px;
+    box-shadow: 0 1px 6px rgba(0, 0, 0, 0.06);
+    background: #fff;
+    cursor: pointer;
+    outline: none;
+}
+
+.group-card:focus-visible {
+    box-shadow: 0 0 0 3px rgba(11, 116, 218, 0.35);
+}
+
+/* כותרת הכרטיס */
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    align-items: center;
+}
+
+.card-title {
+    margin: 0;
+    font-size: 18px;
+    line-height: 1.2;
+}
+
+/* באדג׳ */
+.badge {
+    background: #eef7ff;
+    color: #0b74da;
+    border: 1px solid #cfe7ff;
+    border-radius: 999px;
+    padding: 4px 10px;
+    font-size: 12px;
+}
+
+/* תיאור ומטא */
+.card-desc {
+    margin: 8px 0 0;
+    color: #444;
+}
+
+.meta-row {
+    margin-top: 8px;
+    font-size: 14px;
+    color: #333;
+}
+
+.meta-grid {
+    margin-top: 8px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    font-size: 14px;
+}
+
+/* צ׳יפים */
+.chips-row {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 10px;
+}
+
+.chip {
+    background: #f6f6f6;
+    border: 1px solid #e2e2e2;
+    border-radius: 999px;
+    padding: 4px 10px;
+    font-size: 12px;
+}
+
+/* פעולות */
+.actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.btn {
+    background: #0b74da;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 12px;
+    cursor: pointer;
+}
+
+.btn-outline {
+    border: 1px solid #0b74da;
+    color: #0b74da;
+    background: transparent;
+    border-radius: 8px;
+    padding: 8px 12px;
+    cursor: pointer;
+}
+
+/* רמז/פוטר */
+.hint {
+    margin-top: 10px;
+    font-size: 12px;
+    color: #666;
+}
+
+/* מצבי טעינה */
+.skeleton-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px;
+}
+
+.skeleton-card {
+    border: 1px solid #e6e6e6;
+    border-radius: 14px;
+    padding: 14px;
+    background: linear-gradient(90deg, #f4f4f4 25%, #eeeeee 37%, #f4f4f4 63%);
+    background-size: 400% 100%;
+    animation: loading 1.4s ease infinite;
+    height: 160px;
+}
+
+@keyframes loading {
+    0% {
+        background-position: 100% 0;
+    }
+
+    100% {
+        background-position: 0 0;
+    }
+}
+
+/* הודעות */
+.error {
+    color: crimson;
+    padding: 16px;
+}
+
+.empty {
+    padding: 16px;
+}
+
+/* כותרת הטעינה */
+.loading-wrap {
+    padding: 16px;
+}
+
+.loading-title {
+    margin-bottom: 12px;
+}

@@ -1,22 +1,20 @@
+// server/src/routes/group_routes.js
 const express = require('express');
 const router = express.Router();
+
 const {
   createGroup,
   updateGroup,
   deleteGroup,
   getGroupById,
-  getAllGroups
+  getAllGroups,
 } = require('../controllers/group_controller');
 
-const handleGroupDependencies = require('../middlewares/group_middleware');
-
+// שימי ראוטים "מפורשים" לפני :id כדי שלא יתנגשו
 router.post('/create', createGroup);
+router.get('/', getAllGroups);        // GET /api/groups
+router.get('/:id', getGroupById);     // GET /api/groups/:id
 router.put('/:id', updateGroup);
-
-// ✅ המחיקה עוברת קודם דרך ה-middleware של התלויות
-router.delete('/:id', handleGroupDependencies, deleteGroup);
-
-router.get('/:id', getGroupById);
-router.get('/', getAllGroups);
+router.delete('/:id', deleteGroup);
 
 module.exports = router;
