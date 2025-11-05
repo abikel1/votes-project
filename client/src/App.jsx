@@ -1,6 +1,6 @@
 import { Routes, Route, Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { logout } from './features/auth/authSlice';
+import { logout } from './slices/authSlice';
 
 import RegisterPage from './pages/RegisterPage.jsx';
 import LoginPage from './pages/LoginPage.jsx';
