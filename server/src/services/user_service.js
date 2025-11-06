@@ -7,7 +7,7 @@ const JWT_EXPIRES = process.env.JWT_EXPIRES || '7d';
 
 async function register({ name, email, address, phone, password }) {
     const exists = await User.findOne({ email });
-    if (exists) throw Object.assign(new Error('Email already in use'), { status: 409 });
+    if (exists) throw Object.assign(new Error('המייל קיים כבר'), { status: 409 });
 
     const passwordHash = await bcrypt.hash(password, 12);
     const user = await User.create({ name, email, address, phone, passwordHash, joinedGroups: [], createdGroups: [], voteHistory: [] });

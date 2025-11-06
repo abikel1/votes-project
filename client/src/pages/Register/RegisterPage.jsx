@@ -1,12 +1,44 @@
 import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom'; // 🟢 הוספה
+import { useNavigate } from 'react-router-dom';
 import { register } from '../../slices/authSlice';
 import './RegisterPage.css';
 
+// קומפוננטת Input עם עיצוב קיים
+const InputField = ({ placeholder, field, value, onChange, error, type = 'text', onFocus }) => (
+  <div className="control block-cube block-input" style={{ position: 'relative' }}>
+    <input
+      type={type}
+      placeholder={placeholder}
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+      onFocus={onFocus}
+    />
+    <div className="bg-top"><div className="bg-inner" /></div>
+    <div className="bg-right"><div className="bg-inner" /></div>
+    <div className="bg"><div className="bg-inner" /></div>
+
+    {error && (
+      <span
+        className="msg error"
+        style={{
+          position: 'absolute',
+          top: '50%',
+          left: '10px',
+          transform: 'translateY(-50%)',
+          pointerEvents: 'none',
+          fontSize: '0.85rem',
+        }}
+      >
+        {error}
+      </span>
+    )}
+  </div>
+);
+
 export default function RegisterPage() {
   const dispatch = useDispatch();
-  const navigate = useNavigate(); // 🟢 הוספה
+  const navigate = useNavigate();
   const { loading, error, registeredOk } = useSelector((s) => s.auth);
 
   const [form, setForm] = useState({
@@ -19,31 +51,23 @@ export default function RegisterPage() {
 
   const [errors, setErrors] = useState({});
 
-  const handleFocus = (field) => {
-    setErrors((prev) => ({ ...prev, [field]: null }));
-  };
+  // ניקוי שגיאות כשמתמקדים בשדה
+  const handleFocus = (field) => setErrors((prev) => ({ ...prev, [field]: null }));
 
+  // ולידציה בסיסית
   const validateForm = () => {
     const newErrors = {};
-    if (!form.name.trim()) newErrors.name = 'שם מלא*';
-    else if (form.name.length < 2) newErrors.name = 'שם חייב לפחות 2 תווים';
-
-    if (!form.email.trim()) newErrors.email = 'אימייל*';
-    else if (!/^\S+@\S+\.\S+$/.test(form.email)) newErrors.email = 'אימייל לא תקין';
-
-    if (!form.password) newErrors.password = 'סיסמה*';
-    else if (form.password.length < 6) newErrors.password = 'סיסמה חייבת לפחות 6 תווים';
-
-    if (form.phone && !/^[\d+\-\s()]{6,20}$/.test(form.phone))
-      newErrors.phone = 'טלפון לא תקין';
-
+    if (form.name.length < 2) newErrors.name = 'שם חייב לפחות 2 תווים';
+    if (!/^\S+@\S+\.\S+$/.test(form.email)) newErrors.email = 'אימייל לא תקין';
+    if (form.password.length < 6) newErrors.password = 'סיסמה חייבת לפחות 6 תווים';
+    if (form.phone && !/^[\d+\-\s()]{6,20}$/.test(form.phone)) newErrors.phone = 'טלפון לא תקין';
     return newErrors;
   };
 
+  // שליחת הטופס
   const submit = (e) => {
     e.preventDefault();
     const validationErrors = validateForm();
-
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
       return;
@@ -56,46 +80,13 @@ export default function RegisterPage() {
       .catch((err) => console.log('❌ Error registering:', err));
   };
 
-  // 🟢 נווט לעמוד התחברות אחרי רישום
+  // נווט לאחר רישום מוצלח
   useEffect(() => {
     if (registeredOk) {
-      const timer = setTimeout(() => {
-        navigate('/login');
-      }, 1500); // 1.5 שניות כדי שהמשתמש יספיק לראות את ההודעה
+      const timer = setTimeout(() => navigate('/login'), 1500);
       return () => clearTimeout(timer);
     }
   }, [registeredOk, navigate]);
-
-  const renderField = (placeholder, field, type = 'text') => (
-    <div className="control block-cube block-input" style={{ position: 'relative' }}>
-      <input
-        type={type}
-        placeholder={placeholder}
-        value={form[field]}
-        onChange={(e) => setForm((f) => ({ ...f, [field]: e.target.value }))}
-        onFocus={() => handleFocus(field)}
-      />
-      <div className="bg-top"><div className="bg-inner" /></div>
-      <div className="bg-right"><div className="bg-inner" /></div>
-      <div className="bg"><div className="bg-inner" /></div>
-
-      {errors[field] && (
-        <span
-          className="msg error"
-          style={{
-            position: 'absolute',
-            top: '50%',
-            left: '10px',
-            transform: 'translateY(-50%)',
-            pointerEvents: 'none',
-            fontSize: '0.85rem',
-          }}
-        >
-          {errors[field]}
-        </span>
-      )}
-    </div>
-  );
 
   return (
     <div className="form-container">
@@ -104,17 +95,63 @@ export default function RegisterPage() {
           <h1>הרשמה</h1>
         </div>
 
-        {registeredOk && (
-          <div className="msg success">נרשמת בהצלחה! עכשיו ננווט לעמוד ההתחברות...</div>
+        {/* הודעות הצלחה ושגיאה */}
+        {/* הודעות הצלחה ושגיאה */}
+        {(registeredOk || error) && (
+          <div className={`top-msg ${registeredOk ? 'success' : 'error'}`}>
+            {registeredOk
+              ? 'נרשמת בהצלחה! עכשיו  לעמוד ההתחברות...'
+              : error}
+          </div>
         )}
-        {error && <div className="msg error">{error}</div>}
 
-        {renderField('שם מלא', 'name')}
-        {renderField('אימייל', 'email', 'email')}
-        {renderField('סיסמה', 'password', 'password')}
-        {renderField('כתובת', 'address')}
-        {renderField('טלפון', 'phone')}
+        {/* {error && <div className="msg error">{error}</div>} */}
 
+        {/* שדות הטופס */}
+        <InputField
+          placeholder="*שם מלא"
+          field="name"
+          value={form.name}
+          onChange={(val) => setForm((f) => ({ ...f, name: val }))}
+          onFocus={() => handleFocus('name')}
+          error={errors.name}
+        />
+        <InputField
+          placeholder="*אימייל"
+          field="email"
+          type="email"
+          value={form.email}
+          onChange={(val) => setForm((f) => ({ ...f, email: val }))}
+          onFocus={() => handleFocus('email')}
+          error={errors.email}
+        />
+        <InputField
+          placeholder="*סיסמה"
+          field="password"
+          type="password"
+          value={form.password}
+          onChange={(val) => setForm((f) => ({ ...f, password: val }))}
+          onFocus={() => handleFocus('password')}
+          error={errors.password}
+        />
+        <InputField
+          placeholder="*כתובת"
+          field="address"
+          value={form.address}
+          onChange={(val) => setForm((f) => ({ ...f, address: val }))}
+          onFocus={() => handleFocus('address')}
+          error={errors.address}
+        />
+        <InputField
+          placeholder="*טלפון"
+          field="phone"
+          value={form.phone}
+          onChange={(val) => setForm((f) => ({ ...f, phone: val }))}
+          onFocus={() => handleFocus('phone')}
+          error={errors.phone}
+        />
+
+        {/* כפתור שמירה */}
         <button
           type="submit"
           className="btn block-cube block-cube-hover"
