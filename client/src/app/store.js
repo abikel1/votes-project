@@ -1,12 +1,16 @@
 import { configureStore } from '@reduxjs/toolkit';
 import authReducer from '../slices/authSlice';
 import usersReducer from '../slices/usersSlice';
+import groupsReducer from '../slices/groupsSlice'; // ✅ חדש
 
 const store = configureStore({
     reducer: {
         auth: authReducer,
         users: usersReducer,
+        groups: groupsReducer,
+
     },
+    devTools: true,
 });
 
 // סנכרון הטוקן ל-localStorage (פשוט ויעיל)

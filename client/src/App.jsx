@@ -5,11 +5,10 @@ import GroupsPage from './pages/GroupList/GroupsPage.jsx';
 import RegisterPage from './pages/Register/RegisterPage.jsx';
 // import ProfilePage from './pages/ProfilePage.jsx';
 // import UsersPage from './pages/UsersPage.jsx';
-// import ProtectedRoute from './components/ProtectedRoute.jsx';
-import GroupCandidatesPage from './components/GroupCandidatesPage.jsx';
+import GroupCandidatesPage from './components/GroupCandidates/GroupCandidatesPage.jsx';
 import NavBar from './components/NavBar/NavBar.jsx';
 import HomeRoute from './pages/Home/HomePage.jsx';
-import LoginPage from './pages/LoginPage.jsx';
+import LoginPage from './pages/Login/LoginPage.jsx';
 
 export default function App() {
   return (
@@ -23,7 +22,6 @@ export default function App() {
         <Route path="/groups/:groupId/candidates" element={<GroupCandidatesPage />} />
         <Route path="/groups" element={<GroupsPage />} />
         <Route path="/" element={<HomeRoute />} />
-        {/* <Route path="/me" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} /> */}
         {/* <Route path="/users" element={<UsersPage />} /> */}
       </Routes>
     </div>
