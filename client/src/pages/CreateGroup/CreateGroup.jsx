@@ -1,4 +1,3 @@
-// client/src/pages/CreateGroup/CreateGroup.jsx
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { createGroup, clearCreateState } from '../../slices/groupsSlice';
@@ -9,7 +8,7 @@ export default function CreateGroupPage() {
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
-    const { user } = useSelector((s) => s.auth); // נשתמש בשם/אימייל ביצירה
+  const userEmail = useSelector((s) => s.auth.userEmail);
     const { createLoading, createError, justCreated } = useSelector((s) => s.groups);
 
     const [form, setForm] = useState({
@@ -29,7 +28,10 @@ export default function CreateGroupPage() {
 
     const onChange = (e) => {
         const { name, value } = e.target;
-        setForm((prev) => ({ ...prev, [name]: name === 'maxWinners' ? Number(value) : value }));
+        setForm((prev) => ({
+            ...prev,
+            [name]: name === 'maxWinners' ? Number(value) : value
+        }));
     };
 
     const onSubmit = (e) => {
@@ -37,10 +39,12 @@ export default function CreateGroupPage() {
         if (!form.name.trim()) return alert('שם קבוצה חובה');
         if (!form.endDate) return alert('תאריך סיום חובה');
 
-        const payload = {
-            ...form,
-            createdBy: user?.name || user?.email || 'anonymous',
-        };
+       const payload = {
+      ...form,
+      createdBy: userEmail || 'anonymous', // לוג בלבד; השרת יתעלם וישתמש ב-req.user.email
+    };
+        // ✅ לוג לבדוק מה בדיוק נשלח
+        console.log('📦 Group payload to send:', payload);
 
         dispatch(createGroup(payload));
     };
