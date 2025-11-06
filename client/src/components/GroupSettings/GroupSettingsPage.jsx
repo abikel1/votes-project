@@ -1,15 +1,16 @@
+// client/src/components/GroupSettings/GroupSettingsPage.jsx
 import { useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
+import { fetchGroupOnly } from '../../slices/groupsSlice';
 import {
-    fetchGroupWithCandidates,
-    fetchGroupMembers,
-    addCandidateToGroup,
-    removeCandidateFromGroup,
-    addMemberToGroup,
-    removeMemberFromGroup,
-} from '../../slices/groupsSlice';
-import { fetchUsers } from '../../slices/usersSlice';
+    fetchCandidatesByGroup,
+    createCandidate,
+    deleteCandidate,
+    selectCandidatesForGroup,
+    selectCandidatesLoadingForGroup,
+    selectCandidatesErrorForGroup,
+} from '../../slices/candidateSlice';
 import './GroupSettingsPage.css';
 
 export default function GroupSettingsPage() {
@@ -17,39 +18,40 @@ export default function GroupSettingsPage() {
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
-    const { selectedGroup: group, candidates, members, loading, error } = useSelector(s => s.groups);
-    const { userId, userName } = useSelector(s => s.auth);
-    const { list: allUsers, loading: usersLoading } = useSelector(s => s.users);
+    const { selectedGroup: group, loading: groupLoading, error: groupError } = useSelector(s => s.groups);
+    const { userId, userName, userEmail } = useSelector(s => s.auth);
 
-    const [filter, setFilter] = useState('');
+    const candidates = useSelector(selectCandidatesForGroup(groupId));
+    const candLoading = useSelector(selectCandidatesLoadingForGroup(groupId));
+    const candError = useSelector(selectCandidatesErrorForGroup(groupId));
+
+    const [form, setForm] = useState({ name: '', description: '', symbol: '', photoUrl: '' });
 
     useEffect(() => {
-        dispatch(fetchGroupWithCandidates(groupId));
-        dispatch(fetchGroupMembers(groupId));
-        dispatch(fetchUsers());
+        dispatch(fetchGroupOnly(groupId));
+        dispatch(fetchCandidatesByGroup(groupId));
     }, [dispatch, groupId]);
 
     const isOwner = useMemo(() => {
         if (!group) return false;
         if (typeof group.isOwner === 'boolean') return group.isOwner;
-        const byId = group.createdById && userId && String(group.createdById) === String(userId);
-        const byName = group.createdBy && userName &&
+
+        const byEmail =
+            group?.createdBy && userEmail &&
+            String(group.createdBy).trim().toLowerCase() === String(userEmail).trim().toLowerCase();
+
+        const byId = group?.createdById && userId && String(group.createdById) === String(userId);
+
+        const byName =
+            group?.createdBy && userName &&
+            !String(group.createdBy).includes('@') &&
             String(group.createdBy).trim().toLowerCase() === String(userName).trim().toLowerCase();
-        return !!(byId || byName);
-    }, [group, userId, userName]);
 
-    const candidateIds = new Set(candidates.map(c => String(c.user?._id || c.userId || c._id)));
-    const memberIds = new Set(members.map(m => String(m.user?._id || m.userId || m._id)));
+        return !!(byEmail || byId || byName);
+    }, [group, userEmail, userId, userName]);
 
-    const filteredUsers = useMemo(() => {
-        const q = filter.trim().toLowerCase();
-        let list = allUsers;
-        if (q) list = allUsers.filter(u => (`${u.name || ''} ${u.email || ''}`).toLowerCase().includes(q));
-        return list;
-    }, [allUsers, filter]);
-
-    if (loading) return <div className="gs-wrap"><h2>הגדרות קבוצה</h2><div>טוען...</div></div>;
-    if (error) return <div className="gs-wrap"><h2>הגדרות קבוצה</h2><div className="err">{error}</div></div>;
+    if (groupLoading) return <div className="gs-wrap"><h2>הגדרות קבוצה</h2><div>טוען...</div></div>;
+    if (groupError) return <div className="gs-wrap"><h2>הגדרות קבוצה</h2><div className="err">{groupError}</div></div>;
     if (!group) return <div className="gs-wrap"><h2>הגדרות קבוצה</h2><div>לא נמצאה קבוצה.</div></div>;
 
     if (!isOwner) {
@@ -62,10 +64,20 @@ export default function GroupSettingsPage() {
         );
     }
 
-    const addCandidate = (uid) => dispatch(addCandidateToGroup({ groupId, userId: uid }));
-    const removeCandidate = (cid) => dispatch(removeCandidateFromGroup({ candidateId: cid }));
-    const addMember = (uid) => dispatch(addMemberToGroup({ groupId, userId: uid }));
-    const removeMember = (mid) => dispatch(removeMemberFromGroup({ groupId, memberId: mid }));
+    const onChange = (e) => {
+        const { name, value } = e.target;
+        setForm(prev => ({ ...prev, [name]: value }));
+    };
+
+    const onAdd = (e) => {
+        e.preventDefault();
+        if (!form.name.trim()) return alert('שם מועמד/ת חובה');
+        dispatch(createCandidate({ groupId, ...form }))
+            .unwrap()
+            .then(() => setForm({ name: '', description: '', symbol: '', photoUrl: '' }));
+    };
+
+    const onDelete = (cid) => dispatch(deleteCandidate({ candidateId: cid, groupId }));
 
     return (
         <div className="gs-wrap">
@@ -73,31 +85,37 @@ export default function GroupSettingsPage() {
                 <h2>הגדרות קבוצה</h2>
                 <div className="gs-subtitle"><b>{group.name}</b> · מזהה: {group._id}</div>
                 <div className="gs-actions">
-                    <button className="gs-btn-outline" onClick={() => navigate(`/groups/${groupId}/candidates`)}>למסך המועמדים</button>
                     <button className="gs-btn" onClick={() => navigate('/groups')}>לרשימת הקבוצות</button>
                 </div>
             </div>
 
             <div className="gs-grid">
-                {/* מועמדים */}
                 <section className="gs-card">
                     <h3>מועמדים</h3>
-                    {!candidates?.length ? (
+                    {candLoading ? (
+                        <div>טוען מועמדים…</div>
+                    ) : candError ? (
+                        <div className="err">{candError}</div>
+                    ) : !candidates?.length ? (
                         <div className="muted">אין מועמדים בקבוצה.</div>
                     ) : (
                         <ul className="list">
                             {candidates.map((c) => {
                                 const id = String(c._id);
-                                const uid = String(c.user?._id || c.userId || c._id);
-                                const name = c.user?.name || c.name || c.user?.email || c.email || uid;
                                 return (
                                     <li key={id} className="row">
                                         <div className="row-main">
-                                            <div className="title">{name}</div>
-                                            {c.user?.email && <div className="sub">{c.user.email}</div>}
+                                            <div className="title">
+                                                {c.name || '(ללא שם)'} {c.symbol ? `· ${c.symbol}` : ''}
+                                            </div>
+                                            {(c.description || c.photoUrl) && (
+                                                <div className="sub">
+                                                    {c.description || ''}{c.photoUrl ? ` · ${c.photoUrl}` : ''}
+                                                </div>
+                                            )}
                                         </div>
                                         <div className="row-actions">
-                                            <button className="small danger" onClick={() => removeCandidate(id)}>הסר/י</button>
+                                            <button className="small danger" onClick={() => onDelete(id)}>הסר/י</button>
                                         </div>
                                     </li>
                                 );
@@ -106,68 +124,25 @@ export default function GroupSettingsPage() {
                     )}
                 </section>
 
-                {/* משתתפים */}
                 <section className="gs-card">
-                    <h3>משתתפים (חברי קבוצה)</h3>
-                    {!members?.length ? (
-                        <div className="muted">אין משתתפים עדיין.</div>
-                    ) : (
-                        <ul className="list">
-                            {members.map((m) => {
-                                const id = String(m._id);
-                                const uid = String(m.user?._id || m.userId || m._id);
-                                const name = m.user?.name || m.name || m.user?.email || m.email || uid;
-                                return (
-                                    <li key={id} className="row">
-                                        <div className="row-main">
-                                            <div className="title">{name}</div>
-                                            {m.user?.email && <div className="sub">{m.user.email}</div>}
-                                        </div>
-                                        <div className="row-actions">
-                                            <button className="small danger" onClick={() => removeMember(id)}>הסר/י</button>
-                                        </div>
-                                    </li>
-                                );
-                            })}
-                        </ul>
-                    )}
-                </section>
+                    <h3>הוספת מועמד/ת</h3>
+                    <form onSubmit={onAdd} className="field">
+                        <label>שם *</label>
+                        <input className="input" name="name" value={form.name} onChange={onChange} required />
 
-                {/* הוספה */}
-                <section className="gs-card">
-                    <h3>הוספת משתמשים</h3>
-                    <div className="field">
-                        <label>חיפוש משתמשים</label>
-                        <input className="input" placeholder="שם או אימייל..." value={filter} onChange={(e) => setFilter(e.target.value)} />
-                    </div>
+                        <label>תיאור</label>
+                        <textarea className="input" rows={3} name="description" value={form.description} onChange={onChange} />
 
-                    {usersLoading ? (
-                        <div>טוען משתמשים...</div>
-                    ) : (
-                        <ul className="list">
-                            {filteredUsers.map(u => {
-                                const uid = String(u._id);
-                                const inCandidates = candidateIds.has(uid);
-                                const inMembers = memberIds.has(uid);
-                                return (
-                                    <li key={uid} className="row">
-                                        <div className="row-main">
-                                            <div className="title">{u.name || u.email || uid}</div>
-                                            {u.email && <div className="sub">{u.email}</div>}
-                                        </div>
-                                        <div className="row-actions">
-                                            <button className="small" disabled={inCandidates} onClick={() => addCandidate(uid)}>
-                                                הוסף/י מועמד/ת
-                                            </button>
-                                            <button className="small" disabled={inMembers} onClick={() => addMember(uid)}>
-                                                הוסף/י משתתף/ת
-                                            </button>
-                                        </div>
-                                    </li>
-                                );
-                            })}
-                        </ul>
-                    )}
+                        <label>סמל (אופציונלי)</label>
+                        <input className="input" name="symbol" value={form.symbol} onChange={onChange} placeholder="למשל: א'" />
+
+                        <label>קישור תמונה (אופציונלי)</label>
+                        <input className="input" name="photoUrl" type="url" value={form.photoUrl} onChange={onChange} placeholder="https://..." />
+
+                        <div style={{ marginTop: 8 }}>
+                            <button className="gs-btn" type="submit">הוסף/י מועמד/ת</button>
+                        </div>
+                    </form>
                 </section>
             </div>
         </div>
