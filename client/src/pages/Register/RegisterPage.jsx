@@ -15,14 +15,78 @@ export default function RegisterPage() {
     phone: '',
   });
 
+  const [errors, setErrors] = useState({});
+
+  // 🟢 פונקציה שמסתירה את השגיאה בזמן פוקוס
+  const handleFocus = (field) => {
+    setErrors((prev) => ({ ...prev, [field]: null }));
+  };
+
+  // 🟢 ולידציה מקומית
+  const validateForm = () => {
+    const newErrors = {};
+    if (!form.name.trim()) newErrors.name = 'שם מלא*';
+    else if (form.name.length < 2) newErrors.name = 'שם חייב לפחות 2 תווים';
+
+    if (!form.email.trim()) newErrors.email = 'אימייל*';
+    else if (!/^\S+@\S+\.\S+$/.test(form.email)) newErrors.email = 'אימייל לא תקין';
+
+    if (!form.password) newErrors.password = 'סיסמה*';
+    else if (form.password.length < 6) newErrors.password = 'סיסמה חייבת לפחות 6 תווים';
+
+    if (form.phone && !/^[\d+\-\s()]{6,20}$/.test(form.phone))
+      newErrors.phone = 'טלפון לא תקין';
+
+    return newErrors;
+  };
+
   const submit = (e) => {
     e.preventDefault();
-    console.log('Submitting form:', form); // לבדיקה
+    const validationErrors = validateForm();
+
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
+      return;
+    }
+
+    setErrors({});
     dispatch(register(form))
       .unwrap()
       .then(() => console.log('✅ Registered successfully'))
       .catch((err) => console.log('❌ Error registering:', err));
   };
+
+  // 🟢 פונקציה ליצירת שדה עם עיצוב קיים ושגיאה פנימית
+  const renderField = (placeholder, field, type = 'text') => (
+    <div className="control block-cube block-input" style={{ position: 'relative' }}>
+      <input
+        type={type}
+        placeholder={placeholder}
+        value={form[field]}
+        onChange={(e) => setForm((f) => ({ ...f, [field]: e.target.value }))}
+        onFocus={() => handleFocus(field)}
+      />
+      <div className="bg-top"><div className="bg-inner" /></div>
+      <div className="bg-right"><div className="bg-inner" /></div>
+      <div className="bg"><div className="bg-inner" /></div>
+
+      {errors[field] && (
+        <span
+          className="msg error"
+          style={{
+            position: 'absolute',
+            top: '50%',
+            left: '10px',
+            transform: 'translateY(-50%)',
+            pointerEvents: 'none',
+            fontSize: '0.85rem',
+          }}
+        >
+          {errors[field]}
+        </span>
+      )}
+    </div>
+  );
 
   return (
     <div className="form-container">
@@ -36,71 +100,11 @@ export default function RegisterPage() {
         )}
         {error && <div className="msg error">{error}</div>}
 
-        <div className="control block-cube block-input">
-          <input
-            placeholder="שם מלא"
-            onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
-            value={form.name}
-            required
-          />
-          <div className="bg-top"><div className="bg-inner" /></div>
-          <div className="bg-right"><div className="bg-inner" /></div>
-          <div className="bg"><div className="bg-inner" /></div>
-        </div>
-
-        <div className="control block-cube block-input">
-          <input
-            type="email"
-            placeholder="אימייל"
-            onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
-            value={form.email}
-            required
-          />
-          <div className="bg-top"><div className="bg-inner" /></div>
-          <div className="bg-right"><div className="bg-inner" /></div>
-          <div className="bg"><div className="bg-inner" /></div>
-        </div>
-
-        <div className="control block-cube block-input">
-          <input
-            type="password"
-            placeholder="סיסמה"
-            onChange={(e) =>
-              setForm((f) => ({ ...f, password: e.target.value }))
-            }
-            value={form.password}
-            required
-          />
-          <div className="bg-top"><div className="bg-inner" /></div>
-          <div className="bg-right"><div className="bg-inner" /></div>
-          <div className="bg"><div className="bg-inner" /></div>
-        </div>
-
-        <div className="control block-cube block-input">
-          <input
-            placeholder="כתובת"
-            onChange={(e) =>
-              setForm((f) => ({ ...f, address: e.target.value }))
-            }
-            value={form.address}
-          />
-          <div className="bg-top"><div className="bg-inner" /></div>
-          <div className="bg-right"><div className="bg-inner" /></div>
-          <div className="bg"><div className="bg-inner" /></div>
-        </div>
-
-        <div className="control block-cube block-input">
-          <input
-            placeholder="טלפון"
-            onChange={(e) =>
-              setForm((f) => ({ ...f, phone: e.target.value }))
-            }
-            value={form.phone}
-          />
-          <div className="bg-top"><div className="bg-inner" /></div>
-          <div className="bg-right"><div className="bg-inner" /></div>
-          <div className="bg"><div className="bg-inner" /></div>
-        </div>
+        {renderField('שם מלא', 'name')}
+        {renderField('אימייל', 'email', 'email')}
+        {renderField('סיסמה', 'password', 'password')}
+        {renderField('כתובת', 'address')}
+        {renderField('טלפון', 'phone')}
 
         <button
           type="submit"
