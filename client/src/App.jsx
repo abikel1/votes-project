@@ -8,7 +8,7 @@ import RegisterPage from './pages/Register/RegisterPage.jsx';
 import GroupCandidatesPage from './components/GroupCandidates/GroupCandidatesPage.jsx';
 import NavBar from './components/NavBar/NavBar.jsx';
 import HomeRoute from './pages/Home/HomePage.jsx';
-import LoginPage from './pages/LoginPage.jsx';
+import LoginPage from './pages/Login/LoginPage.jsx';
 
 export default function App() {
   return (
