@@ -2,9 +2,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import http from '../api/http';
 
-// === פעולות אסינכרוניות ===
-
-// טוען את כל הקבוצות
 export const fetchGroups = createAsyncThunk('groups/fetchAll', async (_, { rejectWithValue }) => {
   try {
     const res = await http.get('/groups');
