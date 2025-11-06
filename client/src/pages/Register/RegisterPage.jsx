@@ -1,10 +1,12 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom'; // 🟢 הוספה
 import { register } from '../../slices/authSlice';
 import './RegisterPage.css';
 
 export default function RegisterPage() {
   const dispatch = useDispatch();
+  const navigate = useNavigate(); // 🟢 הוספה
   const { loading, error, registeredOk } = useSelector((s) => s.auth);
 
   const [form, setForm] = useState({
@@ -17,12 +19,10 @@ export default function RegisterPage() {
 
   const [errors, setErrors] = useState({});
 
-  // 🟢 פונקציה שמסתירה את השגיאה בזמן פוקוס
   const handleFocus = (field) => {
     setErrors((prev) => ({ ...prev, [field]: null }));
   };
 
-  // 🟢 ולידציה מקומית
   const validateForm = () => {
     const newErrors = {};
     if (!form.name.trim()) newErrors.name = 'שם מלא*';
@@ -56,7 +56,16 @@ export default function RegisterPage() {
       .catch((err) => console.log('❌ Error registering:', err));
   };
 
-  // 🟢 פונקציה ליצירת שדה עם עיצוב קיים ושגיאה פנימית
+  // 🟢 נווט לעמוד התחברות אחרי רישום
+  useEffect(() => {
+    if (registeredOk) {
+      const timer = setTimeout(() => {
+        navigate('/login');
+      }, 1500); // 1.5 שניות כדי שהמשתמש יספיק לראות את ההודעה
+      return () => clearTimeout(timer);
+    }
+  }, [registeredOk, navigate]);
+
   const renderField = (placeholder, field, type = 'text') => (
     <div className="control block-cube block-input" style={{ position: 'relative' }}>
       <input
@@ -96,7 +105,7 @@ export default function RegisterPage() {
         </div>
 
         {registeredOk && (
-          <div className="msg success">נרשמת בהצלחה! עכשיו התחברי.</div>
+          <div className="msg success">נרשמת בהצלחה! עכשיו ננווט לעמוד ההתחברות...</div>
         )}
         {error && <div className="msg error">{error}</div>}
 
