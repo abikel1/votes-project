@@ -10,6 +10,7 @@ const store = configureStore({
         groups: groupsReducer,
 
     },
+    devTools: true,
 });
 
 // סנכרון הטוקן ל-localStorage (פשוט ויעיל)
