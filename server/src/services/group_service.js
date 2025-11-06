@@ -1,41 +1,39 @@
 const Group = require('../models/group_model');
 
-// יצירת קבוצה
-async function createGroupService(groupData) {
-  const group = new Group({
-    name: groupData.name,
-    description: groupData.description,
-    createdBy: groupData.createdBy,
-    endDate: groupData.endDate,
-    maxWinners: groupData.maxWinners,
-    shareLink: groupData.shareLink
+async function createGroupService(data, user) {
+  if (!user || !user.email) {
+    // עצירה מכוונת: אם תגיעי לפה — ה-route לא עבר דרך auth או req.user ריק
+    throw new Error('Missing user.email on createGroupService – route must use auth() and req.user must include email');
+  }
+  console.log('[SRV] createGroupService user=', user); // ← LOG
+  const group = await Group.create({
+    name: data.name,
+    description: data.description,
+    createdBy: user.email,
+    createdById: user._id,
+    endDate: data.endDate,
+    maxWinners: data.maxWinners ?? 1,
+    shareLink: data.shareLink || undefined,
   });
-  await group.save();
+  console.log('[SRV] created group _id=', group._id, ' createdBy=', group.createdBy); // ← LOG
   return group;
 }
 
-// עריכת קבוצה
+
 async function updateGroupService(groupId, updateData) {
-  const group = await Group.findByIdAndUpdate(groupId, updateData, { new: true });
-  return group;
+  return Group.findByIdAndUpdate(groupId, updateData, { new: true });
 }
 
-// מחיקת קבוצה
 async function deleteGroupService(groupId) {
-  const group = await Group.findByIdAndDelete(groupId);
-  return group;
+  return Group.findByIdAndDelete(groupId);
 }
 
-// קבלת קבוצה לפי ID
 async function getGroupByIdService(groupId) {
-  const group = await Group.findById(groupId).populate('candidates');
-  return group;
+  return Group.findById(groupId).populate('candidates');
 }
 
-// קבלת כל הקבוצות
 async function getAllGroupsService() {
-  const groups = await Group.find().populate('candidates');
-  return groups;
+  return Group.find().populate('candidates');
 }
 
 module.exports = {
@@ -43,5 +41,5 @@ module.exports = {
   updateGroupService,
   deleteGroupService,
   getGroupByIdService,
-  getAllGroupsService
+  getAllGroupsService,
 };
