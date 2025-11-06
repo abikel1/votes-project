@@ -52,11 +52,24 @@ export const updateProfile = createAsyncThunk('auth/updateProfile', async (paylo
 });
 
 
+export const fetchMe = createAsyncThunk('auth/me', async (_, thunkAPI) => {
+  try {
+    const { data } = await http.get('/users/me'); // { _id, name, email, ... }
+    return data;
+  } catch (e) {
+    return thunkAPI.rejectWithValue(e?.response?.data?.message || 'Load profile failed');
+  }
+});
+
+
+
 const authSlice = createSlice({
   name: 'auth',
   initialState: {
     token: initialToken || null,
     userName: initialUserName || null,
+    // userId: initialUserId || null,
+    // userEmail: initialUserEmail || null, // ✅
     loading: false,
     error: null,
     registeredOk: false,
@@ -67,6 +80,12 @@ const authSlice = createSlice({
       state.userName = null;
       localStorage.removeItem('token');
       localStorage.removeItem('userName');
+      state.userId = null;
+      state.userEmail = null;
+      localStorage.removeItem('token');
+      localStorage.removeItem('userName');
+      localStorage.removeItem('userId');
+      localStorage.removeItem('userEmail');
     }
   },
   extraReducers: (builder) => {
@@ -94,7 +113,21 @@ const authSlice = createSlice({
         localStorage.setItem('token', s.token);
         if (s.userName) localStorage.setItem('userName', s.userName);
       })
-      .addCase(login.rejected, (s, a) => { s.loading = false; s.error = a.payload; });
+      .addCase(login.rejected, (s, a) => { s.loading = false; s.error = a.payload; })
+
+
+       .addCase(fetchMe.pending,   (s) => { s.loading = true; s.error = null; })
+      .addCase(fetchMe.fulfilled, (s,a)=> {
+        s.loading = false;
+        s.userName  = a.payload.name  ?? s.userName;
+        s.userId    = a.payload._id   ?? s.userId;
+        s.userEmail = a.payload.email ?? s.userEmail;
+        if (s.userName)  localStorage.setItem('userName', s.userName);
+        if (s.userId)    localStorage.setItem('userId', s.userId);
+        if (s.userEmail) localStorage.setItem('userEmail', s.userEmail);
+      })
+      .addCase(fetchMe.rejected,  (s,a)=> { s.loading = false; s.error = a.payload; });
+
   }
 });
 

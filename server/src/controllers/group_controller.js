@@ -3,13 +3,13 @@ const {
   updateGroupService,
   deleteGroupService,
   getGroupByIdService,
-  getAllGroupsService
+  getAllGroupsService,
 } = require('../services/group_service');
 
 // יצירת קבוצה
 async function createGroup(req, res) {
   try {
-    const group = await createGroupService(req.body);
+    const group = await createGroupService(req.body, req.user); // מעבירים את המשתמש מה-auth
     res.status(201).json(group);
   } catch (err) {
     console.error('❌ Error creating group:', err);
@@ -17,7 +17,7 @@ async function createGroup(req, res) {
   }
 }
 
-// עריכת קבוצה
+// עדכון קבוצה
 async function updateGroup(req, res) {
   try {
     const group = await updateGroupService(req.params.id, req.body);
@@ -41,7 +41,7 @@ async function deleteGroup(req, res) {
   }
 }
 
-// קבלת קבוצה לפי ID
+// קבלת קבוצה לפי מזהה
 async function getGroupById(req, res) {
   try {
     const group = await getGroupByIdService(req.params.id);
@@ -53,7 +53,7 @@ async function getGroupById(req, res) {
   }
 }
 
-// קבלת כל הקבוצות
+// כל הקבוצות
 async function getAllGroups(req, res) {
   try {
     const groups = await getAllGroupsService();
@@ -69,5 +69,5 @@ module.exports = {
   updateGroup,
   deleteGroup,
   getGroupById,
-  getAllGroups
+  getAllGroups,
 };

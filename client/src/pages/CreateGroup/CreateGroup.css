@@ -1,0 +1,61 @@
+/* client/src/pages/CreateGroup/CreateGroup.css */
+.cg-wrap {
+    padding: 16px;
+    max-width: 640px;
+    margin: 0 auto;
+}
+
+.cg-title {
+    margin: 0 0 12px;
+}
+
+.cg-form {
+    display: grid;
+    gap: 12px;
+}
+
+.cg-label {
+    display: grid;
+    gap: 6px;
+    font-weight: 500;
+}
+
+.cg-input {
+    border: 1px solid #e1e1e1;
+    border-radius: 10px;
+    padding: 10px 12px;
+    font: inherit;
+}
+
+.cg-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 6px;
+}
+
+.cg-btn {
+    background: #0b74da;
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    padding: 10px 14px;
+    cursor: pointer;
+}
+
+.cg-btn:disabled {
+    opacity: .7;
+    cursor: default;
+}
+
+.cg-btn-outline {
+    border: 1px solid #0b74da;
+    color: #0b74da;
+    background: transparent;
+    border-radius: 10px;
+    padding: 10px 14px;
+    cursor: pointer;
+}
+
+.cg-error {
+    color: crimson;
+}
