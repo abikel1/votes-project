@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { login } from '../../slices/authSlice';
 import { useNavigate } from 'react-router-dom';
-import '../Register/RegisterPage.css'; // ניתן להשתמש באותו CSS
+import '../Register/RegisterPage.css';
 
 export default function LoginPage() {
   const dispatch = useDispatch();
@@ -12,17 +12,11 @@ export default function LoginPage() {
   const [form, setForm] = useState({ email: '', password: '' });
   const [errors, setErrors] = useState({});
 
-  // 🟢 פונקציה שמסתירה את השגיאה בזמן פוקוס
-  const handleFocus = (field) => {
-    setErrors(prev => ({ ...prev, [field]: null }));
-  };
+  const handleFocus = (field) => setErrors(prev => ({ ...prev, [field]: null }));
 
-  // 🟢 ולידציה מקומית
   const validateForm = () => {
     const newErrors = {};
     if (!form.email.trim()) newErrors.email = 'אימייל*';
-    else if (!/^\S+@\S+\.\S+$/.test(form.email)) newErrors.email = 'אימייל לא תקין';
-
     if (!form.password) newErrors.password = 'סיסמה*';
     return newErrors;
   };
@@ -34,13 +28,14 @@ export default function LoginPage() {
       setErrors(validationErrors);
       return;
     }
-
     setErrors({});
+
     const res = await dispatch(login(form));
-    if (res.meta.requestStatus === 'fulfilled') navigate('/'); // 🟢 ניווט לדף הבית
+    if (res.meta.requestStatus === 'fulfilled') {
+      navigate('/'); // ניווט לדף הבית
+    }
   };
 
-  // 🟢 יצירת שדה עם עיצוב קיים ושגיאה פנימית
   const renderField = (placeholder, field, type = 'text') => (
     <div className="control block-cube block-input" style={{ position: 'relative' }}>
       <input

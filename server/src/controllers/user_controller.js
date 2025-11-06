@@ -5,7 +5,7 @@ exports.register = async (req, res) => {
         const result = await userService.register(req.body);
         res.status(201).json(result);
     } catch (err) {
-        res.status(err.status || 500).json({ message: err.message || 'Server error' });
+        res.status(err.status || 500).json({ message: err.message  });
     }
 };
 
