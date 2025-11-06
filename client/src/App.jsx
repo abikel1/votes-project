@@ -6,7 +6,7 @@ import RegisterPage from './pages/Register/RegisterPage.jsx';
 // import ProfilePage from './pages/ProfilePage.jsx';
 // import UsersPage from './pages/UsersPage.jsx';
 // import ProtectedRoute from './components/ProtectedRoute.jsx';
-import GroupCandidatesPage from './components/GroupCandidatesPage.jsx';
+import GroupCandidatesPage from './components/GroupCandidates/GroupCandidatesPage.jsx';
 import NavBar from './components/NavBar/NavBar.jsx';
 import HomeRoute from './pages/Home/HomePage.jsx';
 import LoginPage from './pages/LoginPage.jsx';

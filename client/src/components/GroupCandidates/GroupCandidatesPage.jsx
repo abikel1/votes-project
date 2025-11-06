@@ -1,7 +1,7 @@
 // client/src/pages/GroupCandidatesPage.jsx
 import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import http from '../api/http'; // ✅ נתיב נכון מהעמוד הזה
+import http from '../../api/http'; // ✅ נתיב נכון מהעמוד הזה
 
 export default function GroupCandidatesPage() {
     const { groupId } = useParams();
