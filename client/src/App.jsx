@@ -6,6 +6,8 @@ import { fetchMe } from './slices/authSlice';
 import GroupsPage from './pages/GroupList/GroupsPage.jsx';
 import GroupSettingsPage from './components/GroupSettings/GroupSettingsPage.jsx';
 import RegisterPage from './pages/Register/RegisterPage.jsx';
+import ProfilePage from './pages/Profile/ProfilePage.jsx';
+
 import GroupCandidatesPage from './components/GroupCandidates/GroupCandidatesPage.jsx';
 import NavBar from './components/NavBar/NavBar.jsx';
 import HomeRoute from './pages/Home/HomePage.jsx';
@@ -29,6 +31,7 @@ export default function App() {
         <Route path="/groups/:groupId/candidates" element={<GroupCandidatesPage />} />
         <Route path="/groups" element={<GroupsPage />} />
         <Route path="/" element={<HomeRoute />} />
+        <Route path="/profile" element={<ProfilePage />} />
         <Route path="/groups/create" element={<CreateGroupPage />} />
         <Route path="/groups/:groupId/settings" element={<GroupSettingsPage />} />
       </Routes>
