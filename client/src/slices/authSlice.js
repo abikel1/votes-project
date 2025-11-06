@@ -29,6 +29,20 @@ export const login = createAsyncThunk(
   }
 );
 
+// authSlice.js
+export const fetchProfile = createAsyncThunk(
+  'auth/fetchProfile',
+  async (_, { rejectWithValue }) => {
+    try {
+      const { data } = await http.get('/users/me'); // ראוט שמחזיר את המשתמש הנוכחי לפי token
+      return data;
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.message || err.message);
+    }
+  }
+);
+
+
 const authSlice = createSlice({
   name: 'auth',
   initialState: {
@@ -53,6 +67,15 @@ const authSlice = createSlice({
       .addCase(register.fulfilled, (s) => { s.loading = false; s.registeredOk = true; })
       .addCase(register.rejected, (s, a) => { s.loading = false; s.error = a.payload; })
 
+
+
+        .addCase(fetchProfile.pending, (s) => { s.loading = true; s.error = null; })
+    .addCase(fetchProfile.fulfilled, (s, a) => {
+      s.loading = false;
+      s.user = a.payload;
+    })
+    .addCase(fetchProfile.rejected, (s, a) => { s.loading = false; s.error = a.payload; })
+    
       // login
       .addCase(login.pending, (s) => { s.loading = true; s.error = null; })
       .addCase(login.fulfilled, (s, a) => {
