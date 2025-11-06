@@ -42,6 +42,15 @@ export const fetchProfile = createAsyncThunk(
   }
 );
 
+export const updateProfile = createAsyncThunk('auth/updateProfile', async (payload, thunkAPI) => {
+  try {
+    const { data } = await http.put('/users/me', payload); // PUT עדכון פרופיל
+    return data;
+  } catch (e) {
+    return thunkAPI.rejectWithValue(e?.response?.data?.message || 'Update profile failed');
+  }
+});
+
 
 const authSlice = createSlice({
   name: 'auth',
