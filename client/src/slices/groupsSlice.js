@@ -24,6 +24,15 @@ export const fetchGroupWithCandidates = createAsyncThunk('groups/fetchOne', asyn
   }
 });
 
+// --- יצירת קבוצה חדשה ---
+export const createGroup = createAsyncThunk('groups/create', async (payload, { rejectWithValue }) => {
+  try {
+    const { data } = await http.post('/groups/create', payload); // שרת: POST /api/groups/create
+    return data; // אובייקט הקבוצה
+  } catch (err) {
+    return rejectWithValue(err?.response?.data?.message || 'Create group failed');
+  }
+});
 
 // === ה־slice עצמו ===
 
@@ -35,8 +44,18 @@ const groupsSlice = createSlice({
     candidates: [],      // מועמדים של הקבוצה הנבחרת
     loading: false,
     error: null,
+    // מצבים ליצירה
+    createLoading: false,
+    createError: null,
+    justCreated: null,
   },
-  reducers: {},
+  reducers: {
+    clearCreateState(state) {
+      state.createLoading = false;
+      state.createError = null;
+      state.justCreated = null;
+    }
+  },
 
   extraReducers: (builder) => {
     builder
@@ -68,8 +87,26 @@ const groupsSlice = createSlice({
       .addCase(fetchGroupWithCandidates.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
+      })
+
+      // --- createGroup ---
+      .addCase(createGroup.pending, (state) => {
+        state.createLoading = true;
+        state.createError = null;
+        state.justCreated = null;
+      })
+      .addCase(createGroup.fulfilled, (state, action) => {
+        state.createLoading = false;
+        state.justCreated = action.payload;
+        // אופציונלי: לדחוף מיד לרשימה
+        if (Array.isArray(state.list)) state.list.unshift(action.payload);
+      })
+      .addCase(createGroup.rejected, (state, action) => {
+        state.createLoading = false;
+        state.createError = action.payload;
       });
   },
 });
 
+export const { clearCreateState } = groupsSlice.actions;
 export default groupsSlice.reducer;

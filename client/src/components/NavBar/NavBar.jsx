@@ -12,6 +12,8 @@ const NavBar = () => {
         <Link to="/register">הרשמה</Link>
         <Link to="/login">התחברות</Link>
         <Link to="/groups">קבוצות</Link>
+        <Link to="/groups/create">צור קבוצה</Link>
+
       </div>
       <div className="site-name">בחירות</div>
 
