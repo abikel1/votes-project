@@ -41,8 +41,9 @@ export default function RegisterPage() {
   const navigate = useNavigate();
   const { loading, error, registeredOk } = useSelector((s) => s.auth);
 
-  const [form, setForm] = useState({
-    name: '',
+   const [form, setForm] = useState({
+    firstName: '',
+    lastName: '',
     email: '',
     password: '',
     address: '',
@@ -51,25 +52,21 @@ export default function RegisterPage() {
 
   const [errors, setErrors] = useState({});
 
-  // ניקוי שגיאות כשמתמקדים בשדה
-  const handleFocus = (field) => setErrors((prev) => ({ ...prev, [field]: null }));
-
-  // ולידציה בסיסית
-  const validateForm = () => {
-    const newErrors = {};
-    if (form.name.length < 2) newErrors.name = 'שם חייב לפחות 2 תווים';
+  // שליחת טופס
+  const submit = (e) => {
+    e.preventDefault();
+    // ולידציה בסיסית
+ const newErrors = {};
+    if (form.firstName.length < 2) newErrors.firstName = 'שם פרטי חייב לפחות 2 תווים';
+    if (form.lastName.length < 2) newErrors.lastName = 'שם משפחה חייב לפחות 2 תווים';
     if (!/^\S+@\S+\.\S+$/.test(form.email)) newErrors.email = 'אימייל לא תקין';
     if (form.password.length < 6) newErrors.password = 'סיסמה חייבת לפחות 6 תווים';
     if (form.phone && !/^[\d+\-\s()]{6,20}$/.test(form.phone)) newErrors.phone = 'טלפון לא תקין';
-    return newErrors;
-  };
-
-  // שליחת הטופס
-  const submit = (e) => {
-    e.preventDefault();
-    const validationErrors = validateForm();
-    if (Object.keys(validationErrors).length > 0) {
-      setErrors(validationErrors);
+    if (!form.city) newErrors.city = 'עיר חובה';
+    if (!form.address) newErrors.address = 'כתובת חובה';
+   
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
       return;
     }
 
@@ -125,6 +122,29 @@ export default function RegisterPage() {
           onFocus={() => handleFocus('email')}
           error={errors.email}
         />
+       <InputField
+  placeholder="*עיר"
+  value={form.city}
+  onChange={(val) => setForm(f => ({ ...f, city: val }))}
+  error={errors.city}
+/>
+
+<InputField
+  placeholder="*כתובת"
+  value={form.address}
+  onChange={(val) => setForm(f => ({ ...f, address: val }))}
+  error={errors.address}
+/>
+
+
+        <InputField
+          placeholder="*טלפון"
+          field="phone"
+          value={form.phone}
+          onChange={(val) => setForm(f => ({ ...f, phone: val }))}
+          error={errors.phone}
+        />
+
         <InputField
           placeholder="*סיסמה"
           field="password"
