@@ -1,13 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { logout } from '../../slices/authSlice';
 import './NavBar.css';
 
 const NavBar = () => {
-   const dispatch = useDispatch();
+  const dispatch = useDispatch();
   const navigate = useNavigate();
-
 
   const { token, userName } = useSelector((s) => s.auth);
   const isAuthed = Boolean(token);
@@ -17,17 +16,15 @@ const NavBar = () => {
     navigate('/');
   };
 
-  const [initial, setInitial] = useState('');
-  useEffect(() => {
-    const userName = localStorage.getItem('userName');
-    if (userName) setInitial(userName[0]); // לוקח את האות הראשונה
-  }, []);
+  const initial = userName ? userName[0] : '';
 
   return (
     <nav className="navbar">
-      <Link to="/profile" className="profile">
-        {initial}
-      </Link>
+      {isAuthed && (
+        <Link to="/profile" className="profile">
+          {initial}
+        </Link>
+      )}
 
       <div className="links">
         <Link to="/">בית</Link>
