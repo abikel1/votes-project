@@ -2,12 +2,15 @@ import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { fetchProfile, updateProfile } from '../../slices/authSlice'; // thunk עדכון פרופיל
 import './ProfilePage.css';
+import { useNavigate } from 'react-router-dom';
 
 export default function ProfilePage() {
   const dispatch = useDispatch();
   const token = useSelector((state) => state.auth.token);
   const user = useSelector((state) => state.auth.user);
   const loading = useSelector((state) => state.auth.loading);
+const [userGroups, setUserGroups] = useState({ created: [], joined: [] });
+const navigate = useNavigate();
 
   const [editMode, setEditMode] = useState(false);
   const [formData, setFormData] = useState({ name: '', email: '', phone: '', address: '' });
@@ -24,6 +27,15 @@ export default function ProfilePage() {
       });
     }
   }, [user, token, dispatch]);
+
+  useEffect(() => {
+  if (user && token) {
+    fetch('/api/groups/my', { headers: { Authorization: `Bearer ${token}` } })
+      .then(res => res.json())
+      .then(data => setUserGroups(data))
+      .catch(err => console.error('Error fetching user groups:', err));
+  }
+}, [user, token]);
 
   if (loading || !user) {
     return <p style={{ textAlign: 'center', marginTop: '50px' }}>טוען פרופיל...</p>;
@@ -81,14 +93,33 @@ export default function ProfilePage() {
         </div>
       </div>
 
-      <div className="profile-groups">
-        <h2>קבוצות שאני מנהלת / הצבעתי בהן</h2>
-        <ul>
-          {allGroups.length > 0
-            ? allGroups.map((g, idx) => <li key={idx}>{g}</li>)
-            : <li>אין קבוצות להצגה</li>}
-        </ul>
-      </div>
+  
+<div className="profile-groups">
+  <h2>קבוצות שאני מנהלת</h2>
+  <ul>
+    {userGroups.created.length > 0 
+      ? userGroups.created.map(g => (
+          <li key={g._id} className="group-item">
+            <span>{g.name}</span>
+            <button onClick={() => navigate(`/groups/${g._id}`)}>לפרטי הקבוצה</button>
+          </li>
+        ))
+      : <li>אין קבוצות</li>}
+  </ul>
+
+  <h2>קבוצות שאני משתתפת בהן</h2>
+  <ul>
+    {userGroups.joined.length > 0 
+      ? userGroups.joined.map(g => (
+          <li key={g._id} className="group-item">
+            <span>{g.name}</span>
+            <button onClick={() => navigate(`/groups/${g._id}`)}>לפרטי הקבוצה</button>
+          </li>
+        ))
+      : <li>אין קבוצות</li>}
+  </ul>
+</div>
+
     </div>
   );
 }
