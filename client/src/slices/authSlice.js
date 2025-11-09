@@ -4,17 +4,15 @@ import http from '../api/http'; // כאן נמצא axios instance שלך
 const initialToken = localStorage.getItem('token');
 const initialUserName = localStorage.getItem('userName');
 
-export const register = createAsyncThunk(
-  'auth/register',
-  async (payload, thunkAPI) => {
-    try {
-      const { data } = await http.post('/users/register', payload);
-      return data;
-    } catch (e) {
-      return thunkAPI.rejectWithValue(e?.response?.data?.message || 'Registration failed');
-    }
+export const register = createAsyncThunk('auth/register', async (form, thunkAPI) => {
+  try {
+    const { data } = await http.post('/users/register', form);
+    return data;
+  } catch (e) {
+    return thunkAPI.rejectWithValue(e?.response?.data?.message || 'Registration failed');
   }
-);
+});
+
 
 export const login = createAsyncThunk(
   'auth/login',
