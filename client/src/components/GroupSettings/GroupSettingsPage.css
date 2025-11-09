@@ -1,0 +1,118 @@
+.gs-wrap {
+    padding: 16px;
+}
+
+.gs-header {
+    margin-bottom: 16px;
+}
+
+.gs-subtitle {
+    color: #555;
+    margin-top: 4px;
+}
+
+.gs-actions {
+    margin-top: 10px;
+    display: flex;
+    gap: 8px;
+}
+
+.gs-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 16px;
+}
+
+.gs-card {
+    border: 1px solid #e6e6e6;
+    border-radius: 14px;
+    padding: 14px;
+    background: #fff;
+    box-shadow: 0 1px 6px rgba(0, 0, 0, 0.06);
+}
+
+.list {
+    list-style: none;
+    margin: 8px 0 0;
+    padding: 0;
+}
+
+.row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px dashed #eee;
+    padding: 8px 0;
+}
+
+.row:last-child {
+    border-bottom: none;
+}
+
+.row-main .title {
+    font-weight: 600;
+}
+
+.row-main .sub {
+    font-size: 12px;
+    color: #666;
+}
+
+.field {
+    margin: 10px 0;
+    display: grid;
+    gap: 6px;
+}
+
+.input {
+    padding: 8px 10px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    outline: none;
+}
+
+.input:focus {
+    border-color: #0b74da;
+    box-shadow: 0 0 0 3px rgba(11, 116, 218, 0.15);
+}
+
+.gs-btn,
+.gs-btn-outline,
+.small,
+.danger {
+    border-radius: 8px;
+    padding: 8px 12px;
+    cursor: pointer;
+    border: 1px solid transparent;
+    background: #0b74da;
+    color: #fff;
+}
+
+.gs-btn-outline {
+    background: #fff;
+    color: #0b74da;
+    border-color: #0b74da;
+}
+
+.small {
+    padding: 6px 10px;
+    font-size: 12px;
+}
+
+.danger {
+    background: #e11d48;
+}
+
+.danger:disabled,
+.small:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.muted {
+    color: #777;
+}
+
+.err {
+    color: crimson;
+}

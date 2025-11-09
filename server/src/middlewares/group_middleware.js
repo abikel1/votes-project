@@ -1,30 +1,68 @@
-const Candidate = require('../models/candidate_model');
-const Group = require('../models/group_model');
-// אם יהיו בעתיד מודלים נוספים הקשורים לקבוצה, ניתן לייבא כאן
+const {
+  createGroupService,
+  updateGroupService,
+  deleteGroupService,
+  getGroupByIdService,
+  getAllGroupsService
+} = require('../services/group_service');
 
-/**
- * Middleware לניהול פעולות תלויות בקבוצה.
- * כרגע מבצע מחיקה מקבילה של כל המועמדים של הקבוצה.
- */
-async function handleGroupDependencies(req, res, next) {
+async function createGroup(req, res) {
   try {
-    const groupId = req.params.id;
-
-    // 1️⃣ מחיקת כל המועמדים של הקבוצה
-    await Candidate.deleteMany({ groupId });
-
-    // 2️⃣ ניתן להוסיף כאן פעולות נוספות, לדוגמה:
-    // await Votes.deleteMany({ groupId });
-    // await Participants.deleteMany({ groupId });
-
-    console.log(`✅ All dependent objects of group ${groupId} deleted or handled.`);
-
-    // ממשיכים לפונקציה הבאה בקונטרולר
-    next();
+    const group = await createGroupService(req.body, req.user); // ← מוסר user
+    res.status(201).json(group);
   } catch (err) {
-    console.error('❌ Error handling group dependencies:', err);
-    res.status(500).json({ message: 'Error handling group dependencies', error: err.message });
+    console.error('❌ Error creating group:', err);
+    res.status(500).json({ message: 'Error creating group', error: err.message });
   }
 }
 
-module.exports = handleGroupDependencies;
+async function updateGroup(req, res) {
+  try {
+    const group = await updateGroupService(req.params.id, req.body);
+    if (!group) return res.status(404).json({ message: 'Group not found' });
+    res.json(group);
+  } catch (err) {
+    console.error('❌ Error updating group:', err);
+    res.status(500).json({ message: 'Error updating group', error: err.message });
+  }
+}
+
+async function deleteGroup(req, res) {
+  try {
+    const group = await deleteGroupService(req.params.id);
+    if (!group) return res.status(404).json({ message: 'Group not found' });
+    res.json({ message: 'Group deleted successfully' });
+  } catch (err) {
+    console.error('❌ Error deleting group:', err);
+    res.status(500).json({ message: 'Error deleting group', error: err.message });
+  }
+}
+
+async function getGroupById(req, res) {
+  try {
+    const group = await getGroupByIdService(req.params.id);
+    if (!group) return res.status(404).json({ message: 'Group not found' });
+    res.json(group);
+  } catch (err) {
+    console.error('❌ Error getting group:', err);
+    res.status(500).json({ message: 'Error getting group', error: err.message });
+  }
+}
+
+async function getAllGroups(req, res) {
+  try {
+    const groups = await getAllGroupsService();
+    res.json(groups);
+  } catch (err) {
+    console.error('❌ Error getting groups:', err);
+    res.status(500).json({ message: 'Error getting groups', error: err.message });
+  }
+}
+
+module.exports = {
+  createGroup,
+  updateGroup,
+  deleteGroup,
+  getGroupById,
+  getAllGroups
+};

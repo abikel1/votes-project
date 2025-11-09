@@ -6,15 +6,18 @@
 }
 
 body {
-  padding-top: 60px;  /* דוחף את התוכן מתחת לסרגל */
-  overflow-x: hidden;  /* מונע חיתוך אופקי */
+  padding-top: 60px;
+  /* דוחף את התוכן מתחת לסרגל */
+  overflow-x: hidden;
+  /* מונע חיתוך אופקי */
 }
 
 .navbar {
   position: fixed;
   top: 0;
   left: 0;
-  width: 100vw;       /* רוחב מלא של חלון הצפייה */
+  width: 100vw;
+  /* רוחב מלא של חלון הצפייה */
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -24,13 +27,14 @@ body {
   color: white;
   font-family: Arial, sans-serif;
   z-index: 1000;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
 }
 
 
 /* דחיפת התוכן מתחת לסרגל */
 body {
-  padding-top: 60px;  /* בגובה הסרגל */
+  padding-top: 60px;
+  /* בגובה הסרגל */
 }
 
 .site-name {
@@ -39,9 +43,10 @@ body {
 }
 
 .links {
-    direction: rtl;
+  direction: rtl;
   display: flex;
-  gap: 15px; /* רווח בין הקישורים */
+  gap: 15px;
+  /* רווח בין הקישורים */
 }
 
 .links a {
@@ -52,11 +57,12 @@ body {
 }
 
 .links a:hover {
-  color: #00ccff; /* אפקט מעבר */
+  color: #00ccff;
+  /* אפקט מעבר */
 }
 
 .profile {
-  background-color: #0055aa;
+  background-color: #ffffff;
   width: 40px;
   height: 40px;
   border-radius: 50%;
@@ -67,8 +73,26 @@ body {
   font-weight: bold;
   font-size: 18px;
   transition: background-color 0.3s;
+    text-decoration: none;
+    color: #003366;
+
 }
 
 .profile:hover {
-  background-color: #0077dd;
+  background-color: #bebebe;
+}
+
+
+.logout-btn {
+  border: 1px solid #fff;
+  background: transparent;
+  color: #fff;
+  padding: 6px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.logout-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
 }
