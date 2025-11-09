@@ -1,17 +1,31 @@
 const mongoose = require('mongoose');
 
+// סכמת בקשת הצטרפות
+const joinRequestSchema = new mongoose.Schema({
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  email: { type: String, required: true },
+  name: { type: String },
+  status: { type: String, enum: ['pending', 'approved', 'rejected'], default: 'pending' },
+  createdAt: { type: Date, default: Date.now }
+}, { _id: true });
+
 const groupSchema = new mongoose.Schema({
-  name:         { type: String, required: true },
-  description:  { type: String },
-  createdBy:    { type: String, required: true },                // אימייל היוצר
-  createdById:  { type: mongoose.Schema.Types.ObjectId, ref: 'User' }, // מזהה היוצר (לא חובה, מומלץ)
+  name: { type: String, required: true },
+  description: { type: String },
+  createdBy: { type: String, required: true }, // אימייל היוצר
+  createdById: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   creationDate: { type: Date, default: Date.now },
-  endDate:      { type: Date, required: true },
-  candidates:   [{ type: mongoose.Schema.Types.ObjectId, ref: 'Candidate' }],
-  maxWinners:   { type: Number, default: 1 },
-  shareLink:    { type: String },
-  votes:        [{ type: String }],
-  participants: [{ type: String }]
+  endDate: { type: Date, required: true },
+  candidates: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Candidate' }],
+  maxWinners: { type: Number, default: 1 },
+  shareLink: { type: String },
+  votes: [{ type: String }],
+  participants: [{ type: String }],
+
+  // נעילה + הצטרפות
+  isLocked: { type: Boolean, default: false },
+  members: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+  joinRequests: [joinRequestSchema],
 });
 
 module.exports = mongoose.model('Group', groupSchema);

@@ -7,9 +7,14 @@ const router = express.Router();
 
 router.post('/register', validate(schemas.register), ctrl.register);
 router.post('/login', validate(schemas.login), ctrl.login);
-router.get('/me', auth, ctrl.getProfile);
 
-// פתוח לציבור (אם תרצי – הוסיפי auth)
+router.get('/me', auth, ctrl.getProfile);   // ✅ מתוקן
+
+// פתוח לציבור (אפשר להוסיף auth אם תרצי)
 router.get('/', ctrl.listUsers);
+
+// ✅ חדש: batch ויחידני
+router.get('/batch', ctrl.getUsersBatch);
+router.get('/:id', ctrl.getUserById);
 
 module.exports = router;

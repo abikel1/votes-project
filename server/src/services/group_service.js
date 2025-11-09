@@ -1,11 +1,20 @@
 const Group = require('../models/group_model');
 
-async function createGroupService(data, user) {
-  if (!user || !user.email) {
-    // עצירה מכוונת: אם תגיעי לפה — ה-route לא עבר דרך auth או req.user ריק
-    throw new Error('Missing user.email on createGroupService – route must use auth() and req.user must include email');
+function toBoolStrict(v) {
+  if (typeof v === 'boolean') return v;
+  if (typeof v === 'string') {
+    const s = v.trim().toLowerCase();
+    if (s === 'true') return true;
+    if (s === 'false') return false;
   }
-  console.log('[SRV] createGroupService user=', user); // ← LOG
+  return null;
+}
+
+async function createGroupService(data, user) {
+  if (!user || !user.email) throw new Error('Missing user.email');
+  const parsedIsLocked = toBoolStrict(data.isLocked);
+  if (parsedIsLocked === null) { const err = new Error('MISSING_IS_LOCKED'); err.code = 'MISSING_IS_LOCKED'; throw err; }
+
   const group = await Group.create({
     name: data.name,
     description: data.description,
@@ -14,14 +23,17 @@ async function createGroupService(data, user) {
     endDate: data.endDate,
     maxWinners: data.maxWinners ?? 1,
     shareLink: data.shareLink || undefined,
+    isLocked: parsedIsLocked,
   });
-  console.log('[SRV] created group _id=', group._id, ' createdBy=', group.createdBy); // ← LOG
   return group;
 }
 
-
 async function updateGroupService(groupId, updateData) {
-  return Group.findByIdAndUpdate(groupId, updateData, { new: true });
+  if (updateData && Object.prototype.hasOwnProperty.call(updateData, 'isLocked')) {
+    const v = toBoolStrict(updateData.isLocked);
+    if (v !== null) updateData.isLocked = v;
+  }
+  return Group.findByIdAndUpdate(groupId, updateData, { new: true, runValidators: true });
 }
 
 async function deleteGroupService(groupId) {
@@ -29,11 +41,75 @@ async function deleteGroupService(groupId) {
 }
 
 async function getGroupByIdService(groupId) {
-  return Group.findById(groupId).populate('candidates');
+  // ⬅️ נוסיף פופולייט ל-members כדי להציג במסך ההגדרות
+  return Group.findById(groupId)
+    .populate('candidates')
+    .populate({ path: 'members', select: 'name email' });
 }
 
 async function getAllGroupsService() {
   return Group.find().populate('candidates');
+}
+
+/* ===== בקשות הצטרפות ===== */
+
+async function requestJoinGroupService(groupId, user) {
+  const g = await Group.findById(groupId);
+  if (!g) throw new Error('Group not found');
+  if (!g.isLocked) throw new Error('Group is not locked');
+
+  if (g.members?.some(id => String(id) === String(user._id))) return g;
+
+  const exists = g.joinRequests?.find(r =>
+    String(r.userId) === String(user._id) && r.status === 'pending'
+  );
+  if (exists) return g;
+
+  g.joinRequests.push({
+    userId: user._id,
+    email: user.email,
+    name: user.name || user.fullName || '',
+    status: 'pending',
+  });
+
+  await g.save();
+  return g;
+}
+
+async function listJoinRequestsService(groupId, ownerId) {
+  const g = await Group.findById(groupId);
+  if (!g) throw new Error('Group not found');
+  if (String(g.createdById) !== String(ownerId)) throw new Error('Not owner');
+  // ⬅️ מחזירים רק ממתינים
+  return (g.joinRequests || []).filter(r => r.status === 'pending');
+}
+
+async function setJoinRequestStatusService(groupId, ownerId, reqId, status) {
+  const g = await Group.findById(groupId);
+  if (!g) throw new Error('Group not found');
+  if (String(g.createdById) !== String(ownerId)) throw new Error('Not owner');
+
+  const req = g.joinRequests.id(reqId);
+  if (!req) throw new Error('Request not found');
+
+  if (status === 'approved') {
+    // מוסיפים לרשימת חברים (אם לא קיים)
+    if (!g.members) g.members = [];
+    if (!g.members.some(id => String(id) === String(req.userId))) {
+      g.members.push(req.userId);
+    }
+    // מסירים את הבקשה (מועבר ל"משתתפי הקבוצה")
+    req.deleteOne();
+  } else if (status === 'rejected') {
+    // דחייה מוחקת לגמרי
+    req.deleteOne();
+  } else {
+    // אם בעתיד תרצי סטטוסים נוספים
+    req.status = status;
+  }
+
+  await g.save();
+  return g;
 }
 
 module.exports = {
@@ -42,4 +118,7 @@ module.exports = {
   deleteGroupService,
   getGroupByIdService,
   getAllGroupsService,
+  requestJoinGroupService,
+  listJoinRequestsService,
+  setJoinRequestStatusService,
 };

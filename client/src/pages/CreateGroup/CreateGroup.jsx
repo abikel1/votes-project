@@ -1,3 +1,4 @@
+// client/src/pages/CreateGroup/CreateGroupPage.jsx
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { createGroup, clearCreateState } from '../../slices/groupsSlice';
@@ -8,7 +9,6 @@ export default function CreateGroupPage() {
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
-  const userEmail = useSelector((s) => s.auth.userEmail);
     const { createLoading, createError, justCreated } = useSelector((s) => s.groups);
 
     const [form, setForm] = useState({
@@ -16,7 +16,8 @@ export default function CreateGroupPage() {
         description: '',
         endDate: '',
         maxWinners: 1,
-        shareLink: ''
+        shareLink: '',
+        isLocked: null, // ← חובה לבחור (פתוחה/נעולה)
     });
 
     useEffect(() => {
@@ -30,20 +31,32 @@ export default function CreateGroupPage() {
         const { name, value } = e.target;
         setForm((prev) => ({
             ...prev,
-            [name]: name === 'maxWinners' ? Number(value) : value
+            [name]: name === 'maxWinners' ? Number(value) : value,
         }));
+    };
+
+    const onChangeLock = (e) => {
+        const v = e.target.value; // 'open' | 'locked'
+        setForm((prev) => ({ ...prev, isLocked: v === 'locked' }));
     };
 
     const onSubmit = (e) => {
         e.preventDefault();
         if (!form.name.trim()) return alert('שם קבוצה חובה');
         if (!form.endDate) return alert('תאריך סיום חובה');
+        if (form.isLocked === null) return alert('בחרי אם הקבוצה פתוחה או נעולה');
 
-       const payload = {
-      ...form,
-      createdBy: userEmail || 'anonymous', // לוג בלבד; השרת יתעלם וישתמש ב-req.user.email
-    };
-        // ✅ לוג לבדוק מה בדיוק נשלח
+        const payload = {
+            name: form.name.trim(),
+            description: form.description.trim(),
+            maxWinners: Number(form.maxWinners) || 1,
+            shareLink: form.shareLink?.trim() || undefined,
+            isLocked: !!form.isLocked,                                  // ← boolean ודאי
+            endDate: new Date(form.endDate).toISOString(),              // ← ISO
+            // לא שולחים createdBy — השרת לוקח מ־req.user
+        };
+
+        // לוג נוח לבדיקה
         console.log('📦 Group payload to send:', payload);
 
         dispatch(createGroup(payload));
@@ -74,9 +87,44 @@ export default function CreateGroupPage() {
                     <input className="cg-input" type="number" min={1} name="maxWinners" value={form.maxWinners} onChange={onChange} />
                 </label>
 
+                <fieldset className="cg-fieldset">
+                    <legend className="cg-legend">מצב קבוצה *</legend>
+                    <div className="cg-radio-row">
+                        <label className="cg-radio">
+                            <input
+                                type="radio"
+                                name="lockState"
+                                value="open"
+                                checked={form.isLocked === false}
+                                onChange={onChangeLock}
+                                required
+                            />
+                            פתוחה (הצטרפות חופשית)
+                        </label>
+                        <label className="cg-radio" style={{ marginInlineStart: 16 }}>
+                            <input
+                                type="radio"
+                                name="lockState"
+                                value="locked"
+                                checked={form.isLocked === true}
+                                onChange={onChangeLock}
+                                required
+                            />
+                            🔒 נעולה (הצטרפות באישור מנהל/ת)
+                        </label>
+                    </div>
+                </fieldset>
+
                 <label className="cg-label">
                     קישור שיתוף (אופציונלי)
-                    <input className="cg-input" type="url" name="shareLink" value={form.shareLink} onChange={onChange} placeholder="https://..." />
+                    <input
+                        className="cg-input"
+                        type="url"
+                        name="shareLink"
+                        value={form.shareLink}
+                        onChange={onChange}
+                        placeholder="https://..."
+                    />
                 </label>
 
                 {createError && <div className="cg-error">{createError}</div>}

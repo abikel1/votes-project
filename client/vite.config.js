@@ -5,10 +5,11 @@ export default defineConfig({
   plugins: [react()],
   server: {
     proxy: {
+      // כל מה שמתחיל ב-/api יופנה לשרת ה-Node
       '/api': {
-        target: 'http://localhost:3000', // הפורט של השרת שלך
-        changeOrigin: true
-      }
-    }
-  }
+        target: 'http://localhost:3000', // שנה אם השרת על פורט אחר
+        changeOrigin: true,
+      },
+    },
+  },
 })

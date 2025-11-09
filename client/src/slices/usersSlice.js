@@ -1,25 +1,98 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import http from '../api/http';
 
-export const fetchUsers = createAsyncThunk('users/fetchAll', async (_, thunkAPI) => {
-    try {
-        const { data } = await http.get('/users'); // הראוט שלך שמחזיר את כולם, פתוח ללא טוקן
-        return data;
-    } catch (e) {
-        return thunkAPI.rejectWithValue(e?.response?.data?.message || 'Load users failed');
+/** ===== עזר ===== */
+const asId = (u, fallback) => String(u?._id ?? u?.id ?? u?.userId ?? fallback ?? '');
+const toMapById = (arr) => {
+    const out = {};
+    (Array.isArray(arr) ? arr : []).forEach(u => {
+        const id = asId(u);
+        if (id) out[id] = u;
+    });
+    return out;
+};
+
+/** 1) ניסיון להביא לפי רשימת מזהים (batch/יחידני) — לא מפיל אם אין ראוט */
+export const fetchUsersByIds = createAsyncThunk(
+    'users/fetchByIds',
+    async (ids, { rejectWithValue }) => {
+        try {
+            const uniq = Array.from(new Set((ids || []).filter(Boolean).map(String)));
+            if (!uniq.length) return {};
+            // batch
+            try {
+                const { data } = await http.get('/users/batch', { params: { ids: uniq.join(',') } });
+                return toMapById(data);
+            } catch {
+                // יחידני — לא מפיל על 404
+                const results = await Promise.all(uniq.map(async (id) => {
+                    try { const { data } = await http.get(`/users/${id}`); return data; }
+                    catch { return null; }
+                }));
+                return toMapById(results.filter(Boolean));
+            }
+        } catch (err) {
+            return rejectWithValue(err?.response?.data?.message || 'Failed to load users');
+        }
     }
-});
+);
+
+/** 2) פולבאק לפי קבוצה: מנסה כמה ראוטים נפוצים להחזרת חברי קבוצה כ-users */
+export const hydrateUsersForGroup = createAsyncThunk(
+    'users/hydrateForGroup',
+    async ({ groupId }, { rejectWithValue }) => {
+        try {
+            const probes = [
+                `/groups/${groupId}/members`,
+                `/group/${groupId}/members`,
+                `/members?groupId=${groupId}`,
+            ];
+            for (const url of probes) {
+                try {
+                    const { data } = await http.get(url);
+                    const map = toMapById(data);
+                    if (Object.keys(map).length) return map;
+                } catch (_) { /* נמשיך לנסות */ }
+            }
+            return {};
+        } catch (err) {
+            return rejectWithValue(err?.response?.data?.message || 'Failed to hydrate users');
+        }
+    }
+);
 
 const usersSlice = createSlice({
     name: 'users',
-    initialState: { list: [], loading: false, error: null },
-    reducers: {},
-    extraReducers: (builder) => {
-        builder
-            .addCase(fetchUsers.pending, (s) => { s.loading = true; s.error = null; })
-            .addCase(fetchUsers.fulfilled, (s, a) => { s.loading = false; s.list = a.payload; })
-            .addCase(fetchUsers.rejected, (s, a) => { s.loading = false; s.error = a.payload; });
+    initialState: {
+        byId: {},         // { [userId]: user }
+        loading: false,
+        error: null,
+    },
+    reducers: {
+        /** הזרקה ידנית (למשל אחרי אישור בקשה) */
+        upsertUsers(state, action) {
+            const arr = Array.isArray(action.payload) ? action.payload : [action.payload];
+            arr.forEach((u) => {
+                const id = asId(u);
+                if (!id) return;
+                state.byId[id] = { ...(state.byId[id] || {}), ...u };
+            });
+        },
+    },
+    extraReducers: (b) => {
+        b
+            .addCase(fetchUsersByIds.pending, (s) => { s.loading = true; s.error = null; })
+            .addCase(fetchUsersByIds.fulfilled, (s, a) => { s.loading = false; s.byId = { ...s.byId, ...a.payload }; })
+            .addCase(fetchUsersByIds.rejected, (s, a) => { s.loading = false; s.error = a.payload; })
+
+            .addCase(hydrateUsersForGroup.pending, (s) => { s.loading = true; s.error = null; })
+            .addCase(hydrateUsersForGroup.fulfilled, (s, a) => { s.loading = false; s.byId = { ...s.byId, ...a.payload }; })
+            .addCase(hydrateUsersForGroup.rejected, (s, a) => { s.loading = false; s.error = a.payload; });
     }
 });
 
+export const { upsertUsers } = usersSlice.actions;
 export default usersSlice.reducer;
+
+/** סלקטור נוח למיפוי מזהים -> אובייקטים */
+export const selectUsersMap = (s) => s.users.byId || {};

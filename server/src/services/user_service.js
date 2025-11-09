@@ -10,7 +10,10 @@ async function register({ name, email, address, phone, password }) {
     if (exists) throw Object.assign(new Error('המייל קיים כבר'), { status: 409 });
 
     const passwordHash = await bcrypt.hash(password, 12);
-    const user = await User.create({ name, email, address, phone, passwordHash, joinedGroups: [], createdGroups: [], voteHistory: [] });
+    const user = await User.create({
+        name, email, address, phone, passwordHash,
+        joinedGroups: [], createdGroups: [], voteHistory: []
+    });
 
     const token = jwt.sign({ sub: user._id.toString() }, JWT_SECRET, { expiresIn: JWT_EXPIRES });
     const { passwordHash: _pwd, ...safe } = user.toObject();
@@ -39,4 +42,23 @@ async function listUsers() {
     return User.find({}, { passwordHash: 0 }).lean();
 }
 
-module.exports = { register, login, getProfile, listUsers };
+// ✅ חדש: שליפת יחיד
+async function getUserById(id) {
+    if (!id) return null;
+    return User.findById(id, { passwordHash: 0 }).lean();
+}
+
+// ✅ חדש: batch לפי מזהים
+async function getUsersBatch(ids = []) {
+    const clean = Array.from(new Set(ids.filter(Boolean)));
+    if (!clean.length) return {};
+    const rows = await User.find({ _id: { $in: clean } }, { passwordHash: 0 }).lean();
+    const map = {};
+    rows.forEach(u => { map[String(u._id)] = u; });
+    return map;
+}
+
+module.exports = {
+    register, login, getProfile, listUsers,
+    getUserById, getUsersBatch,
+};
