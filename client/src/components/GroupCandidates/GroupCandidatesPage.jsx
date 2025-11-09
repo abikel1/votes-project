@@ -1,9 +1,9 @@
 // client/src/pages/GroupCandidatesPage.jsx
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 
-import { fetchGroupOnly } from '../../slices/groupsSlice';
+import { fetchGroupOnly, setHasVotedInGroup } from '../../slices/groupsSlice';
 import { voteForCandidate } from '../../slices/votesSlice';
 
 import {
@@ -21,39 +21,54 @@ export default function GroupCandidatesPage() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // state
-  const { selectedGroup: group, loading: groupLoading, error: groupError } = useSelector(s => s.groups);
-  const isAuthed = useSelector(s => Boolean(s.auth?.token));
+  const [isVoting, setIsVoting] = useState(false);
 
-  const candidates   = useSelector(selectCandidatesForGroup(groupId));
-  const candLoading  = useSelector(selectCandidatesLoadingForGroup(groupId));
-  const candError    = useSelector(selectCandidatesErrorForGroup(groupId));
+  const { selectedGroup: group, loading: groupLoading, error: groupError, hasVotedInGroup } =
+    useSelector(s => s.groups);
+  const isAuthed   = useSelector(s => Boolean(s.auth?.token));
 
+  const candidates  = useSelector(selectCandidatesForGroup(groupId));
+  const candLoading = useSelector(selectCandidatesLoadingForGroup(groupId));
+  const candError   = useSelector(selectCandidatesErrorForGroup(groupId));
+
+  // טעינת קבוצה + מועמדים
   useEffect(() => {
     if (!groupId) return;
     dispatch(fetchGroupOnly(groupId));
     dispatch(fetchCandidatesByGroup(groupId));
   }, [dispatch, groupId]);
 
-  // voting flow
+  // סנכרון נעילה לפי localStorage בכניסה/החלפת קבוצה
+  useEffect(() => {
+    if (!groupId) return;
+    dispatch(setHasVotedInGroup(Boolean(localStorage.getItem(`voted:${groupId}`))));
+  }, [dispatch, groupId]);
+
   const handleVote = async (candidateId) => {
+    if (hasVotedInGroup || isVoting) return;
+
     if (!isAuthed) {
-      navigate('/login', {
-        state: {
-          redirectTo: location.pathname,
-        },
-        replace: true,
-      });
+      navigate('/login', { state: { redirectTo: location.pathname }, replace: true });
       return;
     }
 
     if (!window.confirm('האם לאשר הצבעה למועמד זה?')) return;
 
-    await dispatch(voteForCandidate({ groupId, candidateId }));
-    alert('הצבעתך נקלטה בהצלחה!');
+    try {
+      setIsVoting(true);
+      await dispatch(voteForCandidate({ groupId, candidateId })).unwrap();
+
+      // ננעל מקומית ומתמשכת
+      localStorage.setItem(`voted:${groupId}`, '1');
+      dispatch(setHasVotedInGroup(true));
+
+      // ריענון מיידי של המועמדים כדי לעדכן מוני קולות
+      await dispatch(fetchCandidatesByGroup(groupId));
+    } finally {
+      setIsVoting(false);
+    }
   };
 
-  // loading & error states
   if (groupLoading) return <div className="gc-wrap"><h2>מועמדים</h2><div>טוען...</div></div>;
   if (groupError)  return <div className="gc-wrap"><h2>מועמדים</h2><div className="err">{groupError}</div></div>;
   if (!group)      return <div className="gc-wrap"><h2>מועמדים</h2><div>לא נמצאה קבוצה.</div></div>;
@@ -62,9 +77,7 @@ export default function GroupCandidatesPage() {
     <div className="gc-wrap">
       <div className="gc-header">
         <h2>מועמדים</h2>
-        <div className="gc-subtitle">
-          <b>{group.name}</b> · מזהה: {group._id}
-        </div>
+        <div className="gc-subtitle"><b>{group.name}</b> · מזהה: {group._id}</div>
         <div className="gc-actions">
           <button className="gc-btn" onClick={() => navigate(`/groups/${groupId}/settings`)}>להגדרות הקבוצה</button>
           <button className="gc-btn-outline" onClick={() => navigate('/groups')}>לרשימת הקבוצות</button>
@@ -107,9 +120,17 @@ export default function GroupCandidatesPage() {
               <div style={{ marginTop: 10, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <span style={chip}>קולות: {c.votesCount ?? 0}</span>
 
-                {/* כפתור ההצבעה */}
-                <button style={voteBtn} onClick={() => handleVote(c._id)}>
-                  הצבע/י
+                <button
+                  style={{
+                    ...voteBtn,
+                    ...(hasVotedInGroup || isVoting
+                      ? { background: '#ccc', color: '#666', cursor: 'not-allowed', opacity: 0.9 }
+                      : {}),
+                  }}
+                  onClick={() => handleVote(c._id)}
+                  disabled={hasVotedInGroup || isVoting}
+                >
+                  {hasVotedInGroup ? 'כבר הצבעת' : isVoting ? 'מצביע/ה…' : 'הצבע/י'}
                 </button>
               </div>
             </div>

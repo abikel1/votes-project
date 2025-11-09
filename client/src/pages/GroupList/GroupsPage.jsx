@@ -70,7 +70,7 @@ export default function GroupsPage() {
                                             title="הגדרות קבוצה"
                                             onMouseDown={(e) => e.preventDefault()}
                                         >
-                                            ⚙️
+                                            ⚙
                                         </button>
                                     )}
                                 </div>

@@ -1,6 +1,7 @@
 // client/src/slices/groupsSlice.js
 import { createSlice, createAsyncThunk, createSelector } from '@reduxjs/toolkit';
 import http from '../api/http';
+import { voteForCandidate } from './votesSlice';
 
 /* ======================
    Thunks
@@ -79,12 +80,19 @@ const groupsSlice = createSlice({
     // תביעת בעלות
     claimLoading: false,
     claimError: null,
+
+    // נעילת ההצבעה לקבוצה הנוכחית
+    hasVotedInGroup: false,
   },
   reducers: {
     clearCreateState(state) {
       state.createLoading = false;
       state.createError = null;
       state.justCreated = null;
+    },
+    // מאפשר להגדיר ידנית (לדוגמה לפי localStorage)
+    setHasVotedInGroup(state, action) {
+      state.hasVotedInGroup = Boolean(action.payload);
     },
   },
   extraReducers: (builder) => {
@@ -99,6 +107,7 @@ const groupsSlice = createSlice({
         s.loading = true;
         s.error = null;
         s.selectedGroup = null;
+        // לא מאפסים כאן hasVotedInGroup — זה תלוי בקבוצה ונקבע לפי localStorage בקומפוננטה
       })
       .addCase(fetchGroupOnly.fulfilled, (s, a) => {
         s.loading = false;
@@ -142,11 +151,16 @@ const groupsSlice = createSlice({
       .addCase(claimGroupOwnership.rejected, (s, a) => {
         s.claimLoading = false;
         s.claimError = a.payload;
+      })
+
+      // === אחרי הצבעה מוצלחת — ננעל את הכפתורים (העלאת מונה נעשית דרך candidateSlice או ריענון)
+      .addCase(voteForCandidate.fulfilled, (state) => {
+        state.hasVotedInGroup = true;
       });
   },
 });
 
-export const { clearCreateState } = groupsSlice.actions;
+export const { clearCreateState, setHasVotedInGroup } = groupsSlice.actions;
 export default groupsSlice.reducer;
 
 /* ======================
@@ -154,7 +168,7 @@ export default groupsSlice.reducer;
    ====================== */
 
 const selectMyEmail = (s) => s.auth.userEmail || null;
-const selectMyId    = (s) => s.auth.userId || null;
+const selectMyId = (s) => s.auth.userId || null;
 
 const getCreatorEmail = (g) => {
   const cand = g?.createdBy ?? g?.created_by ?? g?.createdByEmail ?? g?.ownerEmail ?? g?.owner;
