@@ -1,16 +1,12 @@
-// client/src/pages/LoginPage.jsx
 import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate, useLocation } from 'react-router-dom';
 import { login } from '../../slices/authSlice';
-import { voteForCandidate } from '../../slices/votesSlice';
+import { useNavigate } from 'react-router-dom';
 import '../Register/RegisterPage.css';
 
 export default function LoginPage() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const location = useLocation();
-
   const { loading, error } = useSelector(s => s.auth);
 
   const [form, setForm] = useState({ email: '', password: '' });
@@ -27,8 +23,6 @@ export default function LoginPage() {
 
   const submit = async (e) => {
     e.preventDefault();
-
-    // ולידציה בסיסית לפני שליחה
     const validationErrors = validateForm();
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
@@ -37,26 +31,8 @@ export default function LoginPage() {
     setErrors({});
 
     const res = await dispatch(login(form));
-
-    if (res?.meta?.requestStatus === 'fulfilled') {
-      // בדיקת state מהניווט הקודם (אם הגענו בגלל ניסיון הצבעה)
-      const st = location.state;
-
-      if (st?.action === 'vote' && st?.payload) {
-        const { groupId, candidateId } = st.payload;
-
-        try {
-          await dispatch(voteForCandidate({ groupId, candidateId }));
-        } catch {
-          // לא חוסם ניווט, שגיאה תוצג מה־slice אם יש
-        }
-
-        // חזרה לכתובת המקור או לדף הקבוצה
-        navigate(st.redirectTo || `/groups/${groupId}`, { replace: true });
-      } else {
-        // מקרה רגיל – חזרה לעמוד שממנו באנו (אם יש), אחרת לדף הבית
-        navigate(st?.redirectTo || '/', { replace: true });
-      }
+    if (res.meta.requestStatus === 'fulfilled') {
+      navigate('/'); // ניווט לדף הבית
     }
   };
 
@@ -68,7 +44,6 @@ export default function LoginPage() {
         value={form[field]}
         onChange={e => setForm(f => ({ ...f, [field]: e.target.value }))}
         onFocus={() => handleFocus(field)}
-        autoComplete="off"
       />
       <div className="bg-top"><div className="bg-inner" /></div>
       <div className="bg-right"><div className="bg-inner" /></div>
