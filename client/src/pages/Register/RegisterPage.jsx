@@ -39,7 +39,7 @@ export default function RegisterPage() {
   const navigate = useNavigate();
   const { loading, error, registeredOk } = useSelector((s) => s.auth);
 
-  const [form, setForm] = useState({
+   const [form, setForm] = useState({
     firstName: '',
     lastName: '',
     email: '',
@@ -50,20 +50,20 @@ export default function RegisterPage() {
   });
 
   const [errors, setErrors] = useState({});
-  const [citySuggestions, setCitySuggestions] = useState([]);
-  const [addressSuggestions, setAddressSuggestions] = useState([]);
 
   // שליחת טופס
   const submit = (e) => {
     e.preventDefault();
     // ולידציה בסיסית
-    const newErrors = {};
+ const newErrors = {};
     if (form.firstName.length < 2) newErrors.firstName = 'שם פרטי חייב לפחות 2 תווים';
     if (form.lastName.length < 2) newErrors.lastName = 'שם משפחה חייב לפחות 2 תווים';
     if (!/^\S+@\S+\.\S+$/.test(form.email)) newErrors.email = 'אימייל לא תקין';
     if (form.password.length < 6) newErrors.password = 'סיסמה חייבת לפחות 6 תווים';
     if (form.phone && !/^[\d+\-\s()]{6,20}$/.test(form.phone)) newErrors.phone = 'טלפון לא תקין';
-
+    if (!form.city) newErrors.city = 'עיר חובה';
+    if (!form.address) newErrors.address = 'כתובת חובה';
+   
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
       return;
@@ -76,29 +76,6 @@ export default function RegisterPage() {
       .catch((err) => console.log('❌ Error registering:', err));
   };
 
-  // autocomplete ערים
-  useEffect(() => {
-    if (form.city.length > 1) {
-      fetch(`/api/users/address-suggestions?query=${encodeURIComponent(form.city)}`)
-        .then(res => res.json())
-        .then(data => setCitySuggestions(data))
-        .catch(() => setCitySuggestions([]));
-    } else {
-      setCitySuggestions([]);
-    }
-  }, [form.city]);
-
-  // autocomplete כתובות לפי עיר
-  useEffect(() => {
-    if (form.address.length > 1 && form.city) {
-      fetch(`/api/users/address-suggestions?query=${encodeURIComponent(form.address)}&city=${encodeURIComponent(form.city)}`)
-        .then(res => res.json())
-        .then(data => setAddressSuggestions(data))
-        .catch(() => setAddressSuggestions([]));
-    } else {
-      setAddressSuggestions([]);
-    }
-  }, [form.address, form.city]);
 
   // נווט לאחר רישום מוצלח
   useEffect(() => {
@@ -140,23 +117,20 @@ export default function RegisterPage() {
           onFocus={() => handleFocus('email')}
           error={errors.email}
         />
-        <AutocompleteField
-          placeholder="*עיר"
-          value={form.city}
-          onChange={(val) => setForm(f => ({ ...f, city: val }))}
-          suggestions={citySuggestions}
-          onSelect={(s) => setForm(f => ({ ...f, city: s.city, address: s.street }))}
-          error={errors.city}
-        />
+       <InputField
+  placeholder="*עיר"
+  value={form.city}
+  onChange={(val) => setForm(f => ({ ...f, city: val }))}
+  error={errors.city}
+/>
 
-        <AutocompleteField
-          placeholder="כתובת"
-          value={form.address}
-          onChange={(val) => setForm(f => ({ ...f, address: val }))}
-          suggestions={addressSuggestions}
-          onSelect={(s) => setForm(f => ({ ...f, address: s.street }))}
-          error={errors.address}
-        />
+<InputField
+  placeholder="*כתובת"
+  value={form.address}
+  onChange={(val) => setForm(f => ({ ...f, address: val }))}
+  error={errors.address}
+/>
+
 
         <InputField
           placeholder="*טלפון"
