@@ -108,7 +108,6 @@ async function rejectJoinRequest(req, res) {
     res.status(code).json({ message: err.message });
   }
 }
-// ✅ חדש: החזרת חברי הקבוצה (objects עם name,email,...)
 async function getGroupMembers(req, res) {
   try {
     const g = await Group.findById(req.params.id)

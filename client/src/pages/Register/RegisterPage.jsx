@@ -130,7 +130,7 @@ const submit = (e) => {
           type="email"
           value={form.email}
           onChange={(val) => setForm((f) => ({ ...f, email: val }))}
-          onFocus={() => handleFocus('email')}
+          // onFocus={() => handleFocus('email')}
           error={errors.email}
         />
        <InputField

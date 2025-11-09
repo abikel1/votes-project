@@ -25,7 +25,7 @@ export const fetchGroups = createAsyncThunk('groups/fetchAll', async (_, { rejec
   catch (err) { return rejectWithValue(err?.response?.data?.message || 'Failed to load groups'); }
 });
 
-export const fetchGroupOnly = createAsyncThunk('groups/fetchOnly', async (groupId, { rejectWithValue }) => {
+export const fetchGroupOnly1 = createAsyncThunk('groups/fetchOnly', async (groupId, { rejectWithValue }) => {
   try { const { data } = await http.get(`/groups/${groupId}`); return data; }
   catch (err) { return rejectWithValue(err?.response?.data?.message || 'Failed to load group'); }
 });
@@ -121,6 +121,57 @@ const groupsSlice = createSlice({
 
 export const { clearCreateState, clearUpdateState } = groupsSlice.actions;
 export default groupsSlice.reducer;
+/* ======================
+   Selectors: compute ownership robustly (email first, then id)
+   ====================== */
+
+const selectMyEmail = (s) => s.auth.userEmail || null;
+const selectMyId = (s) => s.auth.userId || null;
+
+const getCreatorEmail = (g) => {
+  const cand = g?.createdBy ?? g?.created_by ?? g?.createdByEmail ?? g?.ownerEmail ?? g?.owner;
+  return (typeof cand === 'string') ? cand.trim().toLowerCase() : null;
+};
+
+const isOwnerByClient = (g, myEmail, myUserId) => {
+  const groupEmail = getCreatorEmail(g);
+  const meEmail = (myEmail || '').trim().toLowerCase();
+  const emailMatch = !!(groupEmail && meEmail && groupEmail === meEmail);
+  const idMatch = !emailMatch && g?.createdById && myUserId &&
+    String(g.createdById) === String(myUserId);
+  return !!(emailMatch || idMatch);
+};
+
+export const selectGroupsWithOwnership = createSelector(
+  (s) => s.groups.list,
+  selectMyEmail,
+  selectMyId,
+  (groups, userEmail, userId) =>
+    (groups || []).map(g => {
+      if (typeof g?.isOwner === 'boolean') return g;
+      return { ...g, isOwner: isOwnerByClient(g, userEmail, userId) };
+    })
+);
+
+export const selectSelectedGroupWithOwnership = createSelector(
+  (s) => s.groups.selectedGroup,
+  selectMyEmail,
+  selectMyId,
+  (g, userEmail, userId) => {
+    if (!g) return null;
+    if (typeof g?.isOwner === 'boolean') return g;
+    return { ...g, isOwner: isOwnerByClient(g, userEmail, userId) };
+  }
+);
+
+export const fetchGroupOnly = createAsyncThunk('groups/fetchOnly', async (groupId, { rejectWithValue }) => {
+  try {
+    const { data } = await http.get(`/groups/${groupId}`);
+    return data;
+  } catch (err) {
+    return rejectWithValue(err?.response?.data?.message || 'Failed to load group');
+  }
+});
 
 /* ===== Selectors ===== */
 export const selectSelectedGroup = (s) => s.groups.selectedGroup;

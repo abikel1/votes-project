@@ -111,7 +111,7 @@ async function setJoinRequestStatusService(groupId, ownerId, reqId, status) {
 
   await g.save();
   return g;
-// =======
+  }
 async function getUserGroupsService(userEmail) {
   if (!userEmail) throw new Error('User email is required');
 
@@ -123,7 +123,7 @@ async function getUserGroupsService(userEmail) {
 
   return { created, joined };
 }
-}
+
 module.exports = {
   createGroupService,
   updateGroupService,

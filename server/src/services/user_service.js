@@ -7,8 +7,20 @@ const JWT_SECRET = process.env.JWT_SECRET || 'dev_secret';
 const JWT_EXPIRES = process.env.JWT_EXPIRES || '7d';
 
 
-function generateToken(userId) {
-    return jwt.sign({ sub: userId.toString() }, JWT_SECRET, { expiresIn: JWT_EXPIRES });
+// function generateToken(userId) {
+//     return jwt.sign({ sub: userId.toString() }, JWT_SECRET, { expiresIn: JWT_EXPIRES });
+// }
+function generateToken(user) {
+  return jwt.sign(
+    {
+      sub: user._id.toString(),
+      email: user.email,
+      firstName: user.firstName,
+      lastName: user.lastName
+    },
+    JWT_SECRET,
+    { expiresIn: JWT_EXPIRES }
+  );
 }
 
 // מחזיר רשימת כתובות לפי חיפוש ZIP או רחוב
@@ -44,7 +56,9 @@ async function register({ firstName, lastName, email, phone, city, address, pass
     });
 
     // יצירת טוקן
-    const token = generateToken(user._id);
+    // const token = generateToken(user._id);
+    const token = generateToken(user);
+
     const { passwordHash: _pwd, ...safe } = user.toObject();
     return { token, user: safe };
 }
@@ -57,7 +71,7 @@ async function login({ email, password }) {
     const ok = await bcrypt.compare(password, user.passwordHash);
     if (!ok) throw Object.assign(new Error('סיסמה לא נכונה'), { status: 401 });
 
-    const token = generateToken(user._id);
+const token = generateToken(user);
     const { passwordHash: _pwd, ...safe } = user.toObject();
     return { token, user: safe };
 }
@@ -112,17 +126,5 @@ async function updateProfile(userId, updates) {
 module.exports = {
     register, login, getProfile, listUsers,
     getUserById, getUsersBatch,updateProfile
-// =======
 
-
-
-
-
-// module.exports = {
-//     register,
-//     login,
-//     getProfile,
-//     listUsers,
-//     updateProfile,
-// >>>>>>> a1c83c8d2145ebf88aa769ba8d04af15a79010c3
 };

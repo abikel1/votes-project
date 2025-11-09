@@ -89,7 +89,7 @@
 const userService = require('../services/user_service');
 
 exports.register = async (req, res) => {
-    console.log('REGISTER BODY:', req.body);
+    console.log('BODY RECEIVED:', req.body);
     try {
         const result = await userService.register(req.body);
         res.status(201).json(result);

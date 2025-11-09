@@ -5,7 +5,7 @@ const auth = require('../middlewares/auth_middleware');
 const {
   createGroup, updateGroup, deleteGroup, getGroupById, getAllGroups,
   requestJoinGroup, listJoinRequests, approveJoinRequest, rejectJoinRequest,
-  getGroupMembers, // ✅
+  getGroupMembers,getUserGroups, // ✅
 } = require('../controllers/group_controller');
 const handleGroupDependencies = require('../middlewares/group_middleware'); // אם יש לך, השאירי
 

@@ -96,17 +96,16 @@ export const fetchMe = createAsyncThunk(
 /** ===== Slice ===== */
 const authSlice = createSlice({
   name: 'auth',
-  initialState: {
-    token: initialToken || null,
-
-    firstName: initialFirstName || null,
-    lastName: initialLastName || null,
+   initialState: {
+    token: localStorage.getItem('token') || null,
+    firstName: localStorage.getItem('firstName') || null,
+    lastName: localStorage.getItem('lastName') || null,
     userId: localStorage.getItem('userId') || null,
     userEmail: localStorage.getItem('userEmail') || null,
     loading: false,
     error: null,
     registeredOk: false,
-    user: null, // לשימוש אופציונלי במסכי פרופיל
+    user: null,
   },
   reducers: {
 // <<<<<<< HEAD
@@ -145,10 +144,10 @@ const authSlice = createSlice({
       .addCase(register.fulfilled, (s)=>{ s.loading=false; s.registeredOk=true; })
       .addCase(register.rejected,  (s,a)=>{ s.loading=false; s.error=a.payload; })
 
-      /** fetchProfile */
-      .addCase(fetchProfile.pending,   (s)=>{ s.loading=true; s.error=null; })
-      .addCase(fetchProfile.fulfilled, (s,a)=>{ s.loading=false; s.user=a.payload; })
-      .addCase(fetchProfile.rejected,  (s,a)=>{ s.loading=false; s.error=a.payload; })
+      // /** fetchProfile */
+      // .addCase(fetchProfile.pending,   (s)=>{ s.loading=true; s.error=null; })
+      // .addCase(fetchProfile.fulfilled, (s,a)=>{ s.loading=false; s.user=a.payload; })
+      // .addCase(fetchProfile.rejected,  (s,a)=>{ s.loading=false; s.error=a.payload; })
 
 // <<<<<<< HEAD
 //       /** login */
