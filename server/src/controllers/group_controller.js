@@ -4,6 +4,7 @@ const {
   deleteGroupService,
   getGroupByIdService,
   getAllGroupsService,
+  getUserGroupsService,
 } = require('../services/group_service');
 
 // יצירת קבוצה
@@ -64,10 +65,25 @@ async function getAllGroups(req, res) {
   }
 }
 
+async function getUserGroups(req, res) {
+  try {
+    const email = req.user.email; // ← auth מבטיח שיש req.user
+    const groups = await getUserGroupsService(email);
+    res.json(groups); // { created: [...], joined: [...] }
+  } catch (err) {
+    console.error('❌ Error getting user groups:', err);
+    res.status(500).json({ message: err.message });
+  }
+}
+
 module.exports = {
   createGroup,
   updateGroup,
   deleteGroup,
   getGroupById,
   getAllGroups,
+  getUserGroups,  // ← ודאי שמייצאים
 };
+
+
+

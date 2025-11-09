@@ -13,7 +13,8 @@ import NavBar from './components/NavBar/NavBar.jsx';
 import HomeRoute from './pages/Home/HomePage.jsx';
 import LoginPage from './pages/Login/LoginPage.jsx';
 import CreateGroupPage from './pages/CreateGroup/CreateGroup.jsx';
-
+import GroupDetailPage from './pages/GroupDetail/GroupDetailPage.jsx';
+GroupDetailPage
 export default function App() {
   const dispatch = useDispatch();
   const token = useSelector(s => s.auth.token);
@@ -26,12 +27,15 @@ export default function App() {
     <div>
       <NavBar />
       <Routes>
-        <Route path="/register" element={<RegisterPage />} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/groups/:groupId/candidates" element={<GroupCandidatesPage />} />
-        <Route path="/groups" element={<GroupsPage />} />
         <Route path="/" element={<HomeRoute />} />
         <Route path="/profile" element={<ProfilePage />} />
+
+        <Route path="/register" element={<RegisterPage />} />
+        <Route path="/login" element={<LoginPage />} />
+
+        <Route path="/groups" element={<GroupsPage />} />
+        <Route path="/groups/:groupId" element={<GroupDetailPage />} />
+        <Route path="/groups/:groupId/candidates" element={<GroupCandidatesPage />} />
         <Route path="/groups/create" element={<CreateGroupPage />} />
         <Route path="/groups/:groupId/settings" element={<GroupSettingsPage />} />
       </Routes>

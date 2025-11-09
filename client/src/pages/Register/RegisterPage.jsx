@@ -52,29 +52,45 @@ export default function RegisterPage() {
   const [errors, setErrors] = useState({});
 
   // שליחת טופס
-  const submit = (e) => {
-    e.preventDefault();
-    // ולידציה בסיסית
- const newErrors = {};
-    if (form.firstName.length < 2) newErrors.firstName = 'שם פרטי חייב לפחות 2 תווים';
-    if (form.lastName.length < 2) newErrors.lastName = 'שם משפחה חייב לפחות 2 תווים';
-    if (!/^\S+@\S+\.\S+$/.test(form.email)) newErrors.email = 'אימייל לא תקין';
-    if (form.password.length < 6) newErrors.password = 'סיסמה חייבת לפחות 6 תווים';
-    if (form.phone && !/^[\d+\-\s()]{6,20}$/.test(form.phone)) newErrors.phone = 'טלפון לא תקין';
-    if (!form.city) newErrors.city = 'עיר חובה';
-    if (!form.address) newErrors.address = 'כתובת חובה';
-   
-    if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors);
-      return;
-    }
+const submit = (e) => {
+  e.preventDefault();
 
-    setErrors({});
-    dispatch(register(form))
-      .unwrap()
-      .then(() => console.log('✅ Registered successfully'))
-      .catch((err) => console.log('❌ Error registering:', err));
-  };
+  // ולידציה בסיסית
+  const newErrors = {};
+  if (form.firstName.length < 2) newErrors.firstName = 'שם פרטי חייב לפחות 2 תווים';
+  if (form.lastName.length < 2) newErrors.lastName = 'שם משפחה חייב לפחות 2 תווים';
+  if (!/^\S+@\S+\.\S+$/.test(form.email)) newErrors.email = 'אימייל לא תקין';
+  if (form.password.length < 6) newErrors.password = 'סיסמה חייבת לפחות 6 תווים';
+  if (form.phone && !/^[\d+\-\s()]{6,20}$/.test(form.phone)) newErrors.phone = 'טלפון לא תקין';
+  if (!form.city) newErrors.city = 'עיר חובה';
+  if (!form.address) newErrors.address = 'כתובת חובה';
+
+  if (Object.keys(newErrors).length > 0) {
+    setErrors(newErrors);
+    return;
+  }
+
+  setErrors({});
+
+  // שליחת הבקשה
+  dispatch(register(form))
+    .unwrap()
+    .then(() => console.log('✅ Registered successfully'))
+    .catch((err) => {
+      // err יכול להיות אובייקט AxiosError או string
+      console.log('❌ Error registering:', err);
+
+      // אם err.response?.data?.message קיים, נשתמש בו
+      const msg =
+        err?.response?.data?.message || // הודעה מהשרת
+        err?.message ||                  // הודעה כללית
+        'אירעה שגיאה ברישום';
+
+      // שמירה ב-state כדי להציג למשתמש
+      setErrors({ form: msg });
+    });
+};
+
 
 
   // נווט לאחר רישום מוצלח
@@ -91,7 +107,7 @@ export default function RegisterPage() {
         <h1>הרשמה</h1>
 
         {registeredOk && <div className="top-msg success">נרשמת בהצלחה!</div>}
-        {error && <div className="top-msg error">{error}</div>}
+{errors.form && <div className="top-msg error">{errors.form}</div>}
 
         <InputField
           placeholder="*שם פרטי"
