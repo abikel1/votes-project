@@ -7,6 +7,8 @@ const {
   requestJoinGroupService,
   listJoinRequestsService,
   setJoinRequestStatusService,
+  getUserGroupsService,
+
 } = require('../services/group_service');
 const Group = require('../models/group_model'); // ✅
 
@@ -61,6 +63,7 @@ async function getAllGroups(req, res) {
   }
 }
 
+// <<<<<<< HEAD
 async function requestJoinGroup(req, res) {
   try {
     const g = await requestJoinGroupService(req.params.id, req.user);
@@ -114,6 +117,17 @@ async function getGroupMembers(req, res) {
     res.json(g.members || []);
   } catch (err) {
     res.status(500).json({ message: err.message || 'Server error' });
+  }}
+
+  // =======
+async function getUserGroups(req, res) {
+  try {
+    const email = req.user.email; // ← auth מבטיח שיש req.user
+    const groups = await getUserGroupsService(email);
+    res.json(groups); // { created: [...], joined: [...] }
+  } catch (err) {
+    console.error('❌ Error getting user groups:', err);
+    res.status(500).json({ message: err.message });
   }
 }
 
@@ -128,4 +142,8 @@ module.exports = {
   approveJoinRequest,
   rejectJoinRequest,
   getGroupMembers, // ✅
+  getUserGroups,  // ← ודאי שמייצאים
 };
+
+
+

@@ -12,9 +12,12 @@ exports.validate = (schema) => (req, res, next) => {
 
 exports.schemas = {
     register: Joi.object({
-        name: stripComma(Joi.string().trim().min(2).max(120).required()),
+        firstName: stripComma(Joi.string().trim().min(2).max(120).required()),
+        lastName: stripComma(Joi.string().trim().min(2).max(120).required()),
         email: stripComma(Joi.string().trim().email().required()),
-        address: stripComma(Joi.string().trim().allow('', null)),
+        city: stripComma(Joi.string().trim().allow('', null)),       // ← הוספתי את העיר
+        zip: stripComma(Joi.string().trim().allow('', null)),       // מזהה עיר/אזור
+        address: stripComma(Joi.string().trim().allow('', null)),   // כתובת פרטית
         phone: stripComma(Joi.string().trim().pattern(/^[\d+\-\s()]{6,20}$/).allow('', null)),
         password: Joi.string().min(6).required(),
     }),

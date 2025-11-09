@@ -37,7 +37,9 @@ export default function GroupsPage() {
             <h2 className="page-title">כל הקבוצות</h2>
             <div className="groups-grid">
                 {groups.map((g) => {
-                    const openCandidates = () => navigate(`/groups/${g._id}/candidates`);
+                    const openGroup = () => navigate(`/groups/${g._id}`);
+
+                    // const openCandidates = () => navigate(`/groups/${g._id}/candidates`);
                     const goSettings = (e) => { e.stopPropagation(); navigate(`/groups/${g._id}/settings`); };
 
                     const isLocked = !!g.isLocked;
@@ -64,7 +66,7 @@ export default function GroupsPage() {
                     };
 
                     return (
-                        <article key={g._id} onClick={openCandidates} className="group-card">
+                        <article key={g._id} onClick={openGroup} className="group-card">
                             <header className="card-header">
                                 <h3 className="card-title">{g.name}</h3>
 

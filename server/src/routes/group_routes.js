@@ -7,10 +7,16 @@ const {
   requestJoinGroup, listJoinRequests, approveJoinRequest, rejectJoinRequest,
   getGroupMembers, // ✅
 } = require('../controllers/group_controller');
+const handleGroupDependencies = require('../middlewares/group_middleware'); // אם יש לך, השאירי
 
 router.post('/create', auth, createGroup);
 router.put('/:id', auth, updateGroup);
-router.delete('/:id', auth, deleteGroup);
+// <<<<<<< HEAD
+// router.delete('/:id', auth, deleteGroup);
+// =======
+router.delete('/:id', auth, handleGroupDependencies, deleteGroup);
+router.get('/my', auth, getUserGroups);
+// >>>>>>> a1c83c8d2145ebf88aa769ba8d04af15a79010c3
 
 router.get('/:id', getGroupById);
 router.get('/:id/members', getGroupMembers); // ✅ חדש

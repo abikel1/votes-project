@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import http from '../api/http';
 
+// <<<<<<< HEAD
 /** ===== עזר: פענוח JWT ללא אימות חתימה (לצורכי UI בלבד) ===== */
 function decodeJwtNoVerify(token) {
   try {
@@ -14,23 +15,35 @@ function decodeJwtNoVerify(token) {
 }
 
 /** ===== קריאה ראשונית מערכי localStorage ===== */
-const initialToken     = localStorage.getItem('token');
-const initialUserName  = localStorage.getItem('userName');
+const initialToken = localStorage.getItem('token');
+const initialFirstName = localStorage.getItem('firstName');
+const initialLastName = localStorage.getItem('lastName');
+
 const initialUserId    = localStorage.getItem('userId');
 const initialUserEmail = localStorage.getItem('userEmail');
 
 /** ===== Thunks ===== */
-export const register = createAsyncThunk(
-  'auth/register',
-  async (payload, thunkAPI) => {
-    try {
-      const { data } = await http.post('/users/register', payload);
-      return data;
-    } catch (e) {
-      return thunkAPI.rejectWithValue(e?.response?.data?.message || 'Registration failed');
-    }
+// export const register = createAsyncThunk(
+//   'auth/register',
+//   async (payload, thunkAPI) => {
+//     try {
+//       const { data } = await http.post('/users/register', payload);
+//       return data;
+//     } catch (e) {
+//       return thunkAPI.rejectWithValue(e?.response?.data?.message || 'Registration failed');
+//     }
+// =======
+
+export const register = createAsyncThunk('auth/register', async (form, thunkAPI) => {
+  try {
+    const { data } = await http.post('/users/register', form);
+    return data;
+  } catch (e) {
+    return thunkAPI.rejectWithValue(e?.response?.data?.message || 'Registration failed');
+// >>>>>>> a1c83c8d2145ebf88aa769ba8d04af15a79010c3
   }
-);
+});
+
 
 export const login = createAsyncThunk(
   'auth/login',
@@ -85,26 +98,45 @@ const authSlice = createSlice({
   name: 'auth',
   initialState: {
     token: initialToken || null,
-    userName: initialUserName || null,
-    userId: initialUserId || null,
-    userEmail: initialUserEmail || null,
+
+    firstName: initialFirstName || null,
+    lastName: initialLastName || null,
+    userId: localStorage.getItem('userId') || null,
+    userEmail: localStorage.getItem('userEmail') || null,
     loading: false,
     error: null,
     registeredOk: false,
     user: null, // לשימוש אופציונלי במסכי פרופיל
   },
   reducers: {
-    logout(state) {
-      state.token = null;
-      state.userName = null;
-      state.userId = null;
-      state.userEmail = null;
-      state.user = null;
-      localStorage.removeItem('token');
-      localStorage.removeItem('userName');
-      localStorage.removeItem('userId');
-      localStorage.removeItem('userEmail');
-    }
+// <<<<<<< HEAD
+//     logout(state) {
+//       state.token = null;
+//       state.userName = null;
+//       state.userId = null;
+//       state.userEmail = null;
+//       state.user = null;
+//       localStorage.removeItem('token');
+//       localStorage.removeItem('userName');
+//       localStorage.removeItem('userId');
+//       localStorage.removeItem('userEmail');
+//     }
+// =======
+ logout(state) {
+  state.token = null;
+  state.firstName = null;
+  state.lastName = null;
+  state.userId = null;
+  state.userEmail = null;
+
+  localStorage.removeItem('token');
+  localStorage.removeItem('firstName');
+  localStorage.removeItem('lastName');
+  localStorage.removeItem('userId');
+  localStorage.removeItem('userEmail');
+}
+
+// >>>>>>> a1c83c8d2145ebf88aa769ba8d04af15a79010c3
   },
   extraReducers: (builder) => {
     builder
@@ -118,38 +150,85 @@ const authSlice = createSlice({
       .addCase(fetchProfile.fulfilled, (s,a)=>{ s.loading=false; s.user=a.payload; })
       .addCase(fetchProfile.rejected,  (s,a)=>{ s.loading=false; s.error=a.payload; })
 
-      /** login */
-      .addCase(login.pending,   (s)=>{ s.loading=true; s.error=null; })
-      .addCase(login.fulfilled, (s,a)=>{
-        s.loading = false;
-        s.token   = a.payload.token;
-        // שם מהשרת אם הגיע
-        s.userName = a.payload.user?.name ?? s.userName;
+// <<<<<<< HEAD
+//       /** login */
+//       .addCase(login.pending,   (s)=>{ s.loading=true; s.error=null; })
+//       .addCase(login.fulfilled, (s,a)=>{
+//         s.loading = false;
+//         s.token   = a.payload.token;
+//         // שם מהשרת אם הגיע
+//         s.userName = a.payload.user?.name ?? s.userName;
 
-        // ⭐️ פענוח JWT לצורך userId/userEmail מיידיים (כדי לחשב בעלות קבוצות ולראות ⚙️)
-        const p = decodeJwtNoVerify(a.payload.token);
-        s.userId    = p._id || p.id || p.userId || p.dbId || p.sub || s.userId || null;
-        s.userEmail = p.email || p.user?.email || s.userEmail || null;
+//         // ⭐️ פענוח JWT לצורך userId/userEmail מיידיים (כדי לחשב בעלות קבוצות ולראות ⚙️)
+//         const p = decodeJwtNoVerify(a.payload.token);
+//         s.userId    = p._id || p.id || p.userId || p.dbId || p.sub || s.userId || null;
+//         s.userEmail = p.email || p.user?.email || s.userEmail || null;
+
+//         localStorage.setItem('token', s.token);
+//         if (s.userName)  localStorage.setItem('userName', s.userName);
+//         if (s.userId)    localStorage.setItem('userId', s.userId);
+//         if (s.userEmail) localStorage.setItem('userEmail', s.userEmail);
+//       })
+//       .addCase(login.rejected,  (s,a)=>{ s.loading=false; s.error=a.payload; })
+
+//       /** fetchMe */
+//       .addCase(fetchMe.pending,   (s)=>{ s.loading=true; s.error=null; })
+//       .addCase(fetchMe.fulfilled, (s,a)=>{
+//         s.loading = false;
+//         s.userName  = a.payload.name  ?? s.userName;
+//         s.userId    = a.payload._id   ?? s.userId;
+//         s.userEmail = a.payload.email ?? s.userEmail;
+//         if (s.userName)  localStorage.setItem('userName', s.userName);
+//         if (s.userId)    localStorage.setItem('userId', s.userId);
+//         if (s.userEmail) localStorage.setItem('userEmail', s.userEmail);
+//       })
+//       .addCase(fetchMe.rejected,  (s,a)=>{ s.loading=false; s.error=a.payload; });
+// =======
+
+      .addCase(fetchProfile.pending, (s) => { s.loading = true; s.error = null; })
+      .addCase(fetchProfile.fulfilled, (s, a) => {
+        s.loading = false;
+        s.user = a.payload;
+      })
+      .addCase(fetchProfile.rejected, (s, a) => { s.loading = false; s.error = a.payload; })
+
+      // login
+      .addCase(login.pending, (s) => { s.loading = true; s.error = null; })
+      .addCase(login.fulfilled, (s, a) => {
+        s.loading = false;
+        s.token = a.payload.token;
+        s.firstName = a.payload.user?.firstName ?? null;
+        s.lastName = a.payload.user?.lastName ?? null;
+        s.userId = a.payload.user?._id ?? null;
+        s.userEmail = a.payload.user?.email ?? null;
 
         localStorage.setItem('token', s.token);
-        if (s.userName)  localStorage.setItem('userName', s.userName);
-        if (s.userId)    localStorage.setItem('userId', s.userId);
+        if (s.firstName) localStorage.setItem('firstName', s.firstName);
+        if (s.lastName) localStorage.setItem('lastName', s.lastName);
+        if (s.userId) localStorage.setItem('userId', s.userId);
         if (s.userEmail) localStorage.setItem('userEmail', s.userEmail);
       })
-      .addCase(login.rejected,  (s,a)=>{ s.loading=false; s.error=a.payload; })
 
-      /** fetchMe */
-      .addCase(fetchMe.pending,   (s)=>{ s.loading=true; s.error=null; })
-      .addCase(fetchMe.fulfilled, (s,a)=>{
-        s.loading = false;
-        s.userName  = a.payload.name  ?? s.userName;
-        s.userId    = a.payload._id   ?? s.userId;
-        s.userEmail = a.payload.email ?? s.userEmail;
-        if (s.userName)  localStorage.setItem('userName', s.userName);
-        if (s.userId)    localStorage.setItem('userId', s.userId);
-        if (s.userEmail) localStorage.setItem('userEmail', s.userEmail);
-      })
-      .addCase(fetchMe.rejected,  (s,a)=>{ s.loading=false; s.error=a.payload; });
+      .addCase(login.rejected, (s, a) => { s.loading = false; s.error = a.payload; })
+
+
+      .addCase(fetchMe.pending, (s) => { s.loading = true; s.error = null; })
+.addCase(fetchMe.fulfilled, (s, a) => {
+  s.loading = false;
+  s.firstName = a.payload.firstName ?? s.firstName;
+  s.lastName = a.payload.lastName ?? s.lastName;
+  s.userId = a.payload._id ?? s.userId;
+  s.userEmail = a.payload.email ?? s.userEmail;
+
+  if (s.firstName) localStorage.setItem('firstName', s.firstName);
+  if (s.lastName) localStorage.setItem('lastName', s.lastName);
+  if (s.userId) localStorage.setItem('userId', s.userId);
+  if (s.userEmail) localStorage.setItem('userEmail', s.userEmail);
+})
+
+      .addCase(fetchMe.rejected, (s, a) => { s.loading = false; s.error = a.payload; });
+
+// >>>>>>> a1c83c8d2145ebf88aa769ba8d04af15a79010c3
   }
 });
 
