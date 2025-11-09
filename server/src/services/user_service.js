@@ -7,8 +7,20 @@ const JWT_SECRET = process.env.JWT_SECRET || 'dev_secret';
 const JWT_EXPIRES = process.env.JWT_EXPIRES || '7d';
 
 
-function generateToken(userId) {
-    return jwt.sign({ sub: userId.toString() }, JWT_SECRET, { expiresIn: JWT_EXPIRES });
+// function generateToken(userId) {
+//     return jwt.sign({ sub: userId.toString() }, JWT_SECRET, { expiresIn: JWT_EXPIRES });
+// }
+function generateToken(user) {
+  return jwt.sign(
+    {
+      sub: user._id.toString(),
+      email: user.email,
+      firstName: user.firstName,
+      lastName: user.lastName
+    },
+    JWT_SECRET,
+    { expiresIn: JWT_EXPIRES }
+  );
 }
 
 // מחזיר רשימת כתובות לפי חיפוש ZIP או רחוב
@@ -21,6 +33,13 @@ async function register({ firstName, lastName, email, phone, city, address, pass
 
     // הצפנת סיסמה
     const passwordHash = await bcrypt.hash(password, 12);
+// <<<<<<< HEAD
+//     const user = await User.create({
+//         name, email, address, phone, passwordHash,
+//         joinedGroups: [], createdGroups: [], voteHistory: []
+//     });
+// =======
+// >>>>>>> a1c83c8d2145ebf88aa769ba8d04af15a79010c3
 
     // יצירת המשתמש במסד
     const user = await User.create({
@@ -37,7 +56,9 @@ async function register({ firstName, lastName, email, phone, city, address, pass
     });
 
     // יצירת טוקן
-    const token = generateToken(user._id);
+    // const token = generateToken(user._id);
+    const token = generateToken(user);
+
     const { passwordHash: _pwd, ...safe } = user.toObject();
     return { token, user: safe };
 }
@@ -50,7 +71,7 @@ async function login({ email, password }) {
     const ok = await bcrypt.compare(password, user.passwordHash);
     if (!ok) throw Object.assign(new Error('סיסמה לא נכונה'), { status: 401 });
 
-    const token = generateToken(user._id);
+const token = generateToken(user);
     const { passwordHash: _pwd, ...safe } = user.toObject();
     return { token, user: safe };
 }
@@ -63,6 +84,23 @@ async function getProfile(userId) {
 
 async function listUsers() {
     return User.find({}, { passwordHash: 0 }).lean();
+}
+
+// <<<<<<< HEAD
+// ✅ חדש: שליפת יחיד
+async function getUserById(id) {
+    if (!id) return null;
+    return User.findById(id, { passwordHash: 0 }).lean();
+}
+
+// ✅ חדש: batch לפי מזהים
+async function getUsersBatch(ids = []) {
+    const clean = Array.from(new Set(ids.filter(Boolean)));
+    if (!clean.length) return {};
+    const rows = await User.find({ _id: { $in: clean } }, { passwordHash: 0 }).lean();
+    const map = {};
+    rows.forEach(u => { map[String(u._id)] = u; });
+    return map;
 }
 
 async function updateProfile(userId, updates) {
@@ -85,13 +123,8 @@ async function updateProfile(userId, updates) {
     return user;
 }
 
-
-
-
 module.exports = {
-    register,
-    login,
-    getProfile,
-    listUsers,
-    updateProfile,
+    register, login, getProfile, listUsers,
+    getUserById, getUsersBatch,updateProfile
+
 };
