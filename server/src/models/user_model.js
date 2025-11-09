@@ -8,8 +8,8 @@ const userSchema = new mongoose.Schema({
         lowercase: true, trim: true,
         match: [/^\S+@\S+\.\S+$/, 'Invalid email']
     },
-    city: { type: String, trim: true },       // תגיע מה-API החיצוני
-    address: { type: String, trim: true },    // תגיע מה-API החיצוני
+    city: { type: String, trim: true },      
+    address: { type: String, trim: true },    
     phone: {
         type: String, trim: true,
         match: [/^[\d+\-\s()]{6,20}$/, 'Invalid phone number']

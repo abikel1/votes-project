@@ -1,6 +1,7 @@
 const userService = require('../services/user_service');
 
 exports.register = async (req, res) => {
+    console.log('REGISTER BODY:', req.body); // <--- לבדוק מה מגיע
     try {
         const result = await userService.register(req.body);
         res.status(201).json(result);
@@ -8,6 +9,7 @@ exports.register = async (req, res) => {
         res.status(err.status || 500).json({ message: err.message || 'Server error' });
     }
 };
+
 
 exports.login = async (req, res) => {
     try {
