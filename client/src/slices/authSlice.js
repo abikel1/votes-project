@@ -97,13 +97,13 @@ const authSlice = createSlice({
 
 
 
-        .addCase(fetchProfile.pending, (s) => { s.loading = true; s.error = null; })
-    .addCase(fetchProfile.fulfilled, (s, a) => {
-      s.loading = false;
-      s.user = a.payload;
-    })
-    .addCase(fetchProfile.rejected, (s, a) => { s.loading = false; s.error = a.payload; })
-    
+      .addCase(fetchProfile.pending, (s) => { s.loading = true; s.error = null; })
+      .addCase(fetchProfile.fulfilled, (s, a) => {
+        s.loading = false;
+        s.user = a.payload;
+      })
+      .addCase(fetchProfile.rejected, (s, a) => { s.loading = false; s.error = a.payload; })
+
       // login
       .addCase(login.pending, (s) => { s.loading = true; s.error = null; })
       .addCase(login.fulfilled, (s, a) => {
@@ -116,17 +116,17 @@ const authSlice = createSlice({
       .addCase(login.rejected, (s, a) => { s.loading = false; s.error = a.payload; })
 
 
-       .addCase(fetchMe.pending,   (s) => { s.loading = true; s.error = null; })
-      .addCase(fetchMe.fulfilled, (s,a)=> {
+      .addCase(fetchMe.pending, (s) => { s.loading = true; s.error = null; })
+      .addCase(fetchMe.fulfilled, (s, a) => {
         s.loading = false;
-        s.userName  = a.payload.name  ?? s.userName;
-        s.userId    = a.payload._id   ?? s.userId;
+        s.userName = a.payload.name ?? s.userName;
+        s.userId = a.payload._id ?? s.userId;
         s.userEmail = a.payload.email ?? s.userEmail;
-        if (s.userName)  localStorage.setItem('userName', s.userName);
-        if (s.userId)    localStorage.setItem('userId', s.userId);
+        if (s.userName) localStorage.setItem('userName', s.userName);
+        if (s.userId) localStorage.setItem('userId', s.userId);
         if (s.userEmail) localStorage.setItem('userEmail', s.userEmail);
       })
-      .addCase(fetchMe.rejected,  (s,a)=> { s.loading = false; s.error = a.payload; });
+      .addCase(fetchMe.rejected, (s, a) => { s.loading = false; s.error = a.payload; });
 
   }
 });
