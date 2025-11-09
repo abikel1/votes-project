@@ -2,7 +2,8 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import http from '../api/http'; // כאן נמצא axios instance שלך
 
 const initialToken = localStorage.getItem('token');
-const initialUserName = localStorage.getItem('userName');
+const initialFirstName = localStorage.getItem('firstName');
+const initialLastName = localStorage.getItem('lastName');
 
 export const register = createAsyncThunk('auth/register', async (form, thunkAPI) => {
   try {
@@ -65,26 +66,29 @@ const authSlice = createSlice({
   name: 'auth',
   initialState: {
     token: initialToken || null,
-    userName: initialUserName || null,
-    // userId: initialUserId || null,
-    // userEmail: initialUserEmail || null, // ✅
+    firstName: initialFirstName || null,
+    lastName: initialLastName || null,
+    userId: localStorage.getItem('userId') || null,
+    userEmail: localStorage.getItem('userEmail') || null,
     loading: false,
     error: null,
     registeredOk: false,
   },
   reducers: {
-    logout(state) {
-      state.token = null;
-      state.userName = null;
-      localStorage.removeItem('token');
-      localStorage.removeItem('userName');
-      state.userId = null;
-      state.userEmail = null;
-      localStorage.removeItem('token');
-      localStorage.removeItem('userName');
-      localStorage.removeItem('userId');
-      localStorage.removeItem('userEmail');
-    }
+ logout(state) {
+  state.token = null;
+  state.firstName = null;
+  state.lastName = null;
+  state.userId = null;
+  state.userEmail = null;
+
+  localStorage.removeItem('token');
+  localStorage.removeItem('firstName');
+  localStorage.removeItem('lastName');
+  localStorage.removeItem('userId');
+  localStorage.removeItem('userEmail');
+}
+
   },
   extraReducers: (builder) => {
     builder
@@ -107,23 +111,35 @@ const authSlice = createSlice({
       .addCase(login.fulfilled, (s, a) => {
         s.loading = false;
         s.token = a.payload.token;
-        s.userName = a.payload.user?.name ?? null;
+        s.firstName = a.payload.user?.firstName ?? null;
+        s.lastName = a.payload.user?.lastName ?? null;
+        s.userId = a.payload.user?._id ?? null;
+        s.userEmail = a.payload.user?.email ?? null;
+
         localStorage.setItem('token', s.token);
-        if (s.userName) localStorage.setItem('userName', s.userName);
+        if (s.firstName) localStorage.setItem('firstName', s.firstName);
+        if (s.lastName) localStorage.setItem('lastName', s.lastName);
+        if (s.userId) localStorage.setItem('userId', s.userId);
+        if (s.userEmail) localStorage.setItem('userEmail', s.userEmail);
       })
+
       .addCase(login.rejected, (s, a) => { s.loading = false; s.error = a.payload; })
 
 
       .addCase(fetchMe.pending, (s) => { s.loading = true; s.error = null; })
-      .addCase(fetchMe.fulfilled, (s, a) => {
-        s.loading = false;
-        s.userName = a.payload.name ?? s.userName;
-        s.userId = a.payload._id ?? s.userId;
-        s.userEmail = a.payload.email ?? s.userEmail;
-        if (s.userName) localStorage.setItem('userName', s.userName);
-        if (s.userId) localStorage.setItem('userId', s.userId);
-        if (s.userEmail) localStorage.setItem('userEmail', s.userEmail);
-      })
+.addCase(fetchMe.fulfilled, (s, a) => {
+  s.loading = false;
+  s.firstName = a.payload.firstName ?? s.firstName;
+  s.lastName = a.payload.lastName ?? s.lastName;
+  s.userId = a.payload._id ?? s.userId;
+  s.userEmail = a.payload.email ?? s.userEmail;
+
+  if (s.firstName) localStorage.setItem('firstName', s.firstName);
+  if (s.lastName) localStorage.setItem('lastName', s.lastName);
+  if (s.userId) localStorage.setItem('userId', s.userId);
+  if (s.userEmail) localStorage.setItem('userEmail', s.userEmail);
+})
+
       .addCase(fetchMe.rejected, (s, a) => { s.loading = false; s.error = a.payload; });
 
   }

@@ -19,7 +19,7 @@ export default function GroupSettingsPage() {
     const navigate = useNavigate();
 
     const { selectedGroup: group, loading: groupLoading, error: groupError } = useSelector(s => s.groups);
-    const { userId, userName, userEmail } = useSelector(s => s.auth);
+const { userId, userEmail, firstName, lastName } = useSelector(s => s.auth);
 
     const candidates = useSelector(selectCandidatesForGroup(groupId));
     const candLoading = useSelector(selectCandidatesLoadingForGroup(groupId));
@@ -32,23 +32,24 @@ export default function GroupSettingsPage() {
         dispatch(fetchCandidatesByGroup(groupId));
     }, [dispatch, groupId]);
 
-    const isOwner = useMemo(() => {
-        if (!group) return false;
-        if (typeof group.isOwner === 'boolean') return group.isOwner;
+const isOwner = useMemo(() => {
+    if (!group) return false;
+    if (typeof group.isOwner === 'boolean') return group.isOwner;
 
-        const byEmail =
-            group?.createdBy && userEmail &&
-            String(group.createdBy).trim().toLowerCase() === String(userEmail).trim().toLowerCase();
+    const byEmail =
+        group?.createdBy && userEmail &&
+        String(group.createdBy).trim().toLowerCase() === String(userEmail).trim().toLowerCase();
 
-        const byId = group?.createdById && userId && String(group.createdById) === String(userId);
+    const byId = group?.createdById && userId && String(group.createdById) === String(userId);
 
-        const byName =
-            group?.createdBy && userName &&
-            !String(group.createdBy).includes('@') &&
-            String(group.createdBy).trim().toLowerCase() === String(userName).trim().toLowerCase();
+    // במקום userName, נשווה לשילוב של firstName + lastName
+    const byFullName =
+        group?.createdBy && firstName && lastName &&
+        !String(group.createdBy).includes('@') &&
+        String(group.createdBy).trim().toLowerCase() === `${firstName} ${lastName}`.trim().toLowerCase();
 
-        return !!(byEmail || byId || byName);
-    }, [group, userEmail, userId, userName]);
+    return !!(byEmail || byId || byFullName);
+}, [group, userEmail, userId, firstName, lastName]);
 
     if (groupLoading) return <div className="gs-wrap"><h2>הגדרות קבוצה</h2><div>טוען...</div></div>;
     if (groupError) return <div className="gs-wrap"><h2>הגדרות קבוצה</h2><div className="err">{groupError}</div></div>;
