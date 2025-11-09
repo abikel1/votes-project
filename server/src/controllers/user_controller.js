@@ -35,3 +35,13 @@ exports.listUsers = async (req, res) => {
         res.status(err.status || 500).json({ message: err.message || 'Server error' });
     }
 };
+
+exports.updateProfile = async (req, res) => {
+    try {
+        const updatedUser = await userService.updateProfile(req.user._id, req.body);
+        res.json(updatedUser);
+    } catch (err) {
+        res.status(err.status || 500).json({ message: err.message || 'Server error' });
+    }
+};
+

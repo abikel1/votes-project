@@ -8,8 +8,7 @@ const router = express.Router();
 router.post('/register', validate(schemas.register), ctrl.register);
 router.post('/login', validate(schemas.login), ctrl.login);
 router.get('/me', auth, ctrl.getProfile);
-
-// פתוח לציבור (אם תרצי – הוסיפי auth)
+router.patch('/me', auth, ctrl.updateProfile); // ← השתמש ב־ctrl
 router.get('/', ctrl.listUsers);
 
 module.exports = router;
