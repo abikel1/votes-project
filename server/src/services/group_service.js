@@ -36,10 +36,23 @@ async function getAllGroupsService() {
   return Group.find().populate('candidates');
 }
 
+async function getUserGroupsService(userEmail) {
+  if (!userEmail) throw new Error('User email is required');
+
+  // קבוצות שהמשתמש יצר
+  const created = await Group.find({ createdBy: userEmail }).lean();
+
+  // קבוצות שהמשתמש משתתף בהן
+  const joined = await Group.find({ participants: userEmail }).lean();
+
+  return { created, joined };
+}
+
 module.exports = {
   createGroupService,
   updateGroupService,
   deleteGroupService,
   getGroupByIdService,
   getAllGroupsService,
+  getUserGroupsService,
 };

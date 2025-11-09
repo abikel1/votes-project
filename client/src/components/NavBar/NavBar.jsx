@@ -8,16 +8,16 @@ const NavBar = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const { token, userName } = useSelector((s) => s.auth);
-  const isAuthed = Boolean(token);
+const { token, firstName, lastName } = useSelector((s) => s.auth);
+const isAuthed = Boolean(token);
 
   const onLogout = () => {
     dispatch(logout());
     navigate('/');
   };
 
-  const initial = userName ? userName[0] : '';
-
+const fullName = firstName && lastName ? `${firstName} ${lastName}` : '';
+const initial = fullName ? fullName[0] : '';
   return (
     <nav className="navbar">
       {isAuthed && (
