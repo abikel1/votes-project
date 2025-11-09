@@ -1,37 +1,73 @@
-const { createVoteService, deleteVoteService , getVotesByCandidateInGroupService } = require('../services/vote_service');
+const {
+  createVoteService,
+  deleteVoteService,
+  getVotesByCandidateInGroupService,
+} = require('../services/vote_service');
 
 async function createVote(req, res) {
   try {
-    // לפי הסגנון של group: הכל נכנס מ-body (אפשר בעתיד לעבור ל-auth)
-    const voteData = req.body;
+    const voteData = req.body; // { userId, groupId, candidateId }
     const vote = await createVoteService(voteData);
-    res.status(201).json(vote);
+    return res.status(201).json(vote);
   } catch (err) {
     console.error('❌ Error creating vote:', err);
-    res.status(500).json({ message: 'Error creating vote' });
+    const msg = String(err.message || '');
+
+    if (msg.includes('Missing required fields') || msg.includes('Invalid IDs'))
+      return res.status(400).json({ message: msg });
+
+    if (msg.includes('not found'))
+      return res.status(404).json({ message: msg });
+
+    if (msg.includes('Voting period has ended') || msg.includes('does not belong'))
+      return res.status(400).json({ message: msg });
+
+    if (msg.includes('already voted'))
+      return res.status(409).json({ message: 'User already voted in this group' });
+
+    return res.status(500).json({ message: 'Error creating vote' });
   }
 }
 
 async function deleteVote(req, res) {
   try {
-    // לפי הסטייל אצלכן: מזהים לפי userId + groupId שנשלחים ב-body
     const { userId, groupId } = req.body;
     const deleted = await deleteVoteService({ userId, groupId });
-    res.status(200).json(deleted); // מחזירים את הדוק שנמחק (כמו style פשוט)
+    return res.status(200).json(deleted);
   } catch (err) {
     console.error('❌ Error deleting vote:', err);
-    res.status(500).json({ message: 'Error deleting vote' });
+    const msg = String(err.message || '');
+
+    if (msg.includes('Missing required fields') || msg.includes('Invalid IDs'))
+      return res.status(400).json({ message: msg });
+
+    if (msg.includes('Vote not found'))
+      return res.status(404).json({ message: msg });
+
+    return res.status(500).json({ message: 'Error deleting vote' });
   }
 }
+
 async function getVotesByCandidateInGroup(req, res) {
   try {
-    // מקבל מה-Query: /api/votes/by-candidate?candidateId=...&groupId=...
     const { candidateId, groupId } = req.query;
     const votes = await getVotesByCandidateInGroupService({ candidateId, groupId });
-    res.status(200).json(votes);
+    return res.status(200).json(votes);
   } catch (err) {
     console.error('❌ Error getting votes by candidate in group:', err);
-    res.status(500).json({ message: 'Error getting votes by candidate in group' });
+    const msg = String(err.message || '');
+
+    if (msg.includes('Missing required fields') || msg.includes('Invalid IDs'))
+      return res.status(400).json({ message: msg });
+
+    if (msg.includes('not found'))
+      return res.status(404).json({ message: msg });
+
+    if (msg.includes('does not belong'))
+      return res.status(400).json({ message: msg });
+
+    return res.status(500).json({ message: 'Error getting votes by candidate in group' });
   }
 }
+
 module.exports = { createVote, deleteVote, getVotesByCandidateInGroup };

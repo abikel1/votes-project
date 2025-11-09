@@ -3,6 +3,7 @@ import authReducer from '../slices/authSlice';
 import usersReducer from '../slices/usersSlice';
 import groupsReducer from '../slices/groupsSlice';
 import candidatesReducer from '../slices/candidateSlice'; // 👈 חדש
+import votesReducer from '../slices/votesSlice';
 
 const store = configureStore({
     reducer: {
@@ -10,6 +11,7 @@ const store = configureStore({
         users: usersReducer,
         groups: groupsReducer,
         candidates: candidatesReducer,           // 👈 חדש
+        votes: votesReducer,
     },
     devTools: true,
 });

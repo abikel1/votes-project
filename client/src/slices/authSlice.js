@@ -3,6 +3,8 @@ import http from '../api/http'; // כאן נמצא axios instance שלך
 
 const initialToken = localStorage.getItem('token');
 const initialUserName = localStorage.getItem('userName');
+const initialUserId = localStorage.getItem('userId');      // ← חדש
+const initialUserEmail = localStorage.getItem('userEmail');   // ← אופציונלי
 
 export const register = createAsyncThunk('auth/register', async (form, thunkAPI) => {
   try {
@@ -66,8 +68,8 @@ const authSlice = createSlice({
   initialState: {
     token: initialToken || null,
     userName: initialUserName || null,
-    // userId: initialUserId || null,
-    // userEmail: initialUserEmail || null, // ✅
+    userId: initialUserId || null,         // ← חדש
+    userEmail: initialUserEmail || null,   // ← אופציונלי
     loading: false,
     error: null,
     registeredOk: false,
@@ -76,8 +78,6 @@ const authSlice = createSlice({
     logout(state) {
       state.token = null;
       state.userName = null;
-      localStorage.removeItem('token');
-      localStorage.removeItem('userName');
       state.userId = null;
       state.userEmail = null;
       localStorage.removeItem('token');
@@ -108,8 +108,13 @@ const authSlice = createSlice({
         s.loading = false;
         s.token = a.payload.token;
         s.userName = a.payload.user?.name ?? null;
+        s.userId = a.payload.user?._id ?? null;   // ← חשוב!
+        s.userEmail = a.payload.user?.email ?? null;
+
         localStorage.setItem('token', s.token);
         if (s.userName) localStorage.setItem('userName', s.userName);
+        if (s.userId) localStorage.setItem('userId', s.userId);
+        if (s.userEmail) localStorage.setItem('userEmail', s.userEmail);
       })
       .addCase(login.rejected, (s, a) => { s.loading = false; s.error = a.payload; })
 
