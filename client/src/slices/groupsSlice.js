@@ -1,6 +1,7 @@
 // client/src/slices/groupsSlice.js
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import http from '../api/http';
+import { voteForCandidate } from './votesSlice'; 
 
 export const fetchGroups = createAsyncThunk('groups/fetchAll', async (_, { rejectWithValue }) => {
   try {
@@ -11,7 +12,6 @@ export const fetchGroups = createAsyncThunk('groups/fetchAll', async (_, { rejec
   }
 });
 
-// טוען קבוצה בודדת + מועמדים שלה
 export const fetchGroupWithCandidates = createAsyncThunk('groups/fetchOne', async (groupId, { rejectWithValue }) => {
   try {
     const [gRes, cRes] = await Promise.all([
@@ -24,23 +24,18 @@ export const fetchGroupWithCandidates = createAsyncThunk('groups/fetchOne', asyn
   }
 });
 
-
-// === ה־slice עצמו ===
-
 const groupsSlice = createSlice({
   name: 'groups',
   initialState: {
-    list: [],            // כל הקבוצות
-    selectedGroup: null, // קבוצה ספציפית
-    candidates: [],      // מועמדים של הקבוצה הנבחרת
+    list: [],
+    selectedGroup: null,
+    candidates: [],
     loading: false,
     error: null,
   },
   reducers: {},
-
   extraReducers: (builder) => {
     builder
-
       // === fetchGroups ===
       .addCase(fetchGroups.pending, (state) => {
         state.loading = true;
@@ -68,7 +63,8 @@ const groupsSlice = createSlice({
       .addCase(fetchGroupWithCandidates.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
-      });
+      })
+
   },
 });
 
