@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 
-const auth = require('../middlewares/auth');
+const auth = require('../middlewares/auth_middleware');
 const handleGroupDependencies = require('../middlewares/group_middleware'); // אם יש לך, השאירי
 
 const {
