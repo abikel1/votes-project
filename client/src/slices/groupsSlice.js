@@ -7,26 +7,43 @@ import http from '../api/http';
    ====================== */
 
 // כל הקבוצות
-export const fetchGroups = createAsyncThunk('groups/fetchAll', async (_, { rejectWithValue }) => {
-  try {
-    const res = await http.get('/groups');
-    return res.data;
-  } catch (err) {
-    return rejectWithValue(err?.response?.data?.message || 'Failed to load groups');
+export const fetchGroups = createAsyncThunk(
+  'groups/fetchAll',
+  async (_, { rejectWithValue }) => {
+    try {
+      const res = await http.get('/groups');
+      return res.data;
+    } catch (err) {
+      return rejectWithValue(err?.response?.data?.message || 'Failed to load groups');
+    }
   }
-});
+);
 
-
+// קבוצה אחת (ללא מועמדים)
+export const fetchGroupOnly = createAsyncThunk(
+  'groups/fetchOnly',
+  async (groupId, { rejectWithValue }) => {
+    try {
+      const { data } = await http.get(`/groups/${groupId}`);
+      return data;
+    } catch (err) {
+      return rejectWithValue(err?.response?.data?.message || 'Failed to load group');
+    }
+  }
+);
 
 // יצירת קבוצה
-export const createGroup = createAsyncThunk('groups/create', async (payload, { rejectWithValue }) => {
-  try {
-    const { data } = await http.post('/groups/create', payload);
-    return data;
-  } catch (err) {
-    return rejectWithValue(err?.response?.data?.message || 'Create group failed');
+export const createGroup = createAsyncThunk(
+  'groups/create',
+  async (payload, { rejectWithValue }) => {
+    try {
+      const { data } = await http.post('/groups/create', payload);
+      return data;
+    } catch (err) {
+      return rejectWithValue(err?.response?.data?.message || 'Create group failed');
+    }
   }
-});
+);
 
 // תביעת בעלות (לקבוצות ישנות ללא createdById)
 export const claimGroupOwnership = createAsyncThunk(
@@ -44,20 +61,22 @@ export const claimGroupOwnership = createAsyncThunk(
 /* ======================
    Slice
    ====================== */
-
 const groupsSlice = createSlice({
   name: 'groups',
   initialState: {
     list: [],
     selectedGroup: null,
 
+    // מצב כללי
     loading: false,
     error: null,
 
+    // יצירה
     createLoading: false,
     createError: null,
     justCreated: null,
 
+    // תביעת בעלות
     claimLoading: false,
     claimError: null,
   },
@@ -66,39 +85,64 @@ const groupsSlice = createSlice({
       state.createLoading = false;
       state.createError = null;
       state.justCreated = null;
-    }
+    },
   },
   extraReducers: (builder) => {
     builder
-      // fetch all
+      // === fetchGroups ===
       .addCase(fetchGroups.pending, (s) => { s.loading = true; s.error = null; })
       .addCase(fetchGroups.fulfilled, (s, a) => { s.loading = false; s.list = a.payload; })
       .addCase(fetchGroups.rejected, (s, a) => { s.loading = false; s.error = a.payload; })
 
-      // fetch one (only group)
-      .addCase(fetchGroupOnly.pending, (s) => { s.loading = true; s.error = null; s.selectedGroup = null; })
-      .addCase(fetchGroupOnly.fulfilled, (s, a) => { s.loading = false; s.selectedGroup = a.payload; })
-      .addCase(fetchGroupOnly.rejected, (s, a) => { s.loading = false; s.error = a.payload; })
+      // === fetchGroupOnly ===
+      .addCase(fetchGroupOnly.pending, (s) => {
+        s.loading = true;
+        s.error = null;
+        s.selectedGroup = null;
+      })
+      .addCase(fetchGroupOnly.fulfilled, (s, a) => {
+        s.loading = false;
+        s.selectedGroup = a.payload;
+      })
+      .addCase(fetchGroupOnly.rejected, (s, a) => {
+        s.loading = false;
+        s.error = a.payload;
+      })
 
-      // create
-      .addCase(createGroup.pending, (s) => { s.createLoading = true; s.createError = null; s.justCreated = null; })
+      // === createGroup ===
+      .addCase(createGroup.pending, (s) => {
+        s.createLoading = true;
+        s.createError = null;
+        s.justCreated = null;
+      })
       .addCase(createGroup.fulfilled, (s, a) => {
         s.createLoading = false;
         s.justCreated = a.payload;
         if (Array.isArray(s.list)) s.list.unshift(a.payload);
       })
-      .addCase(createGroup.rejected, (s, a) => { s.createLoading = false; s.createError = a.payload; })
+      .addCase(createGroup.rejected, (s, a) => {
+        s.createLoading = false;
+        s.createError = a.payload;
+      })
 
-      // claim ownership
-      .addCase(claimGroupOwnership.pending, (s) => { s.claimLoading = true; s.claimError = null; })
+      // === claimGroupOwnership ===
+      .addCase(claimGroupOwnership.pending, (s) => {
+        s.claimLoading = true;
+        s.claimError = null;
+      })
       .addCase(claimGroupOwnership.fulfilled, (s, a) => {
         s.claimLoading = false;
         const g = a.payload;
         const idx = s.list.findIndex(x => String(x._id) === String(g._id));
         if (idx >= 0) s.list[idx] = g;
-        if (s.selectedGroup && String(s.selectedGroup._id) === String(g._id)) s.selectedGroup = g;
+        if (s.selectedGroup && String(s.selectedGroup._id) === String(g._id)) {
+          s.selectedGroup = g;
+        }
       })
-      .addCase(claimGroupOwnership.rejected, (s, a) => { s.claimLoading = false; s.claimError = a.payload; });
+      .addCase(claimGroupOwnership.rejected, (s, a) => {
+        s.claimLoading = false;
+        s.claimError = a.payload;
+      });
   },
 });
 
@@ -106,11 +150,11 @@ export const { clearCreateState } = groupsSlice.actions;
 export default groupsSlice.reducer;
 
 /* ======================
-   Selectors: compute ownership robustly (email first, then id)
+   Selectors: בעלות – קודם אימייל, אח"כ מזהה
    ====================== */
 
 const selectMyEmail = (s) => s.auth.userEmail || null;
-const selectMyId = (s) => s.auth.userId || null;
+const selectMyId    = (s) => s.auth.userId || null;
 
 const getCreatorEmail = (g) => {
   const cand = g?.createdBy ?? g?.created_by ?? g?.createdByEmail ?? g?.ownerEmail ?? g?.owner;
@@ -147,13 +191,3 @@ export const selectSelectedGroupWithOwnership = createSelector(
     return { ...g, isOwner: isOwnerByClient(g, userEmail, userId) };
   }
 );
-
-export const fetchGroupOnly = createAsyncThunk('groups/fetchOnly', async (groupId, { rejectWithValue }) => {
-  try {
-    const { data } = await http.get(`/groups/${groupId}`);
-    return data;
-  } catch (err) {
-    return rejectWithValue(err?.response?.data?.message || 'Failed to load group');
-  }
-});
-
