@@ -8,43 +8,34 @@ import { voteForCandidate } from './votesSlice';
    ====================== */
 
 // כל הקבוצות
-export const fetchGroups = createAsyncThunk(
-  'groups/fetchAll',
-  async (_, { rejectWithValue }) => {
-    try {
-      const res = await http.get('/groups');
-      return res.data;
-    } catch (err) {
-      return rejectWithValue(err?.response?.data?.message || 'Failed to load groups');
-    }
+export const fetchGroups = createAsyncThunk('groups/fetchAll', async (_, { rejectWithValue }) => {
+  try {
+    const res = await http.get('/groups');
+    return res.data;
+  } catch (err) {
+    return rejectWithValue(err?.response?.data?.message || 'Failed to load groups');
   }
-);
+});
 
 // קבוצה אחת (ללא מועמדים)
-export const fetchGroupOnly = createAsyncThunk(
-  'groups/fetchOnly',
-  async (groupId, { rejectWithValue }) => {
-    try {
-      const { data } = await http.get(`/groups/${groupId}`);
-      return data;
-    } catch (err) {
-      return rejectWithValue(err?.response?.data?.message || 'Failed to load group');
-    }
+export const fetchGroupOnly = createAsyncThunk('groups/fetchOnly', async (groupId, { rejectWithValue }) => {
+  try {
+    const { data } = await http.get(`/groups/${groupId}`);
+    return data;
+  } catch (err) {
+    return rejectWithValue(err?.response?.data?.message || 'Failed to load group');
   }
-);
+});
 
 // יצירת קבוצה
-export const createGroup = createAsyncThunk(
-  'groups/create',
-  async (payload, { rejectWithValue }) => {
-    try {
-      const { data } = await http.post('/groups/create', payload);
-      return data;
-    } catch (err) {
-      return rejectWithValue(err?.response?.data?.message || 'Create group failed');
-    }
+export const createGroup = createAsyncThunk('groups/create', async (payload, { rejectWithValue }) => {
+  try {
+    const { data } = await http.post('/groups/create', payload);
+    return data;
+  } catch (err) {
+    return rejectWithValue(err?.response?.data?.message || 'Create group failed');
   }
-);
+});
 
 // תביעת בעלות (לקבוצות ישנות ללא createdById)
 export const claimGroupOwnership = createAsyncThunk(
@@ -62,6 +53,7 @@ export const claimGroupOwnership = createAsyncThunk(
 /* ======================
    Slice
    ====================== */
+
 const groupsSlice = createSlice({
   name: 'groups',
   initialState: {
@@ -81,7 +73,7 @@ const groupsSlice = createSlice({
     claimLoading: false,
     claimError: null,
 
-    // נעילת ההצבעה לקבוצה הנוכחית
+    // נעילת ההצבעה לקבוצה הנוכחית (לדוגמה מהשרת/לוקאל סטורג')
     hasVotedInGroup: false,
   },
   reducers: {
@@ -90,7 +82,7 @@ const groupsSlice = createSlice({
       state.createError = null;
       state.justCreated = null;
     },
-    // מאפשר להגדיר ידנית (לדוגמה לפי localStorage)
+    // מאפשר להגדיר ידנית (לפי localStorage וכד')
     setHasVotedInGroup(state, action) {
       state.hasVotedInGroup = Boolean(action.payload);
     },
@@ -98,64 +90,38 @@ const groupsSlice = createSlice({
   extraReducers: (builder) => {
     builder
       // === fetchGroups ===
-      .addCase(fetchGroups.pending, (s) => { s.loading = true; s.error = null; })
+      .addCase(fetchGroups.pending,   (s)    => { s.loading = true;  s.error = null; })
       .addCase(fetchGroups.fulfilled, (s, a) => { s.loading = false; s.list = a.payload; })
-      .addCase(fetchGroups.rejected, (s, a) => { s.loading = false; s.error = a.payload; })
+      .addCase(fetchGroups.rejected,  (s, a) => { s.loading = false; s.error = a.payload; })
 
       // === fetchGroupOnly ===
-      .addCase(fetchGroupOnly.pending, (s) => {
-        s.loading = true;
-        s.error = null;
-        s.selectedGroup = null;
-        // לא מאפסים כאן hasVotedInGroup — זה תלוי בקבוצה ונקבע לפי localStorage בקומפוננטה
-      })
-      .addCase(fetchGroupOnly.fulfilled, (s, a) => {
-        s.loading = false;
-        s.selectedGroup = a.payload;
-      })
-      .addCase(fetchGroupOnly.rejected, (s, a) => {
-        s.loading = false;
-        s.error = a.payload;
-      })
+      .addCase(fetchGroupOnly.pending,   (s)    => { s.loading = true; s.error = null; s.selectedGroup = null; })
+      .addCase(fetchGroupOnly.fulfilled, (s, a) => { s.loading = false; s.selectedGroup = a.payload; })
+      .addCase(fetchGroupOnly.rejected,  (s, a) => { s.loading = false; s.error = a.payload; })
 
       // === createGroup ===
-      .addCase(createGroup.pending, (s) => {
-        s.createLoading = true;
-        s.createError = null;
-        s.justCreated = null;
-      })
+      .addCase(createGroup.pending,   (s)    => { s.createLoading = true; s.createError = null; s.justCreated = null; })
       .addCase(createGroup.fulfilled, (s, a) => {
         s.createLoading = false;
         s.justCreated = a.payload;
         if (Array.isArray(s.list)) s.list.unshift(a.payload);
       })
-      .addCase(createGroup.rejected, (s, a) => {
-        s.createLoading = false;
-        s.createError = a.payload;
-      })
+      .addCase(createGroup.rejected,  (s, a) => { s.createLoading = false; s.createError = a.payload; })
 
       // === claimGroupOwnership ===
-      .addCase(claimGroupOwnership.pending, (s) => {
-        s.claimLoading = true;
-        s.claimError = null;
-      })
+      .addCase(claimGroupOwnership.pending,   (s)    => { s.claimLoading = true;  s.claimError = null; })
       .addCase(claimGroupOwnership.fulfilled, (s, a) => {
         s.claimLoading = false;
         const g = a.payload;
         const idx = s.list.findIndex(x => String(x._id) === String(g._id));
         if (idx >= 0) s.list[idx] = g;
-        if (s.selectedGroup && String(s.selectedGroup._id) === String(g._id)) {
-          s.selectedGroup = g;
-        }
+        if (s.selectedGroup && String(s.selectedGroup._id) === String(g._id)) s.selectedGroup = g;
       })
-      .addCase(claimGroupOwnership.rejected, (s, a) => {
-        s.claimLoading = false;
-        s.claimError = a.payload;
-      })
+      .addCase(claimGroupOwnership.rejected,  (s, a) => { s.claimLoading = false; s.claimError = a.payload; })
 
-      // === אחרי הצבעה מוצלחת — ננעל את הכפתורים (העלאת מונה נעשית דרך candidateSlice או ריענון)
-      .addCase(voteForCandidate.fulfilled, (state) => {
-        state.hasVotedInGroup = true;
+      // === אחרי הצבעה מוצלחת — ננעל את הכפתורים (העלאת מונה נעשית ב־candidateSlice/ריענון)
+      .addCase(voteForCandidate.fulfilled, (s) => {
+        s.hasVotedInGroup = true;
       });
   },
 });
@@ -168,7 +134,7 @@ export default groupsSlice.reducer;
    ====================== */
 
 const selectMyEmail = (s) => s.auth.userEmail || null;
-const selectMyId = (s) => s.auth.userId || null;
+const selectMyId    = (s) => s.auth.userId || null;
 
 const getCreatorEmail = (g) => {
   const cand = g?.createdBy ?? g?.created_by ?? g?.createdByEmail ?? g?.ownerEmail ?? g?.owner;
@@ -177,9 +143,9 @@ const getCreatorEmail = (g) => {
 
 const isOwnerByClient = (g, myEmail, myUserId) => {
   const groupEmail = getCreatorEmail(g);
-  const meEmail = (myEmail || '').trim().toLowerCase();
+  const meEmail    = (myEmail || '').trim().toLowerCase();
   const emailMatch = !!(groupEmail && meEmail && groupEmail === meEmail);
-  const idMatch = !emailMatch && g?.createdById && myUserId &&
+  const idMatch    = !emailMatch && g?.createdById && myUserId &&
     String(g.createdById) === String(myUserId);
   return !!(emailMatch || idMatch);
 };
@@ -189,10 +155,9 @@ export const selectGroupsWithOwnership = createSelector(
   selectMyEmail,
   selectMyId,
   (groups, userEmail, userId) =>
-    (groups || []).map(g => {
-      if (typeof g?.isOwner === 'boolean') return g;
-      return { ...g, isOwner: isOwnerByClient(g, userEmail, userId) };
-    })
+    (groups || []).map(g => (typeof g?.isOwner === 'boolean'
+      ? g
+      : { ...g, isOwner: isOwnerByClient(g, userEmail, userId) }))
 );
 
 export const selectSelectedGroupWithOwnership = createSelector(

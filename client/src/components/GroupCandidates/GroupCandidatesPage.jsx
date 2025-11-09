@@ -3,9 +3,8 @@ import { useEffect, useState } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 
-import { fetchGroupOnly, setHasVotedInGroup } from '../../slices/groupsSlice';
+import { fetchGroupOnly } from '../../slices/groupsSlice';
 import { voteForCandidate } from '../../slices/votesSlice';
-
 import {
   fetchCandidatesByGroup,
   selectCandidatesForGroup,
@@ -21,15 +20,17 @@ export default function GroupCandidatesPage() {
   const navigate = useNavigate();
   const location = useLocation();
 
+  // ספינר/נעילה בזמן הצבעה
   const [isVoting, setIsVoting] = useState(false);
 
-  const { selectedGroup: group, loading: groupLoading, error: groupError, hasVotedInGroup } =
-    useSelector(s => s.groups);
-  const isAuthed   = useSelector(s => Boolean(s.auth?.token));
+  // סטייטים מה-store
+  const { selectedGroup: group, loading: groupLoading, error: groupError } = useSelector(s => s.groups);
+  const isAuthed = useSelector(s => Boolean(s.auth?.token));
 
-  const candidates  = useSelector(selectCandidatesForGroup(groupId));
-  const candLoading = useSelector(selectCandidatesLoadingForGroup(groupId));
-  const candError   = useSelector(selectCandidatesErrorForGroup(groupId));
+  // מועמדים
+  const candidates   = useSelector(selectCandidatesForGroup(groupId));
+  const candLoading  = useSelector(selectCandidatesLoadingForGroup(groupId));
+  const candError    = useSelector(selectCandidatesErrorForGroup(groupId));
 
   // טעינת קבוצה + מועמדים
   useEffect(() => {
@@ -38,14 +39,11 @@ export default function GroupCandidatesPage() {
     dispatch(fetchCandidatesByGroup(groupId));
   }, [dispatch, groupId]);
 
-  // סנכרון נעילה לפי localStorage בכניסה/החלפת קבוצה
-  useEffect(() => {
-    if (!groupId) return;
-    dispatch(setHasVotedInGroup(Boolean(localStorage.getItem(`voted:${groupId}`))));
-  }, [dispatch, groupId]);
+  // דגל נעילה מאוחד (מהשרת או מה-localStorage)
+  const locked = Boolean(group?.hasVotedInGroup) || Boolean(localStorage.getItem(`voted:${groupId}`));
 
   const handleVote = async (candidateId) => {
-    if (hasVotedInGroup || isVoting) return;
+    if (locked || isVoting) return;
 
     if (!isAuthed) {
       navigate('/login', { state: { redirectTo: location.pathname }, replace: true });
@@ -58,17 +56,20 @@ export default function GroupCandidatesPage() {
       setIsVoting(true);
       await dispatch(voteForCandidate({ groupId, candidateId })).unwrap();
 
-      // ננעל מקומית ומתמשכת
+      // שמירת נעילה מתמשכת לרענונים
       localStorage.setItem(`voted:${groupId}`, '1');
-      dispatch(setHasVotedInGroup(true));
 
-      // ריענון מיידי של המועמדים כדי לעדכן מוני קולות
+      // ריענון מיידי להצגת מוני קולות מעודכנים
       await dispatch(fetchCandidatesByGroup(groupId));
+    } catch (e) {
+      console.error(e);
+      alert(e?.message || 'Vote failed');
     } finally {
       setIsVoting(false);
     }
   };
 
+  // מצבים כלליים
   if (groupLoading) return <div className="gc-wrap"><h2>מועמדים</h2><div>טוען...</div></div>;
   if (groupError)  return <div className="gc-wrap"><h2>מועמדים</h2><div className="err">{groupError}</div></div>;
   if (!group)      return <div className="gc-wrap"><h2>מועמדים</h2><div>לא נמצאה קבוצה.</div></div>;
@@ -91,28 +92,18 @@ export default function GroupCandidatesPage() {
       ) : !candidates?.length ? (
         <div className="muted">אין מועמדים בקבוצה.</div>
       ) : (
-        <div style={grid}>
+        <ul className="gc-list">
           {candidates.map(c => (
-            <div key={c._id} style={card}>
-              <div style={{ display: 'flex', gap: 10 }}>
-                {c.photoUrl ? (
-                  <img
-                    src={c.photoUrl}
-                    alt={c.name || 'מועמד'}
-                    style={{ width: 72, height: 72, objectFit: 'cover', borderRadius: 8, border: '1px solid #eee' }}
-                  />
-                ) : (
-                  <div style={avatar}>{(c.symbol || c.name || '?').slice(0, 2).toUpperCase()}</div>
-                )}
-                <div>
-                  <h3 style={{ margin: '6px 0 4px' }}>{c.name || '(ללא שם)'}</h3>
-                  {c.symbol && <div style={{ opacity: .8 }}>סמל: <b>{c.symbol}</b></div>}
-                  {(c.description || c.photoUrl) && (
-                    <div className="gc-sub">
-                      {c.description || ''}{c.photoUrl ? ` · ${c.photoUrl}` : ''}
-                    </div>
-                  )}
+            <li key={c._id} className="gc-row">
+              <div className="gc-main">
+                <div className="gc-title">
+                  {c.name || '(ללא שם)'} {c.symbol ? `· ${c.symbol}` : ''}
                 </div>
+                {(c.description || c.photoUrl) && (
+                  <div className="gc-sub">
+                    {c.description || ''}{c.photoUrl ? ` · ${c.photoUrl}` : ''}
+                  </div>
+                )}
               </div>
 
               {c.description && <p style={{ margin: '10px 0 0', color: '#444' }}>{c.description}</p>}
@@ -123,26 +114,24 @@ export default function GroupCandidatesPage() {
                 <button
                   style={{
                     ...voteBtn,
-                    ...(hasVotedInGroup || isVoting
+                    ...(locked || isVoting
                       ? { background: '#ccc', color: '#666', cursor: 'not-allowed', opacity: 0.9 }
                       : {}),
                   }}
                   onClick={() => handleVote(c._id)}
-                  disabled={hasVotedInGroup || isVoting}
+                  disabled={locked || isVoting}
                 >
-                  {hasVotedInGroup ? 'כבר הצבעת' : isVoting ? 'מצביע/ה…' : 'הצבע/י'}
+                  {locked ? 'כבר הצבעת' : isVoting ? 'מצביע/ה…' : 'הצבע/י'}
                 </button>
               </div>
-            </div>
+            </li>
           ))}
-        </div>
+        </ul>
       )}
     </div>
   );
 }
 
-const grid   = { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 16 };
-const card   = { border: '1px solid #e6e6e6', borderRadius: 14, padding: 14, boxShadow: '0 1px 6px rgba(0,0,0,0.06)', background: '#fff' };
-const avatar = { width: 72, height: 72, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: 8, border: '1px solid #eee', background: '#f7f7f7', fontWeight: 700 };
-const chip   = { background: '#f6f6f6', border: '1px solid #e2e2e2', borderRadius: 999, padding: '4px 10px', fontSize: 12 };
-const voteBtn= { background: '#0d47a1', color: '#fff', border: 'none', borderRadius: 6, padding: '6px 12px', cursor: 'pointer' };
+// סגנונות קטנים בשורת קוד (אם אין בקובץ ה-CSS)
+const chip    = { background: '#f6f6f6', border: '1px solid #e2e2e2', borderRadius: 999, padding: '4px 10px', fontSize: 12 };
+const voteBtn = { background: '#0d47a1', color: '#fff', border: 'none', borderRadius: 6, padding: '6px 12px', cursor: 'pointer' };
