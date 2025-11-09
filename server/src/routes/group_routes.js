@@ -10,6 +10,7 @@ const {
   deleteGroup,
   getGroupById,
   getAllGroups,
+  getUserGroups,
 } = require('../controllers/group_controller');
 
 // יצירה/עדכון/מחיקה – דורשים התחברות כדי שיהיה req.user.email
@@ -23,6 +24,7 @@ router.post('/create',
 );
 router.put('/:id', auth, updateGroup);
 router.delete('/:id', auth, handleGroupDependencies, deleteGroup);
+router.get('/my', auth, getUserGroups);
 
 // קריאה
 router.get('/:id', getGroupById);
