@@ -28,7 +28,7 @@ async function register({ firstName, lastName, email, phone, city, address, pass
         lastName,
         email,
         phone,
-    city: city || '', // ← ודאי שיש ערך
+        city: city || '', // ← ודאי שיש ערך
         address, // הכתובת שמתקבלת מהלקוח
         passwordHash,
         joinedGroups: [],
