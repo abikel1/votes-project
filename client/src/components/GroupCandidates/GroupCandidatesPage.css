@@ -1,0 +1,177 @@
+/* ===== GroupCandidatesPage ===== */
+:root{
+  --brand: #0d47a1;         /* כחול נביגציה */
+  --brand-700:#0b3b88;
+  --text:#0a0a0a;
+  --muted:#667085;
+  --bg:#f5f7fb;
+  --card:#ffffff;
+  --line:#e6eaf2;
+  --chip-bg:#f1f4f9;
+  --danger:#c62828;
+  --success:#1b5e20;
+}
+
+/* פריסת דף כללית */
+.gc-wrap{
+  direction: rtl;
+  max-width: 1100px;
+  margin: 24px auto;
+  padding: 0 16px 32px;
+  color: var(--text);
+}
+
+/* כותרת עליונה */
+.gc-header{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 18px;
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 12px;
+}
+.gc-header h2{
+  margin: 0;
+  font-size: 28px;
+  letter-spacing: .3px;
+}
+.gc-subtitle{
+  font-size: 14px;
+  color: var(--muted);
+}
+.gc-actions{
+  display: flex;
+  gap: 8px;
+}
+
+/* כפתורים */
+.gc-btn,
+.gc-btn-outline{
+  font-size: 14px;
+  padding: 8px 14px;
+  border-radius: 10px;
+  transition: transform .08s ease, box-shadow .15s ease, background .15s ease, color .15s ease;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.gc-btn{
+  background: var(--brand);
+  color: #fff;
+  border: 1px solid var(--brand);
+  box-shadow: 0 2px 8px rgba(13,71,161,.12);
+}
+.gc-btn:hover{ background: var(--brand-700); transform: translateY(-1px); }
+.gc-btn:active{ transform: translateY(0); }
+
+.gc-btn:disabled{
+  background: #cfd7e6 !important;
+  color: #6b7280 !important;
+  border-color: #cfd7e6 !important;
+  cursor: not-allowed !important;
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+.gc-btn-outline{
+  background: #fff;
+  color: var(--brand);
+  border: 1px solid var(--brand);
+}
+.gc-btn-outline:hover{
+  background: rgba(13,71,161,.06);
+}
+
+/* רשימת המועמדים – כרטיסים */
+.gc-list{
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 14px;
+}
+
+.gc-row{
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 14px 16px;
+  box-shadow: 0 2px 10px rgba(16,24,40,.06);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.gc-row:hover{
+  box-shadow: 0 4px 16px rgba(16,24,40,.08);
+}
+
+/* תוכן בכרטיס */
+.gc-main{
+  min-width: 0; /* שומר על חיתוך יפה בשורות ארוכות */
+}
+.gc-title{
+  font-weight: 700;
+  font-size: 16px;
+  margin-bottom: 6px;
+  color: var(--text);
+}
+.gc-sub{
+  font-size: 13px;
+  color: var(--muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* צד ימין בכרטיס (כפתור+צ'יפ) */
+.gc-actions{
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* צ'יפ קטן לספירת קולות */
+.gc-chip{
+  background: var(--chip-bg);
+  border: 1px solid var(--line);
+  color: var(--brand);
+  font-weight: 600;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+}
+
+/* מצבים */
+.err{
+  color: var(--danger);
+  background: #fde8e8;
+  border: 1px solid #f8c7c7;
+  padding: 10px 12px;
+  border-radius: 10px;
+  margin: 8px 0;
+}
+.muted{
+  color: var(--muted);
+  background: var(--bg);
+  border: 1px dashed var(--line);
+  padding: 16px;
+  border-radius: 12px;
+}
+
+/* מובייל */
+@media (max-width: 640px){
+  .gc-header{
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+  .gc-actions{ width: 100%; }
+  .gc-actions .gc-btn,
+  .gc-actions .gc-btn-outline{
+    flex: 1;
+    text-align: center;
+  }
+}
