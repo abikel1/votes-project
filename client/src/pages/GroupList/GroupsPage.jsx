@@ -1,8 +1,20 @@
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { fetchGroups } from '../../slices/groupsSlice';
-import { requestJoinGroup } from '../../slices/joinRequestsSlice';
+import {
+    fetchGroups,
+    fetchMyGroups,
+    selectMyJoinedIds,
+    selectMyCreatedIds,
+} from '../../slices/groupsSlice';
+import {
+    requestJoinGroup,
+    markJoinedLocally,
+    fetchMyJoinStatuses,
+    selectMyPendingSet,
+    hydratePendingFromLocalStorage,
+} from '../../slices/joinRequestsSlice';
+import http from '../../api/http';
 import './GroupsPage.css';
 
 function formatDate(d) {
@@ -14,7 +26,6 @@ function formatDate(d) {
     }
 }
 
-// עוזר: הורדת אימייל לקייס אחיד
 const lc = (s) => (s || '').trim().toLowerCase();
 
 export default function GroupsPage() {
@@ -22,58 +33,127 @@ export default function GroupsPage() {
     const navigate = useNavigate();
 
     const { loading, error: err, list: groups } = useSelector((s) => s.groups);
-
-    // נשלוף גם מה־auth לרינדור מיידי
     const { userEmail: authEmail, userId: authId } = useSelector((s) => s.auth);
 
-    useEffect(() => { dispatch(fetchGroups()); }, [dispatch]);
+    const joinedIdsSet = useSelector(selectMyJoinedIds);
+    const pendingIdsSet = useSelector(selectMyPendingSet);
+    const createdIdsSet = useSelector(selectMyCreatedIds);
+
+    // 1) לשחזר pending מ-LS לפני ששרת עונה
+    useEffect(() => { dispatch(hydratePendingFromLocalStorage()); }, [dispatch]);
+
+    // 2) טעינה ראשונית
+    useEffect(() => {
+        dispatch(fetchGroups());
+        dispatch(fetchMyGroups());
+        dispatch(fetchMyJoinStatuses());
+    }, [dispatch]);
+
+    // 3) פולינג עדין לעדכון מהיר לאחר אישור מנהל
+    useEffect(() => {
+        const t = setInterval(() => {
+            dispatch(fetchMyGroups());
+            dispatch(fetchMyJoinStatuses());
+        }, 5000);
+        return () => clearInterval(t);
+    }, [dispatch]);
+
+    // 4) רענון כשחוזרים לפוקוס
+    useEffect(() => {
+        const refresh = () => {
+            dispatch(fetchMyGroups());
+            dispatch(fetchMyJoinStatuses());
+        };
+        window.addEventListener('focus', refresh);
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'visible') refresh();
+        });
+        return () => { window.removeEventListener('focus', refresh); };
+    }, [dispatch]);
+
+    // 5) אם מזהים חברות — מסמנים מקומית (ניקוי pending מה-LS)
+    useEffect(() => {
+        for (const gid of joinedIdsSet) {
+            dispatch(markJoinedLocally(String(gid)));
+        }
+    }, [dispatch, joinedIdsSet]);
 
     if (loading) return <div className="loading-wrap">טוען קבוצות...</div>;
     if (err) return <div className="error">{err}</div>;
     if (!groups?.length) return <div className="empty">אין קבוצות עדיין.</div>;
+
+    const myEmail = lc(authEmail) || lc(localStorage.getItem('userEmail'));
+    const myId = String(authId ?? localStorage.getItem('userId') ?? '');
 
     return (
         <div className="page-wrap">
             <h2 className="page-title">כל הקבוצות</h2>
             <div className="groups-grid">
                 {groups.map((g) => {
-                    const openGroup = () => navigate(`/groups/${g._id}`);
-
-                    // const openCandidates = () => navigate(`/groups/${g._id}/candidates`);
-                    const goSettings = (e) => { e.stopPropagation(); navigate(`/groups/${g._id}/settings`); };
-
+                    const gid = String(g._id);
                     const isLocked = !!g.isLocked;
 
-                    // --- Fallback לבעלות כדי להציג ⚙️ מיידית גם אחרי רענון ---
-                    const myEmail = lc(authEmail) || lc(localStorage.getItem('userEmail'));
-                    const myId = String(authId ?? localStorage.getItem('userId') ?? '');
-
+                    // בעלות (ללא hooks)
                     const createdByEmail = lc(g.createdBy ?? g.created_by ?? g.createdByEmail ?? g.ownerEmail ?? g.owner);
                     const createdById = String(g.createdById ?? '');
-
-                    const fallbackOwner =
+                    const isOwner =
+                        !!g.isOwner ||
                         (!!myEmail && !!createdByEmail && myEmail === createdByEmail) ||
                         (!!myId && !!createdById && myId === createdById);
 
-                    const showGear = !!g.isOwner || fallbackOwner;
+                    const isMember = joinedIdsSet.has(gid);
+                    const isPending = pendingIdsSet.has(gid);
+
+                    const goSettings = (e) => { e.stopPropagation(); navigate(`/groups/${gid}/settings`); };
 
                     const onRequestJoin = (e) => {
                         e.stopPropagation();
-                        dispatch(requestJoinGroup(g._id))
-                            .unwrap()
-                            .then(() => alert('הבקשה נשלחה'))
-                            .catch((er) => alert(er));
+                        if (isMember || isPending) return;
+                        dispatch(requestJoinGroup(gid)).unwrap().catch(() => { });
                     };
 
+                    // ✅ בלחיצה בזמן "בהמתנה" נבדוק עם השרת האם כבר אושרה החברות
+                    const onCardClick = async () => {
+                        if (!isOwner && isLocked && isPending && !isMember) {
+                            try {
+                                const { data } = await http.get(`/groups/${gid}/my-membership`);
+                                if (data?.member) {
+                                    dispatch(markJoinedLocally(gid));
+                                    navigate(`/groups/${gid}`);
+                                    return;
+                                }
+                            } catch (err) {
+                                console.error('Error checking membership:', err);
+                            }
+                            alert('עדיין אינך מחובר/ת לקבוצה. הבקשה בהמתנה לאישור מנהל/ת.');
+                            return;
+                        }
+
+                        if (!isOwner && isLocked && !isMember) {
+                            alert('הקבוצה נעולה. אין לך גישה אליה.');
+                            return;
+                        }
+
+                        navigate(`/groups/${gid}`);
+                    };
+
+
+                    const cardDisabled = (!isOwner && isLocked && ((isPending && !isMember) || (!isPending && !isMember)));
+
                     return (
-                        <article key={g._id} onClick={openGroup} className="group-card">
+                        <article
+                            key={gid}
+                            onClick={onCardClick}
+                            className={`group-card ${cardDisabled ? 'card-disabled' : ''}`}
+                            title={cardDisabled ? 'אין גישה לקבוצה כרגע' : undefined}
+                        >
                             <header className="card-header">
                                 <h3 className="card-title">{g.name}</h3>
 
                                 <div className="card-actions">
                                     <span className="badge">מקס׳ זוכים: <b>{g.maxWinners ?? 1}</b></span>
                                     {isLocked && <span className="chip">🔒 נעולה</span>}
-                                    {showGear && (
+                                    {isOwner && (
                                         <button
                                             className="gear-btn"
                                             onClick={goSettings}
@@ -91,9 +171,18 @@ export default function GroupsPage() {
                                 <div><small>סיום:</small><b>{formatDate(g.endDate)}</b></div>
                             </div>
 
-                            {isLocked && !showGear && (
+                            {!isOwner && isLocked && (
                                 <div className="actions" style={{ marginTop: 10 }}>
-                                    <button className="btn" onClick={onRequestJoin}>בקש/י הצטרפות</button>
+                                    {isMember ? (
+                                        <span className="chip success">מחובר/ת</span>
+                                    ) : isPending ? (
+                                        <>
+                                            <button className="btn" disabled>בהמתנה…</button>
+                                            <div className="pending-hint">הבקשה נשלחה וממתינה לאישור מנהל/ת</div>
+                                        </>
+                                    ) : (
+                                        <button className="btn" onClick={onRequestJoin}>בקש/י הצטרפות</button>
+                                    )}
                                 </div>
                             )}
                         </article>
