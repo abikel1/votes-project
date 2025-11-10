@@ -120,3 +120,52 @@ h1 {
   background-color: #d4edda; /* ירוק עדין */
   color: #155724;
 }
+
+/* אחידות מרווחים גם עבור הקומפוננטה של עיר+רחוב בתוך ההרשמה */
+.citystreet--register {
+  /* אל תהיי Grid כאן כדי לא לשנות את חישוב המרווחים */
+  display: block;
+  margin: 0;
+  padding: 0;
+}
+
+/* ודאי שכל אינפוט-קוביה בקומפוננטה מקבל בדיוק אותו מרווח כמו שאר השדות */
+.citystreet--register .control {
+  margin: 0 0 24px;  /* כמו .form .control */
+}
+.citystreet--register .control:last-child {
+  margin-bottom: 24px; /* לשמור על עקביות גם באחרון */
+}
+
+
+/* סטייל נקי להרשמה
+.citystreet--register {
+  display: grid;
+  gap: 14px;
+}
+.citystreet--register .reg-input {
+  width: 100%;
+  padding: 14px 16px;
+  font-family: 'Rubik', sans-serif;
+  font-size: 16px;
+  border: 2px solid #0a3a66;
+  border-radius: 6px;
+  background: #fff;
+  color: #003366;
+}
+.citystreet--register .reg-input:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(13, 71, 161, 0.15);
+} */
+
+/* יותר ריווח מתחת ל־navbar */
+body { padding-top: 80px; }     /* אם יש לך כבר 60px – תעדכני ל-80px */
+
+.form-container { 
+  padding-top: 5px;            /* שיהיה מרווח נעים לפני הכותרת */
+}
+
+.form h1 {
+  margin: 0 0 40px 0;           /* שלא יחתך ולא יתנגש עם הבלוק מעל */
+}
+
