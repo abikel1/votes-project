@@ -1,10 +1,10 @@
 .page-wrap {
-    padding: 15px;
+    padding: 12px;
     max-width: 100%;
     height: 100vh;
     margin: 0;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(135deg, #f5f7fa 0%, #e8ecf1 100%);
+    background: #f8fafc;
     overflow: hidden;
     display: flex;
     flex-direction: column;
@@ -13,92 +13,86 @@
 
 .page-header {
     text-align: center;
-    margin-bottom: 10px;
+    margin-bottom: 12px;
+    background: white;
+    padding: 12px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
 
 .page-title {
-    font-size: 28px;
-    margin-bottom: 5px;
-    color: #1a202c;
+    font-size: 24px;
+    margin: 0 0 6px 0;
+    color: #1e293b;
     font-weight: 700;
-    text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
 }
 
 .group-description {
-    margin-bottom: 8px;
-    color: #4a5568;
+    margin: 0;
+    color: #64748b;
     font-size: 13px;
-    line-height: 1.3;
+    line-height: 1.4;
 }
 
 .meta-and-button {
     display: flex;
     justify-content: center;
-    align-items: center;
-    gap: 15px;
-    margin-bottom: 10px;
+    align-items: stretch;
+    gap: 12px;
+    margin-bottom: 12px;
 }
 
 .group-meta {
     background: white;
-    padding: 10px 18px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+    padding: 12px 16px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
     display: flex;
     flex-direction: row;
-    gap: 18px;
-    border-right: 4px solid #3b82f6;
+    gap: 20px;
     flex-wrap: wrap;
+    align-items: center;
 }
 
 .group-meta > div {
     display: flex;
     align-items: center;
     gap: 6px;
-    font-size: 12px;
+    font-size: 13px;
 }
 
 .meta-label {
     font-weight: 600;
-    color: #2d3748;
+    color: #475569;
 }
 
 .meta-value {
     color: #3b82f6;
     font-weight: 700;
-    font-size: 13px;
+    font-size: 14px;
 }
 
 .vote-btn {
-    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    background: #3b82f6;
     color: white;
     border: none;
-    padding: 10px 25px;
+    padding: 12px 24px;
     cursor: pointer;
-    font-size: 13px;
+    font-size: 14px;
     font-weight: 600;
-    box-shadow: 0 4px 10px rgba(37, 99, 235, 0.3);
-    transition: all 0.3s ease;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    transition: all 0.2s ease;
     text-transform: uppercase;
     letter-spacing: 0.5px;
 }
 
 .vote-btn:hover {
-    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
-    transform: translateY(-2px);
-    box-shadow: 0 6px 15px rgba(37, 99, 235, 0.4);
+    background: #2563eb;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
 }
 
 .vote-btn:active {
-    transform: translateY(0);
-}
-
-.main-content {
-    display: grid;
-    grid-template-columns: 0.5fr 1fr;
-    gap: 15px;
-    flex: 1;
-    overflow: hidden;
-    min-height: 0;
+    transform: scale(0.98);
 }
 
 .main-content-resizable {
@@ -107,11 +101,13 @@
     overflow: hidden;
     min-height: 0;
     gap: 0;
+    border: 1px solid #e2e8f0;
+    background: white;
 }
 
 .resize-handle {
-    width: 8px;
-    background: #e5e7eb;
+    width: 6px;
+    background: #e2e8f0;
     cursor: col-resize;
     display: flex;
     align-items: center;
@@ -141,19 +137,21 @@
     flex-direction: column;
     overflow: hidden;
     flex-shrink: 0;
+    border-left: 1px solid #e2e8f0;
 }
 
 .section-title {
-    font-size: 18px;
-    color: #1a202c;
+    font-size: 16px;
+    color: #1e293b;
     font-weight: 700;
-    margin: 0 0 8px 0;
+    margin: 0 0 10px 0;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #3b82f6;
 }
 
 .candidates-container {
-    background: white;
+    background: #f8fafc;
     padding: 12px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
     overflow-y: auto;
     flex: 1;
     height: 100%;
@@ -161,39 +159,39 @@
 
 .dashboard .candidates-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
     gap: 10px;
 }
 
 .candidate-card {
     background: white;
-    padding: 10px;
+    padding: 12px;
     text-align: center;
     position: relative;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-    transition: all 0.3s ease;
-    border: 2px solid transparent;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    transition: all 0.2s ease;
 }
 
 .candidate-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+    transform: translateY(-2px);
+    box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+    border-color: #3b82f6;
 }
 
 .candidate-card.leader {
-    border: 3px solid #4caf50;
-    background: linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%);
-    box-shadow: 0 4px 12px rgba(76, 175, 80, 0.25);
+    border: 2px solid #10b981;
+    background: #f0fdf4;
 }
 
 .candidate-photo {
-    width: 55px;
-    height: 55px;
+    width: 60px;
+    height: 60px;
     object-fit: cover;
-    margin: 0 auto 8px;
+    margin: 0 auto 10px;
     display: block;
-    border: 2px solid #e5e7eb;
-    transition: border-color 0.3s ease;
+    border: 2px solid #e2e8f0;
+    transition: border-color 0.2s ease;
 }
 
 .candidate-card:hover .candidate-photo {
@@ -201,142 +199,136 @@
 }
 
 .candidate-card.leader .candidate-photo {
-    border-color: #4caf50;
+    border-color: #10b981;
 }
 
 .candidate-card h4 {
-    font-size: 13px;
-    margin: 5px 0;
-    color: #1a202c;
+    font-size: 14px;
+    margin: 6px 0;
+    color: #1e293b;
     font-weight: 700;
 }
 
 .candidate-symbol {
     display: inline-block;
-    background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%);
-    color: #3730a3;
-    padding: 2px 6px;
-    margin: 3px 0;
+    background: #dbeafe;
+    color: #1e40af;
+    padding: 3px 8px;
+    margin: 4px 0;
     font-weight: 600;
-    font-size: 10px;
-    border: 2px solid #a5b4fc;
+    font-size: 11px;
+    border: 1px solid #93c5fd;
 }
 
 .candidate-card p {
-    color: #6b7280;
-    font-size: 10px;
+    color: #64748b;
+    font-size: 11px;
     line-height: 1.3;
     margin: 6px 0;
 }
 
 .votes-count {
-    margin-top: 6px;
-    font-weight: 800;
-    font-size: 13px;
+    margin-top: 8px;
+    font-weight: 700;
+    font-size: 14px;
     color: #059669;
     background: #d1fae5;
-    padding: 3px 8px;
+    padding: 4px 10px;
     display: inline-block;
+    border: 1px solid #6ee7b7;
 }
 
 .current-leader {
     position: absolute;
-    top: -8px;
-    right: -8px;
-    background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
-    width: 28px;
-    height: 28px;
+    top: -10px;
+    right: -10px;
+    background: #fbbf24;
+    width: 32px;
+    height: 32px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 16px;
-    box-shadow: 0 3px 10px rgba(251, 191, 36, 0.4);
+    font-size: 18px;
+    box-shadow: 0 2px 6px rgba(251, 191, 36, 0.4);
     border: 2px solid white;
-    animation: pulse 2s infinite;
-}
-
-@keyframes pulse {
-    0%, 100% {
-        transform: scale(1);
-    }
-    50% {
-        transform: scale(1.1);
-    }
 }
 
 .right-section {
     display: flex;
     flex-direction: column;
-    gap: 15px;
-    overflow: hidden;
+    gap: 12px;
     height: 100%;
+    padding: 12px;
+    background: #f8fafc;
+    overflow: hidden;
 }
 
 .charts {
     display: flex;
     flex-direction: column;
-    gap: 15px;
+    gap: 12px;
     height: 100%;
+    width: 100%;
 }
 
 .pie-chart-container,
 .bar-chart-container {
     background: white;
+    border: 1px solid #e2e8f0;
     padding: 12px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
-    flex: 1;
     display: flex;
     flex-direction: column;
-    min-height: 0;
-    height: calc(50% - 7.5px);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    /* height: calc(50% - 6px); */
+        height: 260px; /* או כל גובה שאתה רוצה */
+
+    min-height: 250px;
 }
 
 .pie-chart-container h3,
 .bar-chart-container h3 {
     font-size: 15px;
-    color: #1a202c;
-    margin: 0 0 8px 0;
+    color: #1e293b;
+    margin: 0 0 10px 0;
     font-weight: 700;
     flex-shrink: 0;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #3b82f6;
 }
 
 .chart-wrapper {
+    width: 100%;
+    height: 260px; /* גובה קבוע שמבטיח שהגרף יוצג */
     flex: 1;
-    min-height: 0;
-    height: 100%;
 }
+
 
 .loading-wrap {
     text-align: center;
-    font-size: 16px;
+    font-size: 15px;
     padding: 30px 20px;
-    color: #6b7280;
+    color: #64748b;
 }
 
 .err {
     background: #fee2e2;
     color: #dc2626;
-    padding: 8px 12px;
+    padding: 10px 14px;
     text-align: center;
-    margin: 8px 0;
-    border-right: 4px solid #dc2626;
+    margin: 12px 0;
+    border: 1px solid #fca5a5;
+    border-right: 3px solid #dc2626;
     font-weight: 600;
-    font-size: 12px;
+    font-size: 13px;
 }
 
-@media (max-width: 1200px) {
-    .main-content {
-        grid-template-columns: 1fr;
-        grid-template-rows: 1fr 1fr;
-    }
-    
-    .charts {
-        flex-direction: row;
-    }
-    
-    .pie-chart-container,
-    .bar-chart-container {
-        height: 100%;
-        width: calc(50% - 7.5px);
-    }
+.no-votes-message {
+    text-align: center;
+    padding: 40px;
+    font-size: 15px;
+    color: #64748b;
+    background: white;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    margin: auto;
 }
