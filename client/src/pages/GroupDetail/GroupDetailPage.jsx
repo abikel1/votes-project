@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchGroups, selectGroupsWithOwnership } from '../../slices/groupsSlice';
@@ -29,10 +29,74 @@ export default function GroupDetailPage() {
   const loadingCandidates = useSelector(selectCandidatesLoadingForGroup(groupId));
   const errorCandidates = useSelector(selectCandidatesErrorForGroup(groupId));
 
+  const [leftWidth, setLeftWidth] = useState(35); // אחוז רוחב של עמודה שמאלית
+  const [isDragging, setIsDragging] = useState(false);
+  const containerRef = useRef(null);
+
+
+
   useEffect(() => {
     dispatch(fetchGroups());
     dispatch(fetchCandidatesByGroup(groupId));
   }, [dispatch, groupId]);
+
+  useEffect(() => {
+    const handleMouseMove = (e) => {
+      if (!isDragging || !containerRef.current) return;
+      
+      const container = containerRef.current;
+      const containerRect = container.getBoundingClientRect();
+      const newLeftWidth = ((e.clientX - containerRect.left) / containerRect.width) * 100;
+      
+      // הגבלה בין 20% ל-70%
+      if (newLeftWidth >= 20 && newLeftWidth <= 70) {
+        setLeftWidth(newLeftWidth);
+      }
+    };
+
+    const handleMouseUp = () => {
+      setIsDragging(false);
+    };
+
+    if (isDragging) {
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', handleMouseUp);
+    }
+
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [isDragging]);
+
+  useEffect(() => {
+    const handleMouseMove = (e) => {
+      if (!isDragging || !containerRef.current) return;
+      
+      const container = containerRef.current;
+      const containerRect = container.getBoundingClientRect();
+      const newLeftWidth = ((e.clientX - containerRect.left) / containerRect.width) * 100;
+      
+      // הגבלה בין 20% ל-70%
+      if (newLeftWidth >= 20 && newLeftWidth <= 70) {
+        setLeftWidth(newLeftWidth);
+      }
+    };
+
+    const handleMouseUp = () => {
+      setIsDragging(false);
+    };
+
+    if (isDragging) {
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', handleMouseUp);
+    }
+
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [isDragging]);
 
   const group = groups.find(g => g._id === groupId);
   
@@ -43,7 +107,6 @@ export default function GroupDetailPage() {
   const totalVotes = candidates.reduce((sum, c) => sum + (c.votesCount || 0), 0);
   const sortedCandidates = [...candidates].sort((a, b) => (b.votesCount || 0) - (a.votesCount || 0));
 
-  // נתונים לגרף Pie
   const pieData = candidates
     .filter(c => c.votesCount > 0)
     .map(c => ({
@@ -51,19 +114,19 @@ export default function GroupDetailPage() {
       value: c.votesCount || 0
     }));
 
-  // נתונים לגרף Bar
   const barData = sortedCandidates.map(c => ({
-    name: c.name.length > 12 ? c.name.substring(0, 12) + '...' : c.name,
+    name: c.name.length > 10 ? c.name.substring(0, 10) + '...' : c.name,
     votesCount: c.votesCount || 0
   }));
 
   return (
     <div className="page-wrap dashboard">
-      <h2 className="page-title">{group.name}</h2>
-      <p className="group-description">{group.description}</p>
+      <div className="page-header">
+        <h2 className="page-title">{group.name}</h2>
+        <p className="group-description">{group.description}</p>
+      </div>
 
-      <div className="meta-and-box">
-        {/* מידע על הקבוצה */}
+      <div className="meta-and-button">
         <div className="group-meta">
           <div>
             <span className="meta-label">📅 תאריך יצירה:</span>
@@ -78,144 +141,158 @@ export default function GroupDetailPage() {
             <span className="meta-value">{totalVotes}</span>
           </div>
         </div>
+
+        <button 
+          className="vote-btn" 
+          onClick={() => navigate(`/groups/${groupId}/candidates`)}
+        >
+          🗳️ לכו להצביע
+        </button>
       </div>
 
-      <button 
-        className="vote-btn" 
-        onClick={() => navigate(`/groups/${groupId}/candidates`)}
-      >
-        🗳️ לכו להצביע עכשיו
-      </button>
-
-      {loadingCandidates && (
-        <p className="loading-wrap">טוען מועמדים...</p>
-      )}
-      
       {errorCandidates && (
         <p className="err">❌ שגיאה: {errorCandidates}</p>
       )}
 
-      {/* כרטיסי מועמדים */}
-      {!loadingCandidates && candidates.length > 0 && (
-        <>
-          <h3 className="section-title">המועמדים</h3>
-          <div className="candidates-grid">
-            {sortedCandidates.map((c, idx) => (
-              <div 
-                key={c._id} 
-                className={`candidate-card ${idx === 0 && totalVotes > 0 ? 'leader' : ''}`}
-              >
-                {idx === 0 && totalVotes > 0 && (
-                  <div className="current-leader">🏆</div>
-                )}
-                
-                {c.photoUrl ? (
-                  <img 
-                    src={c.photoUrl} 
-                    alt={c.name} 
-                    className="candidate-photo" 
-                  />
-                ) : (
-                  <div className="candidate-photo" style={{
-                    background: 'linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontSize: '40px',
-                    color: '#4338ca'
-                  }}>
-                    👤
+      <div 
+        className="main-content-resizable" 
+        ref={containerRef}
+        style={{ cursor: isDragging ? 'col-resize' : 'default' }}
+      >
+        {/* עמודה שמאלית - מועמדים */}
+        <div className="left-section" style={{ width: `${leftWidth}%` }}>
+          <div className="candidates-container">
+            <h3 className="section-title">המועמדים</h3>
+            {loadingCandidates && <p>טוען מועמדים...</p>}
+            
+            {!loadingCandidates && candidates.length > 0 && (
+              <div className="candidates-grid">
+                {sortedCandidates.map((c, idx) => (
+                  <div 
+                    key={c._id} 
+                    className={`candidate-card ${idx === 0 && totalVotes > 0 ? 'leader' : ''}`}
+                  >
+                    {idx === 0 && totalVotes > 0 && (
+                      <div className="current-leader">🏆</div>
+                    )}
+                    
+                    {c.photoUrl ? (
+                      <img 
+                        src={c.photoUrl} 
+                        alt={c.name} 
+                        className="candidate-photo" 
+                      />
+                    ) : (
+                      <div className="candidate-photo" style={{
+                        background: 'linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontSize: '30px',
+                        color: '#4338ca'
+                      }}>
+                        👤
+                      </div>
+                    )}
+                    
+                    <h4>{c.name}</h4>
+                    
+                    {c.symbol && (
+                      <span className="candidate-symbol">{c.symbol}</span>
+                    )}
+                    
+                    {c.description && <p>{c.description}</p>}
+                    
+                    <div className="votes-count">
+                      {c.votesCount || 0} קולות
+                    </div>
                   </div>
-                )}
-                
-                <h4>{c.name}</h4>
-                
-                {c.symbol && (
-                  <span className="candidate-symbol">{c.symbol}</span>
-                )}
-                
-                {c.description && <p>{c.description}</p>}
-                
-                <div className="votes-count">
-                  {c.votesCount || 0} קולות
+                ))}
+              </div>
+            )}
+
+            {!loadingCandidates && candidates.length === 0 && (
+              <p>אין מועמדים זמינים כרגע</p>
+            )}
+          </div>
+        </div>
+
+        {/* סרגל לגרירה */}
+        <div 
+          className="resize-handle"
+          onMouseDown={() => setIsDragging(true)}
+        >
+          <div className="resize-line"></div>
+        </div>
+
+        {/* עמודה ימנית - גרפים */}
+        <div className="right-section" style={{ width: `${100 - leftWidth}%` }}>
+          {!loadingCandidates && candidates.length > 0 && totalVotes > 0 && (
+            <div className="charts">
+              <div className="pie-chart-container">
+                <h3>📊 אחוזי הצבעה</h3>
+                <div className="chart-wrapper">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie
+                        data={pieData}
+                        dataKey="value"
+                        nameKey="name"
+                        cx="50%"
+                        cy="50%"
+                        outerRadius="70%"
+                        label={({ name, percent }) => 
+                          `${name}: ${(percent * 100).toFixed(0)}%`
+                        }
+                      >
+                        {pieData.map((entry, index) => (
+                          <Cell 
+                            key={`cell-${index}`} 
+                            fill={COLORS[index % COLORS.length]} 
+                          />
+                        ))}
+                      </Pie>
+                      <Tooltip formatter={(value) => `${value} קולות`} />
+                      <Legend 
+                        verticalAlign="bottom" 
+                        height={30}
+                        wrapperStyle={{ fontSize: '12px' }}
+                      />
+                    </PieChart>
+                  </ResponsiveContainer>
                 </div>
               </div>
-            ))}
-          </div>
-        </>
-      )}
 
-      {/* גרפים */}
-      {!loadingCandidates && candidates.length > 0 && totalVotes > 0 && (
-        <div className="charts">
-          {/* גרף עוגה */}
-          <div className="pie-chart-container">
-            <h3>📊 אחוזי הצבעה</h3>
-            <ResponsiveContainer width="100%" height={350}>
-              <PieChart>
-                <Pie
-                  data={pieData}
-                  dataKey="value"
-                  nameKey="name"
-                  cx="50%"
-                  cy="50%"
-                  outerRadius={110}
-                  label={({ name, percent }) => 
-                    `${name}: ${(percent * 100).toFixed(1)}%`
-                  }
-                  labelLine={true}
-                >
-                  {pieData.map((entry, index) => (
-                    <Cell 
-                      key={`cell-${index}`} 
-                      fill={COLORS[index % COLORS.length]} 
-                    />
-                  ))}
-                </Pie>
-                <Tooltip 
-                  formatter={(value) => `${value} קולות`}
-                />
-                <Legend 
-                  verticalAlign="bottom" 
-                  height={36}
-                />
-              </PieChart>
-            </ResponsiveContainer>
-          </div>
-
-          {/* גרף עמודות */}
-          <div className="bar-chart-container">
-            <h3>📈 מספר קולות לכל מועמד</h3>
-            <ResponsiveContainer width="100%" height={350}>
-              <BarChart data={barData} margin={{ top: 20, right: 30, left: 20, bottom: 60 }}>
-                <XAxis 
-                  dataKey="name" 
-                  angle={-45} 
-                  textAnchor="end"
-                  height={80}
-                  interval={0}
-                />
-                <YAxis />
-                <Tooltip 
-                  formatter={(value) => `${value} קולות`}
-                  cursor={{ fill: 'rgba(59, 130, 246, 0.1)' }}
-                />
-                <Bar 
-                  dataKey="votesCount" 
-                  fill="#3b82f6"
-                  radius={[8, 8, 0, 0]}
-                />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
+              <div className="bar-chart-container">
+                <h3>📈 מספר קולות</h3>
+                <div className="chart-wrapper">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={barData} margin={{ top: 10, right: 10, left: 0, bottom: 40 }}>
+                      <XAxis 
+                        dataKey="name" 
+                        angle={-45} 
+                        textAnchor="end"
+                        height={60}
+                        interval={0}
+                        tick={{ fontSize: 11 }}
+                      />
+                      <YAxis tick={{ fontSize: 11 }} />
+                      <Tooltip 
+                        formatter={(value) => `${value} קולות`}
+                        cursor={{ fill: 'rgba(59, 130, 246, 0.1)' }}
+                      />
+                      <Bar 
+                        dataKey="votesCount" 
+                        fill="#3b82f6"
+                      />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
-      )}
-
-      {!loadingCandidates && candidates.length === 0 && (
-        <div className="loading-wrap">
-          <p>אין מועמדים זמינים כרגע</p>
-        </div>
-      )}
+      </div>
     </div>
   );
 }
