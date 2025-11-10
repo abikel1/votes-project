@@ -196,5 +196,33 @@ body { padding-top: 80px; }     /* אם יש לך כבר 60px – תעדכני �
   pointer-events: none;      /* שהשגיאה לא תפריע להקלדה */
   z-index: 5;
 }
+/* כפתור עין בתוך שדה הסיסמה */
+.block-cube.block-input .password-toggle {
+  position: absolute;
+  top: 50%;
+  left: 12px;          /* מיקום בצד ימין */
+  transform: translateY(-50%);
+  cursor: pointer;
+  color: #003366;
+  font-size: 1rem;
+  z-index: 10;
+}
+
+.block-cube.block-input .password-toggle:hover {
+  color: #0077cc;
+}
+
+/* הודעת שגיאה בתוך התיבה */
+.msg.error {
+  display: block;
+  width: 100%;
+  padding: 6px 12px;
+  margin-bottom: 6px;
+  background-color: #ffd6d6;
+  color: #a10000;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  text-align: center;   /* טקסט במרכז */
+}
 
 

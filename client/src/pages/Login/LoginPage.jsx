@@ -3,14 +3,16 @@ import { useDispatch, useSelector } from 'react-redux';
 import { login } from '../../slices/authSlice';
 import { useNavigate } from 'react-router-dom';
 import '../Register/RegisterPage.css';
+import { FaEye, FaEyeSlash } from 'react-icons/fa'; // ספריית אייקונים
 
 export default function LoginPage() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { loading, error } = useSelector(s => s.auth);
+  const { loading } = useSelector(s => s.auth);
 
   const [form, setForm] = useState({ email: '', password: '' });
   const [errors, setErrors] = useState({});
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleFocus = (field) => setErrors(prev => ({ ...prev, [field]: null }));
 
@@ -37,58 +39,50 @@ export default function LoginPage() {
     } catch (err) {
       console.log('--- LoginPage catch ---');
       console.log('err:', err);
-
-      // אם unwrap נזרק, err הוא האובייקט של השגיאה (כמו { password: 'סיסמה לא נכונה' })
       setErrors(err || { form: 'אירעה שגיאה' });
     }
-
-
-
   };
 
+  const renderField = (placeholder, field, type = 'text') => (
+    <div className="control block-cube block-input" style={{ position: 'relative', marginBottom: '24px' }}>
+      <input
+        type={field === 'password' ? (showPassword ? 'text' : 'password') : type}
+        placeholder={placeholder}
+        value={form[field]}
+        onChange={e => setForm(f => ({ ...f, [field]: e.target.value }))}
+        onFocus={() => handleFocus(field)}
+      />
 
+      {errors[field] && (
+        <span className="msg error">{errors[field]}</span>
+      )}
 
-const renderField = (placeholder, field, type = 'text') => (
-  <div className="control block-cube block-input" style={{ position: 'relative', marginBottom: '24px' }}>
-    
-    <input
-      type={type}
-      placeholder={placeholder}
-      value={form[field]}
-      onChange={e => setForm(f => ({ ...f, [field]: e.target.value }))}
-      onFocus={() => handleFocus(field)}
-    />
+      {field === 'password' && (
+        <span
+          className="password-toggle"
+          onClick={() => setShowPassword(prev => !prev)}
+        >
+          {showPassword ? <FaEyeSlash /> : <FaEye />}
+        </span>
+      )}
 
-    {errors[field] && (
-      <span className="msg error">{errors[field]}</span>
-    )}
-
-    <div className="bg-top"><div className="bg-inner" /></div>
-    <div className="bg-right"><div className="bg-inner" /></div>
-    <div className="bg"><div className="bg-inner" /></div>
-  </div>
-);
-
-
+      <div className="bg-top"><div className="bg-inner" /></div>
+      <div className="bg-right"><div className="bg-inner" /></div>
+      <div className="bg"><div className="bg-inner" /></div>
+    </div>
+  );
 
   return (
     <div className="form-container">
       <form className="form" autoComplete="off" onSubmit={submit}>
-        <div className="control">
-          <h1>התחברות</h1>
-        </div>
+        <h1>התחברות</h1>
 
         {errors.form && <div className="top-msg error">{errors.form}</div>}
-        {/* {errors[field] && <span className="msg error">{errors[field]}</span>} */}
 
         {renderField('אימייל', 'email', 'email')}
         {renderField('סיסמה', 'password', 'password')}
 
-        <button
-          type="submit"
-          className="btn block-cube block-cube-hover"
-          disabled={loading}
-        >
+        <button type="submit" className="btn block-cube block-cube-hover" disabled={loading}>
           <div className="bg-top"><div className="bg-inner" /></div>
           <div className="bg-right"><div className="bg-inner" /></div>
           <div className="bg"><div className="bg-inner" /></div>
