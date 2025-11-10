@@ -25,15 +25,12 @@ export const fetchGroups = createAsyncThunk('groups/fetchAll', async (_, { rejec
   catch (err) { return rejectWithValue(err?.response?.data?.message || 'Failed to load groups'); }
 });
 
-export const fetchGroupOnly1 = createAsyncThunk('groups/fetchOnly', async (groupId, { rejectWithValue }) => {
+export const fetchGroupOnly = createAsyncThunk('groups/fetchOnly', async (groupId, { rejectWithValue }) => {
   try { const { data } = await http.get(`/groups/${groupId}`); return data; }
   catch (err) { return rejectWithValue(err?.response?.data?.message || 'Failed to load group'); }
 });
 
-/** טען קבוצה + השלם פרטי חברים:
- *  1) fetchUsersByIds (batch/יחידני)
- *  2) אם עדיין חסר — hydrateUsersForGroup (פולבאקים לפי ראוטים חלופיים)
- */
+/** טען קבוצה + השלם פרטי חברים */
 export const fetchGroupWithMembers = createAsyncThunk(
   'groups/fetchWithMembers',
   async (groupId, { dispatch, rejectWithValue, getState }) => {
@@ -42,11 +39,11 @@ export const fetchGroupWithMembers = createAsyncThunk(
       const ids = (Array.isArray(group?.members) ? group.members : []).map(pickId).filter(Boolean);
 
       if (ids.length) {
-        await dispatch(fetchUsersByIds(ids));      // לא מפיל על 404
+        await dispatch(fetchUsersByIds(ids));
         const afterBatch = getState().users?.byId || {};
         const missing = ids.filter(id => !afterBatch[String(id)]);
         if (missing.length) {
-          await dispatch(hydrateUsersForGroup({ groupId })); // מנסה /groups/:id/members וכו'
+          await dispatch(hydrateUsersForGroup({ groupId }));
         }
       }
       return group;
@@ -74,7 +71,35 @@ export const updateGroup = createAsyncThunk(
   }
 );
 
-/* ===== Slice ===== */
+// *** אילו קבוצות שלי? (נוצרו/הצטרפתי) ***
+export const fetchMyGroups = createAsyncThunk(
+  'groups/fetchMy',
+  async (_, { rejectWithValue }) => {
+    try {
+      const { data } = await http.get('/groups/my'); // { created: [], joined: [] }
+      return data;
+    } catch (err) {
+      return rejectWithValue(err?.response?.data?.message || 'Failed to load my groups');
+    }
+  }
+);
+
+// ✅ חדש: הסרת משתתף/ת ע״י מנהל/ת
+export const removeGroupMember = createAsyncThunk(
+  'groups/removeMember',
+  async ({ groupId, memberId, email }, { rejectWithValue }) => {
+    try {
+      const payload = {};
+      if (memberId) payload.memberId = memberId;
+      if (email) payload.email = email;
+      const { data } = await http.patch(`/groups/${groupId}/members/remove`, payload);
+      return { groupId, data };
+    } catch (err) {
+      return rejectWithValue(err?.response?.data?.message || 'Failed to remove member');
+    }
+  }
+);
+
 const groupsSlice = createSlice({
   name: 'groups',
   initialState: {
@@ -88,6 +113,8 @@ const groupsSlice = createSlice({
     updateLoading: false,
     updateError: null,
     updateSuccess: false,
+    myCreatedIds: [],
+    myJoinedIds: [],
   },
   reducers: {
     clearCreateState(state) { state.createLoading = false; state.createError = null; state.justCreated = null; },
@@ -115,16 +142,36 @@ const groupsSlice = createSlice({
         if (idx >= 0) s.list[idx] = g;
         if (s.selectedGroup && String(s.selectedGroup._id) === String(g._id)) s.selectedGroup = g;
       })
-      .addCase(updateGroup.rejected, (s, a) => { s.updateLoading = false; s.updateError = a.payload; });
+      .addCase(updateGroup.rejected, (s, a) => { s.updateLoading = false; s.updateError = a.payload; })
+
+      .addCase(fetchMyGroups.fulfilled, (s, a) => {
+        const created = Array.isArray(a.payload?.created) ? a.payload.created : [];
+        const joined = Array.isArray(a.payload?.joined) ? a.payload.joined : [];
+        s.myCreatedIds = created.map(g => String(g._id));
+        s.myJoinedIds = joined.map(g => String(g._id));
+      })
+
+      // ✅ לאחר הסרת משתתף — נעדכן selectedGroup והרשימה
+      .addCase(removeGroupMember.fulfilled, (s, a) => {
+        const { groupId, data } = a.payload || {};
+        const g = data?.group;
+        if (g) {
+          if (s.selectedGroup && String(s.selectedGroup._id) === String(groupId)) {
+            s.selectedGroup = g;
+          }
+          const idx = s.list.findIndex(x => String(x._id) === String(groupId));
+          if (idx >= 0) s.list[idx] = g;
+        }
+      });
   }
 });
 
 export const { clearCreateState, clearUpdateState } = groupsSlice.actions;
 export default groupsSlice.reducer;
-/* ======================
-   Selectors: compute ownership robustly (email first, then id)
-   ====================== */
 
+/* ======================
+   Selectors (ממואזרים!)
+   ====================== */
 const selectMyEmail = (s) => s.auth.userEmail || null;
 const selectMyId = (s) => s.auth.userId || null;
 
@@ -137,8 +184,7 @@ const isOwnerByClient = (g, myEmail, myUserId) => {
   const groupEmail = getCreatorEmail(g);
   const meEmail = (myEmail || '').trim().toLowerCase();
   const emailMatch = !!(groupEmail && meEmail && groupEmail === meEmail);
-  const idMatch = !emailMatch && g?.createdById && myUserId &&
-    String(g.createdById) === String(myUserId);
+  const idMatch = !emailMatch && g?.createdById && myUserId && String(g.createdById) === String(myUserId);
   return !!(emailMatch || idMatch);
 };
 
@@ -153,27 +199,6 @@ export const selectGroupsWithOwnership = createSelector(
     })
 );
 
-export const selectSelectedGroupWithOwnership = createSelector(
-  (s) => s.groups.selectedGroup,
-  selectMyEmail,
-  selectMyId,
-  (g, userEmail, userId) => {
-    if (!g) return null;
-    if (typeof g?.isOwner === 'boolean') return g;
-    return { ...g, isOwner: isOwnerByClient(g, userEmail, userId) };
-  }
-);
-
-export const fetchGroupOnly = createAsyncThunk('groups/fetchOnly', async (groupId, { rejectWithValue }) => {
-  try {
-    const { data } = await http.get(`/groups/${groupId}`);
-    return data;
-  } catch (err) {
-    return rejectWithValue(err?.response?.data?.message || 'Failed to load group');
-  }
-});
-
-/* ===== Selectors ===== */
 export const selectSelectedGroup = (s) => s.groups.selectedGroup;
 
 export const selectSelectedGroupMembersEnriched = createSelector(
@@ -188,4 +213,14 @@ export const selectSelectedGroupMembersEnriched = createSelector(
       return { ...merged, _id: merged._id || id, name };
     });
   }
+);
+
+// ✅ ממואיזציה כדי למנוע warnings
+export const selectMyJoinedIds = createSelector(
+  (s) => s.groups.myJoinedIds,
+  (arr) => new Set((arr || []).map(String))
+);
+export const selectMyCreatedIds = createSelector(
+  (s) => s.groups.myCreatedIds,
+  (arr) => new Set((arr || []).map(String))
 );

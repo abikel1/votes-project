@@ -5,21 +5,27 @@ const auth = require('../middlewares/auth_middleware');
 const {
   createGroup, updateGroup, deleteGroup, getGroupById, getAllGroups,
   requestJoinGroup, listJoinRequests, approveJoinRequest, rejectJoinRequest,
-  getGroupMembers,getUserGroups, // ✅
+  getGroupMembers, getUserGroups, getMyJoinStatuses, getMyMembership,
+  removeMember, // ✅
 } = require('../controllers/group_controller');
-const handleGroupDependencies = require('../middlewares/group_middleware'); // אם יש לך, השאירי
+const handleGroupDependencies = require('../middlewares/group_middleware');
 
 router.post('/create', auth, createGroup);
 router.put('/:id', auth, updateGroup);
-// <<<<<<< HEAD
-// router.delete('/:id', auth, deleteGroup);
-// =======
 router.delete('/:id', auth, handleGroupDependencies, deleteGroup);
+
 router.get('/my', auth, getUserGroups);
-// >>>>>>> a1c83c8d2145ebf88aa769ba8d04af15a79010c3
+router.get('/my-join-status', auth, getMyJoinStatuses);
+
+// בדיקת חברות לקבוצה בודדת
+router.get('/:id/my-membership', auth, getMyMembership);
+
+// *** חדש: הסרת משתתף/ת ע״י מנהל/ת ***
+// משתמשים ב-PATCH עם גוף { memberId, email }
+router.patch('/:id/members/remove', auth, removeMember);
 
 router.get('/:id', getGroupById);
-router.get('/:id/members', getGroupMembers); // ✅ חדש
+router.get('/:id/members', getGroupMembers);
 router.get('/', getAllGroups);
 
 router.post('/:id/join', auth, requestJoinGroup);
