@@ -93,7 +93,19 @@ h1 {
 .block-cube.block-cube-hover:hover .text,
 .block-cube.block-cube-hover:focus .text { color: #ffffff; }
 
-.msg.error { color: #ff5555; font-size: 0.85rem; text-align: right; }
+/* .msg.error { color: #ff5555; font-size: 0.85rem; text-align: right; } */
+/* הודעת שגיאה מעל ה-input */
+.msg.error {
+  display: block;
+  width: 100%;
+  padding: 6px 12px;
+  margin-bottom: 6px;   /* ריווח קטן מתחת להודעה */
+  background-color: #ffd6d6; /* אדום בהיר */
+  color: #a10000;           /* אדום כהה לטקסט */
+  border-radius: 6px;
+  font-size: 0.85rem;
+  text-align: right;        /* מתאים ל-RTL */
+}
 
 .msg.success { color: #009933; font-size: 0.9rem; text-align: center; margin-bottom: 12px; }
 
@@ -168,4 +180,21 @@ body { padding-top: 80px; }     /* אם יש לך כבר 60px – תעדכני �
 .form h1 {
   margin: 0 0 40px 0;           /* שלא יחתך ולא יתנגש עם הבלוק מעל */
 }
+
+/* הודעת שגיאה בתוך התיבה */
+.block-cube.block-input .msg.error {
+  position: absolute;
+  top: 50%;                 /* באמצע התיבה אנכית */
+  left: 50%;                /* באמצע התיבה אופקית */
+  transform: translate(-50%, -50%); /* מוודא שהיא באמת במרכז */
+  background-color: #ffd6d6;  /* אדום בהיר */
+  color: #a10000;            /* אדום כהה */
+  font-size: 0.85rem;
+  padding: 4px 8px;
+  border-radius: 4px;
+  text-align: center;
+  pointer-events: none;      /* שהשגיאה לא תפריע להקלדה */
+  z-index: 5;
+}
+
 

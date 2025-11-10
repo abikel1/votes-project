@@ -65,11 +65,11 @@ async function register({ firstName, lastName, email, phone, city, address, pass
 
 
 async function login({ email, password }) {
-    const user = await User.findOne({ email }).select('+passwordHash');
-    if (!user) throw Object.assign(new Error('משתמש לא קיים'), { status: 404 });
+const user = await User.findOne({ email }).select('+passwordHash');
+if (!user) throw { status: 404, errors: { email: 'אימייל לא קיים' } };
 
-    const ok = await bcrypt.compare(password, user.passwordHash);
-    if (!ok) throw Object.assign(new Error('סיסמה לא נכונה'), { status: 401 });
+const ok = await bcrypt.compare(password, user.passwordHash);
+if (!ok) throw { status: 401, errors: { password: 'סיסמה לא נכונה' } };
 
 const token = generateToken(user);
     const { passwordHash: _pwd, ...safe } = user.toObject();
