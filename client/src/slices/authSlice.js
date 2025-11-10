@@ -16,11 +16,10 @@ function decodeJwtNoVerify(token) {
 
 /** ===== קריאה ראשונית מערכי localStorage ===== */
 const initialToken = localStorage.getItem('token');
+const initialUserId = localStorage.getItem('userId');      // ← חדש
+const initialUserEmail = localStorage.getItem('userEmail');   // ← אופציונלי
 const initialFirstName = localStorage.getItem('firstName');
 const initialLastName = localStorage.getItem('lastName');
-
-const initialUserId    = localStorage.getItem('userId');
-const initialUserEmail = localStorage.getItem('userEmail');
 
 /** ===== Thunks ===== */
 // export const register = createAsyncThunk(
@@ -134,8 +133,6 @@ const authSlice = createSlice({
   localStorage.removeItem('userId');
   localStorage.removeItem('userEmail');
 }
-
-// >>>>>>> a1c83c8d2145ebf88aa769ba8d04af15a79010c3
   },
   extraReducers: (builder) => {
     builder
@@ -196,6 +193,12 @@ const authSlice = createSlice({
       .addCase(login.fulfilled, (s, a) => {
         s.loading = false;
         s.token = a.payload.token;
+        s.userId = a.payload.user?._id ?? null;   // ← חשוב!
+        s.userEmail = a.payload.user?.email ?? null;
+
+        localStorage.setItem('token', s.token);
+        if (s.firstName) localStorage.setItem('firstName', s.firstName);
+        if (s.lastName) localStorage.setItem('lastName', s.lastName);
         s.firstName = a.payload.user?.firstName ?? null;
         s.lastName = a.payload.user?.lastName ?? null;
         s.userId = a.payload.user?._id ?? null;

@@ -51,7 +51,19 @@ const candidateSlice = createSlice({
     creating: false,
     createError: null,
   },
-  reducers: {},
+  reducers: {
+    // ⬅️ חדש: אינקרמנט/דקרמנט אופטימי
+    optimisticIncVote: (s, { payload }) => {
+      const { groupId, candidateId, delta = 1 } = payload || {};
+      const list = s.listByGroup[groupId];
+      if (!Array.isArray(list)) return;
+      const idx = list.findIndex(c => String(c._id) === String(candidateId));
+      if (idx === -1) return;
+      const curr = list[idx].votesCount ?? 0;
+      const next = curr + delta;
+      list[idx].votesCount = next < 0 ? 0 : next; // לא לרדת מתחת ל־0
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(fetchCandidatesByGroup.pending, (s, a) => {
@@ -90,13 +102,13 @@ const candidateSlice = createSlice({
   },
 });
 
+export const { optimisticIncVote } = candidateSlice.actions; // ⬅️ חדש
 export default candidateSlice.reducer;
 
+// selectors (ללא שינוי)
 export const selectCandidatesForGroup = (groupId) => (state) =>
   state.candidates.listByGroup[groupId] || [];
-
 export const selectCandidatesLoadingForGroup = (groupId) => (state) =>
   !!state.candidates.loadingByGroup[groupId];
-
 export const selectCandidatesErrorForGroup = (groupId) => (state) =>
   state.candidates.errorByGroup[groupId] || null;

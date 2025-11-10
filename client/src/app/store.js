@@ -2,6 +2,7 @@ import { configureStore } from '@reduxjs/toolkit';
 import authReducer from '../slices/authSlice';
 import usersReducer from '../slices/usersSlice';
 import groupsReducer from '../slices/groupsSlice';
+import votesReducer from '../slices/votesSlice';
 import candidatesReducer from '../slices/candidateSlice';
 import joinReqReducer from '../slices/joinRequestsSlice';
 
@@ -11,6 +12,7 @@ const store = configureStore({
         users: usersReducer,
         groups: groupsReducer,
         candidates: candidatesReducer,
+        votes: votesReducer,
         joinReq: joinReqReducer,
     },
     devTools: true,

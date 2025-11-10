@@ -1,9 +1,8 @@
-// server/src/services/vote_service.js
 const mongoose = require('mongoose');
 const Vote = require('../models/vote_model');
 const Group = require('../models/group_model');
 const Candidate = require('../models/candidate_model');
-const User = require('../models/user_model'); // חדש: בדיקת קיום משתמש
+const User = require('../models/user_model');
 
 /**
  * יצירת הצבעה חדשה
@@ -12,9 +11,8 @@ const User = require('../models/user_model'); // חדש: בדיקת קיום מ�
  */
 async function createVoteService(voteData) {
   const { userId, groupId, candidateId } = voteData || {};
-
-  // ---------- בדיקות קלט ----------
   const isId = (v) => mongoose.isValidObjectId(v);
+
   if (!userId || !groupId || !candidateId) {
     throw new Error('Missing required fields (userId, groupId, candidateId)');
   }
@@ -22,8 +20,6 @@ async function createVoteService(voteData) {
     throw new Error('Invalid IDs format');
   }
 
-  // ---------- קריאות DB בסיסיות ----------
-  // מביאים במקביל לחיסכון זמן
   const [user, group, candidate] = await Promise.all([
     User.findById(userId).lean(),
     Group.findById(groupId).lean(),
@@ -34,31 +30,25 @@ async function createVoteService(voteData) {
   if (!group) throw new Error('Group not found');
   if (!candidate) throw new Error('Candidate not found');
 
-  // קבוצה לא סגורה (אם יש endDate בעבר — חוסמים הצבעה)
   if (group.endDate && new Date(group.endDate).getTime() < Date.now()) {
     throw new Error('Voting period has ended for this group');
   }
 
-  // שייכות המועמד לקבוצה – לפי candidate.groupId בלבד (כפי שביקשת)
-  if (!candidate.groupId || candidate.groupId.toString() !== groupId.toString()) {
+  if (!candidate.groupId || String(candidate.groupId) !== String(groupId)) {
     throw new Error('Candidate does not belong to this group');
   }
 
-  // אין הצבעה קודמת של המשתמש בקבוצה
   const exists = await Vote.findOne({ userId, groupId }).lean();
   if (exists) throw new Error('User already voted in this group');
 
-  // ---------- טרנזקציה למניעת חוסר-סנכרון ----------
   const session = await mongoose.startSession();
   try {
     let createdVote = null;
 
     await session.withTransaction(async () => {
-      // 1) יוצרים את ההצבעה
       const voteDoc = new Vote({ userId, groupId, candidateId });
       await voteDoc.save({ session });
 
-      // 2) מעדכנים מונה קולות של המועמד (אופציונלי אך מומלץ)
       await Candidate.updateOne(
         { _id: candidateId },
         { $inc: { votesCount: 1 } },
@@ -71,49 +61,33 @@ async function createVoteService(voteData) {
     console.log('✅ Vote created:', createdVote);
     return createdVote;
   } catch (e) {
-    // במקרה נדיר של מירוץ, מונגו עשוי להרים E11000 (אינדקס ייחודי על userId+groupId)
-    if (e && e.code === 11000) {
-      e.message = 'User already voted in this group';
-    }
+    if (e && e.code === 11000) e.message = 'User already voted in this group';
     throw e;
   } finally {
     session.endSession();
   }
 }
 
-
-// מחיקת הצבעה קיימת (לפי userId+groupId) + עדכון מונה קולות של המועמד בטרנזקציה
 async function deleteVoteService(voteData) {
   const { userId, groupId } = voteData || {};
   const isId = (v) => mongoose.isValidObjectId(v);
 
-  if (!userId || !groupId) {
-    throw new Error('Missing required fields (userId, groupId)');
-  }
-  if (!isId(userId) || !isId(groupId)) {
-    throw new Error('Invalid IDs format');
-  }
+  if (!userId || !groupId) throw new Error('Missing required fields (userId, groupId)');
+  if (!isId(userId) || !isId(groupId)) throw new Error('Invalid IDs format');
 
-  // מאתרים את ההצבעה
   const vote = await Vote.findOne({ userId, groupId }).lean();
-  if (!vote) {
-    throw new Error('Vote not found');
-  }
+  if (!vote) throw new Error('Vote not found');
 
-  // טרנזקציה: מוחקים את ההצבעה ומפחיתים 1 מהמועמד שהצביעו לו
   const session = await mongoose.startSession();
   try {
     let deleted = null;
 
     await session.withTransaction(async () => {
-      // מחיקה
       const delRes = await Vote.deleteOne({ _id: vote._id }, { session });
-      if (delRes.deletedCount !== 1) {
-        throw new Error('Failed to delete vote');
-      }
+      if (delRes.deletedCount !== 1) throw new Error('Failed to delete vote');
+
       deleted = vote;
 
-      // הפחתת מונה קולות של המועמד (אם קיים)
       if (vote.candidateId) {
         await Candidate.updateOne(
           { _id: vote.candidateId },
@@ -124,23 +98,17 @@ async function deleteVoteService(voteData) {
     });
 
     console.log('🗑️ Vote deleted:', deleted);
-    return deleted; // מחזיר את ההצבעה שנמחקה
+    return deleted;
   } finally {
     session.endSession();
   }
 }
 
-// מחזיר את כל ההצבעות עבור מועמד מסוים בתוך קבוצה מסוימת
 async function getVotesByCandidateInGroupService({ candidateId, groupId }) {
   const isId = (v) => mongoose.isValidObjectId(v);
-  if (!candidateId || !groupId) {
-    throw new Error('Missing required fields (candidateId, groupId)');
-  }
-  if (!isId(candidateId) || !isId(groupId)) {
-    throw new Error('Invalid IDs format');
-  }
+  if (!candidateId || !groupId) throw new Error('Missing required fields (candidateId, groupId)');
+  if (!isId(candidateId) || !isId(groupId)) throw new Error('Invalid IDs format');
 
-  // ודא שמועמד וקבוצה קיימים
   const [group, candidate] = await Promise.all([
     Group.findById(groupId).lean(),
     Candidate.findById(candidateId).lean(),
@@ -148,18 +116,12 @@ async function getVotesByCandidateInGroupService({ candidateId, groupId }) {
   if (!group) throw new Error('Group not found');
   if (!candidate) throw new Error('Candidate not found');
 
-  // ודא שהמועמד שייך לקבוצה (לפי candidate.groupId)
-  if (!candidate.groupId || candidate.groupId.toString() !== groupId.toString()) {
+  if (!candidate.groupId || String(candidate.groupId) !== String(groupId)) {
     throw new Error('Candidate does not belong to this group');
   }
 
-  // שליפת ההצבעות (אפשר גם populate למידע על המשתמש שהצביע)
-  const votes = await Vote.find({ candidateId, groupId })
-    // .populate('userId', 'name email') // אם תרצי מידע על המשתמשים – בטלי הערה
-    .lean();
-
-  return votes; // מערך של הצבעות
+  const votes = await Vote.find({ candidateId, groupId }).lean();
+  return votes;
 }
 
 module.exports = { createVoteService, deleteVoteService, getVotesByCandidateInGroupService };
-
