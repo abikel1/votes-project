@@ -1,6 +1,9 @@
 // server/server.js
 require('dotenv').config();
 const app = require('./app');
+const passport = require('passport');
+app.use(passport.initialize());
+
 
 (async () => {
   // מחבר למונגו דרך db.js (ESM) – לא משנים את db.js

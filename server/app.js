@@ -7,6 +7,7 @@ const userRoutes = require('./src/routes/user_routes');
 const candidateRoutes = require('./src/routes/candidate_routes');
 const groupRoutes = require('./src/routes/group_routes'); 
 const voteRoutes = require('./src/routes/vote_routes');
+const passport = require('./config/google_auth');
 
 
 const app = express();
@@ -14,8 +15,10 @@ const app = express();
 // Middleware
 app.use(cors());
 app.use(express.json());
+app.use(passport.initialize());
 
 // Routes
+
 app.use('/api/users', userRoutes);
 app.use('/api/candidates', candidateRoutes);
 app.use('/api/groups', groupRoutes);

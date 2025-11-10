@@ -120,19 +120,9 @@ const authSlice = createSlice({
     user: null,
   },
   reducers: {
-    // <<<<<<< HEAD
-    //     logout(state) {
-    //       state.token = null;
-    //       state.userName = null;
-    //       state.userId = null;
-    //       state.userEmail = null;
-    //       state.user = null;
-    //       localStorage.removeItem('token');
-    //       localStorage.removeItem('userName');
-    //       localStorage.removeItem('userId');
-    //       localStorage.removeItem('userEmail');
-    //     }
-    // =======
+
+    
+
     logout(state) {
       state.token = null;
       state.firstName = null;
@@ -146,6 +136,18 @@ const authSlice = createSlice({
       localStorage.removeItem('userId');
       localStorage.removeItem('userEmail');
     }
+    ,
+        loginSuccess(state, action) {
+      const { token, user } = action.payload;
+
+      state.token = token;
+      state.userEmail = user?.email ?? null;
+      state.userId = user?._id ?? null;
+
+      localStorage.setItem('token', token);
+      if (state.userEmail) localStorage.setItem('userEmail', state.userEmail);
+      if (state.userId) localStorage.setItem('userId', state.userId);
+    }
   },
   extraReducers: (builder) => {
     builder
@@ -153,46 +155,6 @@ const authSlice = createSlice({
       .addCase(register.pending, (s) => { s.loading = true; s.error = null; s.registeredOk = false; })
       .addCase(register.fulfilled, (s) => { s.loading = false; s.registeredOk = true; })
       .addCase(register.rejected, (s, a) => { s.loading = false; s.error = a.payload; })
-
-      // /** fetchProfile */
-      // .addCase(fetchProfile.pending,   (s)=>{ s.loading=true; s.error=null; })
-      // .addCase(fetchProfile.fulfilled, (s,a)=>{ s.loading=false; s.user=a.payload; })
-      // .addCase(fetchProfile.rejected,  (s,a)=>{ s.loading=false; s.error=a.payload; })
-
-      // <<<<<<< HEAD
-      //       /** login */
-      //       .addCase(login.pending,   (s)=>{ s.loading=true; s.error=null; })
-      //       .addCase(login.fulfilled, (s,a)=>{
-      //         s.loading = false;
-      //         s.token   = a.payload.token;
-      //         // שם מהשרת אם הגיע
-      //         s.userName = a.payload.user?.name ?? s.userName;
-
-      //         // ⭐️ פענוח JWT לצורך userId/userEmail מיידיים (כדי לחשב בעלות קבוצות ולראות ⚙️)
-      //         const p = decodeJwtNoVerify(a.payload.token);
-      //         s.userId    = p._id || p.id || p.userId || p.dbId || p.sub || s.userId || null;
-      //         s.userEmail = p.email || p.user?.email || s.userEmail || null;
-
-      //         localStorage.setItem('token', s.token);
-      //         if (s.userName)  localStorage.setItem('userName', s.userName);
-      //         if (s.userId)    localStorage.setItem('userId', s.userId);
-      //         if (s.userEmail) localStorage.setItem('userEmail', s.userEmail);
-      //       })
-      //       .addCase(login.rejected,  (s,a)=>{ s.loading=false; s.error=a.payload; })
-
-      //       /** fetchMe */
-      //       .addCase(fetchMe.pending,   (s)=>{ s.loading=true; s.error=null; })
-      //       .addCase(fetchMe.fulfilled, (s,a)=>{
-      //         s.loading = false;
-      //         s.userName  = a.payload.name  ?? s.userName;
-      //         s.userId    = a.payload._id   ?? s.userId;
-      //         s.userEmail = a.payload.email ?? s.userEmail;
-      //         if (s.userName)  localStorage.setItem('userName', s.userName);
-      //         if (s.userId)    localStorage.setItem('userId', s.userId);
-      //         if (s.userEmail) localStorage.setItem('userEmail', s.userEmail);
-      //       })
-      //       .addCase(fetchMe.rejected,  (s,a)=>{ s.loading=false; s.error=a.payload; });
-      // =======
 
       .addCase(fetchProfile.pending, (s) => { s.loading = true; s.error = null; })
       .addCase(fetchProfile.fulfilled, (s, a) => {
@@ -259,5 +221,5 @@ const authSlice = createSlice({
   }
 });
 
-export const { logout } = authSlice.actions;
+export const { logout, loginSuccess } = authSlice.actions;
 export default authSlice.reducer;
