@@ -48,13 +48,26 @@ export const login = createAsyncThunk(
   'auth/login',
   async (formData, { rejectWithValue }) => {
     try {
-      const { data } = await http.post('/users/login', formData); // { token, user? }
+      const { data } = await http.post('/users/login', formData);
       return data;
     } catch (err) {
-      return rejectWithValue(err.response?.data?.message || err.message);
+      console.log('--- Frontend error in thunk ---');
+      console.log('err:', err);
+      console.log('err.response:', err.response);
+      console.log('err.response?.data:', err.response?.data);
+
+      if (err.response && err.response.data) {
+        return rejectWithValue(err.response.data.errors || { form: err.response.data.message });
+      }
+      return rejectWithValue({ form: err.message });
     }
   }
 );
+
+
+
+
+
 
 export const fetchProfile = createAsyncThunk(
   'auth/fetchProfile',

@@ -57,6 +57,19 @@ h1 { font-size: 23px; text-align: center; }
 .block-cube.block-cube-hover:hover .text,
 .block-cube.block-cube-hover:focus .text { color:#ffffff; }
 
+/* .msg.error { color: #ff5555; font-size: 0.85rem; text-align: right; } */
+/* הודעת שגיאה מעל ה-input */
+.msg.error {
+  display: block;
+  width: 100%;
+  padding: 6px 12px;
+  margin-bottom: 6px;   /* ריווח קטן מתחת להודעה */
+  background-color: #ffd6d6; /* אדום בהיר */
+  color: #a10000;           /* אדום כהה לטקסט */
+  border-radius: 6px;
+  font-size: 0.85rem;
+  text-align: right;  
+  }      /* מתאים ל-RTL */
 /* ===== כפתור שליחה ===== */
 .form .btn {
   width: 100%; display: block; padding: 14px 16px;
@@ -152,4 +165,49 @@ h1 { font-size: 23px; text-align: center; }
 .citystreet--register .control:last-child {
   margin-bottom: 24px; /* לשמור עקביות גם לאחרונה */
 }
+
+/* הודעת שגיאה בתוך התיבה */
+.block-cube.block-input .msg.error {
+  position: absolute;
+  top: 50%;                 /* באמצע התיבה אנכית */
+  left: 50%;                /* באמצע התיבה אופקית */
+  transform: translate(-50%, -50%); /* מוודא שהיא באמת במרכז */
+  background-color: #ffd6d6;  /* אדום בהיר */
+  color: #a10000;            /* אדום כהה */
+  font-size: 0.85rem;
+  padding: 4px 8px;
+  border-radius: 4px;
+  text-align: center;
+  pointer-events: none;      /* שהשגיאה לא תפריע להקלדה */
+  z-index: 5;
+}
+/* כפתור עין בתוך שדה הסיסמה */
+.block-cube.block-input .password-toggle {
+  position: absolute;
+  top: 50%;
+  left: 12px;          /* מיקום בצד ימין */
+  transform: translateY(-50%);
+  cursor: pointer;
+  color: #003366;
+  font-size: 1rem;
+  z-index: 10;
+}
+
+.block-cube.block-input .password-toggle:hover {
+  color: #0077cc;
+}
+
+/* הודעת שגיאה בתוך התיבה */
+.msg.error {
+  display: block;
+  width: 100%;
+  padding: 6px 12px;
+  margin-bottom: 6px;
+  background-color: #ffd6d6;
+  color: #a10000;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  text-align: center;   /* טקסט במרכז */
+}
+
 
