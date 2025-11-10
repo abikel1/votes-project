@@ -1,5 +1,4 @@
-
-
+/* ===== בסיס ===== */
 *, ::after, ::before { box-sizing: border-box; }
 
 body {
@@ -9,163 +8,148 @@ body {
   letter-spacing: 0.05em;
   direction: rtl;
   text-align: right;
+  padding-top: 80px;                 /* רווח מתחת ל-navbar */
 }
 
-h1 {
-  font-size: 23px;
-  text-align: center;
-}
+h1 { font-size: 23px; text-align: center; }
 
 .form-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
+  display: flex; justify-content: center; align-items: center;
+  min-height: 100vh; padding-top: 5px;
 }
+.form { width: 300px; padding: 64px 15px 24px; margin: 0 auto; }
+.form h1 { margin: 0 0 40px 0; }
 
-.form {
-  width: 300px;
-  padding: 64px 15px 24px;
-  margin: 0 auto;
-}
-
-.form .control {
-  margin: 0 0 24px;
-}
+/* ===== אינפוטים וקוביות ===== */
+.form .control { margin: 0 0 24px; }
 
 .form .control input {
-  width: 100%;
-  padding: 14px 16px;
-  border: 0;
-  background: transparent;
-  color: #003366;
-  font-family: 'Rubik', sans-serif;
-  letter-spacing: 0.05em;
-  font-size: 16px;
+  width: 100%; padding: 14px 16px;
+  border: 0; background: transparent; color: #003366;
+  font-family: 'Rubik', sans-serif; letter-spacing: 0.05em; font-size: 16px;
 }
-
 .form .control input:hover,
-.form .control input:focus {
-  outline: none;
-  border: 0;
-}
+.form .control input:focus { outline: none; border: 0; }
+.form .control input::placeholder { color: rgba(0, 51, 102, 0.5); }
 
-.form .control input::placeholder {
-  color: rgba(0, 51, 102, 0.5);
-}
-
-.form .btn {
-  width: 100%;
-  display: block;
-  padding: 14px 16px;
-  background: transparent;
-  outline: none;
-  border: 0;
-  color: #003366;
-  letter-spacing: 0.1em;
-  font-weight: bold;
-  font-family: 'Rubik', sans-serif;
-  font-size: 16px;
-  cursor: pointer;
-}
-
+/* קוביית מסגרת תלת־ממד */
 .block-cube { position: relative; }
-.block-cube .bg-top { position: absolute; height: 10px; background: #003366; bottom: 100%; left: 5px; right: -5px; transform: skew(-45deg, 0); margin: 0; }
-.block-cube .bg-top .bg-inner { bottom: 0; }
-.block-cube .bg { position: absolute; left: 0; top: 0; right: 0; bottom: 0; background: #003366; }
-.block-cube .bg-right { position: absolute; background: #003366; top: -5px; z-index: 0; bottom: 5px; width: 10px; left: 100%; transform: skew(0, -45deg); }
-.block-cube .bg-right .bg-inner { left: 0; }
-.block-cube .bg .bg-inner { transition: all 0.2s ease-in-out; }
-.block-cube .bg-inner { background: #ffffff; position: absolute; left: 2px; top: 2px; right: 2px; bottom: 2px; transition: background 0.3s ease-in-out; }
-.block-cube .text { position: relative; z-index: 2; text-align: center; transition: color 0.3s ease-in-out; }
+.block-cube .bg-top      { position: absolute; height: 10px; background:#003366; bottom:100%; left:5px; right:-5px; transform:skew(-45deg,0); margin:0; }
+.block-cube .bg-top .bg-inner { bottom:0; }
+.block-cube .bg          { position: absolute; inset:0; background:#003366; }
+.block-cube .bg-right    { position: absolute; background:#003366; top:-5px; z-index:0; bottom:5px; width:10px; left:100%; transform:skew(0,-45deg); }
+.block-cube .bg-right .bg-inner { left:0; }
+.block-cube .bg .bg-inner{ transition: all .2s ease-in-out; }
+.block-cube .bg-inner    { background:#ffffff; position:absolute; left:2px; top:2px; right:2px; bottom:2px; transition: background .3s ease-in-out; }
+.block-cube .text        { position:relative; z-index:2; text-align:center; transition:color .3s ease-in-out; }
 .block-cube.block-input input { position: relative; z-index: 2; }
+
 .block-cube.block-input input:focus ~ .bg-right .bg-inner,
 .block-cube.block-input input:focus ~ .bg-top .bg-inner { top: 100%; }
-.block-cube.block-input .bg-top, .block-cube.block-input .bg-right, .block-cube.block-input .bg { background: #003366; }
-.block-cube.block-input .bg-right .bg-inner,
-.block-cube.block-input .bg-top .bg-inner { transition: all 0.2s ease-in-out; }
+.block-cube.block-input .bg-top,
+.block-cube.block-input .bg-right,
+.block-cube.block-input .bg { background:#003366; }
 .block-cube.block-input:focus-within .bg .bg-inner,
-.block-cube.block-input:hover .bg .bg-inner { background: #e6f2ff; }
+.block-cube.block-input:hover       .bg .bg-inner { background:#e6f2ff; }
+
 .block-cube.block-cube-hover:focus .bg .bg-inner,
-.block-cube.block-cube-hover:hover .bg .bg-inner { top: 100%; }
-.block-cube.block-cube-hover:hover .bg .bg-inner,
-.block-cube.block-cube-hover:focus .bg .bg-inner { background: #003366; }
+.block-cube.block-cube-hover:hover .bg .bg-inner { top:100%; background:#003366; }
 .block-cube.block-cube-hover:hover .text,
-.block-cube.block-cube-hover:focus .text { color: #ffffff; }
+.block-cube.block-cube-hover:focus .text { color:#ffffff; }
 
-.msg.error { color: #ff5555; font-size: 0.85rem; text-align: right; }
+/* ===== כפתור שליחה ===== */
+.form .btn {
+  width: 100%; display: block; padding: 14px 16px;
+  background: transparent; outline: none; border: 0;
+  color:#003366; letter-spacing:.1em; font-weight:bold; font-family:'Rubik',sans-serif; font-size:16px; cursor:pointer;
+}
 
-.msg.success { color: #009933; font-size: 0.9rem; text-align: center; margin-bottom: 12px; }
+/* ===== הודעות ===== */
+.msg.error   { color:#ff5555; font-size:.85rem; text-align:right; }
+.msg.success { color:#009933; font-size:.9rem;  text-align:center; margin-bottom:12px; }
 
-
-/* תיבה עדינה למעלה להצגת הודעות כלליות */
 .top-msg {
-  width: 100%;
-  padding: 12px 16px;
-  border-radius: 8px;
-  margin-bottom: 20px;
-  font-size: 0.95rem;
-  text-align: center;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.08);
-  transition: all 0.3s ease;
+  width:100%; padding:12px 16px; border-radius:8px; margin-bottom:20px; font-size:.95rem; text-align:center;
+  box-shadow:0 2px 5px rgba(0,0,0,0.08); transition:all .3s ease;
+}
+.top-msg.error   { background:#f0f0f0; color:#333; }
+.top-msg.success { background:#d4edda; color:#155724; }
+
+/* טקסט שגיאה בתוך הקובייה */
+.field-error-inline{
+  position:absolute; top:50%; left:10px; transform:translateY(-50%);
+  pointer-events:none; font-size:.85rem; color:#ff5555;
 }
 
-/* צבע רקע לפי סוג ההודעה */
-.top-msg.error {
-  background-color: #f0f0f0; /* אפור עדין */
-  color: #333333;
-}
+/* ===== עיר+רחוב בתוך ההרשמה (אותו מרווח בדיוק כמו קוביות) ===== */
+.citystreet--register { display:block; margin:0; padding:0; }
+.citystreet--register .control { margin:0 0 24px; }
+.citystreet--register .control:last-child { margin-bottom:24px; }
 
-.top-msg.success {
-  background-color: #d4edda; /* ירוק עדין */
-  color: #155724;
-}
+/* ===== שדות סיסמה (עין משמאל בלבד) ===== */
+.password-field { position: relative; }
+.password-field input { padding-left: 46px; }   /* מקום לעין משמאל */
 
-/* אחידות מרווחים גם עבור הקומפוננטה של עיר+רחוב בתוך ההרשמה */
-.citystreet--register {
-  /* אל תהיי Grid כאן כדי לא לשנות את חישוב המרווחים */
+.eye-btn{
+  position:absolute; left:10px; top:50%; transform:translateY(-50%);
+  background:transparent; border:none; cursor:pointer;
+  z-index:3; padding:0; line-height:0; display:flex; align-items:center; justify-content:center;
+  color:#003366; opacity:.6; transition:opacity .2s ease;
+}
+.eye-btn:hover{ opacity:1; }
+.eye-btn svg { fill:#003366; }
+
+/* שורה בטופס: מחזיקה הודעת שגיאה מעל הקובייה והקובייה עצמה */
+.form-row { margin: 0 0 24px; }
+.form-row .control { margin: 0; }
+
+/* הודעת שגיאה מעל הקובייה */
+.field-error-above{
   display: block;
-  margin: 0;
-  padding: 0;
+  margin-bottom: 15px; /* רווח קטן לפני הקובייה */
+  color: #ff5555;
+  font-size: 0.85rem;
+  text-align: right;
 }
 
-/* ודאי שכל אינפוט-קוביה בקומפוננטה מקבל בדיוק אותו מרווח כמו שאר השדות */
-.citystreet--register .control {
-  margin: 0 0 24px;  /* כמו .form .control */
-}
-.citystreet--register .control:last-child {
-  margin-bottom: 24px; /* לשמור על עקביות גם באחרון */
-}
+/* אם נשארה שארית מהשגיאה הפנימית – להסתיר */
+.field-error-inline{ display:none; }
 
+/* כפתור העין בצד שמאל + ריווח בשדה סיסמה */
+.password-field{ position:relative; }
+.password-field input{ padding-left:46px; } /* מקום לעין */
+.eye-btn{
+  position:absolute;
+  left:10px;
+  top:50%;
+  transform:translateY(-50%);
+  z-index:3;
+  background:transparent;
+  border:none;
+  cursor:pointer;
+  padding:0;
+  line-height:0;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  color:#003366;
+  opacity:.7;
+  transition:opacity .2s ease;
+}
+.eye-btn:hover{ opacity:1; }
 
-/* סטייל נקי להרשמה
+/* הגדרות העיצוב הקיימות שלך נשארות כמות שהן... */
+
+/* רווח אחיד בין כל הקוביות גם בקומפוננטת העיר */
 .citystreet--register {
-  display: grid;
-  gap: 14px;
-}
-.citystreet--register .reg-input {
-  width: 100%;
-  padding: 14px 16px;
-  font-family: 'Rubik', sans-serif;
-  font-size: 16px;
-  border: 2px solid #0a3a66;
-  border-radius: 6px;
-  background: #fff;
-  color: #003366;
-}
-.citystreet--register .reg-input:focus {
-  outline: none;
-  box-shadow: 0 0 0 3px rgba(13, 71, 161, 0.15);
-} */
-
-/* יותר ריווח מתחת ל־navbar */
-body { padding-top: 80px; }     /* אם יש לך כבר 60px – תעדכני ל-80px */
-
-.form-container { 
-  padding-top: 5px;            /* שיהיה מרווח נעים לפני הכותרת */
+  display: block;
 }
 
-.form h1 {
-  margin: 0 0 40px 0;           /* שלא יחתך ולא יתנגש עם הבלוק מעל */
+.citystreet--register .control {
+  margin-bottom: 24px; /* אותו רווח כמו שאר השדות */
+}
+
+.citystreet--register .control:last-child {
+  margin-bottom: 24px; /* לשמור עקביות גם לאחרונה */
 }
 
