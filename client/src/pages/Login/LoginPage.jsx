@@ -1,13 +1,14 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { login } from '../../slices/authSlice';
-import { useNavigate } from 'react-router-dom';
+import { login, loginSuccess } from '../../slices/authSlice'; // 👈 לוודא שיש loginSuccess ב־slice שלך
+import { useNavigate, useLocation } from 'react-router-dom';
 import '../Register/RegisterPage.css';
-import { FaEye, FaEyeSlash } from 'react-icons/fa'; // ספריית אייקונים
+import { FaEye, FaEyeSlash } from 'react-icons/fa';
 
 export default function LoginPage() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const location = useLocation();
   const { loading } = useSelector(s => s.auth);
 
   const [form, setForm] = useState({ email: '', password: '' });
@@ -22,6 +23,19 @@ export default function LoginPage() {
     if (!form.password) newErrors.password = 'סיסמה*';
     return newErrors;
   };
+
+  // ✅ אם חזרנו מדף גוגל עם token ו-email בפרמטרים
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const token = params.get('token');
+    const email = params.get('email');
+
+    if (token && email) {
+      localStorage.setItem('token', token);
+      dispatch(loginSuccess({ token, user: { email } }));
+      navigate('/');
+    }
+  }, [location, dispatch, navigate]);
 
   const submit = async (e) => {
     e.preventDefault();
@@ -44,7 +58,10 @@ export default function LoginPage() {
   };
 
   const renderField = (placeholder, field, type = 'text') => (
-    <div className="control block-cube block-input" style={{ position: 'relative', marginBottom: '24px' }}>
+    <div
+      className="control block-cube block-input"
+      style={{ position: 'relative', marginBottom: '24px' }}
+    >
       <input
         type={field === 'password' ? (showPassword ? 'text' : 'password') : type}
         placeholder={placeholder}
@@ -53,9 +70,7 @@ export default function LoginPage() {
         onFocus={() => handleFocus(field)}
       />
 
-      {errors[field] && (
-        <span className="msg error">{errors[field]}</span>
-      )}
+      {errors[field] && <span className="msg error">{errors[field]}</span>}
 
       {field === 'password' && (
         <span
@@ -82,12 +97,23 @@ export default function LoginPage() {
         {renderField('אימייל', 'email', 'email')}
         {renderField('סיסמה', 'password', 'password')}
 
-        <button type="submit" className="btn block-cube block-cube-hover" disabled={loading}>
+        <button
+          type="submit"
+          className="btn block-cube block-cube-hover"
+          disabled={loading}
+        >
           <div className="bg-top"><div className="bg-inner" /></div>
           <div className="bg-right"><div className="bg-inner" /></div>
           <div className="bg"><div className="bg-inner" /></div>
           <span className="text">{loading ? '...' : 'התחבר'}</span>
         </button>
+
+        {/* 🔹 כפתור התחברות עם גוגל */}
+        <a href="http://localhost:3000/api/users/google">
+          <button type="button" className="btn google-btn">
+            התחבר עם Google
+          </button>
+        </a>
       </form>
     </div>
   );
