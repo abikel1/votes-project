@@ -3,7 +3,7 @@ import http from '../api/http';
 
 /* ===== LocalStorage helpers ===== */
 const LS_KEY = 'join_pending_groups';
-const LS_REMOVED = 'removed_by_owner_groups'; // ← חדש: { [groupId]: timestamp }
+const LS_REMOVED = 'removed_by_owner_groups'; // { [groupId]: timestamp }
 
 function loadPendingFromLS() {
   try {
@@ -51,7 +51,8 @@ export const fetchMyJoinStatuses = createAsyncThunk(
   'joinReq/fetchMyStatuses',
   async (_, { rejectWithValue }) => {
     try {
-      const { data } = await http.get('/groups/my-join-status'); // { pending: [...] }
+      // צפי: { pending: string[] }
+      const { data } = await http.get('/groups/my-join-status');
       return data;
     } catch (err) {
       return rejectWithValue(err?.response?.data?.message || 'כשל בטעינת סטטוסי הצטרפות');
@@ -104,8 +105,9 @@ const joinReqSlice = createSlice({
   initialState: {
     byGroup: {},
     actionError: null,
-    my: {},          // [groupId]: { requesting, status: 'none'|'pending'|'member'|'error', error? }
-    removedNotice: loadRemovedMap(), // ← { [groupId]: timestamp } מי שסומן כהוסר
+    // [groupId]: { requesting, status: 'none'|'pending'|'member'|'rejected'|'error', error?, rejectedAt? }
+    my: {},
+    removedNotice: loadRemovedMap(), // { [groupId]: timestamp } מי שסומן כהוסר
   },
   reducers: {
     clearJoinRequestsError(s) { s.actionError = null; },
@@ -127,10 +129,19 @@ const joinReqSlice = createSlice({
       if (s.removedNotice[gid]) { delete s.removedNotice[gid]; saveRemovedMap(s.removedNotice); }
     },
 
-    // ← חדש: לנקות הודעת "הוסרת" ידנית (למשל אחרי SEND שוב)
+    // לנקות הודעת "הוסרת" ידנית (למשל אחרי SEND שוב)
     clearRemovedNotice(s, a) {
       const gid = String(a.payload);
       if (s.removedNotice[gid]) { delete s.removedNotice[gid]; saveRemovedMap(s.removedNotice); }
+    },
+
+    // איפוס דגל "נדחה" — אם רוצים לנקות ידנית
+    clearRejectedForGroup(s, a) {
+      const gid = String(a.payload);
+      const prev = s.my[gid] || {};
+      if (prev.status === 'rejected') {
+        s.my[gid] = { requesting: false, status: 'none', error: null };
+      }
     },
   },
   extraReducers: (b) => {
@@ -178,9 +189,9 @@ const joinReqSlice = createSlice({
       /* ===== הזרימה שלי ===== */
       .addCase(requestJoinGroup.pending, (s, a) => {
         const gid = String(a.meta.arg);
+        // אם היה rejected – נעבור מייד ל-pending ונאפס rejectedAt
         s.my[gid] = { requesting: true, status: 'pending', error: null };
         const set = loadPendingFromLS(); set.add(gid); savePendingToLS(set);
-        // אם הופיעה הודעת "הוסרת" — ננקה אותה ברגע ששולחים שוב בקשה
         if (s.removedNotice[gid]) { delete s.removedNotice[gid]; saveRemovedMap(s.removedNotice); }
       })
       .addCase(requestJoinGroup.fulfilled, (s, a) => {
@@ -195,12 +206,11 @@ const joinReqSlice = createSlice({
         if (set.has(gid)) { set.delete(gid); savePendingToLS(set); }
       })
 
-      // ✅ זיהוי “הוסרה חברות” (member → לא בשרת) + סימון הודעה
+      // ✅ “אני חבר/ה” מ־/groups/my – נסמן חבר/ה, ונוריד מי שמסומן member מקומית אבל לא מופיע בשרת.
       .addCase('groups/fetchMy/fulfilled', (s, a) => {
         const joined = Array.isArray(a.payload?.joined) ? a.payload.joined : [];
-        const serverJoinedSet = new Set(joined.map(g => String(g._id)));
+        const currentJoinedSet = new Set(joined.map(g => String(g._id)));
 
-        // כל מי שבאמת חבר — נסמן member וננקה pending + דגלי הסרה
         const ls = loadPendingFromLS();
         for (const g of joined) {
           const gid = String(g._id);
@@ -209,9 +219,9 @@ const joinReqSlice = createSlice({
           if (s.removedNotice[gid]) { delete s.removedNotice[gid]; }
         }
 
-        // מי שאצלנו היה member ועכשיו לא מופיע — ירד ל-none + דגל “הוסרת”
+        // אם מישהו סומן member מקומית אבל אינו חבר בשרת (הוסר) → none
         for (const [gid, st] of Object.entries(s.my)) {
-          if (st?.status === 'member' && !serverJoinedSet.has(String(gid))) {
+          if (st?.status === 'member' && !currentJoinedSet.has(String(gid))) {
             s.my[gid] = { requesting: false, status: 'none', error: null };
             s.removedNotice[gid] = Date.now();
           }
@@ -221,15 +231,28 @@ const joinReqSlice = createSlice({
         saveRemovedMap(s.removedNotice);
       })
 
-      // יישור קו עם שרת לגבי pending
+      // ✅ יישור קו עם שרת לגבי pending:
+      //    - מי שבשרת pending → pending
+      //    - מי שאצלנו pending אבל לא בשרת → rejected
       .addCase(fetchMyJoinStatuses.fulfilled, (s, a) => {
         const ids = Array.isArray(a.payload?.pending) ? a.payload.pending.map(String) : [];
         const serverSet = new Set(ids);
+
+        // עדכון לכל אלו שבשרת עדיין pending
         serverSet.forEach((gid) => {
           s.my[gid] = { requesting: false, status: 'pending', error: null };
         });
-        // איחוד עם LS
+
         const localSet = loadPendingFromLS();
+        // מי שהיה pending מקומית אך לא בשרת → נדחה
+        for (const [gid, st] of Object.entries(s.my)) {
+          if (st?.status === 'pending' && !serverSet.has(String(gid))) {
+            s.my[gid] = { requesting: false, status: 'rejected', error: null, rejectedAt: Date.now() };
+            if (localSet.has(gid)) localSet.delete(gid);
+          }
+        }
+
+        // שמירת LS אחרי ניקוי הדחויים
         const union = new Set([...localSet, ...serverSet]);
         savePendingToLS(union);
       });
@@ -240,7 +263,8 @@ export const {
   clearJoinRequestsError,
   hydratePendingFromLocalStorage,
   markJoinedLocally,
-  clearRemovedNotice, // ← חדש
+  clearRemovedNotice,
+  clearRejectedForGroup,
 } = joinReqSlice.actions;
 
 export default joinReqSlice.reducer;
@@ -272,7 +296,22 @@ export const selectMyMemberSet = createSelector(
   }
 );
 
-// ← חדש: לבדוק אם יש הודעת “הוסרת” עבור קבוצה
-export const selectWasRemovedFromGroup = (groupId) => (s) => {
-  return !!s.joinReq.removedNotice?.[String(groupId)];
-};
+// “הוסרת”
+export const selectWasRemovedFromGroup = (groupId) => (s) =>
+  !!s.joinReq.removedNotice?.[String(groupId)];
+
+// “נדחית” – סט ממואזר של קבוצות שנדחו
+export const selectMyRejectedSet = createSelector(
+  (s) => s.joinReq.my,
+  (my) => {
+    const out = new Set();
+    for (const [gid, st] of Object.entries(my || {})) {
+      if (st?.status === 'rejected') out.add(String(gid));
+    }
+    return out;
+  }
+);
+
+// סטטוס לקבוצה
+export const selectMyStatusByGroup = (groupId) => (s) =>
+  s.joinReq.my?.[String(groupId)]?.status || 'none';
