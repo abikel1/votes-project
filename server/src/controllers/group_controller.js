@@ -10,7 +10,7 @@ const {
   getUserGroupsService,
   getMyJoinStatusesService,
   isMemberOfGroupService,
-  removeGroupMemberService, // ✅ נכון
+  removeGroupMemberService,
 } = require('../services/group_service');
 const Group = require('../models/group_model');
 
@@ -32,10 +32,19 @@ async function updateGroup(req, res) {
 
 async function deleteGroup(req, res) {
   try {
-    const group = await deleteGroupService(req.params.id);
-    if (!group) return res.status(404).json({ message: 'Group not found' });
-    res.json({ message: 'Group deleted successfully' });
-  } catch (err) { res.status(500).json({ message: 'Error deleting group', error: err.message }); }
+    // בדיקת בעלות לפני מחיקה
+    const g = await Group.findById(req.params.id).lean();
+    if (!g) return res.status(404).json({ message: 'Group not found' });
+    if (String(g.createdById) !== String(req.user._id)) {
+      return res.status(403).json({ message: 'Not owner' });
+    }
+
+    await deleteGroupService(req.params.id);
+    // אפשר בעתיד להוסיף ניקוי ישויות תלויות במידלוואר.
+    res.json({ ok: true, message: 'Group deleted successfully', deletedId: String(req.params.id) });
+  } catch (err) {
+    res.status(500).json({ message: 'Error deleting group', error: err.message });
+  }
 }
 
 async function getGroupById(req, res) {
@@ -124,7 +133,7 @@ async function getMyMembership(req, res) {
   }
 }
 
-/** ✅ הסרת משתתף/ת */
+/** הסרת משתתף/ת */
 async function removeMember(req, res) {
   try {
     const { memberId, email } = req.body || {};
@@ -156,5 +165,5 @@ module.exports = {
   getUserGroups,
   getMyJoinStatuses,
   getMyMembership,
-  removeMember, // ✅
+  removeMember,
 };

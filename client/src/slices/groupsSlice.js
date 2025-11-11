@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk, createSelector } from '@reduxjs/toolkit';
 import http from '../api/http';
-import { fetchUsersByIds, hydrateUsersForGroup, selectUsersMap } from './usersSlice'
+import { fetchUsersByIds, hydrateUsersForGroup, selectUsersMap } from './usersSlice';
 
 /* ===== Helpers ===== */
 const pickId = (m) => {
@@ -83,7 +83,7 @@ export const fetchMyGroups = createAsyncThunk(
   }
 );
 
-// ❗ חדש: הסרת משתתף
+// ❗ הסרת משתתף
 export const removeGroupMember = createAsyncThunk(
   'groups/removeMember',
   async ({ groupId, memberId, email }, { rejectWithValue }) => {
@@ -95,6 +95,19 @@ export const removeGroupMember = createAsyncThunk(
       return { groupId, data };
     } catch (err) {
       return rejectWithValue(err?.response?.data?.message || 'Failed to remove member');
+    }
+  }
+);
+
+// ❗❗ חדש: מחיקת קבוצה
+export const deleteGroupById = createAsyncThunk(
+  'groups/delete',
+  async (groupId, { rejectWithValue }) => {
+    try {
+      const { data } = await http.delete(`/groups/${groupId}`);
+      return { groupId, data };
+    } catch (err) {
+      return rejectWithValue(err?.response?.data?.message || 'Failed to delete group');
     }
   }
 );
@@ -150,7 +163,6 @@ const groupsSlice = createSlice({
         s.myJoinedIds = joined.map(g => String(g._id));
       })
 
-      // אחרי הסרת משתתף — לעדכן selectedGroup והרשימה
       .addCase(removeGroupMember.fulfilled, (s, a) => {
         const { groupId, data } = a.payload || {};
         const g = data?.group;
@@ -158,6 +170,15 @@ const groupsSlice = createSlice({
           if (s.selectedGroup && String(s.selectedGroup._id) === String(groupId)) s.selectedGroup = g;
           const idx = s.list.findIndex(x => String(x._id) === String(groupId));
           if (idx >= 0) s.list[idx] = g;
+        }
+      })
+
+      // מחיקת קבוצה: מוציאים מהרשימה ומנקים selectedGroup
+      .addCase(deleteGroupById.fulfilled, (s, a) => {
+        const gid = a.payload?.groupId;
+        s.list = (s.list || []).filter(g => String(g._id) !== String(gid));
+        if (s.selectedGroup && String(s.selectedGroup._id) === String(gid)) {
+          s.selectedGroup = null;
         }
       });
   }

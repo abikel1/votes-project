@@ -4,11 +4,13 @@ const {
   createVote,
   deleteVote,
   getVotesByCandidateInGroup,
+  getVotersByGroup,              // ← חדש
 } = require('../controllers/vote_controller');
 
 // ללא auth בשלב זה; אם תרצי בהמשך – הוסיפי middleware
 router.post('/create', createVote);
 router.delete('/delete', deleteVote);
-router.get('/by-candidate', getVotesByCandidateInGroup); // ?candidateId=&groupId=
+router.get('/by-candidate', getVotesByCandidateInGroup);       // ?candidateId=&groupId=
+router.get('/group/:groupId/voters', getVotersByGroup);        // ← חדש: מצביעים לפי קבוצה
 
 module.exports = router;
