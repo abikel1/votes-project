@@ -127,7 +127,15 @@ async function getVotesByCandidateInGroupService({ candidateId, groupId }) {
 }
 
 /**
- * ← מצביעים לפי קבוצה (מחזיר שם מלא אם קיים, עם רווח יחיד תקין)
+ * האם משתמש הצביע בקבוצה
+ */
+async function hasUserVotedInGroup(userId, groupId) {
+  const exists = await Vote.exists({ userId, groupId });
+  return Boolean(exists);
+}
+
+/**
+ * מצביעים לפי קבוצה (מחזיר שם מלא אם קיים, עם רווח יחיד תקין)
  */
 async function getVotersByGroupService({ groupId }) {
   const isId = (v) => mongoose.isValidObjectId(v);
@@ -210,4 +218,5 @@ module.exports = {
   deleteVoteService,
   getVotesByCandidateInGroupService,
   getVotersByGroupService,
+  hasUserVotedInGroup,
 };

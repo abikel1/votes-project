@@ -173,6 +173,33 @@ const groupsSlice = createSlice({
         }
       })
 
+
+      .addCase(createGroup.pending, (state) => {
+        state.createLoading = true;
+        state.createError = null;
+        state.justCreated = false;
+      })
+      .addCase(createGroup.rejected, (state, action) => {
+        state.createLoading = false;
+        state.createError = action.payload;
+      })
+
+      .addCase(createGroup.fulfilled, (state, action) => {
+        state.createLoading = false;
+        state.justCreated = true; // בשביל הניווט אחרי יצירה
+        state.createError = null;
+
+        // נעדכן את הרשימה אם היא קיימת
+        if (Array.isArray(state.list)) {
+          state.list.push(action.payload);
+        } else {
+          state.list = [action.payload];
+        }
+
+        // נעדכן גם selectedGroup אם תרצה
+        state.selectedGroup = action.payload;
+      })
+
       // מחיקת קבוצה: מוציאים מהרשימה ומנקים selectedGroup
       .addCase(deleteGroupById.fulfilled, (s, a) => {
         const gid = a.payload?.groupId;

@@ -8,12 +8,16 @@ import GroupSettingsPage from './components/GroupSettings/GroupSettingsPage.jsx'
 import RegisterPage from './pages/Register/RegisterPage.jsx';
 import ProfilePage from './pages/Profile/ProfilePage.jsx';
 
-import GroupCandidatesPage from './components/GroupCandidates/GroupCandidatesPage.jsx';
+import VotingPage from './components/Voting/VotingPage.jsx';
 import NavBar from './components/NavBar/NavBar.jsx';
 import HomeRoute from './pages/Home/HomePage.jsx';
 import LoginPage from './pages/Login/LoginPage.jsx';
 import CreateGroupPage from './pages/CreateGroup/CreateGroup.jsx';
 import GroupDetailPage from './pages/GroupDetail/GroupDetailPage.jsx';
+import SendEmailPage from './pages/Tools/SendEmailPage.jsx';
+import ForgotPasswordPage from './pages/Login/ForgotPasswordPage.jsx';
+import ResetPasswordPage from './pages/Login/ResetPasswordPage.jsx';
+
 GroupDetailPage
 export default function App() {
   const dispatch = useDispatch();
@@ -35,9 +39,12 @@ export default function App() {
 
         <Route path="/groups" element={<GroupsPage />} />
         <Route path="/groups/:groupId" element={<GroupDetailPage />} />
-        <Route path="/groups/:groupId/candidates" element={<GroupCandidatesPage />} />
+        <Route path="/groups/:groupId/candidates" element={<VotingPage />} />
         <Route path="/groups/create" element={<CreateGroupPage />} />
         <Route path="/groups/:groupId/settings" element={<GroupSettingsPage />} />
+        <Route path="/tools/send-email" element={<SendEmailPage />} />
+        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+        <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
       </Routes>
     </div>
   );

@@ -4,6 +4,7 @@ import { login, loginSuccess } from '../../slices/authSlice'; // 👈 לוודא
 import { useNavigate, useLocation } from 'react-router-dom';
 import '../Register/RegisterPage.css';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
+import { Link } from 'react-router-dom';
 
 export default function LoginPage() {
   const dispatch = useDispatch();
@@ -114,6 +115,7 @@ export default function LoginPage() {
             התחבר עם Google
           </button>
         </a>
+        <Link to="/forgot-password">שכחתי סיסמה?</Link>
       </form>
     </div>
   );

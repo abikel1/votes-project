@@ -3,6 +3,7 @@ const {
   deleteVoteService,
   getVotesByCandidateInGroupService,
   getVotersByGroupService,                // ← חדש
+  hasUserVotedInGroup,
 } = require('../services/vote_service');
 
 async function createVote(req, res) {
@@ -76,9 +77,23 @@ async function getVotersByGroup(req, res) {
   }
 }
 
+
+async function hasVoted(req, res) {
+  try {
+    const { userId, groupId } = req.query;
+    const voted = await hasUserVotedInGroup(userId, groupId);
+    res.json({ voted });
+  } catch (err) {
+    res.status(500).json({ message: 'Error checking vote status' });
+  }
+}
+
 module.exports = {
   createVote,
   deleteVote,
   getVotesByCandidateInGroup,
-  getVotersByGroup,                  // ← חדש
+  getVotersByGroup,   
+  hasVoted               // ← חדש
 };
+
+
