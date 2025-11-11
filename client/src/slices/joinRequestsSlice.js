@@ -91,7 +91,8 @@ const joinReqSlice = createSlice({
     initialState: {
         byGroup: {},
         actionError: null,
-        my: {}, // [groupId]: { requesting, status: 'none'|'pending'|'member'|'error', error? }
+        // [groupId]: { requesting, status: 'none'|'pending'|'member'|'rejected'|'error', error?, rejectedAt? }
+        my: {},
     },
     reducers: {
         clearJoinRequestsError(s) { s.actionError = null; },
@@ -111,6 +112,15 @@ const joinReqSlice = createSlice({
             s.my[gid] = { requesting: false, status: 'member', error: null };
             const set = loadPendingFromLS();
             if (set.has(gid)) { set.delete(gid); savePendingToLS(set); }
+        },
+
+        // איפוס דגל "נדחה" (למשל לאחר שהמשתמש רענן/סגר הודעה)
+        clearRejectedForGroup(s, a) {
+            const gid = String(a.payload);
+            const prev = s.my[gid] || {};
+            if (prev.status === 'rejected') {
+                s.my[gid] = { requesting: false, status: 'none', error: null };
+            }
         },
     },
     extraReducers: (b) => {
@@ -158,6 +168,7 @@ const joinReqSlice = createSlice({
             /* ===== הזרימה שלי ===== */
             .addCase(requestJoinGroup.pending, (s, a) => {
                 const gid = String(a.meta.arg);
+                // אם היה "rejected" – מעבר מיידי ל-pending ומנקים rejectedAt
                 s.my[gid] = { requesting: true, status: 'pending', error: null };
                 const set = loadPendingFromLS(); set.add(gid); savePendingToLS(set);
             })
@@ -173,9 +184,7 @@ const joinReqSlice = createSlice({
                 if (set.has(gid)) { set.delete(gid); savePendingToLS(set); }
             })
 
-            // ✅ כשמגיע עדכון "אני חבר/ה" מ־/groups/my:
-            //    1) מי שבאמת חבר/ה בשרת → נסמן member ונסיר מה-LS.
-            //    2) מי שמסומן אצלנו member אבל לא מופיע בשרת → נוריד ל-none (למשל אחרי הסרה ע״י מנהל).
+            // ✅ כשמגיע עדכון "אני חבר/ה" מ־/groups/my – נסמן חבר/ה, ונוריד מי שמסומן member מקומית אבל לא מופיע בשרת.
             .addCase('groups/fetchMy/fulfilled', (s, a) => {
                 const joined = Array.isArray(a.payload?.joined) ? a.payload.joined : [];
                 const currentJoinedSet = new Set(joined.map(g => String(g._id)));
@@ -187,6 +196,7 @@ const joinReqSlice = createSlice({
                     if (ls.has(gid)) ls.delete(gid);
                 }
 
+                // אם מישהו סומן member מקומית אבל אינו חבר בשרת (הוסר) → none
                 for (const [gid, st] of Object.entries(s.my)) {
                     if (st?.status === 'member' && !currentJoinedSet.has(String(gid))) {
                         s.my[gid] = { requesting: false, status: 'none', error: null };
@@ -196,17 +206,27 @@ const joinReqSlice = createSlice({
                 savePendingToLS(ls);
             })
 
-            // יישור קו עם שרת לגבי pending
+            // ✅ יישור קו עם שרת לגבי pending:
+            //    - מי שמופיע בשרת כ-pending → נשאר pending
+            //    - מי שהיה pending אצלנו אבל לא מופיע בשרת → נהפוך ל-rejected (נדחה ע״י מנהל/ת)
             .addCase(fetchMyJoinStatuses.fulfilled, (s, a) => {
                 const ids = Array.isArray(a.payload?.pending) ? a.payload.pending.map(String) : [];
                 const serverSet = new Set(ids);
+
+                // עדכון לכל אלו שבשרת עדיין pending
                 serverSet.forEach((gid) => {
                     s.my[gid] = { requesting: false, status: 'pending', error: null };
                 });
-                // איחוד עם LS
+
+                // מי שהיה pending מקומית אך לא בשרת → נדחה
                 const localSet = loadPendingFromLS();
-                const union = new Set([...localSet, ...serverSet]);
-                savePendingToLS(union);
+                for (const [gid, st] of Object.entries(s.my)) {
+                    if (st?.status === 'pending' && !serverSet.has(String(gid))) {
+                        s.my[gid] = { requesting: false, status: 'rejected', error: null, rejectedAt: Date.now() };
+                        if (localSet.has(gid)) localSet.delete(gid);
+                    }
+                }
+                savePendingToLS(localSet);
             });
     }
 });
@@ -214,16 +234,18 @@ const joinReqSlice = createSlice({
 export const {
     clearJoinRequestsError,
     hydratePendingFromLocalStorage,
-    markJoinedLocally
+    markJoinedLocally,
+    clearRejectedForGroup
 } = joinReqSlice.actions;
 
 export default joinReqSlice.reducer;
 
-/* ===== Selectors (ממואיזציה כדי למנוע אזהרות) ===== */
+/* ===== Selectors ===== */
 export const selectJoinRequestsForGroup = (groupId) => (s) => s.joinReq.byGroup[groupId]?.list || [];
 export const selectJoinRequestsLoading = (groupId) => (s) => !!s.joinReq.byGroup[groupId]?.loading;
 export const selectJoinRequestsError = (groupId) => (s) => s.joinReq.byGroup[groupId]?.error || null;
 
+// סטים ממואזרים
 export const selectMyPendingSet = createSelector(
     (s) => s.joinReq.my,
     (my) => {
@@ -235,13 +257,17 @@ export const selectMyPendingSet = createSelector(
     }
 );
 
-export const selectMyMemberSet = createSelector(
+export const selectMyRejectedSet = createSelector(
     (s) => s.joinReq.my,
     (my) => {
         const out = new Set();
         for (const [gid, st] of Object.entries(my || {})) {
-            if (st?.status === 'member') out.add(String(gid));
+            if (st?.status === 'rejected') out.add(String(gid));
         }
         return out;
     }
 );
+
+// סטטוס קונקרטי לקבוצה
+export const selectMyStatusByGroup = (groupId) => (s) =>
+    s.joinReq.my?.[String(groupId)]?.status || 'none';

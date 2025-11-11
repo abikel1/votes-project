@@ -233,3 +233,13 @@
     color: #666;
     margin-top: 4px;
 }
+
+.rejected-hint {
+    margin-top: 4px;
+    font-size: 12px;
+    color: #b92c28;
+    background: #fdeaea;
+    border: 1px solid #f3c0c0;
+    border-radius: 8px;
+    padding: 6px 8px;
+}

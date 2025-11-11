@@ -13,6 +13,8 @@ import {
     fetchMyJoinStatuses,
     selectMyPendingSet,
     hydratePendingFromLocalStorage,
+    // חדש:
+    selectMyRejectedSet,
 } from '../../slices/joinRequestsSlice';
 import http from '../../api/http';
 import './GroupsPage.css';
@@ -37,19 +39,17 @@ export default function GroupsPage() {
 
     const joinedIdsSet = useSelector(selectMyJoinedIds);
     const pendingIdsSet = useSelector(selectMyPendingSet);
+    const rejectedIdsSet = useSelector(selectMyRejectedSet); // ← חדש
     const createdIdsSet = useSelector(selectMyCreatedIds);
 
-    // 1) לשחזר pending מ-LS לפני ששרת עונה
     useEffect(() => { dispatch(hydratePendingFromLocalStorage()); }, [dispatch]);
 
-    // 2) טעינה ראשונית
     useEffect(() => {
         dispatch(fetchGroups());
         dispatch(fetchMyGroups());
         dispatch(fetchMyJoinStatuses());
     }, [dispatch]);
 
-    // 3) פולינג עדין לעדכון מהיר לאחר אישור מנהל
     useEffect(() => {
         const t = setInterval(() => {
             dispatch(fetchMyGroups());
@@ -58,7 +58,6 @@ export default function GroupsPage() {
         return () => clearInterval(t);
     }, [dispatch]);
 
-    // 4) רענון כשחוזרים לפוקוס
     useEffect(() => {
         const refresh = () => {
             dispatch(fetchMyGroups());
@@ -71,7 +70,6 @@ export default function GroupsPage() {
         return () => { window.removeEventListener('focus', refresh); };
     }, [dispatch]);
 
-    // 5) אם מזהים חברות — מסמנים מקומית (ניקוי pending מה-LS)
     useEffect(() => {
         for (const gid of joinedIdsSet) {
             dispatch(markJoinedLocally(String(gid)));
@@ -93,7 +91,6 @@ export default function GroupsPage() {
                     const gid = String(g._id);
                     const isLocked = !!g.isLocked;
 
-                    // בעלות (ללא hooks)
                     const createdByEmail = lc(g.createdBy ?? g.created_by ?? g.createdByEmail ?? g.ownerEmail ?? g.owner);
                     const createdById = String(g.createdById ?? '');
                     const isOwner =
@@ -103,16 +100,17 @@ export default function GroupsPage() {
 
                     const isMember = joinedIdsSet.has(gid);
                     const isPending = pendingIdsSet.has(gid);
+                    const isRejected = rejectedIdsSet.has(gid); // ← חדש
 
                     const goSettings = (e) => { e.stopPropagation(); navigate(`/groups/${gid}/settings`); };
 
                     const onRequestJoin = (e) => {
                         e.stopPropagation();
                         if (isMember || isPending) return;
+                        // אם נדחתה — גם פה נותנים לבקש שוב
                         dispatch(requestJoinGroup(gid)).unwrap().catch(() => { });
                     };
 
-                    // ✅ בלחיצה בזמן "בהמתנה" נבדוק עם השרת האם כבר אושרה החברות
                     const onCardClick = async () => {
                         if (!isOwner && isLocked && isPending && !isMember) {
                             try {
@@ -130,13 +128,17 @@ export default function GroupsPage() {
                         }
 
                         if (!isOwner && isLocked && !isMember) {
+                            // אם נדחתה — נסביר שאפשר לשלוח שוב
+                            if (isRejected) {
+                                alert('בקשתך נדחתה על ידי מנהל/ת הקבוצה. ניתן לשלוח בקשה חדשה.');
+                                return;
+                            }
                             alert('הקבוצה נעולה. אין לך גישה אליה.');
                             return;
                         }
 
                         navigate(`/groups/${gid}`);
                     };
-
 
                     const cardDisabled = (!isOwner && isLocked && ((isPending && !isMember) || (!isPending && !isMember)));
 
@@ -179,6 +181,11 @@ export default function GroupsPage() {
                                         <>
                                             <button className="btn" disabled>בהמתנה…</button>
                                             <div className="pending-hint">הבקשה נשלחה וממתינה לאישור מנהל/ת</div>
+                                        </>
+                                    ) : isRejected ? (
+                                        <>
+                                            <div className="rejected-hint">בקשתך נדחתה על ידי מנהל/ת הקבוצה</div>
+                                            <button className="btn-outline" onClick={onRequestJoin}>שלח/י בקשה שוב</button>
                                         </>
                                     ) : (
                                         <button className="btn" onClick={onRequestJoin}>בקש/י הצטרפות</button>
