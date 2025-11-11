@@ -162,7 +162,34 @@ const groupsSlice = createSlice({
           const idx = s.list.findIndex(x => String(x._id) === String(groupId));
           if (idx >= 0) s.list[idx] = g;
         }
-      });
+      })
+
+.addCase(createGroup.pending, (state) => {
+  state.createLoading = true;
+  state.createError = null;
+  state.justCreated = false;
+})
+.addCase(createGroup.rejected, (state, action) => {
+  state.createLoading = false;
+  state.createError = action.payload;
+})
+
+ .addCase(createGroup.fulfilled, (state, action) => {
+  state.createLoading = false;
+  state.justCreated = true; // בשביל הניווט אחרי יצירה
+  state.createError = null;
+
+  // נעדכן את הרשימה אם היא קיימת
+  if (Array.isArray(state.list)) {
+    state.list.push(action.payload);
+  } else {
+    state.list = [action.payload];
+  }
+
+  // נעדכן גם selectedGroup אם תרצה
+  state.selectedGroup = action.payload;
+})
+;
   }
 });
 
