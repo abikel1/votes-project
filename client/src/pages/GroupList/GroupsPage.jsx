@@ -13,7 +13,8 @@ import {
   fetchMyJoinStatuses,
   selectMyPendingSet,
   hydratePendingFromLocalStorage,
-  clearRemovedNotice, // ננקה את הודעת "הוסרת" כששולחים בקשה מחדש
+  clearRemovedNotice, // לא להראות שוב "הוסרת"
+  selectMyRejectedSet, // ← חדש
 } from '../../slices/joinRequestsSlice';
 import http from '../../api/http';
 import './GroupsPage.css';
@@ -36,14 +37,15 @@ export default function GroupsPage() {
   const { loading, error: err, list: groups } = useSelector((s) => s.groups);
   const { userEmail: authEmail, userId: authId } = useSelector((s) => s.auth);
 
-  const joinedIdsSet = useSelector(selectMyJoinedIds);
+  const joinedIdsSet  = useSelector(selectMyJoinedIds);
   const pendingIdsSet = useSelector(selectMyPendingSet);
+  const rejectedIdsSet = useSelector(selectMyRejectedSet); // ← חדש
   const createdIdsSet = useSelector(selectMyCreatedIds);
 
-  // ← חדש: ניקח את כל מפת "הוסרת" בקריאה אחת (בלי הוקים בתוך map)
+  // מפת "הוסרת"
   const removedMap = useSelector((s) => s.joinReq.removedNotice || {});
 
-  // 1) לשחזר pending מ-LS לפני ששרת עונה
+  // 1) לשחזר pending מ-LS לפני שהשרת עונה
   useEffect(() => { dispatch(hydratePendingFromLocalStorage()); }, [dispatch]);
 
   // 2) טעינה ראשונית
@@ -53,7 +55,7 @@ export default function GroupsPage() {
     dispatch(fetchMyJoinStatuses());
   }, [dispatch]);
 
-  // 3) פולינג עדין לעדכון מהיר לאחר אישור מנהל
+  // 3) פולינג עדין
   useEffect(() => {
     const t = setInterval(() => {
       dispatch(fetchMyGroups());
@@ -75,7 +77,7 @@ export default function GroupsPage() {
     return () => { window.removeEventListener('focus', refresh); };
   }, [dispatch]);
 
-  // 5) אם מזהים חברות — מסמנים מקומית (ניקוי pending מה-LS)
+  // 5) אם מזהים חברות — מסמנים מקומית
   useEffect(() => {
     for (const gid of joinedIdsSet) {
       dispatch(markJoinedLocally(String(gid)));
@@ -105,9 +107,10 @@ export default function GroupsPage() {
             (!!myEmail && !!createdByEmail && myEmail === createdByEmail) ||
             (!!myId && !!createdById && myId === createdById);
 
-          const isMember = joinedIdsSet.has(gid);
-          const isPending = pendingIdsSet.has(gid);
-          const wasRemoved = !!removedMap[gid]; // ← במקום useSelector בתוך map
+          const isMember   = joinedIdsSet.has(gid);
+          const isPending  = pendingIdsSet.has(gid);
+          const isRejected = rejectedIdsSet.has(gid); // ← חדש
+          const wasRemoved = !!removedMap[gid];
 
           const goSettings = (e) => { e.stopPropagation(); navigate(`/groups/${gid}/settings`); };
 
@@ -118,6 +121,7 @@ export default function GroupsPage() {
             dispatch(requestJoinGroup(gid)).unwrap().catch(() => {});
           };
 
+          // בזמן "בהמתנה" — בדיקת חברוּת מול השרת
           const onCardClick = async () => {
             if (!isOwner && isLocked && isPending && !isMember) {
               try {
@@ -133,7 +137,11 @@ export default function GroupsPage() {
             }
 
             if (!isOwner && isLocked && !isMember) {
-              // אם אינה/אינך חבר/ה — לא נפתח את הקבוצה
+              if (isRejected) {
+                alert('בקשתך נדחתה על ידי מנהל/ת הקבוצה. ניתן לשלוח בקשה חדשה.');
+                return;
+              }
+              // סגור/הוסרה/לא חבר/ה
               return;
             }
 
@@ -178,6 +186,13 @@ export default function GroupsPage() {
                 <div className="actions" style={{ marginTop: 10 }}>
                   {isMember ? (
                     <span className="chip success">מחובר/ת</span>
+                  ) : isRejected ? (
+                    <>
+                      <div className="removed-box" style={{ background: '#fff3f3' }}>
+                        בקשתך נדחתה ע״י מנהל/ת הקבוצה. ניתן לשלוח בקשה חדשה.
+                      </div>
+                      <button className="btn" onClick={onRequestJoin}>שלח/י בקשה שוב</button>
+                    </>
                   ) : isPending ? (
                     <>
                       <button className="btn" disabled>בהמתנה…</button>
