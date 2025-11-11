@@ -105,6 +105,33 @@ export const fetchMe = createAsyncThunk(
   }
 );
 
+// בקשת מייל איפוס
+export const requestPasswordReset = createAsyncThunk(
+  'auth/requestPasswordReset',
+  async (email, { rejectWithValue }) => {
+    try {
+      const { data } = await http.post('/auth/password/forgot', { email });
+      return data?.message || 'אם המייל קיים, נשלחו הוראות לאיפוס.';
+    } catch (e) {
+      return rejectWithValue(e?.response?.data?.message || 'Request failed');
+    }
+  }
+);
+
+// איפוס בפועל
+export const resetPassword = createAsyncThunk(
+  'auth/resetPassword',
+  async ({ token, password }, { rejectWithValue }) => {
+    try {
+      const { data } = await http.post('/auth/password/reset', { token, password });
+      return data?.message || 'הסיסמה עודכנה בהצלחה.';
+    } catch (e) {
+      return rejectWithValue(e?.response?.data?.message || 'Reset failed');
+    }
+  }
+);
+
+
 /** ===== Slice ===== */
 const authSlice = createSlice({
   name: 'auth',
@@ -118,10 +145,11 @@ const authSlice = createSlice({
     error: null,
     registeredOk: false,
     user: null,
+    message: '',
   },
   reducers: {
 
-    
+
 
     logout(state) {
       state.token = null;
@@ -137,7 +165,7 @@ const authSlice = createSlice({
       localStorage.removeItem('userEmail');
     }
     ,
-        loginSuccess(state, action) {
+    loginSuccess(state, action) {
       const { token, user } = action.payload;
 
       state.token = token;
@@ -217,7 +245,15 @@ const authSlice = createSlice({
         if (s.lastName) localStorage.setItem('lastName', s.lastName);
         if (s.userEmail) localStorage.setItem('userEmail', s.userEmail);
       })
-      .addCase(updateProfile.rejected, (s, a) => { s.loading = false; s.error = a.payload; });
+      .addCase(updateProfile.rejected, (s, a) => { s.loading = false; s.error = a.payload; })
+
+      .addCase(requestPasswordReset.pending, (s) => { s.loading = true; s.error = null; })
+      .addCase(requestPasswordReset.fulfilled, (s, a) => { s.loading = false; s.error = null; s.message = a.payload; })
+      .addCase(requestPasswordReset.rejected, (s, a) => { s.loading = false; s.error = a.payload; })
+
+      .addCase(resetPassword.pending, (s) => { s.loading = true; s.error = null; })
+      .addCase(resetPassword.fulfilled, (s, a) => { s.loading = false; s.error = null; s.message = a.payload; })
+      .addCase(resetPassword.rejected, (s, a) => { s.loading = false; s.error = a.payload; });
   }
 });
 

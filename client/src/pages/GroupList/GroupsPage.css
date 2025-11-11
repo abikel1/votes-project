@@ -233,3 +233,33 @@
     color: #666;
     margin-top: 4px;
 }
+
+.rejected-hint {
+    margin-top: 4px;
+    font-size: 12px;
+    color: #b92c28;
+    background: #fdeaea;
+    border: 1px solid #f3c0c0;
+    border-radius: 8px;
+    padding: 6px 8px;
+}
+
+.rejected-msg {
+    margin-bottom: 6px;
+    font-size: 12px;
+    color: #b92c28;
+    background: #fdeaea;
+    border: 1px solid #f3c0c0;
+    border-radius: 6px;
+    padding: 6px 8px;
+}
+.removed-box {
+  background: #fff3f3;
+  color: #a12622;
+  border: 1px solid #f0caca;
+  border-radius: 8px;
+  padding: 8px 10px;
+  margin-bottom: 8px;
+  font-size: 13px;
+  line-height: 1.3;
+}

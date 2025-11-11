@@ -10,7 +10,7 @@ const {
   getUserGroupsService,
   getMyJoinStatusesService,
   isMemberOfGroupService,
-  removeGroupMemberService, // ✅ חדש
+  removeGroupMemberService,
 } = require('../services/group_service');
 const Group = require('../models/group_model');
 
@@ -32,10 +32,19 @@ async function updateGroup(req, res) {
 
 async function deleteGroup(req, res) {
   try {
-    const group = await deleteGroupService(req.params.id);
-    if (!group) return res.status(404).json({ message: 'Group not found' });
-    res.json({ message: 'Group deleted successfully' });
-  } catch (err) { res.status(500).json({ message: 'Error deleting group', error: err.message }); }
+    // בדיקת בעלות לפני מחיקה
+    const g = await Group.findById(req.params.id).lean();
+    if (!g) return res.status(404).json({ message: 'Group not found' });
+    if (String(g.createdById) !== String(req.user._id)) {
+      return res.status(403).json({ message: 'Not owner' });
+    }
+
+    await deleteGroupService(req.params.id);
+    // אפשר בעתיד להוסיף ניקוי ישויות תלויות במידלוואר.
+    res.json({ ok: true, message: 'Group deleted successfully', deletedId: String(req.params.id) });
+  } catch (err) {
+    res.status(500).json({ message: 'Error deleting group', error: err.message });
+  }
 }
 
 async function getGroupById(req, res) {
@@ -50,7 +59,6 @@ async function getAllGroups(req, res) {
   try { const groups = await getAllGroupsService(); res.json(groups); }
   catch (err) { res.status(500).json({ message: 'Error getting groups', error: err.message }); }
 }
-
 
 async function requestJoinGroup(req, res) {
   try {
@@ -73,7 +81,6 @@ async function listJoinRequests(req, res) {
     res.status(code).json({ message: err.message });
   }
 }
-
 
 async function approveJoinRequest(req, res) {
   try {
@@ -108,7 +115,7 @@ async function getGroupMembers(req, res) {
 
 async function getUserGroups(req, res) {
   try { const groups = await getUserGroupsService(req.user); res.json(groups); }
-  catch (err) { console.error('❌ Error getting user groups:', err); res.status(500).json({ message: err.message }); }
+  catch (err) { res.status(500).json({ message: err.message }); }
 }
 
 async function getMyJoinStatuses(req, res) {
@@ -126,11 +133,14 @@ async function getMyMembership(req, res) {
   }
 }
 
+/** הסרת משתתף/ת */
 async function removeMember(req, res) {
   try {
     const { memberId, email } = req.body || {};
-    const g = await removeMemberFromGroupService(req.params.id, req.user._id, { memberId, email });
-    // נחזיר את רשימת הממתינים המעודכנת גם (נוח לכלים בצד לקוח)
+    if (!memberId && !email) {
+      return res.status(400).json({ message: 'memberId or email is required' });
+    }
+    const g = await removeGroupMemberService(req.params.id, req.user._id, { memberId, email });
     const pending = await listJoinRequestsService(req.params.id, req.user._id).catch(() => []);
     res.json({ ok: true, group: g, pending });
   } catch (err) {
@@ -155,5 +165,5 @@ module.exports = {
   getUserGroups,
   getMyJoinStatuses,
   getMyMembership,
-  removeMember, // ✅ חדש
+  removeMember,
 };

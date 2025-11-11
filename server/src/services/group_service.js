@@ -1,4 +1,5 @@
-const mongoose = require('mongoose');              // ✅ חשוב!
+// server/src/services/group_service.js
+const mongoose = require('mongoose');
 const Group = require('../models/group_model');
 
 function toBoolStrict(v) {
@@ -19,7 +20,7 @@ async function createGroupService(data, user) {
   const group = await Group.create({
     name: data.name,
     description: data.description,
-    createdBy: user.email,
+    createdBy: (user.email || '').trim().toLowerCase(),
     createdById: user._id,
     endDate: data.endDate,
     maxWinners: data.maxWinners ?? 1,
@@ -60,7 +61,8 @@ async function requestJoinGroupService(groupId, user) {
 
   // כבר חבר?
   if (g.members?.some(id => String(id) === String(user._id))) return g;
-  if (Array.isArray(g.participants) && g.participants.includes(user.email)) return g;
+  const emailNorm = (user.email || '').trim().toLowerCase();
+  if (Array.isArray(g.participants) && g.participants.includes(emailNorm)) return g;
 
   // קיימת בקשה ממתינה?
   const exists = g.joinRequests?.find(r =>
@@ -70,7 +72,7 @@ async function requestJoinGroupService(groupId, user) {
 
   g.joinRequests.push({
     userId: user._id,
-    email: (user.email || '').trim().toLowerCase(),
+    email: emailNorm,
     name: user.name || user.fullName || '',
     status: 'pending',
   });
@@ -160,11 +162,51 @@ async function isMemberOfGroupService(groupId, user) {
   const email = (user.email || '').trim().toLowerCase();
 
   const byMembers = Array.isArray(g.members) && g.members.some(id => String(id) === uid);
-  const byParticipants = Array.isArray(g.participants) && g.participants
-    .map(e => (e || '').trim().toLowerCase())
-    .includes(email);
+  const byParticipants = Array.isArray(g.participants) &&
+    g.participants.map(e => (e || '').trim().toLowerCase()).includes(email);
 
   return { member: !!(byMembers || byParticipants) };
+}
+
+/** ✅ הסרת משתתף/ת מהקבוצה ע"י מנהל/ת */
+async function removeGroupMemberService(groupId, ownerId, { memberId, email }) {
+  if (!memberId && !email) {
+    const e = new Error('memberId or email is required');
+    e.code = 'BAD_ARGS';
+    throw e;
+  }
+
+  const g = await Group.findById(groupId);
+  if (!g) throw new Error('Group not found');
+  if (String(g.createdById) !== String(ownerId)) throw new Error('Not owner');
+
+  const emailNorm = (email || '').trim().toLowerCase();
+
+  // הסרה מ-members לפי ObjectId
+  if (memberId) {
+    g.members = (g.members || []).filter(id => String(id) !== String(memberId));
+  }
+
+  // הסרה גם מ-participants לפי אימייל
+  if (emailNorm) {
+    g.participants = (g.participants || [])
+      .map(e => (e || '').trim().toLowerCase())
+      .filter(e => e !== emailNorm);
+  }
+
+  // מחיקת בקשות בהמתנה של אותו משתמש/אימייל (לא חובה אבל נחמד)
+  g.joinRequests = (g.joinRequests || []).filter(r => {
+    const sameUser = memberId && String(r.userId) === String(memberId);
+    const sameEmail = emailNorm && (r.email || '').trim().toLowerCase() === emailNorm;
+    return !(sameUser || sameEmail);
+  });
+
+  await g.save();
+
+  const updated = await Group.findById(groupId)
+    .populate({ path: 'members', select: 'name email' });
+
+  return updated;
 }
 
 module.exports = {
@@ -179,4 +221,5 @@ module.exports = {
   getUserGroupsService,
   getMyJoinStatusesService,
   isMemberOfGroupService,
+  removeGroupMemberService, // ✅ export תקין
 };
