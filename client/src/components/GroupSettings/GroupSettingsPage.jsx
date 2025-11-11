@@ -7,6 +7,8 @@ import {
   updateGroup,
   clearUpdateState,
   selectSelectedGroupMembersEnriched,
+  removeGroupMember,
+  deleteGroupById,
 } from '../../slices/groupsSlice';
 
 import {
@@ -27,6 +29,14 @@ import {
   selectJoinRequestsError
 } from '../../slices/joinRequestsSlice';
 
+// מצביעים
+import {
+  fetchVotersByGroup,
+  selectVotersForGroup,
+  selectVotersLoadingForGroup,
+  selectVotersErrorForGroup,
+} from '../../slices/votesSlice';
+
 import { upsertUsers } from '../../slices/usersSlice';
 import './GroupSettingsPage.css';
 
@@ -37,20 +47,16 @@ function toLocalDateInputValue(d) {
   try {
     const dt = new Date(d);
     return `${dt.getFullYear()}-${String(dt.getMonth() + 1).padStart(2, '0')}-${String(dt.getDate()).padStart(2, '0')}`;
-  } catch {
-    return '';
-  }
+  } catch { return ''; }
 }
 
-// חילוץ userId ממבני בקשה שונים
 function getReqUserId(r) {
   return String(
     r.userId ?? r.user_id ?? r.applicantId ?? r.applicant_id ?? r.user?._id ?? r.user?.id ?? ''
   ) || null;
 }
 
-// מציג מירב הפרטים שקיימים למשתתף
-function MemberRow({ m }) {
+function MemberRow({ m, onRemove, isOwner }) {
   const phone = m.phone || m.phoneNumber || m.mobile || m.mobilePhone;
   const role = m.role || m.roleName || m.type;
   const created = m.createdAt ? new Date(m.createdAt).toLocaleDateString('he-IL') : null;
@@ -67,6 +73,11 @@ function MemberRow({ m }) {
           {joined ? ` · הצטרף: ${joined}` : ''}
         </div>
       </div>
+      {isOwner && onRemove && (
+        <div className="row-actions">
+          <button className="small danger" onClick={onRemove}>הסר/י</button>
+        </div>
+      )}
     </li>
   );
 }
@@ -96,17 +107,30 @@ export default function GroupSettingsPage() {
   const reqsLoading = useSelector(selectJoinRequestsLoading(groupId));
   const reqsError = useSelector(selectJoinRequestsError(groupId));
 
+  const voters = useSelector(selectVotersForGroup(groupId)) || EMPTY_ARR;
+  const votersLoading = useSelector(selectVotersLoadingForGroup(groupId));
+  const votersError = useSelector(selectVotersErrorForGroup(groupId));
+
   const [form, setForm] = useState({
     name: '', description: '', symbol: '', photoUrl: '', maxWinners: 1, endDate: '', isLocked: false,
   });
   const [editMode, setEditMode] = useState(false);
 
-  // טופס הוספת מועמד/ת
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const confirmSlug = useMemo(() => {
+    if (!group) return '';
+    const by = (group.createdBy || '').trim();
+    const nm = (group.name || '').trim();
+    return `${by}/${nm}`;
+  }, [group]);
+  const [typedSlug, setTypedSlug] = useState('');
+
   const [candForm, setCandForm] = useState({ name: '', description: '', symbol: '', photoUrl: '' });
 
   useEffect(() => {
     dispatch(fetchGroupWithMembers(groupId));
     dispatch(fetchCandidatesByGroup(groupId));
+    dispatch(fetchVotersByGroup(groupId));
   }, [dispatch, groupId]);
 
   useEffect(() => {
@@ -186,6 +210,7 @@ export default function GroupSettingsPage() {
     setEditMode(false);
     if (patch.isLocked) dispatch(fetchJoinRequests(groupId));
     dispatch(fetchGroupWithMembers(groupId));
+    dispatch(fetchVotersByGroup(groupId));
   };
 
   const onCancelEdit = () => {
@@ -199,7 +224,6 @@ export default function GroupSettingsPage() {
     }
   };
 
-  // === הוספת מועמד/ת ===
   const onCandChange = (e) => {
     const { name, value } = e.target;
     setCandForm(prev => ({ ...prev, [name]: value }));
@@ -214,7 +238,63 @@ export default function GroupSettingsPage() {
       .then(() => dispatch(fetchCandidatesByGroup(groupId)));
   };
 
-  const onDelete = (cid) => dispatch(deleteCandidate({ candidateId: cid, groupId }));
+  const onDeleteCandidate = (cid) => dispatch(deleteCandidate({ candidateId: cid, groupId }));
+
+  const doDeleteGroup = async () => {
+    try {
+      await dispatch(deleteGroupById(groupId)).unwrap();
+      setDeleteOpen(false);
+      navigate('/groups');
+    } catch (e) {
+      alert(e || 'מחיקה נכשלה');
+    }
+  };
+
+  // --- עזר להצגת שם מצביע בצורה יפה עם רווח בין פרטי למשפחה ---
+  const humanizeName = (raw, email) => {
+    const cap = (s) => (s ? s.charAt(0).toUpperCase() + s.slice(1) : '');
+    if (!raw && email) {
+      const local = String(email).split('@')[0] || '';
+      const parts = local.split(/[._\-]+/).filter(Boolean);
+      return parts.length ? parts.map(cap).join(' ') : local;
+    }
+    if (!raw) return '(ללא שם)';
+
+    let s = String(raw).trim();
+
+    // אם כבר יש רווחים – ננקה כפולים ונכַתֵּב
+    if (/\s/.test(s)) {
+      return s.replace(/\s+/g, ' ')
+              .split(' ')
+              .map(w => cap(w.toLowerCase()))
+              .join(' ');
+    }
+
+    // פיצול לפי מפרידים נפוצים
+    let parts = s.split(/[._\-]+/).filter(Boolean);
+
+    // אם עדיין חלק אחד – camelCase/PascalCase
+    if (parts.length === 1) {
+      parts = s.split(/(?=[A-Z])/).filter(Boolean);
+    }
+
+    // אם עדיין חלק אחד – ננסה מהאימייל
+    if (parts.length === 1 && email) {
+      const local = String(email).split('@')[0] || '';
+      const emailParts = local.split(/[._\-]+/).filter(Boolean);
+      if (emailParts.length > 1) parts = emailParts;
+    }
+
+    return parts.map(p => cap(p.toLowerCase())).join(' ') || s;
+  };
+
+  // שם לתצוגת מצביע
+  const formatVoterTitle = (v) => {
+    const composed =
+      v?.name ||
+      [v?.firstName || v?.first_name, v?.lastName || v?.last_name].filter(Boolean).join(' ');
+    return humanizeName(composed, v?.email);
+  };
 
   return (
     <div className="gs-wrap">
@@ -280,7 +360,7 @@ export default function GroupSettingsPage() {
 
         {/* סיידבר */}
         <aside className="sidebar">
-          {/* אקורדיון 1: רשימת מועמדים */}
+          {/* מועמדים */}
           <details open className="acc">
             <summary className="acc-sum">מועמדים</summary>
             <div className="acc-body">
@@ -305,12 +385,7 @@ export default function GroupSettingsPage() {
                         )}
                       </div>
                       <div className="row-actions">
-                        <button
-                          className="small danger"
-                          onClick={() => onDelete(String(c._id))}
-                        >
-                          הסר/י
-                        </button>
+                        <button className="small danger" onClick={() => onDeleteCandidate(String(c._id))}>הסר/י</button>
                       </div>
                     </li>
                   ))}
@@ -319,48 +394,19 @@ export default function GroupSettingsPage() {
             </div>
           </details>
 
-          {/* אקורדיון 2: הוספת מועמד/ת */}
+          {/* הוספת מועמד/ת */}
           <details className="acc">
             <summary className="acc-sum">הוספת מועמד/ת</summary>
             <div className="acc-body">
               <form onSubmit={onAddCandidate} className="field">
                 <label>שם *</label>
-                <input
-                  className="input"
-                  name="name"
-                  value={candForm.name}
-                  onChange={onCandChange}
-                  required
-                />
-
+                <input className="input" name="name" value={candForm.name} onChange={onCandChange} required />
                 <label>תיאור</label>
-                <textarea
-                  className="input"
-                  rows={3}
-                  name="description"
-                  value={candForm.description}
-                  onChange={onCandChange}
-                />
-
+                <textarea className="input" rows={3} name="description" value={candForm.description} onChange={onCandChange} />
                 <label>סמל (אופציונלי)</label>
-                <input
-                  className="input"
-                  name="symbol"
-                  value={candForm.symbol}
-                  onChange={onCandChange}
-                  placeholder="למשל: א׳"
-                />
-
+                <input className="input" name="symbol" value={candForm.symbol} onChange={onCandChange} placeholder="למשל: א׳" />
                 <label>קישור תמונה (אופציונלי)</label>
-                <input
-                  className="input"
-                  name="photoUrl"
-                  type="url"
-                  value={candForm.photoUrl}
-                  onChange={onCandChange}
-                  placeholder="https://..."
-                />
-
+                <input className="input" name="photoUrl" type="url" value={candForm.photoUrl} onChange={onCandChange} placeholder="https://..." />
                 <div style={{ marginTop: 8 }}>
                   <button className="gs-btn" type="submit">הוסף/י מועמד/ת</button>
                 </div>
@@ -368,6 +414,41 @@ export default function GroupSettingsPage() {
             </div>
           </details>
 
+          {/* המצביעים */}
+          <details className="acc">
+            <summary className="acc-sum">המצביעים</summary>
+            <div className="acc-body">
+              {votersLoading ? (
+                <div>טוען מצביעים…</div>
+              ) : votersError ? (
+                <div className="err">{votersError}</div>
+              ) : !voters.length ? (
+                <div className="muted">אין מצביעים עדיין.</div>
+              ) : (
+                <ul className="list">
+                  {voters.map((v) => {
+                    const titleName = formatVoterTitle(v);
+                    const email = v.email;
+                    const when = v.lastVoteAt || v.votedAt || v.createdAt;
+
+                    return (
+                      <li key={String(v._id || v.userId || v.id)} className="row">
+                        <div className="row-main">
+                          <div className="title">{titleName}</div>
+                          <div className="sub">
+                            {email ? `${email}` : ''}
+                            {when ? ` · ${new Date(when).toLocaleString('he-IL')}` : ''}
+                          </div>
+                        </div>
+                      </li>
+                    );
+                  })}
+                </ul>
+              )}
+            </div>
+          </details>
+
+          {/* בקשות הצטרפות — רק בקבוצה נעולה */}
           {group.isLocked && (
             <details className="acc">
               <summary className="acc-sum">בקשות הצטרפות</summary>
@@ -417,20 +498,85 @@ export default function GroupSettingsPage() {
             </details>
           )}
 
-          <details className="acc">
-            <summary className="acc-sum">משתתפי הקבוצה</summary>
+          {/* משתתפי הקבוצה — רק כשנעול */}
+          {group.isLocked && (
+            <details className="acc">
+              <summary className="acc-sum">משתתפי הקבוצה</summary>
+              <div className="acc-body">
+                {!enrichedMembers?.length ? (
+                  <div className="muted">אין משתתפים עדיין.</div>
+                ) : (
+                  <ul className="list">
+                    {enrichedMembers.map((m) => {
+                      const mid = String(m._id || m.id);
+                      const removable = isOwner && String(group.createdById) !== mid;
+                      const onRemove = removable ? async () => {
+                        if (!window.confirm(`להסיר את ${m.name || m.email || mid} מהקבוצה?`)) return;
+                        try {
+                          await dispatch(removeGroupMember({
+                            groupId,
+                            memberId: mid,
+                            email: m.email || undefined,
+                          })).unwrap();
+                          if (group.isLocked) dispatch(fetchJoinRequests(groupId));
+                          dispatch(fetchGroupWithMembers(groupId));
+                        } catch (e) {
+                          alert(e || 'Failed to remove member');
+                        }
+                      } : undefined;
+
+                      return <MemberRow key={mid} m={m} onRemove={onRemove} isOwner={isOwner} />;
+                    })}
+                  </ul>
+                )}
+              </div>
+            </details>
+          )}
+
+          {/* אזור מסוכן: מחיקת קבוצה */}
+          <details className="acc danger">
+            <summary className="acc-sum">מחיקת קבוצה</summary>
             <div className="acc-body">
-              {!enrichedMembers?.length ? (
-                <div className="muted">אין משתתפים עדיין.</div>
-              ) : (
-                <ul className="list">
-                  {enrichedMembers.map((m) => <MemberRow key={m._id || m.id} m={m} />)}
-                </ul>
-              )}
+              <p className="danger-text">
+                מחיקה היא פעולה בלתי הפיכה. כל נתוני הקבוצה יימחקו לכולם.
+              </p>
+              <button className="btn-danger" onClick={() => { setDeleteOpen(true); setTypedSlug(''); }}>
+                מחיקת הקבוצה…
+              </button>
             </div>
           </details>
         </aside>
       </div>
+
+      {/* מודאל מחיקה */}
+      {deleteOpen && (
+        <div className="modal-backdrop" onClick={() => setDeleteOpen(false)}>
+          <div className="modal" onClick={(e) => e.stopPropagation()}>
+            <h3>מחק/י את הקבוצה</h3>
+            <p className="muted" style={{ marginTop: 6 }}>
+              כדי לאשר, הקלד/י בתיבה את <b>{confirmSlug}</b>
+            </p>
+            <input
+              className="input"
+              placeholder={confirmSlug}
+              value={typedSlug}
+              onChange={(e) => setTypedSlug(e.target.value)}
+              style={{ direction: 'ltr' }}
+            />
+            <div className="actions-row" style={{ marginTop: 12 }}>
+              <button className="gs-btn-outline" onClick={() => setDeleteOpen(false)}>ביטול</button>
+              <button
+                className="btn-danger"
+                disabled={typedSlug.trim() !== confirmSlug}
+                onClick={doDeleteGroup}
+                title={typedSlug.trim() !== confirmSlug ? 'יש להקליד בדיוק את הערך לעיל' : undefined}
+              >
+                מחיקת הקבוצה לצמיתות
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -6,8 +6,6 @@ const User = require('../models/user_model');
 
 /**
  * יצירת הצבעה חדשה
- * @param {{ userId: string, groupId: string, candidateId: string }} voteData
- * @returns {Promise<Object>} מסמך ההצבעה שנוצר
  */
 async function createVoteService(voteData) {
   const { userId, groupId, candidateId } = voteData || {};
@@ -58,7 +56,6 @@ async function createVoteService(voteData) {
       createdVote = voteDoc;
     });
 
-    console.log('✅ Vote created:', createdVote);
     return createdVote;
   } catch (e) {
     if (e && e.code === 11000) e.message = 'User already voted in this group';
@@ -68,6 +65,9 @@ async function createVoteService(voteData) {
   }
 }
 
+/**
+ * מחיקת הצבעה
+ */
 async function deleteVoteService(voteData) {
   const { userId, groupId } = voteData || {};
   const isId = (v) => mongoose.isValidObjectId(v);
@@ -97,13 +97,15 @@ async function deleteVoteService(voteData) {
       }
     });
 
-    console.log('🗑️ Vote deleted:', deleted);
     return deleted;
   } finally {
     session.endSession();
   }
 }
 
+/**
+ * הצבעות לפי מועמד בקבוצה
+ */
 async function getVotesByCandidateInGroupService({ candidateId, groupId }) {
   const isId = (v) => mongoose.isValidObjectId(v);
   if (!candidateId || !groupId) throw new Error('Missing required fields (candidateId, groupId)');
@@ -123,12 +125,98 @@ async function getVotesByCandidateInGroupService({ candidateId, groupId }) {
   const votes = await Vote.find({ candidateId, groupId }).lean();
   return votes;
 }
+
+/**
+ * האם משתמש הצביע בקבוצה
+ */
 async function hasUserVotedInGroup(userId, groupId) {
   const exists = await Vote.exists({ userId, groupId });
   return Boolean(exists);
 }
 
-module.exports = { createVoteService,
-   deleteVoteService,
-    getVotesByCandidateInGroupService
-  ,hasUserVotedInGroup, };
+/**
+ * מצביעים לפי קבוצה (מחזיר שם מלא אם קיים, עם רווח יחיד תקין)
+ */
+async function getVotersByGroupService({ groupId }) {
+  const isId = (v) => mongoose.isValidObjectId(v);
+  if (!groupId) throw new Error('Missing required fields (groupId)');
+  if (!isId(groupId)) throw new Error('Invalid IDs format');
+
+  const group = await Group.findById(groupId).lean();
+  if (!group) throw new Error('Group not found');
+
+  const votes = await Vote.find({ groupId }).sort({ updatedAt: -1 }).lean();
+  const userIds = [...new Set(votes.map(v => String(v.userId)))];
+
+  // בוחרים מגוון שדות אפשריים לשמות + שדות מקוננים נפוצים
+  const users = await User.find({ _id: { $in: userIds } })
+    .select([
+      '_id',
+      'email',
+      'name',
+      'fullName',
+      'displayName',
+      'username',
+      'firstName',
+      'lastName',
+      'first_name',
+      'last_name',
+      'givenName',
+      'familyName',
+      'profile.firstName',
+      'profile.lastName',
+      'metadata.firstName',
+      'metadata.lastName',
+      'phone',
+      'phoneNumber',
+      'mobile',
+    ].join(' '))
+    .lean();
+
+  const userById = new Map(users.map(u => [String(u._id), u]));
+  const pick = (...vals) => vals.find(v => typeof v === 'string' && v.trim())?.trim();
+
+  const firstOf = (u = {}) =>
+    pick(u.firstName, u.first_name, u.givenName, u.profile?.firstName, u.metadata?.firstName);
+
+  const lastOf = (u = {}) =>
+    pick(u.lastName, u.last_name, u.familyName, u.profile?.lastName, u.metadata?.lastName);
+
+  const displayNameOf = (u = {}) => {
+    const fn = firstOf(u);
+    const ln = lastOf(u);
+    const joined = [fn, ln].filter(Boolean).join(' ').replace(/\s+/g, ' ').trim();
+    const fromEmail = (u.email || '').split('@')[0] || null;
+    return (
+      joined ||
+      u.name ||
+      u.fullName ||
+      u.displayName ||
+      u.username ||
+      fromEmail ||
+      null
+    );
+  };
+
+  return votes.map(v => {
+    const u = userById.get(String(v.userId)) || {};
+    return {
+      _id: v._id,
+      userId: v.userId,
+      firstName: firstOf(u) || null,
+      lastName: lastOf(u) || null,
+      name: displayNameOf(u),
+      email: u.email || null,
+      phone: u.phone || u.phoneNumber || u.mobile || null,
+      lastVoteAt: v.updatedAt || v.timestamp || v.createdAt,
+    };
+  });
+}
+
+module.exports = {
+  createVoteService,
+  deleteVoteService,
+  getVotesByCandidateInGroupService,
+  getVotersByGroupService,
+  hasUserVotedInGroup,
+};

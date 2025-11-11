@@ -2,6 +2,7 @@ const {
   createVoteService,
   deleteVoteService,
   getVotesByCandidateInGroupService,
+  getVotersByGroupService,                // ← חדש
   hasUserVotedInGroup,
 } = require('../services/vote_service');
 
@@ -13,19 +14,14 @@ async function createVote(req, res) {
   } catch (err) {
     console.error('❌ Error creating vote:', err);
     const msg = String(err.message || '');
-
     if (msg.includes('Missing required fields') || msg.includes('Invalid IDs'))
       return res.status(400).json({ message: msg });
-
     if (msg.includes('not found'))
       return res.status(404).json({ message: msg });
-
     if (msg.includes('Voting period has ended') || msg.includes('does not belong'))
       return res.status(400).json({ message: msg });
-
     if (msg.includes('already voted'))
       return res.status(409).json({ message: 'User already voted in this group' });
-
     return res.status(500).json({ message: 'Error creating vote' });
   }
 }
@@ -38,13 +34,10 @@ async function deleteVote(req, res) {
   } catch (err) {
     console.error('❌ Error deleting vote:', err);
     const msg = String(err.message || '');
-
     if (msg.includes('Missing required fields') || msg.includes('Invalid IDs'))
       return res.status(400).json({ message: msg });
-
     if (msg.includes('Vote not found'))
       return res.status(404).json({ message: msg });
-
     return res.status(500).json({ message: 'Error deleting vote' });
   }
 }
@@ -57,19 +50,33 @@ async function getVotesByCandidateInGroup(req, res) {
   } catch (err) {
     console.error('❌ Error getting votes by candidate in group:', err);
     const msg = String(err.message || '');
-
     if (msg.includes('Missing required fields') || msg.includes('Invalid IDs'))
       return res.status(400).json({ message: msg });
-
     if (msg.includes('not found'))
       return res.status(404).json({ message: msg });
-
     if (msg.includes('does not belong'))
       return res.status(400).json({ message: msg });
-
     return res.status(500).json({ message: 'Error getting votes by candidate in group' });
   }
 }
+
+/** ← חדש: מצביעים לפי קבוצה */
+async function getVotersByGroup(req, res) {
+  try {
+    const { groupId } = req.params;
+    const voters = await getVotersByGroupService({ groupId });
+    return res.status(200).json(voters);
+  } catch (err) {
+    console.error('❌ Error getting voters by group:', err);
+    const msg = String(err.message || '');
+    if (msg.includes('Missing required fields') || msg.includes('Invalid IDs'))
+      return res.status(400).json({ message: msg });
+    if (msg.includes('not found'))
+      return res.status(404).json({ message: msg });
+    return res.status(500).json({ message: 'Error getting voters by group' });
+  }
+}
+
 
 async function hasVoted(req, res) {
   try {
@@ -81,8 +88,12 @@ async function hasVoted(req, res) {
   }
 }
 
+module.exports = {
+  createVote,
+  deleteVote,
+  getVotesByCandidateInGroup,
+  getVotersByGroup,   
+  hasVoted               // ← חדש
+};
 
-module.exports = { createVote,
-   deleteVote,
-    getVotesByCandidateInGroup 
-    ,hasVoted,};
+

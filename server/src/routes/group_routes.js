@@ -6,7 +6,7 @@ const {
   createGroup, updateGroup, deleteGroup, getGroupById, getAllGroups,
   requestJoinGroup, listJoinRequests, approveJoinRequest, rejectJoinRequest,
   getGroupMembers, getUserGroups, getMyJoinStatuses, getMyMembership,
-  removeMember, // ✅
+  removeMember,
 } = require('../controllers/group_controller');
 const handleGroupDependencies = require('../middlewares/group_middleware');
 
@@ -16,12 +16,8 @@ router.delete('/:id', auth, handleGroupDependencies, deleteGroup);
 
 router.get('/my', auth, getUserGroups);
 router.get('/my-join-status', auth, getMyJoinStatuses);
-
-// בדיקת חברות לקבוצה בודדת
 router.get('/:id/my-membership', auth, getMyMembership);
 
-// *** חדש: הסרת משתתף/ת ע״י מנהל/ת ***
-// משתמשים ב-PATCH עם גוף { memberId, email }
 router.patch('/:id/members/remove', auth, removeMember);
 
 router.get('/:id', getGroupById);

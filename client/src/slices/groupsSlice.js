@@ -30,7 +30,6 @@ export const fetchGroupOnly = createAsyncThunk('groups/fetchOnly', async (groupI
   catch (err) { return rejectWithValue(err?.response?.data?.message || 'Failed to load group'); }
 });
 
-/** טען קבוצה + השלם פרטי חברים */
 export const fetchGroupWithMembers = createAsyncThunk(
   'groups/fetchWithMembers',
   async (groupId, { dispatch, rejectWithValue, getState }) => {
@@ -71,7 +70,7 @@ export const updateGroup = createAsyncThunk(
   }
 );
 
-// *** אילו קבוצות שלי? (נוצרו/הצטרפתי) ***
+// אילו קבוצות שלי
 export const fetchMyGroups = createAsyncThunk(
   'groups/fetchMy',
   async (_, { rejectWithValue }) => {
@@ -84,7 +83,7 @@ export const fetchMyGroups = createAsyncThunk(
   }
 );
 
-// ✅ חדש: הסרת משתתף/ת ע״י מנהל/ת
+// ❗ הסרת משתתף
 export const removeGroupMember = createAsyncThunk(
   'groups/removeMember',
   async ({ groupId, memberId, email }, { rejectWithValue }) => {
@@ -96,6 +95,19 @@ export const removeGroupMember = createAsyncThunk(
       return { groupId, data };
     } catch (err) {
       return rejectWithValue(err?.response?.data?.message || 'Failed to remove member');
+    }
+  }
+);
+
+// ❗❗ חדש: מחיקת קבוצה
+export const deleteGroupById = createAsyncThunk(
+  'groups/delete',
+  async (groupId, { rejectWithValue }) => {
+    try {
+      const { data } = await http.delete(`/groups/${groupId}`);
+      return { groupId, data };
+    } catch (err) {
+      return rejectWithValue(err?.response?.data?.message || 'Failed to delete group');
     }
   }
 );
@@ -151,45 +163,51 @@ const groupsSlice = createSlice({
         s.myJoinedIds = joined.map(g => String(g._id));
       })
 
-      // ✅ לאחר הסרת משתתף — נעדכן selectedGroup והרשימה
       .addCase(removeGroupMember.fulfilled, (s, a) => {
         const { groupId, data } = a.payload || {};
         const g = data?.group;
         if (g) {
-          if (s.selectedGroup && String(s.selectedGroup._id) === String(groupId)) {
-            s.selectedGroup = g;
-          }
+          if (s.selectedGroup && String(s.selectedGroup._id) === String(groupId)) s.selectedGroup = g;
           const idx = s.list.findIndex(x => String(x._id) === String(groupId));
           if (idx >= 0) s.list[idx] = g;
         }
       })
 
-.addCase(createGroup.pending, (state) => {
-  state.createLoading = true;
-  state.createError = null;
-  state.justCreated = false;
-})
-.addCase(createGroup.rejected, (state, action) => {
-  state.createLoading = false;
-  state.createError = action.payload;
-})
 
- .addCase(createGroup.fulfilled, (state, action) => {
-  state.createLoading = false;
-  state.justCreated = true; // בשביל הניווט אחרי יצירה
-  state.createError = null;
+      .addCase(createGroup.pending, (state) => {
+        state.createLoading = true;
+        state.createError = null;
+        state.justCreated = false;
+      })
+      .addCase(createGroup.rejected, (state, action) => {
+        state.createLoading = false;
+        state.createError = action.payload;
+      })
 
-  // נעדכן את הרשימה אם היא קיימת
-  if (Array.isArray(state.list)) {
-    state.list.push(action.payload);
-  } else {
-    state.list = [action.payload];
-  }
+      .addCase(createGroup.fulfilled, (state, action) => {
+        state.createLoading = false;
+        state.justCreated = true; // בשביל הניווט אחרי יצירה
+        state.createError = null;
 
-  // נעדכן גם selectedGroup אם תרצה
-  state.selectedGroup = action.payload;
-})
-;
+        // נעדכן את הרשימה אם היא קיימת
+        if (Array.isArray(state.list)) {
+          state.list.push(action.payload);
+        } else {
+          state.list = [action.payload];
+        }
+
+        // נעדכן גם selectedGroup אם תרצה
+        state.selectedGroup = action.payload;
+      })
+
+      // מחיקת קבוצה: מוציאים מהרשימה ומנקים selectedGroup
+      .addCase(deleteGroupById.fulfilled, (s, a) => {
+        const gid = a.payload?.groupId;
+        s.list = (s.list || []).filter(g => String(g._id) !== String(gid));
+        if (s.selectedGroup && String(s.selectedGroup._id) === String(gid)) {
+          s.selectedGroup = null;
+        }
+      });
   }
 });
 
@@ -197,7 +215,7 @@ export const { clearCreateState, clearUpdateState } = groupsSlice.actions;
 export default groupsSlice.reducer;
 
 /* ======================
-   Selectors (ממואזרים!)
+   Selectors
    ====================== */
 const selectMyEmail = (s) => s.auth.userEmail || null;
 const selectMyId = (s) => s.auth.userId || null;
@@ -242,7 +260,7 @@ export const selectSelectedGroupMembersEnriched = createSelector(
   }
 );
 
-// ✅ ממואיזציה כדי למנוע warnings
+// ממואיזציה
 export const selectMyJoinedIds = createSelector(
   (s) => s.groups.myJoinedIds,
   (arr) => new Set((arr || []).map(String))
