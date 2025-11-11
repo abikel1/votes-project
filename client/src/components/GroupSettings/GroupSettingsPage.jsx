@@ -7,6 +7,7 @@ import {
   updateGroup,
   clearUpdateState,
   selectSelectedGroupMembersEnriched,
+  removeGroupMember, // ← חדש
 } from '../../slices/groupsSlice';
 
 import {
@@ -37,9 +38,7 @@ function toLocalDateInputValue(d) {
   try {
     const dt = new Date(d);
     return `${dt.getFullYear()}-${String(dt.getMonth() + 1).padStart(2, '0')}-${String(dt.getDate()).padStart(2, '0')}`;
-  } catch {
-    return '';
-  }
+  } catch { return ''; }
 }
 
 // חילוץ userId ממבני בקשה שונים
@@ -49,8 +48,8 @@ function getReqUserId(r) {
   ) || null;
 }
 
-// מציג מירב הפרטים שקיימים למשתתף
-function MemberRow({ m }) {
+// שורת משתתף (כולל כפתור הסרה לבעלי קבוצה)
+function MemberRow({ m, onRemove, isOwner }) {
   const phone = m.phone || m.phoneNumber || m.mobile || m.mobilePhone;
   const role = m.role || m.roleName || m.type;
   const created = m.createdAt ? new Date(m.createdAt).toLocaleDateString('he-IL') : null;
@@ -67,6 +66,11 @@ function MemberRow({ m }) {
           {joined ? ` · הצטרף: ${joined}` : ''}
         </div>
       </div>
+      {isOwner && onRemove && (
+        <div className="row-actions">
+          <button className="small danger" onClick={onRemove}>הסר/י</button>
+        </div>
+      )}
     </li>
   );
 }
@@ -280,7 +284,7 @@ export default function GroupSettingsPage() {
 
         {/* סיידבר */}
         <aside className="sidebar">
-          {/* אקורדיון 1: רשימת מועמדים */}
+          {/* אקורדיון: מועמדים */}
           <details open className="acc">
             <summary className="acc-sum">מועמדים</summary>
             <div className="acc-body">
@@ -305,12 +309,7 @@ export default function GroupSettingsPage() {
                         )}
                       </div>
                       <div className="row-actions">
-                        <button
-                          className="small danger"
-                          onClick={() => onDelete(String(c._id))}
-                        >
-                          הסר/י
-                        </button>
+                        <button className="small danger" onClick={() => onDelete(String(c._id))}>הסר/י</button>
                       </div>
                     </li>
                   ))}
@@ -319,48 +318,19 @@ export default function GroupSettingsPage() {
             </div>
           </details>
 
-          {/* אקורדיון 2: הוספת מועמד/ת */}
+          {/* הוספת מועמד/ת */}
           <details className="acc">
             <summary className="acc-sum">הוספת מועמד/ת</summary>
             <div className="acc-body">
               <form onSubmit={onAddCandidate} className="field">
                 <label>שם *</label>
-                <input
-                  className="input"
-                  name="name"
-                  value={candForm.name}
-                  onChange={onCandChange}
-                  required
-                />
-
+                <input className="input" name="name" value={candForm.name} onChange={onCandChange} required />
                 <label>תיאור</label>
-                <textarea
-                  className="input"
-                  rows={3}
-                  name="description"
-                  value={candForm.description}
-                  onChange={onCandChange}
-                />
-
+                <textarea className="input" rows={3} name="description" value={candForm.description} onChange={onCandChange} />
                 <label>סמל (אופציונלי)</label>
-                <input
-                  className="input"
-                  name="symbol"
-                  value={candForm.symbol}
-                  onChange={onCandChange}
-                  placeholder="למשל: א׳"
-                />
-
+                <input className="input" name="symbol" value={candForm.symbol} onChange={onCandChange} placeholder="למשל: א׳" />
                 <label>קישור תמונה (אופציונלי)</label>
-                <input
-                  className="input"
-                  name="photoUrl"
-                  type="url"
-                  value={candForm.photoUrl}
-                  onChange={onCandChange}
-                  placeholder="https://..."
-                />
-
+                <input className="input" name="photoUrl" type="url" value={candForm.photoUrl} onChange={onCandChange} placeholder="https://..." />
                 <div style={{ marginTop: 8 }}>
                   <button className="gs-btn" type="submit">הוסף/י מועמד/ת</button>
                 </div>
@@ -368,6 +338,7 @@ export default function GroupSettingsPage() {
             </div>
           </details>
 
+          {/* בקשות הצטרפות */}
           {group.isLocked && (
             <details className="acc">
               <summary className="acc-sum">בקשות הצטרפות</summary>
@@ -417,6 +388,7 @@ export default function GroupSettingsPage() {
             </details>
           )}
 
+          {/* משתתפי הקבוצה */}
           <details className="acc">
             <summary className="acc-sum">משתתפי הקבוצה</summary>
             <div className="acc-body">
@@ -424,7 +396,28 @@ export default function GroupSettingsPage() {
                 <div className="muted">אין משתתפים עדיין.</div>
               ) : (
                 <ul className="list">
-                  {enrichedMembers.map((m) => <MemberRow key={m._id || m.id} m={m} />)}
+                  {enrichedMembers.map((m) => {
+                    const mid = String(m._id || m.id);
+                    // לא מאפשרים להסיר את בעל/ת הקבוצה
+                    const removable = isOwner && String(group.createdById) !== mid;
+
+                    const onRemove = removable ? async () => {
+                      if (!window.confirm(`להסיר את ${m.name || m.email || mid} מהקבוצה?`)) return;
+                      try {
+                        await dispatch(removeGroupMember({
+                          groupId,
+                          memberId: mid,
+                          email: m.email || undefined,
+                        })).unwrap();
+                        dispatch(fetchJoinRequests(groupId));
+                        dispatch(fetchGroupWithMembers(groupId));
+                      } catch (e) {
+                        alert(e || 'Failed to remove member');
+                      }
+                    } : undefined;
+
+                    return <MemberRow key={mid} m={m} onRemove={onRemove} isOwner={isOwner} />;
+                  })}
                 </ul>
               )}
             </div>

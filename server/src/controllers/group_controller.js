@@ -10,7 +10,7 @@ const {
   getUserGroupsService,
   getMyJoinStatusesService,
   isMemberOfGroupService,
-  removeGroupMemberService, // ✅ חדש
+  removeGroupMemberService, // ✅ נכון
 } = require('../services/group_service');
 const Group = require('../models/group_model');
 
@@ -51,7 +51,6 @@ async function getAllGroups(req, res) {
   catch (err) { res.status(500).json({ message: 'Error getting groups', error: err.message }); }
 }
 
-
 async function requestJoinGroup(req, res) {
   try {
     const g = await requestJoinGroupService(req.params.id, req.user);
@@ -73,7 +72,6 @@ async function listJoinRequests(req, res) {
     res.status(code).json({ message: err.message });
   }
 }
-
 
 async function approveJoinRequest(req, res) {
   try {
@@ -108,7 +106,7 @@ async function getGroupMembers(req, res) {
 
 async function getUserGroups(req, res) {
   try { const groups = await getUserGroupsService(req.user); res.json(groups); }
-  catch (err) { console.error('❌ Error getting user groups:', err); res.status(500).json({ message: err.message }); }
+  catch (err) { res.status(500).json({ message: err.message }); }
 }
 
 async function getMyJoinStatuses(req, res) {
@@ -126,11 +124,14 @@ async function getMyMembership(req, res) {
   }
 }
 
+/** ✅ הסרת משתתף/ת */
 async function removeMember(req, res) {
   try {
     const { memberId, email } = req.body || {};
-    const g = await removeMemberFromGroupService(req.params.id, req.user._id, { memberId, email });
-    // נחזיר את רשימת הממתינים המעודכנת גם (נוח לכלים בצד לקוח)
+    if (!memberId && !email) {
+      return res.status(400).json({ message: 'memberId or email is required' });
+    }
+    const g = await removeGroupMemberService(req.params.id, req.user._id, { memberId, email });
     const pending = await listJoinRequestsService(req.params.id, req.user._id).catch(() => []);
     res.json({ ok: true, group: g, pending });
   } catch (err) {
@@ -155,5 +156,5 @@ module.exports = {
   getUserGroups,
   getMyJoinStatuses,
   getMyMembership,
-  removeMember, // ✅ חדש
+  removeMember, // ✅
 };

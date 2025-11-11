@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk, createSelector } from '@reduxjs/toolkit';
 import http from '../api/http';
-import { fetchUsersByIds, hydrateUsersForGroup, selectUsersMap } from './usersSlice';
+import { fetchUsersByIds, hydrateUsersForGroup, selectUsersMap } from './usersSlice'
 
 /* ===== Helpers ===== */
 const pickId = (m) => {
@@ -30,7 +30,6 @@ export const fetchGroupOnly = createAsyncThunk('groups/fetchOnly', async (groupI
   catch (err) { return rejectWithValue(err?.response?.data?.message || 'Failed to load group'); }
 });
 
-/** טען קבוצה + השלם פרטי חברים */
 export const fetchGroupWithMembers = createAsyncThunk(
   'groups/fetchWithMembers',
   async (groupId, { dispatch, rejectWithValue, getState }) => {
@@ -71,7 +70,7 @@ export const updateGroup = createAsyncThunk(
   }
 );
 
-// *** אילו קבוצות שלי? (נוצרו/הצטרפתי) ***
+// אילו קבוצות שלי
 export const fetchMyGroups = createAsyncThunk(
   'groups/fetchMy',
   async (_, { rejectWithValue }) => {
@@ -84,7 +83,7 @@ export const fetchMyGroups = createAsyncThunk(
   }
 );
 
-// ✅ חדש: הסרת משתתף/ת ע״י מנהל/ת
+// ❗ חדש: הסרת משתתף
 export const removeGroupMember = createAsyncThunk(
   'groups/removeMember',
   async ({ groupId, memberId, email }, { rejectWithValue }) => {
@@ -151,14 +150,12 @@ const groupsSlice = createSlice({
         s.myJoinedIds = joined.map(g => String(g._id));
       })
 
-      // ✅ לאחר הסרת משתתף — נעדכן selectedGroup והרשימה
+      // אחרי הסרת משתתף — לעדכן selectedGroup והרשימה
       .addCase(removeGroupMember.fulfilled, (s, a) => {
         const { groupId, data } = a.payload || {};
         const g = data?.group;
         if (g) {
-          if (s.selectedGroup && String(s.selectedGroup._id) === String(groupId)) {
-            s.selectedGroup = g;
-          }
+          if (s.selectedGroup && String(s.selectedGroup._id) === String(groupId)) s.selectedGroup = g;
           const idx = s.list.findIndex(x => String(x._id) === String(groupId));
           if (idx >= 0) s.list[idx] = g;
         }
@@ -170,7 +167,7 @@ export const { clearCreateState, clearUpdateState } = groupsSlice.actions;
 export default groupsSlice.reducer;
 
 /* ======================
-   Selectors (ממואזרים!)
+   Selectors
    ====================== */
 const selectMyEmail = (s) => s.auth.userEmail || null;
 const selectMyId = (s) => s.auth.userId || null;
@@ -215,7 +212,7 @@ export const selectSelectedGroupMembersEnriched = createSelector(
   }
 );
 
-// ✅ ממואיזציה כדי למנוע warnings
+// ממואיזציה
 export const selectMyJoinedIds = createSelector(
   (s) => s.groups.myJoinedIds,
   (arr) => new Set((arr || []).map(String))
