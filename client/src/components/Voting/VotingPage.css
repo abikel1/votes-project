@@ -509,3 +509,17 @@
     font-size: 56px;
   }
 }
+
+.vd-back-button {
+  background: none;
+  border: none;
+  color: #007bff;
+  font-size: 14px;
+  cursor: pointer;
+  margin-bottom: 8px;
+  padding: 0;
+}
+
+.vd-back-button:hover {
+  text-decoration: underline;
+}

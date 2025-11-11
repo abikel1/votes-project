@@ -10,8 +10,9 @@ import {
   selectCandidatesLoadingForGroup,
   selectCandidatesErrorForGroup,
 } from '../../slices/candidateSlice';
-import { voteForCandidate ,
-  checkHasVoted 
+import {
+  voteForCandidate,
+  checkHasVoted
 } from '../../slices/votesSlice';
 
 import './VotingPage.css';
@@ -35,7 +36,7 @@ export default function VotingDragPage() {
   const candLoading = useSelector(selectCandidatesLoadingForGroup(groupId));
   const candError = useSelector(selectCandidatesErrorForGroup(groupId));
   const userId = useSelector(s => s.auth?.userId || null);
-const hasVoted = useSelector(s => s.votes.hasVoted);
+  const hasVoted = useSelector(s => s.votes.hasVoted);
 
   useEffect(() => {
     if (!groupId) return;
@@ -44,10 +45,10 @@ const hasVoted = useSelector(s => s.votes.hasVoted);
   }, [dispatch, groupId]);
 
 
-useEffect(() => {
-  if (!groupId) return;
-  dispatch(checkHasVoted({ groupId }));
-}, [dispatch, groupId]);
+  useEffect(() => {
+    if (!groupId) return;
+    dispatch(checkHasVoted({ groupId }));
+  }, [dispatch, groupId]);
 
   const handleSlipDragStart = (e, candidate) => {
     if (hasVoted) return;
@@ -81,29 +82,29 @@ useEffect(() => {
     setIsDraggingEnvelope(false);
     setEnvelopePosition({ x: 0, y: 0 });
 
-  try {
-  setIsSubmitting(true);
-  await dispatch(voteForCandidate({ 
-    groupId, 
-    candidateId: slipInEnvelope._id 
-  })).unwrap();
+    try {
+      setIsSubmitting(true);
+      await dispatch(voteForCandidate({
+        groupId,
+        candidateId: slipInEnvelope._id
+      })).unwrap();
 
-  if (userId) {
-    localStorage.setItem(`voted:${groupId}:${userId}`, '1');
-  }
-  // setHasVoted(true);  ← ✅ למחוק
-  await dispatch(fetchCandidatesByGroup(groupId));
-} catch (err) {
-  const msg = String(err || '');
-  if (msg.includes('already voted') || msg.includes('כבר הצבעת')) {
-    if (userId) localStorage.setItem(`voted:${groupId}:${userId}`, '1');
-    // setHasVoted(true);  ← ✅ למחוק
-  } else {
-    alert('שגיאה בהצבעה: ' + msg);
-  }
-} finally {
-  setIsSubmitting(false);
-}
+      if (userId) {
+        localStorage.setItem(`voted:${groupId}:${userId}`, '1');
+      }
+      // setHasVoted(true);  ← ✅ למחוק
+      await dispatch(fetchCandidatesByGroup(groupId));
+    } catch (err) {
+      const msg = String(err || '');
+      if (msg.includes('already voted') || msg.includes('כבר הצבעת')) {
+        if (userId) localStorage.setItem(`voted:${groupId}:${userId}`, '1');
+        // setHasVoted(true);  ← ✅ למחוק
+      } else {
+        alert('שגיאה בהצבעה: ' + msg);
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
 
   };
 
@@ -163,10 +164,19 @@ useEffect(() => {
 
   return (
     <div className="vd-wrap">
+  
+
       <div className="vd-header">
+        <button
+          className="vd-back-button"
+          onClick={() => navigate(`/groups/${groupId}`)}
+        >
+          ← חזור לפרטי הקבוצה
+        </button>
         <h2>דף הצבעה</h2>
         {group && <div className="vd-group-name">{group.name}</div>}
       </div>
+
 
       <div className="vd-container">
         <div className="vd-slips-area">
@@ -182,7 +192,7 @@ useEffect(() => {
               >
                 <div className="vd-slip-click-indicator">
                   <svg width="20" height="20" viewBox="0 0 20 20">
-                    <circle cx="10" cy="10" r="8" fill="none" stroke="currentColor" strokeWidth="1.5" strokeDasharray="2,2" opacity="0.5"/>
+                    <circle cx="10" cy="10" r="8" fill="none" stroke="currentColor" strokeWidth="1.5" strokeDasharray="2,2" opacity="0.5" />
                   </svg>
                 </div>
                 <div className="vd-slip-symbol">{c.symbol || c.name?.substring(0, 2) || '??'}</div>
@@ -228,10 +238,10 @@ useEffect(() => {
       </div>
 
       {isDraggingEnvelope && slipInEnvelope && (
-        <div 
+        <div
           className="vd-envelope-dragging"
-          style={{ 
-            left: `${envelopePosition.x - 140}px`, 
+          style={{
+            left: `${envelopePosition.x - 140}px`,
             top: `${envelopePosition.y - 90}px`,
             pointerEvents: 'none'
           }}
