@@ -123,5 +123,12 @@ async function getVotesByCandidateInGroupService({ candidateId, groupId }) {
   const votes = await Vote.find({ candidateId, groupId }).lean();
   return votes;
 }
+async function hasUserVotedInGroup(userId, groupId) {
+  const exists = await Vote.exists({ userId, groupId });
+  return Boolean(exists);
+}
 
-module.exports = { createVoteService, deleteVoteService, getVotesByCandidateInGroupService };
+module.exports = { createVoteService,
+   deleteVoteService,
+    getVotesByCandidateInGroupService
+  ,hasUserVotedInGroup, };
