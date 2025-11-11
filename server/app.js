@@ -8,6 +8,8 @@ const candidateRoutes = require('./src/routes/candidate_routes');
 const groupRoutes = require('./src/routes/group_routes'); 
 const voteRoutes = require('./src/routes/vote_routes');
 const passport = require('./config/google_auth');
+const mailRoutes = require('./src/routes/mail_routes');
+const authRoutes = require('./src/routes/auth_routes');
 
 
 const app = express();
@@ -23,6 +25,8 @@ app.use('/api/users', userRoutes);
 app.use('/api/candidates', candidateRoutes);
 app.use('/api/groups', groupRoutes);
 app.use('/api/votes', voteRoutes);
+app.use('/api/mail', mailRoutes);
+app.use('/api/auth', authRoutes);
 
 
 // Root check
