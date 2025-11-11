@@ -8,7 +8,7 @@ import GroupSettingsPage from './components/GroupSettings/GroupSettingsPage.jsx'
 import RegisterPage from './pages/Register/RegisterPage.jsx';
 import ProfilePage from './pages/Profile/ProfilePage.jsx';
 
-import GroupCandidatesPage from './components/GroupCandidates/GroupCandidatesPage.jsx';
+import VotingPage from './components/Voting/VotingPage.jsx';
 import NavBar from './components/NavBar/NavBar.jsx';
 import HomeRoute from './pages/Home/HomePage.jsx';
 import LoginPage from './pages/Login/LoginPage.jsx';
@@ -35,7 +35,7 @@ export default function App() {
 
         <Route path="/groups" element={<GroupsPage />} />
         <Route path="/groups/:groupId" element={<GroupDetailPage />} />
-        <Route path="/groups/:groupId/candidates" element={<GroupCandidatesPage />} />
+        <Route path="/groups/:groupId/candidates" element={<VotingPage />} />
         <Route path="/groups/create" element={<CreateGroupPage />} />
         <Route path="/groups/:groupId/settings" element={<GroupSettingsPage />} />
       </Routes>

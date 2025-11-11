@@ -10,9 +10,11 @@ import {
   selectCandidatesLoadingForGroup,
   selectCandidatesErrorForGroup,
 } from '../../slices/candidateSlice';
-import { voteForCandidate } from '../../slices/votesSlice';
+import { voteForCandidate ,
+  checkHasVoted 
+} from '../../slices/votesSlice';
 
-import './GroupCandidatesPage.css';
+import './VotingPage.css';
 
 export default function VotingDragPage() {
   const { groupId } = useParams();
@@ -21,7 +23,7 @@ export default function VotingDragPage() {
 
   const [draggedSlip, setDraggedSlip] = useState(null);
   const [slipInEnvelope, setSlipInEnvelope] = useState(null);
-  const [hasVoted, setHasVoted] = useState(false);
+  // const [hasVoted, setHasVoted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [selectedCandidate, setSelectedCandidate] = useState(null);
@@ -33,6 +35,7 @@ export default function VotingDragPage() {
   const candLoading = useSelector(selectCandidatesLoadingForGroup(groupId));
   const candError = useSelector(selectCandidatesErrorForGroup(groupId));
   const userId = useSelector(s => s.auth?.userId || null);
+const hasVoted = useSelector(s => s.votes.hasVoted);
 
   useEffect(() => {
     if (!groupId) return;
@@ -40,11 +43,11 @@ export default function VotingDragPage() {
     dispatch(fetchCandidatesByGroup(groupId));
   }, [dispatch, groupId]);
 
-  useEffect(() => {
-    if (!groupId || !userId) return;
-    const key = `voted:${groupId}:${userId}`;
-    setHasVoted(Boolean(localStorage.getItem(key)));
-  }, [groupId, userId]);
+
+useEffect(() => {
+  if (!groupId) return;
+  dispatch(checkHasVoted({ groupId }));
+}, [dispatch, groupId]);
 
   const handleSlipDragStart = (e, candidate) => {
     if (hasVoted) return;
@@ -78,29 +81,30 @@ export default function VotingDragPage() {
     setIsDraggingEnvelope(false);
     setEnvelopePosition({ x: 0, y: 0 });
 
-    try {
-      setIsSubmitting(true);
-      await dispatch(voteForCandidate({ 
-        groupId, 
-        candidateId: slipInEnvelope._id 
-      })).unwrap();
+  try {
+  setIsSubmitting(true);
+  await dispatch(voteForCandidate({ 
+    groupId, 
+    candidateId: slipInEnvelope._id 
+  })).unwrap();
 
-      if (userId) {
-        localStorage.setItem(`voted:${groupId}:${userId}`, '1');
-      }
-      setHasVoted(true);
-      await dispatch(fetchCandidatesByGroup(groupId));
-    } catch (err) {
-      const msg = String(err || '');
-      if (msg.includes('already voted') || msg.includes('כבר הצבעת')) {
-        if (userId) localStorage.setItem(`voted:${groupId}:${userId}`, '1');
-        setHasVoted(true);
-      } else {
-        alert('שגיאה בהצבעה: ' + msg);
-      }
-    } finally {
-      setIsSubmitting(false);
-    }
+  if (userId) {
+    localStorage.setItem(`voted:${groupId}:${userId}`, '1');
+  }
+  // setHasVoted(true);  ← ✅ למחוק
+  await dispatch(fetchCandidatesByGroup(groupId));
+} catch (err) {
+  const msg = String(err || '');
+  if (msg.includes('already voted') || msg.includes('כבר הצבעת')) {
+    if (userId) localStorage.setItem(`voted:${groupId}:${userId}`, '1');
+    // setHasVoted(true);  ← ✅ למחוק
+  } else {
+    alert('שגיאה בהצבעה: ' + msg);
+  }
+} finally {
+  setIsSubmitting(false);
+}
+
   };
 
   const handleEnvelopeDragStart = (e) => {
