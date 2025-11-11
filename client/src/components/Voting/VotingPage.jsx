@@ -231,7 +231,7 @@ export default function VotingDragPage() {
           >
             <div className="vd-ballot-slot"></div>
             <div className="vd-ballot-label">
-              {hasVoted ? 'הצבעת בהצלחה!' : 'גרור מעטפה לקלפי'}
+              {hasVoted ? 'הצבעתך נקלטה בהצלחה' : 'גרור מעטפה לקלפי'}
             </div>
           </div>
         </div>
