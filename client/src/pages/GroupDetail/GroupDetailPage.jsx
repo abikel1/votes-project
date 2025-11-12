@@ -1,7 +1,12 @@
 import { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchGroups, selectGroupsWithOwnership } from '../../slices/groupsSlice';
+import {
+  fetchGroups,
+  fetchMyGroups,
+  selectGroupsWithOwnership,
+  selectMyJoinedIds
+} from '../../slices/groupsSlice';
 import {
   fetchCandidatesByGroup,
   selectCandidatesForGroup,
@@ -19,6 +24,8 @@ const COLORS = [
   '#10b981', '#06b6d4', '#6366f1', '#84cc16'
 ];
 
+const lc = (s) => (s || '').trim().toLowerCase();
+
 export default function GroupDetailPage() {
   const { groupId } = useParams();
   const dispatch = useDispatch();
@@ -29,15 +36,27 @@ export default function GroupDetailPage() {
   const loadingCandidates = useSelector(selectCandidatesLoadingForGroup(groupId));
   const errorCandidates = useSelector(selectCandidatesErrorForGroup(groupId));
 
+  // סטטוס התחברות
+  const { userEmail: authEmail, userId: authId } = useSelector((s) => s.auth);
+  const isAuthed = !!authId || !!authEmail || !!localStorage.getItem('authToken');
+
+  // סט קבוצות שאני חברה בהן
+  const myJoinedIdsSet = useSelector(selectMyJoinedIds);
+
   const [leftWidth, setLeftWidth] = useState(35);
   const [isDragging, setIsDragging] = useState(false);
   const containerRef = useRef(null);
 
+  // טוען נתונים
   useEffect(() => {
     dispatch(fetchGroups());
     dispatch(fetchCandidatesByGroup(groupId));
-  }, [dispatch, groupId]);
+    if (isAuthed) {
+      dispatch(fetchMyGroups());
+    }
+  }, [dispatch, groupId, isAuthed]);
 
+  // Drag handlers
   useEffect(() => {
     const handleMouseMove = (e) => {
       if (!isDragging || !containerRef.current) return;
@@ -64,7 +83,62 @@ export default function GroupDetailPage() {
     };
   }, [isDragging]);
 
+  // מצא קבוצה (יכול להיות undefined ברנדר ראשון)
   const group = groups.find(g => g._id === groupId);
+
+  // Guard על כניסה ישירה לקבוצה נעולה
+  useEffect(() => {
+    if (!group) return;
+
+    const isLocked = !!group.isLocked;
+    if (!isLocked) return;
+
+    const myEmail = lc(authEmail) || lc(localStorage.getItem('userEmail'));
+    const myId = String(authId ?? localStorage.getItem('userId') ?? '');
+
+    const createdByEmail = lc(group.createdBy ?? group.created_by ?? group.createdByEmail ?? group.ownerEmail ?? group.owner);
+    const createdById = String(group.createdById ?? '');
+    const isOwner =
+      !!group.isOwner ||
+      (!!myEmail && !!createdByEmail && myEmail === createdByEmail) ||
+      (!!myId && !!createdById && myId === createdById);
+
+    // אם הקבוצה נעולה והמשתמשת לא מחוברת — חוסמים מיד
+    if (!isOwner && !isAuthed) {
+      navigate('/groups', { replace: true });
+      return;
+    }
+
+    // אם מחוברת ולא בעלים — נבדוק חברות מול השרת; אם לא חברה → נחסום
+    const checkMembership = async () => {
+      try {
+        // משתמשת בקוד ה-HTTP שלך (אותו http שבו השתמשת בקבצים אחרים)
+        const { data } = await import('../../api/http').then(m => m.default.get(`/groups/${groupId}/my-membership`));
+        const serverMember = !!data?.member;
+
+        const clientMember = myJoinedIdsSet.has(String(groupId));
+        const isMember = serverMember || clientMember;
+
+        if (!isOwner && !isMember) {
+          navigate('/groups', { replace: true });
+        }
+      } catch (err) {
+        // אם השרת מחזיר 401/403 — אין גישה; נחסום
+        const status = err?.response?.status;
+        if (status === 401 || status === 403) {
+          navigate('/groups', { replace: true });
+          return;
+        }
+        // אם לא הצלחנו לדעת — ליתר ביטחון חוסמים
+        navigate('/groups', { replace: true });
+      }
+    };
+
+    if (!isOwner) {
+      checkMembership();
+    }
+  }, [group, authEmail, authId, isAuthed, myJoinedIdsSet, groupId, navigate]);
+
   if (!group) return <div className="loading-wrap">טוען נתונים...</div>;
 
   // פונקציה לעיצוב תאריכים
@@ -122,7 +196,16 @@ export default function GroupDetailPage() {
 
         <button
           className="vote-btn"
-          onClick={() => navigate(`/groups/${groupId}/candidates`)}
+          onClick={() => {
+            if (!isAuthed) {
+              const goLogin = window.confirm('אינך מחובר/ת. כדי להצביע צריך להתחבר. לעבור למסך ההתחברות?');
+              if (goLogin) {
+                navigate('/login', { state: { redirectTo: `/groups/${groupId}/candidates` } });
+              }
+              return;
+            }
+            navigate(`/groups/${groupId}/candidates`);
+          }}
         >
           🗳️ לכו להצביע
         </button>
