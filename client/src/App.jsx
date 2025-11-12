@@ -17,6 +17,7 @@ import GroupDetailPage from './pages/GroupDetail/GroupDetailPage.jsx';
 import SendEmailPage from './pages/Tools/SendEmailPage.jsx';
 import ForgotPasswordPage from './pages/Login/ForgotPasswordPage.jsx';
 import ResetPasswordPage from './pages/Login/ResetPasswordPage.jsx';
+import JoinGroupPage from './pages/Join/JoinGroupPage.jsx'; 
 
 GroupDetailPage
 export default function App() {
@@ -45,6 +46,7 @@ export default function App() {
         <Route path="/tools/send-email" element={<SendEmailPage />} />
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
         <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
+         <Route path="/join/:groupId" element={<JoinGroupPage />} />
       </Routes>
     </div>
   );
