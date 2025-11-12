@@ -29,6 +29,10 @@ export default function GroupDetailPage() {
   const loadingCandidates = useSelector(selectCandidatesLoadingForGroup(groupId));
   const errorCandidates = useSelector(selectCandidatesErrorForGroup(groupId));
 
+  // 🔹 סטטוס התחברות מה-Redux (תוספת)
+  const { userEmail: authEmail, userId: authId } = useSelector((s) => s.auth);
+  const isAuthed = !!authId || !!authEmail || !!localStorage.getItem('authToken');
+
   const [leftWidth, setLeftWidth] = useState(35);
   const [isDragging, setIsDragging] = useState(false);
   const containerRef = useRef(null);
@@ -122,7 +126,18 @@ export default function GroupDetailPage() {
 
         <button
           className="vote-btn"
-          onClick={() => navigate(`/groups/${groupId}/candidates`)}
+          onClick={() => {
+            // 🔹 בדיקת התחברות לפני מעבר לדף ההצבעה (תוספת)
+            if (!isAuthed) {
+              const goLogin = window.confirm('אינך מחובר/ת. כדי להצביע צריך להתחבר. לעבור למסך ההתחברות?');
+              if (goLogin) {
+                navigate('/login', { state: { redirectTo: `/groups/${groupId}/candidates` } });
+              }
+              // אם בחר/ה ביטול—נשארים בדף זה
+              return;
+            }
+            navigate(`/groups/${groupId}/candidates`);
+          }}
         >
           🗳️ לכו להצביע
         </button>
