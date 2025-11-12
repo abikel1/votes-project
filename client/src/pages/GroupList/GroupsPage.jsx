@@ -41,11 +41,13 @@ export default function GroupsPage() {
   const joinedIdsSet  = useSelector(selectMyJoinedIds);
   const pendingIdsSet = useSelector(selectMyPendingSet);
   const rejectedIdsSet = useSelector(selectMyRejectedSet); // ← חדש
+
   const createdIdsSet = useSelector(selectMyCreatedIds);
-const [searchTerm, setSearchTerm] = useState('');
-const [filter, setFilter] = useState('all');
 const [showFilters, setShowFilters] = useState(false);
+const [showSort, setShowSort] = useState(false);
+const [filter, setFilter] = useState('all');
 const [sortBy, setSortBy] = useState('creationDate');
+const [searchTerm, setSearchTerm] = useState('');
 
   // מפת "הוסרת"
   const removedMap = useSelector((s) => s.joinReq.removedNotice || {});
@@ -135,7 +137,7 @@ const filteredGroups = groups
     <div className="page-wrap">
       <h2 className="page-title">כל הקבוצות</h2>
       {/* 🔍 סרגל סינון ומיון */}
-{/* 🎛️ סרגל סינון ומיון */}
+{/* 🎛️ סרגל חיפוש + סינון + מיון */}
 <div className="filter-bar">
   <input
     type="text"
@@ -145,84 +147,123 @@ const filteredGroups = groups
     className="search-input"
   />
 
-  <div className="filter-controls">
-    <button
-      className="filter-toggle"
-      onClick={() => setShowFilters((v) => !v)}
-    >
-      ⚙️ סינון
-    </button>
-
-    <select
-      className="sort-select"
-      value={sortBy}
-      onChange={(e) => setSortBy(e.target.value)}
-    >
-      <option value="creationDate">תאריך יצירה (חדש קודם)</option>
-      <option value="endDate">תאריך סיום (מוקדם קודם)</option>
-      <option value="name">שם קבוצה (א-ת)</option>
-    </select>
-  </div>
-
-  {showFilters && (
-    <div className="filters-dropdown">
-      <label>
-        <input
-          type="radio"
-          name="filter"
-          value="all"
-          checked={filter === 'all'}
-          onChange={(e) => setFilter(e.target.value)}
-        />
-        כל הקבוצות
-      </label>
-
-      <label>
-        <input
-          type="radio"
-          name="filter"
-          value="open"
-          checked={filter === 'open'}
-          onChange={(e) => setFilter(e.target.value)}
-        />
-        פתוחות
-      </label>
-
-      <label>
-        <input
-          type="radio"
-          name="filter"
-          value="locked"
-          checked={filter === 'locked'}
-          onChange={(e) => setFilter(e.target.value)}
-        />
-        נעולות
-      </label>
-
-      <label>
-        <input
-          type="radio"
-          name="filter"
-          value="joined"
-          checked={filter === 'joined'}
-          onChange={(e) => setFilter(e.target.value)}
-        />
-        קבוצות שאני מחוברת אליהן
-      </label>
-
-      <label>
-        <input
-          type="radio"
-          name="filter"
-          value="owned"
-          checked={filter === 'owned'}
-          onChange={(e) => setFilter(e.target.value)}
-        />
-        קבוצות שאני מנהלת
-      </label>
+  <div className="filter-actions">
+    {/* 🧩 אייקון סינון */}
+    <div className="icon-wrap">
+      <img
+        src="/src/assets/icons/filter.png"
+        alt="סינון"
+        className="icon-btn"
+        onClick={() => {
+          setShowFilters((v) => !v);
+          setShowSort(false);
+        }}
+      />
+      {showFilters && (
+        <div className="filters-dropdown">
+          <label>
+            <input
+              type="radio"
+              name="filter"
+              value="all"
+              checked={filter === 'all'}
+              onChange={(e) => setFilter(e.target.value)}
+            />
+            כל הקבוצות
+          </label>
+          <label>
+            <input
+              type="radio"
+              name="filter"
+              value="open"
+              checked={filter === 'open'}
+              onChange={(e) => setFilter(e.target.value)}
+            />
+            פתוחות
+          </label>
+          <label>
+            <input
+              type="radio"
+              name="filter"
+              value="locked"
+              checked={filter === 'locked'}
+              onChange={(e) => setFilter(e.target.value)}
+            />
+            נעולות
+          </label>
+          <label>
+            <input
+              type="radio"
+              name="filter"
+              value="joined"
+              checked={filter === 'joined'}
+              onChange={(e) => setFilter(e.target.value)}
+            />
+            קבוצות שאני מחוברת אליהן
+          </label>
+          <label>
+            <input
+              type="radio"
+              name="filter"
+              value="owned"
+              checked={filter === 'owned'}
+              onChange={(e) => setFilter(e.target.value)}
+            />
+            קבוצות שאני מנהלת
+          </label>
+        </div>
+      )}
     </div>
-  )}
+
+    {/* 🔽 אייקון מיון */}
+    <div className="icon-wrap">
+      <img
+        src="/src/assets/icons/sort.png"
+        alt="מיון"
+        className="icon-btn"
+        onClick={() => {
+          setShowSort((v) => !v);
+          setShowFilters(false);
+        }}
+      />
+      {showSort && (
+        <div className="sort-dropdown">
+          <label>
+            <input
+              type="radio"
+              name="sort"
+              value="creationDate"
+              checked={sortBy === 'creationDate'}
+              onChange={(e) => setSortBy(e.target.value)}
+            />
+            תאריך יצירה (חדש קודם)
+          </label>
+          <label>
+            <input
+              type="radio"
+              name="sort"
+              value="endDate"
+              checked={sortBy === 'endDate'}
+              onChange={(e) => setSortBy(e.target.value)}
+            />
+            תאריך סיום (מוקדם קודם)
+          </label>
+          <label>
+            <input
+              type="radio"
+              name="sort"
+              value="name"
+              checked={sortBy === 'name'}
+              onChange={(e) => setSortBy(e.target.value)}
+            />
+            שם קבוצה (א-ת)
+          </label>
+        </div>
+      )}
+    </div>
+  </div>
 </div>
+
 
 
       <div className="groups-grid">

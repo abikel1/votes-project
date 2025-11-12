@@ -266,46 +266,54 @@
 
 .filter-bar {
   display: flex;
-  flex-direction: column;
-  gap: 0.6rem;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
   background: #f9fafb;
   border: 1px solid #e5e7eb;
   border-radius: 12px;
-  padding: 12px 16px;
+  padding: 10px 14px;
   margin-bottom: 20px;
+  position: relative;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.search-input {
+  flex: 1;
+  min-width: 240px;
+  padding: 8px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 0.95rem;
+}
+
+.filter-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
   position: relative;
 }
 
-.filter-controls {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 1rem;
+.icon-wrap {
+  position: relative;
 }
 
-.filter-toggle {
-  background: #3b82f6;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  padding: 8px 12px;
+.icon-btn {
+  /* width: 20px; קטן יותר */
+  height: 20px;
   cursor: pointer;
-  font-size: 0.9rem;
-  transition: background 0.2s ease;
+  transition: transform 0.15s ease, opacity 0.2s ease;
+  opacity: 0.8;
+  margin-right: 10px; /* ריווח מלמעלה */
+  /* padding: 10px; */
 }
 
-.filter-toggle:hover {
-  background: #2563eb;
-}
+.icon-btn:hover {
+  transform: scale(1.08);
+  opacity: 1;}
 
-.sort-select {
-  border: 1px solid #d1d5db;
-  border-radius: 8px;
-  padding: 6px 10px;
-  font-size: 0.9rem;
-}
-
-.filters-dropdown {
+.filters-dropdown,
+.sort-dropdown {
   display: flex;
   flex-direction: column;
   gap: 0.4rem;
@@ -314,12 +322,21 @@
   border-radius: 10px;
   padding: 10px 12px;
   position: absolute;
-  top: 100%;
+  top: 130%;
   right: 0;
   z-index: 10;
-  width: 240px;
+  width: 230px;
   box-shadow: 0 4px 10px rgba(0,0,0,0.05);
   animation: fadeIn 0.2s ease;
+}
+
+.filters-dropdown label,
+.sort-dropdown label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.9rem;
+  cursor: pointer;
 }
 
 @keyframes fadeIn {
@@ -327,18 +344,13 @@
   to { opacity: 1; transform: translateY(0); }
 }
 
-.filters-dropdown label {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  font-size: 0.9rem;
-  cursor: pointer;
+.filters-dropdown {
+  left: 0; /* נשאר נפתח ימינה */
+    right: auto;
+
 }
 
-.search-input {
-  width: 100%;
-  padding: 8px 12px;
-  border: 1px solid #d1d5db;
-  border-radius: 8px;
-  font-size: 0.95rem;
+.sort-dropdown {
+  left: 0; /* ייפתח שמאלה */
+  right: auto;
 }
