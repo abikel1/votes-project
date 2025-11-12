@@ -44,6 +44,8 @@ export default function GroupsPage() {
   const createdIdsSet = useSelector(selectMyCreatedIds);
 const [searchTerm, setSearchTerm] = useState('');
 const [filter, setFilter] = useState('all');
+const [showFilters, setShowFilters] = useState(false);
+const [sortBy, setSortBy] = useState('creationDate');
 
   // מפת "הוסרת"
   const removedMap = useSelector((s) => s.joinReq.removedNotice || {});
@@ -95,33 +97,45 @@ const [filter, setFilter] = useState('all');
   const myId = String(authId ?? localStorage.getItem('userId') ?? '');
 
 
-  const filteredGroups = groups.filter((g) => {
-  const gid = String(g._id);
-  const nameMatch = g.name?.toLowerCase().includes(searchTerm.toLowerCase());
-  if (!nameMatch) return false;
+const filteredGroups = groups
+  .filter((g) => {
+    const gid = String(g._id);
+    const nameMatch = g.name?.toLowerCase().includes(searchTerm.toLowerCase());
+    if (!nameMatch) return false;
 
-  const isLocked = !!g.isLocked;
-  const isOwner = createdIdsSet.has(gid);
-  const isMember = joinedIdsSet.has(gid);
+    const isLocked = !!g.isLocked;
+    const isOwner = createdIdsSet.has(gid);
+    const isMember = joinedIdsSet.has(gid);
 
-  switch (filter) {
-    case 'open':
-      return !isLocked;
-    case 'locked':
-      return isLocked;
-    case 'joined':
-      return isMember;
-    case 'owned':
-      return isOwner;
-    default:
-      return true;
-  }
-});
+    switch (filter) {
+      case 'open':
+        return !isLocked;
+      case 'locked':
+        return isLocked;
+      case 'joined':
+        return isMember;
+      case 'owned':
+        return isOwner;
+      default:
+        return true;
+    }
+  })
+  .sort((a, b) => {
+    if (sortBy === 'creationDate')
+      return new Date(b.creationDate) - new Date(a.creationDate);
+    if (sortBy === 'endDate')
+      return new Date(a.endDate) - new Date(b.endDate);
+    if (sortBy === 'name')
+      return a.name.localeCompare(b.name, 'he');
+    return 0;
+  });
+
 
   return (
     <div className="page-wrap">
       <h2 className="page-title">כל הקבוצות</h2>
       {/* 🔍 סרגל סינון ומיון */}
+{/* 🎛️ סרגל סינון ומיון */}
 <div className="filter-bar">
   <input
     type="text"
@@ -131,63 +145,85 @@ const [filter, setFilter] = useState('all');
     className="search-input"
   />
 
-  <div className="filters">
-    <label>
-      <input
-        type="radio"
-        name="filter"
-        value="all"
-        checked={filter === 'all'}
-        onChange={(e) => setFilter(e.target.value)}
-      />
-      כל הקבוצות
-    </label>
+  <div className="filter-controls">
+    <button
+      className="filter-toggle"
+      onClick={() => setShowFilters((v) => !v)}
+    >
+      ⚙️ סינון
+    </button>
 
-    <label>
-      <input
-        type="radio"
-        name="filter"
-        value="open"
-        checked={filter === 'open'}
-        onChange={(e) => setFilter(e.target.value)}
-      />
-      פתוחות
-    </label>
-
-    <label>
-      <input
-        type="radio"
-        name="filter"
-        value="locked"
-        checked={filter === 'locked'}
-        onChange={(e) => setFilter(e.target.value)}
-      />
-      נעולות
-    </label>
-
-    <label>
-      <input
-        type="radio"
-        name="filter"
-        value="joined"
-        checked={filter === 'joined'}
-        onChange={(e) => setFilter(e.target.value)}
-      />
-      קבוצות שאני מחוברת אליהן
-    </label>
-
-    <label>
-      <input
-        type="radio"
-        name="filter"
-        value="owned"
-        checked={filter === 'owned'}
-        onChange={(e) => setFilter(e.target.value)}
-      />
-      קבוצות שאני מנהלת
-    </label>
+    <select
+      className="sort-select"
+      value={sortBy}
+      onChange={(e) => setSortBy(e.target.value)}
+    >
+      <option value="creationDate">תאריך יצירה (חדש קודם)</option>
+      <option value="endDate">תאריך סיום (מוקדם קודם)</option>
+      <option value="name">שם קבוצה (א-ת)</option>
+    </select>
   </div>
+
+  {showFilters && (
+    <div className="filters-dropdown">
+      <label>
+        <input
+          type="radio"
+          name="filter"
+          value="all"
+          checked={filter === 'all'}
+          onChange={(e) => setFilter(e.target.value)}
+        />
+        כל הקבוצות
+      </label>
+
+      <label>
+        <input
+          type="radio"
+          name="filter"
+          value="open"
+          checked={filter === 'open'}
+          onChange={(e) => setFilter(e.target.value)}
+        />
+        פתוחות
+      </label>
+
+      <label>
+        <input
+          type="radio"
+          name="filter"
+          value="locked"
+          checked={filter === 'locked'}
+          onChange={(e) => setFilter(e.target.value)}
+        />
+        נעולות
+      </label>
+
+      <label>
+        <input
+          type="radio"
+          name="filter"
+          value="joined"
+          checked={filter === 'joined'}
+          onChange={(e) => setFilter(e.target.value)}
+        />
+        קבוצות שאני מחוברת אליהן
+      </label>
+
+      <label>
+        <input
+          type="radio"
+          name="filter"
+          value="owned"
+          checked={filter === 'owned'}
+          onChange={(e) => setFilter(e.target.value)}
+        />
+        קבוצות שאני מנהלת
+      </label>
+    </div>
+  )}
 </div>
+
 
       <div className="groups-grid">
         {filteredGroups.map((g) => {
