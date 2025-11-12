@@ -279,9 +279,7 @@
     display: flex;
     flex-direction: column;
     box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-    /* height: calc(50% - 6px); */
-        height: 260px; /* או כל גובה שאתה רוצה */
-
+    height: 260px;
     min-height: 250px;
 }
 
@@ -298,10 +296,9 @@
 
 .chart-wrapper {
     width: 100%;
-    height: 260px; /* גובה קבוע שמבטיח שהגרף יוצג */
+    height: 260px;
     flex: 1;
 }
-
 
 .loading-wrap {
     text-align: center;
@@ -331,4 +328,395 @@
     border: 1px solid #e2e8f0;
     box-shadow: 0 1px 3px rgba(0,0,0,0.1);
     margin: auto;
+}
+
+/* ========== רספונסיביות למובייל ========== */
+
+/* טאבלטים */
+@media (max-width: 1024px) {
+    .main-content-resizable {
+        flex-direction: column;
+    }
+
+    .resize-handle {
+        display: none;
+    }
+
+    .left-section {
+        border-left: none;
+        border-bottom: 1px solid #e2e8f0;
+        max-height: 50vh;
+    }
+
+    .right-section {
+        flex: 1;
+        overflow-y: auto;
+    }
+
+    .charts {
+        gap: 16px;
+    }
+
+    .pie-chart-container,
+    .bar-chart-container {
+        height: 300px;
+        min-height: 280px;
+    }
+}
+
+/* מובייל */
+@media (max-width: 768px) {
+    .page-wrap {
+        padding: 8px;
+        height: auto;
+        min-height: 100vh;
+        overflow: auto;
+    }
+
+    .page-header {
+        padding: 10px;
+        margin-bottom: 10px;
+    }
+
+    .page-title {
+        font-size: 20px;
+        margin-bottom: 4px;
+    }
+
+    .group-description {
+        font-size: 12px;
+    }
+
+    .meta-and-button {
+        flex-direction: column;
+        gap: 8px;
+        margin-bottom: 10px;
+    }
+
+    .group-meta {
+        padding: 10px 12px;
+        gap: 12px;
+        justify-content: center;
+    }
+
+    .group-meta > div {
+        font-size: 12px;
+        gap: 4px;
+    }
+
+    .meta-value {
+        font-size: 13px;
+    }
+
+    .vote-btn {
+        width: 100%;
+        padding: 12px;
+        font-size: 13px;
+    }
+
+    .main-content-resizable {
+        border: none;
+        flex-direction: column;
+        overflow: visible;
+        height: auto;
+    }
+
+    .left-section {
+        border: 1px solid #e2e8f0;
+        border-bottom: none;
+        max-height: 60vh;
+        overflow-y: auto;
+    }
+
+    .candidates-container {
+        padding: 8px;
+    }
+
+    .dashboard .candidates-grid {
+        grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+        gap: 8px;
+    }
+
+    .candidate-card {
+        padding: 10px;
+    }
+
+    .candidate-photo {
+        width: 50px;
+        height: 50px;
+        margin-bottom: 8px;
+    }
+
+    .candidate-card h4 {
+        font-size: 13px;
+        margin: 4px 0;
+    }
+
+    .candidate-symbol {
+        font-size: 10px;
+        padding: 2px 6px;
+        margin: 3px 0;
+    }
+
+    .candidate-card p {
+        font-size: 10px;
+        margin: 4px 0;
+    }
+
+    .votes-count {
+        font-size: 12px;
+        padding: 3px 8px;
+        margin-top: 6px;
+    }
+
+    .current-leader {
+        width: 28px;
+        height: 28px;
+        font-size: 16px;
+        top: -8px;
+        right: -8px;
+    }
+
+    .right-section {
+        border: 1px solid #e2e8f0;
+        padding: 10px;
+        height: auto;
+        overflow: visible;
+    }
+
+    .charts {
+        gap: 12px;
+    }
+
+    .pie-chart-container,
+    .bar-chart-container {
+        padding: 10px;
+        height: 280px;
+        min-height: 250px;
+    }
+
+    .pie-chart-container h3,
+    .bar-chart-container h3 {
+        font-size: 14px;
+        margin-bottom: 8px;
+        padding-bottom: 6px;
+    }
+
+    .chart-wrapper {
+        height: 240px;
+    }
+
+    .section-title {
+        font-size: 15px;
+        margin-bottom: 8px;
+        padding-bottom: 6px;
+    }
+
+    .loading-wrap {
+        padding: 20px 15px;
+        font-size: 14px;
+    }
+
+    .err {
+        padding: 8px 12px;
+        font-size: 12px;
+        margin: 10px 0;
+    }
+
+    .no-votes-message {
+        padding: 30px 20px;
+        font-size: 14px;
+    }
+}
+
+/* מכשירים קטנים מאוד */
+@media (max-width: 480px) {
+    .page-wrap {
+        padding: 6px;
+    }
+
+    .page-header {
+        padding: 8px;
+        margin-bottom: 8px;
+    }
+
+    .page-title {
+        font-size: 18px;
+    }
+
+    .group-description {
+        font-size: 11px;
+    }
+
+    .group-meta {
+        padding: 8px 10px;
+        gap: 10px;
+    }
+
+    .group-meta > div {
+        font-size: 11px;
+    }
+
+    .meta-label {
+        font-size: 11px;
+    }
+
+    .meta-value {
+        font-size: 12px;
+    }
+
+    .vote-btn {
+        padding: 10px;
+        font-size: 12px;
+    }
+
+    .dashboard .candidates-grid {
+        grid-template-columns: repeat(auto-fill, minmax(95px, 1fr));
+        gap: 6px;
+    }
+
+    .candidate-card {
+        padding: 8px;
+    }
+
+    .candidate-photo {
+        width: 45px;
+        height: 45px;
+        margin-bottom: 6px;
+    }
+
+    .candidate-card h4 {
+        font-size: 12px;
+        margin: 3px 0;
+    }
+
+    .candidate-symbol {
+        font-size: 9px;
+        padding: 2px 5px;
+        margin: 2px 0;
+    }
+
+    .candidate-card p {
+        font-size: 9px;
+        margin: 3px 0;
+        line-height: 1.2;
+    }
+
+    .votes-count {
+        font-size: 11px;
+        padding: 2px 6px;
+        margin-top: 4px;
+    }
+
+    .current-leader {
+        width: 24px;
+        height: 24px;
+        font-size: 14px;
+        top: -6px;
+        right: -6px;
+    }
+
+    .left-section {
+        max-height: 55vh;
+    }
+
+    .candidates-container {
+        padding: 6px;
+    }
+
+    .right-section {
+        padding: 8px;
+    }
+
+    .charts {
+        gap: 10px;
+    }
+
+    .pie-chart-container,
+    .bar-chart-container {
+        padding: 8px;
+        height: 250px;
+        min-height: 220px;
+    }
+
+    .pie-chart-container h3,
+    .bar-chart-container h3 {
+        font-size: 13px;
+        margin-bottom: 6px;
+        padding-bottom: 5px;
+    }
+
+    .chart-wrapper {
+        height: 210px;
+    }
+
+    .section-title {
+        font-size: 14px;
+        margin-bottom: 6px;
+        padding-bottom: 5px;
+    }
+
+    .loading-wrap {
+        padding: 15px 10px;
+        font-size: 13px;
+    }
+
+    .err {
+        padding: 6px 10px;
+        font-size: 11px;
+    }
+
+    .no-votes-message {
+        padding: 25px 15px;
+        font-size: 13px;
+    }
+}
+
+/* נוף (landscape) במובייל */
+@media (max-width: 768px) and (orientation: landscape) {
+    .page-wrap {
+        height: auto;
+        min-height: 100vh;
+    }
+
+    .main-content-resizable {
+        flex-direction: row;
+        height: calc(100vh - 180px);
+    }
+
+    .left-section {
+        width: 50%;
+        max-height: none;
+        border-bottom: none;
+        border-left: 1px solid #e2e8f0;
+    }
+
+    .right-section {
+        width: 50%;
+        overflow-y: auto;
+    }
+
+    .charts {
+        height: auto;
+    }
+
+    .pie-chart-container,
+    .bar-chart-container {
+        height: 300px;
+    }
+}
+
+/* תמיכה בגלילה חלקה */
+.candidates-container,
+.right-section {
+    -webkit-overflow-scrolling: touch;
+}
+
+/* שיפור תצוגה בפאדינג */
+@media (max-width: 768px) {
+    .candidate-card,
+    .pie-chart-container,
+    .bar-chart-container {
+        touch-action: manipulation;
+    }
 }
