@@ -311,3 +311,36 @@ button.small.danger:hover {
   box-shadow: 0 10px 30px rgba(0,0,0,.25);
 }
 .modal h3 { margin: 0; }
+
+/* --- Share link row --- */
+.share-row {
+  display: grid;
+  grid-template-columns: 1fr auto; /* שדה + כפתורים */
+  gap: 8px;
+  align-items: center;
+  margin-top: 2px;
+}
+
+.share-input {
+  background: #fcfcfc;
+}
+
+.share-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.share-hint {
+  margin-top: 6px;
+}
+
+/* רספונסיבי לשורת השיתוף */
+@media (max-width: 560px) {
+  .share-row {
+    grid-template-columns: 1fr;
+  }
+  .share-actions {
+    justify-content: flex-start;
+  }
+}
+

@@ -170,6 +170,36 @@ export default function GroupSettingsPage() {
 
     return !!(byEmail || byId || byFullName);
   }, [group, userEmail, userId, firstName, lastName]);
+  // --- קישור שיתוף דינמי (נעולה → /join/:id, פתוחה → /groups/:id) ---
+  const sharePath = useMemo(() => {
+    if (!group) return '';
+    return group.isLocked ? `/join/${groupId}` : `/groups/${groupId}`;
+  }, [group, groupId]);
+
+  const shareUrl = useMemo(() => {
+    if (!sharePath) return '';
+    return `${window.location.origin}${sharePath}`;
+  }, [sharePath]);
+
+  const [copied, setCopied] = useState(false);
+  const copyShareUrl = async () => {
+    if (!shareUrl) return;
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    } catch {
+      // פולבק למקרה שאין הרשאת clipboard
+      const tmp = document.createElement('input');
+      tmp.value = shareUrl;
+      document.body.appendChild(tmp);
+      tmp.select();
+      document.execCommand('copy');
+      document.body.removeChild(tmp);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    }
+  };
 
   if (groupLoading) return (<div className="gs-wrap"><h2>הגדרות קבוצה</h2><div>טוען...</div></div>);
   if (groupError) return (<div className="gs-wrap"><h2>הגדרות קבוצה</h2><div className="err">{groupError}</div></div>);
@@ -265,9 +295,9 @@ export default function GroupSettingsPage() {
     // אם כבר יש רווחים – ננקה כפולים ונכַתֵּב
     if (/\s/.test(s)) {
       return s.replace(/\s+/g, ' ')
-              .split(' ')
-              .map(w => cap(w.toLowerCase()))
-              .join(' ');
+        .split(' ')
+        .map(w => cap(w.toLowerCase()))
+        .join(' ');
     }
 
     // פיצול לפי מפרידים נפוצים
@@ -322,6 +352,36 @@ export default function GroupSettingsPage() {
               {group.symbol && (<div><small>סמל</small><b>{group.symbol}</b></div>)}
               {group.photoUrl && (<div><small>תמונה</small><a href={group.photoUrl} className="link" target="_blank" rel="noreferrer">פתיחה</a></div>)}
               <div><small>נוצר ע״י</small><b>{group.createdBy || '-'}</b></div>
+              {/* קישור שיתוף קבוע */}
+              <div>
+                <small>קישור שיתוף</small>
+                {shareUrl ? (
+                  <div className="share-row">
+                    <input
+                      className="input share-input"
+                      value={shareUrl}
+                      readOnly
+                      style={{ direction: 'ltr' }}
+                      onFocus={(e) => e.target.select()}
+                      aria-label="קישור לשיתוף"
+                    />
+                    <div className="share-actions">
+                      <button className="gs-btn" type="button" onClick={copyShareUrl}>
+                        {copied ? 'הועתק ✓' : 'העתק'}
+                      </button>
+                    </div>
+
+                    <div className="muted share-hint">
+                      {group.isLocked
+                        ? 'קבוצה נעולה: הקישור יבקש התחברות ואז ישלח בקשת הצטרפות.'
+                        : 'קבוצה פתוחה: הקישור מוביל ישירות לעמוד הקבוצה.'}
+                    </div>
+                  </div>
+                ) : (
+                  <div className="muted">—</div>
+                )}
+              </div>
+
               {updateError && <div className="err" style={{ marginTop: 6 }}>{updateError}</div>}
               {updateSuccess && <div className="ok" style={{ marginTop: 6 }}>נשמר בהצלחה</div>}
             </div>
