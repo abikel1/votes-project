@@ -9,7 +9,6 @@
   --slip-bg: #f8fafc;
   --envelope-bg: #87ceeb;
   --ballot-bg: #4a5568;
-  
 }
 
 .vd-wrap {
@@ -49,13 +48,6 @@
   max-height: calc(100vh - 200px);
 }
 
-.vd-slips-area h3 {
-  margin: 0 0 12px;
-  font-size: 18px;
-  font-weight: 600;
-  color: var(--text);
-}
-
 .vd-slips-area {
   display: flex;
   flex-direction: column;
@@ -63,14 +55,18 @@
   height: 100%;
 }
 
-@keyframes pulseRing {
+.vd-slips-area h3 {
+  margin: 0 0 12px;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text);
+}
 
-  0%,
-  100% {
+@keyframes pulseRing {
+  0%, 100% {
     transform: scale(1);
     opacity: 0.6;
   }
-
   50% {
     transform: scale(1.1);
     opacity: 0.8;
@@ -180,12 +176,9 @@
 }
 
 @keyframes bounce {
-
-  0%,
-  100% {
+  0%, 100% {
     transform: translateY(0);
   }
-
   50% {
     transform: translateY(8px);
   }
@@ -195,7 +188,6 @@
   position: relative;
   width: 240px;
   height: 200px;
-  /* background: linear-gradient(160deg, #5a6c7d 0%, #3d4a57 50%, #2d3748 100%); */
   border-radius: 0;
   display: flex;
   flex-direction: column;
@@ -212,8 +204,6 @@
   transform-style: preserve-3d;
   perspective: 1000px;
 }
-
-
 
 .vd-ballot-slot {
   width: 180px;
@@ -325,7 +315,6 @@
     opacity: 0;
     transform: translateY(-20px) scale(0.95);
   }
-
   to {
     opacity: 1;
     transform: translateY(0) scale(1);
@@ -411,6 +400,25 @@
   font-size: 24px;
 }
 
+.vd-select-button {
+  background: var(--brand);
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  font-size: 16px;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-bottom: 16px;
+}
+
+.vd-select-button:hover {
+  background: var(--brand-700);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(13, 71, 161, 0.3);
+}
+
 .vd-error {
   color: #c62828;
   background: #fde8e8;
@@ -430,55 +438,6 @@
   font-size: 18px;
 }
 
-@media (max-width: 1024px) {
-  .vd-container {
-    grid-templavd-slips-gridte-columns: 1fr;
-  }
-
-  .vd-voting-area {
-    position: static;
-  }
-}
-
-@media (max-width: 640px) {
-  .vd-slips-grid {
-    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
-    gap: 0;
-    padding: 0;
-  }
-
-  .vd-slip {
-    padding: 16px 10px;
-  }
-
-  .vd-slip-symbol {
-    font-size: 28px;
-  }
-
-  .vd-slip-click-indicator {
-    top: 4px;
-    right: 4px;
-  }
-
-  .vd-slip-click-indicator svg {
-    width: 16px;
-    height: 16px;
-  }
-
-  .vd-envelope,
-  .vd-ballot {
-    width: 240px;
-  }
-
-  .vd-modal {
-    padding: 24px;
-  }
-
-  .vd-modal-symbol {
-    font-size: 56px;
-  }
-}
-
 .vd-back-button {
   background: none;
   border: none;
@@ -493,19 +452,15 @@
   text-decoration: underline;
 }
 
-/* ===== עיצוב מגש הפתקים ===== */
 .vd-slips-grid {
   display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-
-  /* grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); */
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
   gap: 12px;
-    width: 100%;
+  width: 100%;
   background: #003366;
- overflow-y: auto;
-  max-height: 100%; 
+  overflow-y: auto;
+  max-height: 100%;
   padding: 12px;
-
 }
 
 .vd-slip,
@@ -518,24 +473,12 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
-}
-
-
-/* ===== כל פתק (כרטיס מועמד) - בדיוק כמו בדף פרטי קבוצה ===== */
-/* .vd-slip {
-  background: white;
   padding: 12px;
   text-align: center;
   position: relative;
-  border: 1px solid #e2e8f0;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   transition: all 0.2s ease;
   cursor: grab;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-} */
+}
 
 .vd-slip:hover {
   transform: translateY(-2px);
@@ -547,7 +490,6 @@
   cursor: grabbing;
 }
 
-/* תמונת המועמד */
 .vd-slip-photo {
   width: 60px;
   height: 60px;
@@ -575,7 +517,6 @@
   border: 2px solid #e2e8f0;
 }
 
-/* השם של המועמד */
 .vd-slip-name {
   font-size: 14px;
   margin: 6px 0;
@@ -583,7 +524,6 @@
   font-weight: 700;
 }
 
-/* הסמל של המועמד */
 .vd-slip-symbol {
   display: inline-block;
   background: #dbeafe;
@@ -595,7 +535,6 @@
   border: 1px solid #93c5fd;
 }
 
-/* תיאור המועמד */
 .vd-slip-desc {
   font-size: 11px;
   color: #64748b;
@@ -603,7 +542,6 @@
   margin: 6px 0;
 }
 
-/* מספר הקולות */
 .vd-slip-votes {
   margin-top: 8px;
   font-weight: 700;
@@ -615,7 +553,6 @@
   border: 1px solid #6ee7b7;
 }
 
-/* פתק שנגרר או נבחר */
 .vd-slip-used {
   opacity: 0.4;
   pointer-events: none;
@@ -628,11 +565,240 @@
   pointer-events: none;
 }
 
-/* פתק ריק (תא ריק למילוי רשת אחידה) */
 .vd-slip-empty {
   background: transparent;
   border: 1px dashed #e2e8f0;
   box-shadow: none;
   cursor: default;
   pointer-events: none;
+}
+
+/* ========== רספונסיביות למובייל ========== */
+
+/* טאבלטים */
+@media (max-width: 1024px) {
+  .vd-container {
+    grid-template-columns: 1fr;
+    max-height: none;
+  }
+
+  .vd-voting-area {
+    position: static;
+    order: -1;
+    margin-bottom: 20px;
+  }
+
+  .vd-slips-grid {
+    max-height: 600px;
+  }
+}
+
+/* מובייל */
+@media (max-width: 768px) {
+  .vd-wrap {
+    padding: 16px 12px 24px;
+  }
+
+  .vd-header h2 {
+    font-size: 24px;
+  }
+
+  .vd-group-name {
+    font-size: 16px;
+  }
+
+  .vd-container {
+    gap: 16px;
+  }
+
+  .vd-voting-area {
+    padding: 16px;
+  }
+
+  .vd-envelope {
+    width: 200px;
+    height: 125px;
+  }
+
+  .vd-envelope-label {
+    font-size: 14px;
+  }
+
+  .vd-slip-in-envelope {
+    width: 80px;
+    height: 60px;
+  }
+
+  .vd-slip-symbol-small {
+    font-size: 20px;
+  }
+
+  .vd-arrow {
+    font-size: 32px;
+  }
+
+  .vd-ballot {
+    width: 200px;
+    height: 170px;
+  }
+
+  .vd-ballot-slot {
+    width: 150px;
+    height: 12px;
+  }
+
+  .vd-ballot-label {
+    font-size: 13px;
+    padding: 0 8px;
+  }
+
+  .vd-slips-grid {
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    gap: 8px;
+    padding: 8px;
+    max-height: 500px;
+  }
+
+  .vd-slip {
+    padding: 10px;
+  }
+
+  .vd-slip-photo,
+  .vd-slip-photo-placeholder {
+    width: 50px;
+    height: 50px;
+    font-size: 24px;
+  }
+
+  .vd-slip-name {
+    font-size: 13px;
+  }
+
+  .vd-slip-symbol {
+    font-size: 10px;
+    padding: 2px 6px;
+  }
+
+  .vd-slip-desc {
+    font-size: 10px;
+  }
+
+  .vd-slip-votes {
+    font-size: 12px;
+    padding: 3px 8px;
+  }
+
+  .vd-modal {
+    padding: 24px;
+    width: 95%;
+  }
+
+  .vd-modal-symbol {
+    font-size: 56px;
+  }
+
+  .vd-modal-header h3 {
+    font-size: 22px;
+  }
+
+  .vd-modal-desc {
+    font-size: 14px;
+    padding: 12px;
+  }
+
+  .vd-select-button {
+    padding: 10px 20px;
+    font-size: 14px;
+  }
+}
+
+/* מכשירים קטנים מאוד */
+@media (max-width: 480px) {
+  .vd-header h2 {
+    font-size: 20px;
+  }
+
+  .vd-group-name {
+    font-size: 14px;
+  }
+
+  .vd-envelope {
+    width: 180px;
+    height: 110px;
+  }
+
+  .vd-ballot {
+    width: 180px;
+    height: 150px;
+  }
+
+  .vd-slips-grid {
+    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+    gap: 6px;
+    padding: 6px;
+    max-height: 450px;
+  }
+
+  .vd-slip {
+    padding: 8px;
+  }
+
+  .vd-slip-photo,
+  .vd-slip-photo-placeholder {
+    width: 40px;
+    height: 40px;
+    font-size: 20px;
+    margin-bottom: 6px;
+  }
+
+  .vd-slip-name {
+    font-size: 12px;
+    margin: 4px 0;
+  }
+
+  .vd-slip-symbol {
+    font-size: 9px;
+    padding: 2px 5px;
+  }
+
+  .vd-slip-desc {
+    font-size: 9px;
+    margin: 4px 0;
+  }
+
+  .vd-slip-votes {
+    font-size: 11px;
+    padding: 2px 6px;
+    margin-top: 4px;
+  }
+
+  .vd-arrow {
+    font-size: 28px;
+  }
+
+  .vd-modal-symbol {
+    font-size: 48px;
+  }
+
+  .vd-modal-header h3 {
+    font-size: 20px;
+  }
+}
+
+/* תמיכה בנוף (landscape) במובייל */
+@media (max-width: 768px) and (orientation: landscape) {
+  .vd-container {
+    grid-template-columns: 1fr 280px;
+    max-height: calc(100vh - 150px);
+  }
+
+  .vd-voting-area {
+    order: 0;
+    position: sticky;
+    top: 16px;
+  }
+
+  .vd-slips-grid {
+    max-height: 100%;
+  }
 }

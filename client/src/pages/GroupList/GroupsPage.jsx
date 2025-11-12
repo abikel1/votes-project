@@ -18,6 +18,7 @@ import {
 } from '../../slices/joinRequestsSlice';
 import http from '../../api/http';
 import './GroupsPage.css';
+import { useState } from 'react';
 
 function formatDate(d) {
   if (!d) return '-';
@@ -40,7 +41,13 @@ export default function GroupsPage() {
   const joinedIdsSet  = useSelector(selectMyJoinedIds);
   const pendingIdsSet = useSelector(selectMyPendingSet);
   const rejectedIdsSet = useSelector(selectMyRejectedSet); // ← חדש
+
   const createdIdsSet = useSelector(selectMyCreatedIds);
+const [showFilters, setShowFilters] = useState(false);
+const [showSort, setShowSort] = useState(false);
+const [filter, setFilter] = useState('all');
+const [sortBy, setSortBy] = useState('creationDate');
+const [searchTerm, setSearchTerm] = useState('');
 
   // מפת "הוסרת"
   const removedMap = useSelector((s) => s.joinReq.removedNotice || {});
@@ -91,11 +98,176 @@ export default function GroupsPage() {
   const myEmail = lc(authEmail) || lc(localStorage.getItem('userEmail'));
   const myId = String(authId ?? localStorage.getItem('userId') ?? '');
 
+
+const filteredGroups = groups
+  .filter((g) => {
+    const gid = String(g._id);
+    const nameMatch = g.name?.toLowerCase().includes(searchTerm.toLowerCase());
+    if (!nameMatch) return false;
+
+    const isLocked = !!g.isLocked;
+    const isOwner = createdIdsSet.has(gid);
+    const isMember = joinedIdsSet.has(gid);
+
+    switch (filter) {
+      case 'open':
+        return !isLocked;
+      case 'locked':
+        return isLocked;
+      case 'joined':
+        return isMember;
+      case 'owned':
+        return isOwner;
+      default:
+        return true;
+    }
+  })
+  .sort((a, b) => {
+    if (sortBy === 'creationDate')
+      return new Date(b.creationDate) - new Date(a.creationDate);
+    if (sortBy === 'endDate')
+      return new Date(a.endDate) - new Date(b.endDate);
+    if (sortBy === 'name')
+      return a.name.localeCompare(b.name, 'he');
+    return 0;
+  });
+
+
   return (
     <div className="page-wrap">
       <h2 className="page-title">כל הקבוצות</h2>
+      {/* 🔍 סרגל סינון ומיון */}
+{/* 🎛️ סרגל חיפוש + סינון + מיון */}
+<div className="filter-bar">
+  <input
+    type="text"
+    placeholder="חיפוש קבוצות..."
+    value={searchTerm}
+    onChange={(e) => setSearchTerm(e.target.value)}
+    className="search-input"
+  />
+
+  <div className="filter-actions">
+    {/* 🧩 אייקון סינון */}
+    <div className="icon-wrap">
+      <img
+        src="/src/assets/icons/filter.png"
+        alt="סינון"
+        className="icon-btn"
+        onClick={() => {
+          setShowFilters((v) => !v);
+          setShowSort(false);
+        }}
+      />
+      {showFilters && (
+        <div className="filters-dropdown">
+          <label>
+            <input
+              type="radio"
+              name="filter"
+              value="all"
+              checked={filter === 'all'}
+              onChange={(e) => setFilter(e.target.value)}
+            />
+            כל הקבוצות
+          </label>
+          <label>
+            <input
+              type="radio"
+              name="filter"
+              value="open"
+              checked={filter === 'open'}
+              onChange={(e) => setFilter(e.target.value)}
+            />
+            פתוחות
+          </label>
+          <label>
+            <input
+              type="radio"
+              name="filter"
+              value="locked"
+              checked={filter === 'locked'}
+              onChange={(e) => setFilter(e.target.value)}
+            />
+            נעולות
+          </label>
+          <label>
+            <input
+              type="radio"
+              name="filter"
+              value="joined"
+              checked={filter === 'joined'}
+              onChange={(e) => setFilter(e.target.value)}
+            />
+            קבוצות שאני מחוברת אליהן
+          </label>
+          <label>
+            <input
+              type="radio"
+              name="filter"
+              value="owned"
+              checked={filter === 'owned'}
+              onChange={(e) => setFilter(e.target.value)}
+            />
+            קבוצות שאני מנהלת
+          </label>
+        </div>
+      )}
+    </div>
+
+    {/* 🔽 אייקון מיון */}
+    <div className="icon-wrap">
+      <img
+        src="/src/assets/icons/sort.png"
+        alt="מיון"
+        className="icon-btn"
+        onClick={() => {
+          setShowSort((v) => !v);
+          setShowFilters(false);
+        }}
+      />
+      {showSort && (
+        <div className="sort-dropdown">
+          <label>
+            <input
+              type="radio"
+              name="sort"
+              value="creationDate"
+              checked={sortBy === 'creationDate'}
+              onChange={(e) => setSortBy(e.target.value)}
+            />
+            תאריך יצירה (חדש קודם)
+          </label>
+          <label>
+            <input
+              type="radio"
+              name="sort"
+              value="endDate"
+              checked={sortBy === 'endDate'}
+              onChange={(e) => setSortBy(e.target.value)}
+            />
+            תאריך סיום (מוקדם קודם)
+          </label>
+          <label>
+            <input
+              type="radio"
+              name="sort"
+              value="name"
+              checked={sortBy === 'name'}
+              onChange={(e) => setSortBy(e.target.value)}
+            />
+            שם קבוצה (א-ת)
+          </label>
+        </div>
+      )}
+    </div>
+  </div>
+</div>
+
+
+
       <div className="groups-grid">
-        {groups.map((g) => {
+        {filteredGroups.map((g) => {
           const gid = String(g._id);
           const isLocked = !!g.isLocked;
 
