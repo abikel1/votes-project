@@ -29,7 +29,7 @@ const initial = fullName ? fullName[0] : '';
       <div className="links">
         <Link to="/">בית</Link>
         <Link to="/groups">קבוצות</Link>
-        {isAuthed && <Link to="/groups/create">צור קבוצה</Link>}
+        {/* {isAuthed && <Link to="/groups/create">צור קבוצה</Link>} */}
         {!isAuthed && <Link to="/register">הרשמה</Link>}
         {!isAuthed && <Link to="/login">התחברות</Link>}
         {isAuthed && (
