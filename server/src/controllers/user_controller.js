@@ -2,15 +2,19 @@
 
 const userService = require('../services/user_service');
 
+// user_controller.js
 exports.register = async (req, res) => {
-    console.log('BODY RECEIVED:', req.body);
-    try {
-        const result = await userService.register(req.body);
-        res.status(201).json(result);
-    } catch (err) {
-        res.status(err.status || 500).json({ message: err.message || 'Server error' });
-    }
+  try {
+    const result = await userService.register(req.body);
+    res.status(201).json(result);
+  } catch (err) {
+    console.log('register error:', err);
+    const errors = err.errors || { form: err.message || 'אירעה שגיאה ברישום' };
+    res.status(err.status || 500).json({ errors });
+  }
 };
+
+
 
 exports.login = async (req, res) => {
   try {
