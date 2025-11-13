@@ -130,7 +130,7 @@ export default function LoginPage() {
 
         {/* =======
         {/* התחברות עם גוגל */}
-        <a href={googleHref}>
+        {/* <a href={googleHref}>
           <button type="button" className="btn google-btn">התחבר עם Google</button>
         </a>
 
@@ -139,7 +139,7 @@ export default function LoginPage() {
         <div className="bottom-cta" style={{ marginTop: 16, textAlign: 'center' }}>
           <span>עדיין לא נרשמת? </span>
           <Link to="/register" className="register-link">הירשם</Link>
-        </div>
+        </div> */}
         {/* >>>>>>> 4b2198394879e82c5ccfb050e379b532fe3ea367 */} 
       </form>
     </div>
