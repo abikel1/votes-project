@@ -8,16 +8,17 @@ const NavBar = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-const { token, firstName, lastName } = useSelector((s) => s.auth);
-const isAuthed = Boolean(token);
+  const { token, firstName, lastName } = useSelector((s) => s.auth);
+  const isAuthed = Boolean(token);
 
   const onLogout = () => {
     dispatch(logout());
     navigate('/');
   };
 
-const fullName = firstName && lastName ? `${firstName} ${lastName}` : '';
-const initial = fullName ? fullName[0] : '';
+  const fullName = firstName && lastName ? `${firstName} ${lastName}` : '';
+  const initial = fullName ? fullName[0] : '';
+
   return (
     <nav className="navbar">
       {isAuthed && (
@@ -27,15 +28,18 @@ const initial = fullName ? fullName[0] : '';
       )}
 
       <div className="links">
-        <Link to="/">בית</Link>
-        <Link to="/groups">קבוצות</Link>
-        {/* {isAuthed && <Link to="/groups/create">צור קבוצה</Link>} */}
-        {!isAuthed && <Link to="/register">הרשמה</Link>}
-        {!isAuthed && <Link to="/login">התחברות</Link>}
-        {isAuthed && (
-          <button type="button" className="logout-btn" onClick={onLogout}>
-            יציאה
-          </button>
+        {isAuthed ? (
+          <>
+            <Link to="/">בית</Link>
+            <Link to="/groups">קבוצות</Link>
+            {/* <Link to="/groups/create">צור קבוצה</Link> */}
+            <button type="button" className="logout-btn" onClick={onLogout}>
+              יציאה
+            </button>
+          </>
+        ) : (
+          // במצב לא-מחובר: רק התחברות
+          <Link to="/login">התחברות</Link>
         )}
       </div>
 

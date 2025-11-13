@@ -10,35 +10,46 @@ passport.use(
     {
       clientID: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      callbackURL: process.env.GOOGLE_CALLBACK_URL,
+      callbackURL: process.env.GOOGLE_CALLBACK_URL, // לדוגמה: http://localhost:3000/api/users/google/callback
     },
-    async (accessToken, refreshToken, profile, done) => {
+    async (_accessToken, _refreshToken, profile, done) => {
       try {
-        // חיפוש אם המשתמש כבר קיים
-        let user = await User.findOne({ email: profile.emails[0].value });
+        const email = profile.emails?.[0]?.value || '';
+        if (!email) return done(null, false, { reason: 'missing_email' });
 
-        // אם לא קיים - ניצור אותו
+        const user = await User.findOne({ email }).lean();
+
+        // 1) לא קיים בכלל → שליחה להרשמה עם אימייל ממולא
         if (!user) {
-          user = await User.create({
-            firstName: profile.name.givenName,
-            lastName: profile.name.familyName || 'Unknown', // ← כאן משנה
-            email: profile.emails[0].value,
-            passwordHash: 'google_oauth', // לא באמת בשימוש
-            joinedGroups: [],
-            createdGroups: [],
-            voteHistory: []
+          return done(null, false, { reason: 'new_user', prefill: { email } });
+        }
+
+        // 2) קיים אבל “חשבון לא הושלם” (נוצר אוטומטית בעבר)
+        const isIncomplete =
+          user.passwordHash === 'google_oauth' ||
+          !user.firstName || !user.lastName; // אפשר להרחיב תנאים אם תרצי
+
+        if (isIncomplete) {
+          return done(null, false, {
+            reason: 'incomplete',
+            prefill: { email, firstName: user.firstName || '', lastName: user.lastName || '' },
           });
         }
 
+        // 3) קיים ומלא → כניסה רגילה
         const token = jwt.sign(
-          { sub: user._id, email: user.email },
+          {
+            sub: user._id.toString(),
+            email: user.email,
+            firstName: user.firstName,
+            lastName: user.lastName,
+          },
           JWT_SECRET,
           { expiresIn: '7d' }
         );
-
-        done(null, { token, user });
+        return done(null, { existing: true, token, user });
       } catch (err) {
-        done(err, null);
+        return done(err, null);
       }
     }
   )
