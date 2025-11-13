@@ -103,7 +103,26 @@ export default function GroupsPage() {
 
   if (loading) return <div className="loading-wrap">טוען קבוצות...</div>;
   if (err) return <div className="error">{err}</div>;
-  if (!groups?.length) return <div className="empty">אין קבוצות עדיין.</div>;
+if (!groups?.length)
+  return (
+    <div className="empty">
+      אין קבוצות עדיין.
+      {isAuthed ? (
+        <button
+          className="add-group-btn"
+          onClick={() => navigate('/groups/create')}
+        >
+          <img src="/src/assets/icons/new-folder.png" alt="+" className="plus-icon" />
+          יצירת קבוצה חדשה
+        </button>
+      ) : (
+        <div style={{ marginTop: '1rem', color: '#777' }}>
+          כדי ליצור קבוצה יש להתחבר תחילה.
+        </div>
+      )}
+    </div>
+  );
+
 
   const myEmail = lc(authEmail) || lc(localStorage.getItem('userEmail'));
   const myId = String(authId ?? localStorage.getItem('userId') ?? '');
@@ -196,10 +215,22 @@ export default function GroupsPage() {
           </div>
         </div>
 
-        <button className="add-group-btn" onClick={() => navigate('/groups/create')}>
-          <img src="/src/assets/icons/new-folder.png" alt="+" className="plus-icon" />
-          יצירת קבוצה חדשה
-        </button>
+<button
+  className="add-group-btn"
+  onClick={() => {
+    if (!isAuthed) {
+      alert('כדי ליצור קבוצה יש להתחבר תחילה.');
+      navigate('/login', { state: { redirectTo: '/groups/create' } });
+      return;
+    }
+    navigate('/groups/create');
+  }}
+>
+  <img src="/src/assets/icons/new-folder.png" alt="+" className="plus-icon" />
+  יצירת קבוצה חדשה
+</button>
+
+
       </div>
 
       <div className="groups-grid">
