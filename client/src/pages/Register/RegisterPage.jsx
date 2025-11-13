@@ -109,22 +109,22 @@ export default function RegisterPage() {
     setErrors({});
     const { confirmPassword, ...payload } = form;
 
- try {
+try {
   const result = await dispatch(register(payload)).unwrap();
   console.log('Registration success:', result);
+
+  // נווט ל-login מיד אחרי שההרשמה הצליחה
+  navigate('/login');
 } catch (err) {
   console.log('Registration error from server:', err);
 
   const apiErrors = {};
 
-  // אם השגיאות מגיעות מאובייקט errors רגיל
   if (err?.errors) {
     Object.keys(err.errors).forEach((key) => {
       apiErrors[key] = err.errors[key];
     });
-  }
-  // אם השגיאות מגיעות מהשרת דרך response.data
-  else if (err?.response?.data) {
+  } else if (err?.response?.data) {
     const data = err.response.data;
     if (data.errors) {
       Object.keys(data.errors).forEach((key) => {
@@ -133,15 +133,14 @@ export default function RegisterPage() {
     } else if (data.message) {
       apiErrors.form = data.message;
     }
-  }
-  // fallback לכל שגיאה אחרת
-  else if (err?.message) apiErrors.form = err.message;
+  } else if (err?.message) apiErrors.form = err.message;
   else if (typeof err === 'string') apiErrors.form = err;
-  else apiErrors.form = 'מייל זה כבר קיים במערכת';
+  else apiErrors.form = ' מייל זה קיים במערכת';
 
   console.log('Mapped errors:', apiErrors);
   setErrors(apiErrors);
 }
+
 
   };
 
