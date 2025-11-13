@@ -483,7 +483,7 @@
 .vd-slip:hover {
   transform: translateY(-2px);
   box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
-  border-color: #3b82f6;
+  border-color: #003366;
 }
 
 .vd-slip:active {
@@ -501,7 +501,7 @@
 }
 
 .vd-slip:hover .vd-slip-photo {
-  border-color: #3b82f6;
+  border-color: #003366;
 }
 
 .vd-slip-photo-placeholder {

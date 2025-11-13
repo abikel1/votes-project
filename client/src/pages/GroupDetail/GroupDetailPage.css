@@ -67,13 +67,13 @@
 }
 
 .meta-value {
-    color: #3b82f6;
+    color: #003366;
     font-weight: 700;
     font-size: 14px;
 }
 
 .vote-btn {
-    background: #3b82f6;
+    background: #003366;
     color: white;
     border: none;
     padding: 12px 24px;
@@ -122,7 +122,7 @@
 }
 
 .resize-handle:hover .resize-line {
-    background: #3b82f6;
+    background: #003366;
 }
 
 .resize-line {
@@ -146,7 +146,7 @@
     font-weight: 700;
     margin: 0 0 10px 0;
     padding-bottom: 8px;
-    border-bottom: 2px solid #3b82f6;
+    border-bottom: 2px solid #003366;
 }
 
 .candidates-container {
@@ -176,7 +176,7 @@
 .candidate-card:hover {
     transform: translateY(-2px);
     box-shadow: 0 3px 8px rgba(0,0,0,0.15);
-    border-color: #3b82f6;
+    border-color: #003366;
 }
 
 .candidate-card.leader {
@@ -195,7 +195,7 @@
 }
 
 .candidate-card:hover .candidate-photo {
-    border-color: #3b82f6;
+    border-color: #003366;
 }
 
 .candidate-card.leader .candidate-photo {
@@ -291,7 +291,7 @@
     font-weight: 700;
     flex-shrink: 0;
     padding-bottom: 8px;
-    border-bottom: 2px solid #3b82f6;
+    border-bottom: 2px solid #003366;
 }
 
 .chart-wrapper {

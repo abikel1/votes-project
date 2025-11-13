@@ -18,7 +18,7 @@ import {
   PieChart, Pie, Cell, Legend
 } from 'recharts';
 
-const COLORS = ['#3b82f6', '#8b5cf6', '#ec4899', '#f59e0b', '#10b981', '#06b6d4', '#6366f1', '#84cc16'];
+const COLORS = ['#003366', '#8b5cf6', '#ec4899', '#f59e0b', '#10b981', '#06b6d4', '#6366f1', '#84cc16'];
 const lc = (s) => (s || '').trim().toLowerCase();
 
 export default function GroupDetailPage() {
@@ -210,7 +210,7 @@ const maxVotes = Math.max(...candidates.map(c => c.votesCount || 0));
                       <XAxis dataKey="name" angle={-45} textAnchor="end" height={50} interval={0} tick={{ fontSize: 11 }} />
                       <YAxis tick={{ fontSize: 11 }} />
                       <Tooltip formatter={(v) => `${v} קולות`} cursor={{ fill: 'rgba(59,130,246,0.1)' }} />
-                      <Bar dataKey="votesCount" fill="#3b82f6" />
+                      <Bar dataKey="votesCount" fill="#003366" />
                     </BarChart>
                   </ResponsiveContainer>
                 </div>
