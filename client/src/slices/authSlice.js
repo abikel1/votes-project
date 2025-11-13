@@ -22,32 +22,24 @@ const initialFirstName = localStorage.getItem('firstName');
 const initialLastName = localStorage.getItem('lastName');
 
 /** ===== Thunks ===== */
-// export const register = createAsyncThunk(
-//   'auth/register',
-//   async (payload, thunkAPI) => {
-//     try {
-//       const { data } = await http.post('/users/register', payload);
-//       return data;
-//     } catch (e) {
-//       return thunkAPI.rejectWithValue(e?.response?.data?.message || 'Registration failed');
-//     }
-// =======
 
-export const register = createAsyncThunk('auth/register', async (form, thunkAPI) => {
-  try {
-    const { data } = await http.post('/users/register', form);
-    return data;
-  } catch (err) {
-    // 🔽 זה השינוי הקריטי
-    return thunkAPI.rejectWithValue(
-      err?.response?.data?.errors || { form: 'אירעה שגיאה ברישום' }
-    );
+// רישום
+export const register = createAsyncThunk(
+  'auth/register',
+  async (form, thunkAPI) => {
+    try {
+      const { data } = await http.post('/users/register', form);
+      return data;
+    } catch (err) {
+      // השרת מחזיר { errors: {...} }
+      return thunkAPI.rejectWithValue(
+        err?.response?.data?.errors || { form: 'אירעה שגיאה ברישום' }
+      );
+    }
   }
-});
+);
 
-
-
-
+// התחברות
 export const login = createAsyncThunk(
   'auth/login',
   async (formData, { rejectWithValue }) => {
@@ -61,18 +53,16 @@ export const login = createAsyncThunk(
       console.log('err.response?.data:', err.response?.data);
 
       if (err.response && err.response.data) {
-        return rejectWithValue(err.response.data.errors || { form: err.response.data.message });
+        return rejectWithValue(
+          err.response.data.errors || { form: err.response.data.message }
+        );
       }
       return rejectWithValue({ form: err.message });
     }
   }
 );
 
-
-
-
-
-
+// פרופיל
 export const fetchProfile = createAsyncThunk(
   'auth/fetchProfile',
   async (_, { rejectWithValue }) => {
@@ -85,18 +75,26 @@ export const fetchProfile = createAsyncThunk(
   }
 );
 
+// עדכון פרופיל (כולל טיפול בשגיאת אימייל כפול)
 export const updateProfile = createAsyncThunk(
   'auth/updateProfile',
   async (payload, { rejectWithValue }) => {
     try {
-      const { data } = await http.patch('/users/me', payload); // ← PATCH במקום PUT
-      return data; // מחזיר את המשתמש המעודכן
-    } catch (e) {
-      return rejectWithValue(e?.response?.data?.message || 'Update profile failed');
+      const { data } = await http.patch('/users/me', payload);
+      return data; // המשתמש המעודכן
+    } catch (err) {
+      const serverErrors = err?.response?.data?.errors;
+      if (serverErrors) {
+        // למשל { email: 'המייל כבר קיים במערכת' }
+        return rejectWithValue(serverErrors);
+      }
+      const msg = err?.response?.data?.message || 'Update profile failed';
+      return rejectWithValue({ form: msg });
     }
   }
 );
 
+// fetchMe (להשלמת מידע אחרי ריענון)
 export const fetchMe = createAsyncThunk(
   'auth/me',
   async (_, thunkAPI) => {
@@ -104,7 +102,9 @@ export const fetchMe = createAsyncThunk(
       const { data } = await http.get('/users/me'); // { _id, name, email, ... }
       return data;
     } catch (e) {
-      return thunkAPI.rejectWithValue(e?.response?.data?.message || 'Load profile failed');
+      return thunkAPI.rejectWithValue(
+        e?.response?.data?.message || 'Load profile failed'
+      );
     }
   }
 );
@@ -135,7 +135,6 @@ export const resetPassword = createAsyncThunk(
   }
 );
 
-
 /** ===== Slice ===== */
 const authSlice = createSlice({
   name: 'auth',
@@ -145,17 +144,19 @@ const authSlice = createSlice({
     lastName: localStorage.getItem('lastName') || null,
     userId: localStorage.getItem('userId') || null,
     userEmail: localStorage.getItem('userEmail') || null,
+
     loading: false,
-    error: null,
+    error: null,          // שגיאות כלליות (לוגין/רישום וכו')
+    updateErrors: null,   // 👈 שגיאות של עדכון פרופיל
     registeredOk: false,
     user: null,
     message: '',
   },
   reducers: {
-  clearError: (state) => {
+    clearError: (state) => {
       state.error = null;
+      state.updateErrors = null;
     },
-
 
     logout(state) {
       state.token = null;
@@ -169,8 +170,8 @@ const authSlice = createSlice({
       localStorage.removeItem('lastName');
       localStorage.removeItem('userId');
       localStorage.removeItem('userEmail');
-    }
-    ,
+    },
+
     loginSuccess(state, action) {
       const { token, user } = action.payload;
 
@@ -199,28 +200,33 @@ const authSlice = createSlice({
         state.error = action.payload;
       })
 
-      .addCase(fetchProfile.pending, (s) => { s.loading = true; s.error = null; })
+      /** fetchProfile */
+      .addCase(fetchProfile.pending, (s) => {
+        s.loading = true;
+        s.error = null;
+      })
       .addCase(fetchProfile.fulfilled, (s, a) => {
         s.loading = false;
         s.user = a.payload;
       })
-      .addCase(fetchProfile.rejected, (s, a) => { s.loading = false; s.error = a.payload; })
+      .addCase(fetchProfile.rejected, (s, a) => {
+        s.loading = false;
+        s.error = a.payload;
+      })
 
-      // login
-      .addCase(login.pending, (s) => { s.loading = true; s.error = null; })
+      /** login */
+      .addCase(login.pending, (s) => {
+        s.loading = true;
+        s.error = null;
+      })
       .addCase(login.fulfilled, (s, a) => {
         s.loading = false;
         s.token = a.payload.token;
-        s.userId = a.payload.user?._id ?? null;   // ← חשוב!
-        s.userEmail = a.payload.user?.email ?? null;
-
-        localStorage.setItem('token', s.token);
-        if (s.firstName) localStorage.setItem('firstName', s.firstName);
-        if (s.lastName) localStorage.setItem('lastName', s.lastName);
-        s.firstName = a.payload.user?.firstName ?? null;
-        s.lastName = a.payload.user?.lastName ?? null;
         s.userId = a.payload.user?._id ?? null;
         s.userEmail = a.payload.user?.email ?? null;
+
+        s.firstName = a.payload.user?.firstName ?? null;
+        s.lastName = a.payload.user?.lastName ?? null;
 
         localStorage.setItem('token', s.token);
         if (s.firstName) localStorage.setItem('firstName', s.firstName);
@@ -228,11 +234,16 @@ const authSlice = createSlice({
         if (s.userId) localStorage.setItem('userId', s.userId);
         if (s.userEmail) localStorage.setItem('userEmail', s.userEmail);
       })
+      .addCase(login.rejected, (s, a) => {
+        s.loading = false;
+        s.error = a.payload;
+      })
 
-      .addCase(login.rejected, (s, a) => { s.loading = false; s.error = a.payload; })
-
-
-      .addCase(fetchMe.pending, (s) => { s.loading = true; s.error = null; })
+      /** fetchMe */
+      .addCase(fetchMe.pending, (s) => {
+        s.loading = true;
+        s.error = null;
+      })
       .addCase(fetchMe.fulfilled, (s, a) => {
         s.loading = false;
         s.firstName = a.payload.firstName ?? s.firstName;
@@ -245,13 +256,21 @@ const authSlice = createSlice({
         if (s.userId) localStorage.setItem('userId', s.userId);
         if (s.userEmail) localStorage.setItem('userEmail', s.userEmail);
       })
+      .addCase(fetchMe.rejected, (s, a) => {
+        s.loading = false;
+        s.error = a.payload;
+      })
 
-      .addCase(fetchMe.rejected, (s, a) => { s.loading = false; s.error = a.payload; })
-      .addCase(updateProfile.pending, (s) => { s.loading = true; s.error = null; })
+      /** updateProfile */
+      .addCase(updateProfile.pending, (s) => {
+        s.loading = true;
+        s.updateErrors = null;
+      })
       .addCase(updateProfile.fulfilled, (s, a) => {
         s.loading = false;
-        s.user = a.payload;                               // המשתמש המעודכן
-        // שמירה לשדות הנוחים לך ב־state/localStorage (כדי שהאווטאר וכו' יתעדכן מיד)
+        s.user = a.payload; // המשתמש המעודכן
+        s.updateErrors = null;
+
         s.firstName = a.payload.firstName ?? s.firstName;
         s.lastName = a.payload.lastName ?? s.lastName;
         s.userEmail = a.payload.email ?? s.userEmail;
@@ -260,17 +279,42 @@ const authSlice = createSlice({
         if (s.lastName) localStorage.setItem('lastName', s.lastName);
         if (s.userEmail) localStorage.setItem('userEmail', s.userEmail);
       })
-      .addCase(updateProfile.rejected, (s, a) => { s.loading = false; s.error = a.payload; })
+      .addCase(updateProfile.rejected, (s, a) => {
+        s.loading = false;
+        s.updateErrors = a.payload || { form: 'Update profile failed' };
+      })
 
-      .addCase(requestPasswordReset.pending, (s) => { s.loading = true; s.error = null; })
-      .addCase(requestPasswordReset.fulfilled, (s, a) => { s.loading = false; s.error = null; s.message = a.payload; })
-      .addCase(requestPasswordReset.rejected, (s, a) => { s.loading = false; s.error = a.payload; })
+      /** password reset request */
+      .addCase(requestPasswordReset.pending, (s) => {
+        s.loading = true;
+        s.error = null;
+      })
+      .addCase(requestPasswordReset.fulfilled, (s, a) => {
+        s.loading = false;
+        s.error = null;
+        s.message = a.payload;
+      })
+      .addCase(requestPasswordReset.rejected, (s, a) => {
+        s.loading = false;
+        s.error = a.payload;
+      })
 
-      .addCase(resetPassword.pending, (s) => { s.loading = true; s.error = null; })
-      .addCase(resetPassword.fulfilled, (s, a) => { s.loading = false; s.error = null; s.message = a.payload; })
-      .addCase(resetPassword.rejected, (s, a) => { s.loading = false; s.error = a.payload; });
+      /** resetPassword */
+      .addCase(resetPassword.pending, (s) => {
+        s.loading = true;
+        s.error = null;
+      })
+      .addCase(resetPassword.fulfilled, (s, a) => {
+        s.loading = false;
+        s.error = null;
+        s.message = a.payload;
+      })
+      .addCase(resetPassword.rejected, (s, a) => {
+        s.loading = false;
+        s.error = a.payload;
+      });
   }
 });
 
-export const { logout, loginSuccess ,clearError } = authSlice.actions;
+export const { logout, loginSuccess, clearError } = authSlice.actions;
 export default authSlice.reducer;
