@@ -15,9 +15,12 @@ import {
   fetchCandidatesByGroup,
   createCandidate,
   deleteCandidate,
+  updateCandidate, // ⬅️ חדש
   selectCandidatesForGroup,
   selectCandidatesLoadingForGroup,
   selectCandidatesErrorForGroup,
+  selectCandidateUpdating,
+  selectCandidateUpdateError,
 } from '../../slices/candidateSlice';
 
 import {
@@ -127,6 +130,12 @@ export default function GroupSettingsPage() {
 
   const [candForm, setCandForm] = useState({ name: '', description: '', symbol: '', photoUrl: '' });
 
+  // ⬅️ סטייט למודאל עריכת מועמד/ת
+  const [editCandOpen, setEditCandOpen] = useState(false);
+  const [editCandForm, setEditCandForm] = useState({ _id: '', name: '', description: '', symbol: '', photoUrl: '' });
+  const updatingThisCandidate = useSelector(selectCandidateUpdating(editCandForm._id || ''));
+  const updateCandidateError = useSelector(selectCandidateUpdateError(editCandForm._id || ''));
+
   useEffect(() => {
     dispatch(fetchGroupWithMembers(groupId));
     dispatch(fetchCandidatesByGroup(groupId));
@@ -170,6 +179,7 @@ export default function GroupSettingsPage() {
 
     return !!(byEmail || byId || byFullName);
   }, [group, userEmail, userId, firstName, lastName]);
+
   // --- קישור שיתוף דינמי (נעולה → /join/:id, פתוחה → /groups/:id) ---
   const sharePath = useMemo(() => {
     if (!group) return '';
@@ -189,7 +199,6 @@ export default function GroupSettingsPage() {
       setCopied(true);
       setTimeout(() => setCopied(false), 1500);
     } catch {
-      // פולבק למקרה שאין הרשאת clipboard
       const tmp = document.createElement('input');
       tmp.value = shareUrl;
       document.body.appendChild(tmp);
@@ -292,7 +301,6 @@ export default function GroupSettingsPage() {
 
     let s = String(raw).trim();
 
-    // אם כבר יש רווחים – ננקה כפולים ונכַתֵּב
     if (/\s/.test(s)) {
       return s.replace(/\s+/g, ' ')
         .split(' ')
@@ -300,15 +308,12 @@ export default function GroupSettingsPage() {
         .join(' ');
     }
 
-    // פיצול לפי מפרידים נפוצים
     let parts = s.split(/[._\-]+/).filter(Boolean);
 
-    // אם עדיין חלק אחד – camelCase/PascalCase
     if (parts.length === 1) {
       parts = s.split(/(?=[A-Z])/).filter(Boolean);
     }
 
-    // אם עדיין חלק אחד – ננסה מהאימייל
     if (parts.length === 1 && email) {
       const local = String(email).split('@')[0] || '';
       const emailParts = local.split(/[._\-]+/).filter(Boolean);
@@ -318,12 +323,55 @@ export default function GroupSettingsPage() {
     return parts.map(p => cap(p.toLowerCase())).join(' ') || s;
   };
 
-  // שם לתצוגת מצביע
   const formatVoterTitle = (v) => {
     const composed =
       v?.name ||
       [v?.firstName || v?.first_name, v?.lastName || v?.last_name].filter(Boolean).join(' ');
     return humanizeName(composed, v?.email);
+  };
+
+  // ======== לוגיקת עריכת מועמד/ת ========
+  const openEditCandidate = (c) => {
+    setEditCandForm({
+      _id: String(c._id),
+      name: c.name || '',
+      description: c.description || '',
+      symbol: c.symbol || '',
+      photoUrl: c.photoUrl || '',
+    });
+    setEditCandOpen(true);
+  };
+
+  const onEditCandChange = (e) => {
+    const { name, value } = e.target;
+    setEditCandForm(prev => ({ ...prev, [name]: value }));
+  };
+
+  const onSaveEditedCandidate = async (e) => {
+    e.preventDefault();
+    const { _id, name, description, symbol, photoUrl } = editCandForm;
+    if (!name?.trim()) return alert('שם מועמד/ת חובה');
+
+    const patch = {
+      name: name.trim(),
+      description: (description || '').trim(),
+      symbol: (symbol || '').trim(),
+      photoUrl: (photoUrl || '').trim(),
+    };
+
+    try {
+      await dispatch(updateCandidate({ candidateId: _id, groupId, patch })).unwrap();
+      setEditCandOpen(false);
+      // לא חובה, אבל אם יש עוד מקומות נסמכים – נרענן מהרשימה
+      dispatch(fetchCandidatesByGroup(groupId));
+    } catch (err) {
+      // השגיאה כבר תשב ב־updateErrorById, נוסיף גם alert מינימלי
+      alert(err || 'עדכון נכשל');
+    }
+  };
+
+  const onCancelEditCandidate = () => {
+    setEditCandOpen(false);
   };
 
   return (
@@ -445,6 +493,7 @@ export default function GroupSettingsPage() {
                         )}
                       </div>
                       <div className="row-actions">
+                        <button className="small" onClick={() => openEditCandidate(c)}>עריכה</button>
                         <button className="small danger" onClick={() => onDeleteCandidate(String(c._id))}>הסר/י</button>
                       </div>
                     </li>
@@ -634,6 +683,74 @@ export default function GroupSettingsPage() {
                 מחיקת הקבוצה לצמיתות
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* מודאל עריכת מועמד/ת */}
+      {editCandOpen && (
+        <div className="modal-backdrop" onClick={() => !updatingThisCandidate && setEditCandOpen(false)}>
+          <div className="modal" onClick={(e) => e.stopPropagation()}>
+            <h3>עריכת מועמד/ת</h3>
+            <form className="field" onSubmit={onSaveEditedCandidate}>
+              <label>שם *</label>
+              <input
+                className="input"
+                name="name"
+                value={editCandForm.name}
+                onChange={onEditCandChange}
+                required
+                disabled={updatingThisCandidate}
+              />
+              <label>תיאור</label>
+              <textarea
+                className="input"
+                rows={3}
+                name="description"
+                value={editCandForm.description}
+                onChange={onEditCandChange}
+                disabled={updatingThisCandidate}
+              />
+              <label>סמל (אופציונלי)</label>
+              <input
+                className="input"
+                name="symbol"
+                value={editCandForm.symbol}
+                onChange={onEditCandChange}
+                placeholder="למשל: א׳"
+                disabled={updatingThisCandidate}
+              />
+              <label>קישור תמונה (אופציונלי)</label>
+              <input
+                className="input"
+                name="photoUrl"
+                type="url"
+                value={editCandForm.photoUrl}
+                onChange={onEditCandChange}
+                placeholder="https://..."
+                disabled={updatingThisCandidate}
+              />
+
+              {updateCandidateError && (
+                <div className="err" style={{ marginTop: 6 }}>
+                  {updateCandidateError}
+                </div>
+              )}
+
+              <div className="actions-row">
+                <button className="gs-btn" type="submit" disabled={updatingThisCandidate}>
+                  {updatingThisCandidate ? 'שומר/ת…' : 'שמור/י'}
+                </button>
+                <button
+                  className="gs-btn-outline"
+                  type="button"
+                  onClick={onCancelEditCandidate}
+                  disabled={updatingThisCandidate}
+                >
+                  ביטול
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}
