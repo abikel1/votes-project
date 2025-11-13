@@ -114,8 +114,23 @@ export default function LoginPage() {
           <span className="text">{loading ? '...' : 'התחבר'}</span>
         </button>
 
-        {/* התחברות עם גוגל */}
+        {/* <<<<<<< HEAD */}
+        {/* כפתור התחברות עם גוגל – שומר redirect */}
+        {/* כפתור התחברות עם גוגל – שומר redirect */}
         <a href={googleHref}>
+          <button type="button" className="btn google-btn">התחבר עם Google</button>
+        </a>
+
+        {/* שכחתי סיסמה */}
+        <Link to="/forgot-password" className="btn google-btn">שכחתי סיסמה?</Link>
+        <div className="bottom-cta" style={{ marginTop: 16, textAlign: 'center' }}>
+          <span>עדיין לא נרשמת? </span>
+          <Link to="/register" className="register-link">הירשם</Link>
+        </div>
+
+        {/* =======
+        {/* התחברות עם גוגל */}
+        {/* <a href={googleHref}>
           <button type="button" className="btn google-btn">התחבר עם Google</button>
         </a>
 
@@ -124,7 +139,8 @@ export default function LoginPage() {
         <div className="bottom-cta" style={{ marginTop: 16, textAlign: 'center' }}>
           <span>עדיין לא נרשמת? </span>
           <Link to="/register" className="register-link">הירשם</Link>
-        </div>
+        </div> */}
+        {/* >>>>>>> 4b2198394879e82c5ccfb050e379b532fe3ea367 */} 
       </form>
     </div>
   );

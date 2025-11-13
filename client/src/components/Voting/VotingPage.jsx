@@ -172,30 +172,30 @@ export default function VotingDragPage() {
 
       <div className="vd-container">
         <div className="vd-slips-area">
-        <div className="vd-slips-grid">
-  {candidates.map(c => (
-    <div
-      key={c._id}
-      className={`vd-slip 
+          <div className="vd-slips-grid">
+            {candidates.map(c => (
+              <div
+                key={c._id}
+                className={`vd-slip 
         ${slipInEnvelope?._id === c._id ? 'vd-slip-used' : ''} 
         ${hasVoted ? 'vd-slip-disabled' : ''}`}
-      draggable={!hasVoted && slipInEnvelope?._id !== c._id}
-      onDragStart={(e) => handleSlipDragStart(e, c)}
-      onClick={() => openModal(c)}
-    >
-      {c.photoUrl ? (
-        <img src={c.photoUrl} alt={c.name} className="vd-slip-photo" />
-      ) : (
-        <div className="vd-slip-photo-placeholder">👤</div>
-      )}
+                draggable={!hasVoted && slipInEnvelope?._id !== c._id}
+                onDragStart={(e) => handleSlipDragStart(e, c)}
+                onClick={() => openModal(c)}
+              >
+                {c.photoUrl ? (
+                  <img src={c.photoUrl} alt={c.name} className="vd-slip-photo" />
+                ) : (
+                  <div className="vd-slip-photo-placeholder">👤</div>
+                )}
 
-      <h4 className="vd-slip-name">{c.name || 'ללא שם'}</h4>
-      {c.symbol && <span className="vd-slip-symbol">{c.symbol}</span>}
-      {c.description && <p className="vd-slip-desc">{c.description}</p>}
-      <div className="vd-slip-votes">{c.votesCount || 0} קולות</div>
-    </div>
-  ))}
-</div>
+                <h4 className="vd-slip-name">{c.name || 'ללא שם'}</h4>
+                {c.symbol && <span className="vd-slip-symbol">{c.symbol}</span>}
+                {/* {c.description && <p className="vd-slip-desc">{c.description}</p>} */}
+                {/* <div className="vd-slip-votes">{c.votesCount || 0} קולות</div> */}
+              </div>
+            ))}
+          </div>
 
         </div>
 
@@ -262,15 +262,15 @@ export default function VotingDragPage() {
           <div className="vd-modal" onClick={(e) => e.stopPropagation()}>
             <button className="vd-modal-close" onClick={closeModal}>×</button>
             <div className="vd-modal-header">
-<button
-  className="vd-select-button"
-  onClick={() => {
-    setSlipInEnvelope(selectedCandidate);
-    closeModal();
-  }}
->
-  בחר להצבעה
-</button>
+              <button
+                className="vd-select-button"
+                onClick={() => {
+                  setSlipInEnvelope(selectedCandidate);
+                  closeModal();
+                }}
+              >
+                בחר להצבעה
+              </button>
 
               <div className="vd-modal-symbol">
                 {selectedCandidate.symbol || selectedCandidate.name?.substring(0, 2) || '??'}
