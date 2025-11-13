@@ -21,6 +21,7 @@ const NavBar = () => {
 
   return (
     <nav className="navbar">
+      {/* עיגול פרופיל מוצג רק כשמחובר */}
       {isAuthed && (
         <Link to="/profile" className="profile">
           {initial}
@@ -28,17 +29,16 @@ const NavBar = () => {
       )}
 
       <div className="links">
+        {/* קישורים שמוצגים לכולם */}
+        <Link to="/">בית</Link>
+        <Link to="/groups">קבוצות</Link>
+
+        {/* כפתור או קישור לפי מצב ההתחברות */}
         {isAuthed ? (
-          <>
-            <Link to="/">בית</Link>
-            <Link to="/groups">קבוצות</Link>
-            {/* <Link to="/groups/create">צור קבוצה</Link> */}
-            <button type="button" className="logout-btn" onClick={onLogout}>
-              יציאה
-            </button>
-          </>
+          <button type="button" className="logout-btn" onClick={onLogout}>
+            יציאה
+          </button>
         ) : (
-          // במצב לא-מחובר: רק התחברות
           <Link to="/login">התחברות</Link>
         )}
       </div>
