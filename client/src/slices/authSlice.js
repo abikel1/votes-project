@@ -37,11 +37,15 @@ export const register = createAsyncThunk('auth/register', async (form, thunkAPI)
   try {
     const { data } = await http.post('/users/register', form);
     return data;
-  } catch (e) {
-    return thunkAPI.rejectWithValue(e?.response?.data?.message || 'Registration failed');
-    // >>>>>>> a1c83c8d2145ebf88aa769ba8d04af15a79010c3
+  } catch (err) {
+    // 🔽 זה השינוי הקריטי
+    return thunkAPI.rejectWithValue(
+      err?.response?.data?.errors || { form: 'אירעה שגיאה ברישום' }
+    );
   }
 });
+
+
 
 
 export const login = createAsyncThunk(
@@ -148,7 +152,9 @@ const authSlice = createSlice({
     message: '',
   },
   reducers: {
-
+  clearError: (state) => {
+      state.error = null;
+    },
 
 
     logout(state) {
@@ -180,9 +186,18 @@ const authSlice = createSlice({
   extraReducers: (builder) => {
     builder
       /** register */
-      .addCase(register.pending, (s) => { s.loading = true; s.error = null; s.registeredOk = false; })
-      .addCase(register.fulfilled, (s) => { s.loading = false; s.registeredOk = true; })
-      .addCase(register.rejected, (s, a) => { s.loading = false; s.error = a.payload; })
+      .addCase(register.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(register.fulfilled, (state, action) => {
+        state.loading = false;
+        state.user = action.payload;
+      })
+      .addCase(register.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
 
       .addCase(fetchProfile.pending, (s) => { s.loading = true; s.error = null; })
       .addCase(fetchProfile.fulfilled, (s, a) => {
@@ -257,5 +272,5 @@ const authSlice = createSlice({
   }
 });
 
-export const { logout, loginSuccess } = authSlice.actions;
+export const { logout, loginSuccess ,clearError } = authSlice.actions;
 export default authSlice.reducer;
