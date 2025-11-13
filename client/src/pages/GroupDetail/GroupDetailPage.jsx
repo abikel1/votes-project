@@ -41,8 +41,6 @@ export default function GroupDetailPage() {
   const [isDragging, setIsDragging] = useState(false);
   const containerRef = useRef(null);
 
-  const [checkingAccess, setCheckingAccess] = useState(false);
-
   useEffect(() => {
     if (groupId) dispatch(fetchGroupWithMembers(groupId));
     dispatch(fetchCandidatesByGroup(groupId));
@@ -68,59 +66,7 @@ export default function GroupDetailPage() {
     };
   }, [isDragging]);
 
-  // Guard פר-דף: אם הקבוצה נעולה ואין בעלות/חברות → לדף ההסבר
-  useEffect(() => {
-    if (!group) return;
-    if (!group.isLocked) return;
-
-    setCheckingAccess(true);
-
-    const myEmail = lc(authEmail) || lc(localStorage.getItem('userEmail'));
-    const myId = String(authId ?? localStorage.getItem('userId') ?? '');
-
-    const createdByEmail = lc(
-      group.createdBy ?? group.created_by ?? group.createdByEmail ?? group.ownerEmail ?? group.owner
-    );
-    const createdById = String(group.createdById ?? '');
-    const isOwner =
-      !!group.isOwner ||
-      (!!myEmail && !!createdByEmail && myEmail === createdByEmail) ||
-      (!!myId && !!createdById && myId === createdById);
-
-    if (!isOwner && !isAuthed) {
-      navigate(`/groups/${groupId}/locked`, { replace: true });
-      setCheckingAccess(false);
-      return;
-    }
-
-    const checkMembership = async () => {
-      try {
-        const { data } = await import('../../api/http').then((m) =>
-          m.default.get(`/groups/${groupId}/my-membership`)
-        );
-        const serverMember = !!data?.member;
-        const clientMember = myJoinedIdsSet.has(String(groupId));
-        if (!isOwner && !(serverMember || clientMember)) {
-          navigate(`/groups/${groupId}/locked`, { replace: true });
-        }
-        setCheckingAccess(false);
-      } catch (err) {
-        const status = err?.response?.status;
-        if (status === 401 || status === 403) {
-          navigate(`/groups/${groupId}/locked`, { replace: true });
-        } else {
-          navigate(`/groups/${groupId}/locked`, { replace: true });
-        }
-        setCheckingAccess(false);
-      }
-    };
-
-    if (!isOwner) checkMembership();
-    else setCheckingAccess(false);
-  }, [group, authEmail, authId, isAuthed, myJoinedIdsSet, groupId, navigate]);
-
   if (groupLoading || !group) return <div className="loading-wrap">טוען נתוני קבוצה…</div>;
-  if (checkingAccess) return <div className="loading-wrap">בודק הרשאות…</div>;
 
   const formatDate = (dateString) => {
     if (!dateString) return 'לא זמין';
