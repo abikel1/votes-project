@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { login, loginSuccess } from '../../slices/authSlice';
-import { useNavigate, useLocation, Link } from 'react-router-dom'; // הוספתי Link מכאן
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 import '../Register/RegisterPage.css';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 
@@ -18,8 +18,8 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
 
   const params = new URLSearchParams(location.search);
-  const redirect = params.get('redirect');              // ← נקבל redirect אם קיים
-  const fallbackAfterLogin = '/groups';                 // יעד ברירת מחדל סביר
+  const redirect = params.get('redirect');
+  const fallbackAfterLogin = '/groups';
 
   const handleFocus = (field) => setErrors(prev => ({ ...prev, [field]: null }));
 
@@ -81,7 +81,7 @@ export default function LoginPage() {
     </div>
   );
 
-  // ✅ קישור Google צריך לשמר redirect קדימה (כדי שנחזור ל-join אחר כך)
+  // ✅ קישור Google שומר redirect קדימה (כדי שנחזור ל-join אחר כך)
   const googleHref = (() => {
     const base = 'http://localhost:3000/api/users/google';
     return redirect ? `${base}?redirect=${encodeURIComponent(redirect)}` : base;
@@ -110,6 +110,12 @@ export default function LoginPage() {
         </a>
 
         <Link to="/forgot-password">שכחתי סיסמה?</Link>
+
+        {/* למטה: "אם לא נרשמת – הירשם" */}
+        <div className="bottom-cta" style={{ marginTop: 16, textAlign: 'center' }}>
+          <span>עדיין לא נרשמת? </span>
+          <Link to="/register" className="register-link">הירשם</Link>
+        </div>
       </form>
     </div>
   );
