@@ -326,14 +326,21 @@ export default function GroupsPage() {
               <div className="groups-card-header">
                 <h3 className="groups-card-title">{g.name}</h3>
                 <div className="groups-card-badges">
-                  {isLocked && (
-                    <img 
-                      src="/src/assets/icons/padlock.png" 
-                      alt="נעול" 
-                      className="groups-badge-locked"
-                      title="קבוצה נעולה"
-                    />
-                  )}
+{isLocked && (
+  <div style={{ position: 'relative', display: 'inline-block' }}>
+    <img 
+      src="/src/assets/icons/padlock.png" 
+      alt="נעול" 
+      className="groups-badge-locked"
+      title="קבוצה נעולה"
+    />
+    <span 
+      className={`groups-lock-status ${isMember || isOwner ? 'member' : 'not-member'}`}
+      title={isMember || isOwner ? 'מחוברת' : 'לא מחוברת'}
+    />
+  </div>
+)}
+
                   {isOwner && (
                     <button 
                       className="groups-settings-btn" 
