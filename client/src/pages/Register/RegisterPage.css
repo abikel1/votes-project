@@ -176,7 +176,7 @@ h1 { font-size: 23px; text-align: center; }
   color: #a10000;            /* אדום כהה */
   font-size: 0.85rem;
   padding: 4px 8px;
-  border-radius: 4px;
+  /* border-radius: 4px; */
   text-align: center;
   pointer-events: none;      /* שהשגיאה לא תפריע להקלדה */
   z-index: 5;
@@ -205,9 +205,34 @@ h1 { font-size: 23px; text-align: center; }
   margin-bottom: 6px;
   background-color: #ffd6d6;
   color: #a10000;
-  border-radius: 6px;
+  /* border-radius: 6px; */
   font-size: 0.85rem;
   text-align: center;   /* טקסט במרכז */
 }
 
 
+/* גורם גם לקישורים עם מחלקה google-btn להיראות בדיוק כמו הכפתור */
+a.btn.google-btn,
+.btn.google-btn {
+  margin-top: 7px;
+  display: block;
+  width: 100%;
+  padding: 14px 16px;
+  background: transparent;
+  color: #003366;
+  font-weight: bold;
+  font-family: 'Rubik', sans-serif;
+  letter-spacing: .1em;
+  font-size: 16px;
+  text-align: center;
+  border: none;
+  cursor: pointer;
+  text-decoration: none; /* מסיר קו תחתון */
+  transition: all 0.3s ease;
+}
+
+a.btn.google-btn:hover,
+.btn.google-btn:hover {
+  background-color: #003366;
+  color: #ffffff;
+}

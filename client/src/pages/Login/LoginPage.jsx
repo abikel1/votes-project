@@ -105,11 +105,15 @@ export default function LoginPage() {
         </button>
 
         {/* כפתור התחברות עם גוגל – שומר redirect */}
-        <a href={googleHref}>
-          <button type="button" className="btn google-btn">התחבר עם Google</button>
-        </a>
+    {/* כפתור התחברות עם גוגל – שומר redirect */}
+<a href={googleHref}>
+  <button type="button" className="btn google-btn">התחבר עם Google</button>
+</a>
 
-        <Link to="/forgot-password">שכחתי סיסמה?</Link>
+{/* שכחתי סיסמה */}
+<Link to="/forgot-password" className="btn google-btn">שכחתי סיסמה?</Link>
+
+     
       </form>
     </div>
   );
