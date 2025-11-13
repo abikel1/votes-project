@@ -27,41 +27,37 @@ function generateToken(user) {
 
 
 async function register({ firstName, lastName, email, phone, city, address, password }) {
-    // בדיקה אם המייל כבר קיים
-    const exists = await User.findOne({ email });
-    if (exists) throw Object.assign(new Error('המייל קיים כבר'), { status: 409 });
+  const exists = await User.findOne({ email });
+  // if (exists) {
+  //   const err = new Error('המייל קיים כבר');
+  //   err.status = 409; // Conflict
+  //   throw err;       // ❌ לא res.status
 
-    // הצפנת סיסמה
-    const passwordHash = await bcrypt.hash(password, 12);
-// <<<<<<< HEAD
-//     const user = await User.create({
-//         name, email, address, phone, passwordHash,
-//         joinedGroups: [], createdGroups: [], voteHistory: []
-//     });
-// =======
-// >>>>>>> a1c83c8d2145ebf88aa769ba8d04af15a79010c3
 
-    // יצירת המשתמש במסד
-    const user = await User.create({
-        firstName,
-        lastName,
-        email,
-        phone,
-        city: city || '', // ← ודאי שיש ערך
-        address, // הכתובת שמתקבלת מהלקוח
-        passwordHash,
-        joinedGroups: [],
-        createdGroups: [],
-        voteHistory: []
-    });
+  // }
+if (exists) throw { status: 409, errors: { email: 'המייל כבר קיים' } };
 
-    // יצירת טוקן
-    // const token = generateToken(user._id);
-    const token = generateToken(user);
 
-    const { passwordHash: _pwd, ...safe } = user.toObject();
-    return { token, user: safe };
+  const passwordHash = await bcrypt.hash(password, 12);
+
+  const user = await User.create({
+    firstName,
+    lastName,
+    email,
+    phone,
+    city: city || '',
+    address,
+    passwordHash,
+    joinedGroups: [],
+    createdGroups: [],
+    voteHistory: []
+  });
+
+  const token = generateToken(user);
+  const { passwordHash: _pwd, ...safe } = user.toObject();
+  return { token, user: safe };
 }
+
 
 
 async function login({ email, password }) {
