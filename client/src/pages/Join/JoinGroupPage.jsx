@@ -4,6 +4,8 @@ import { useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
 import http from '../../api/http';
 
+const lc = (s) => (s || '').trim().toLowerCase();
+
 export default function JoinGroupPage() {
   const { groupId } = useParams();
   const navigate = useNavigate();
@@ -12,6 +14,7 @@ export default function JoinGroupPage() {
   const { userId, userEmail } = useSelector(s => s.auth || {});
 
   const [groupName, setGroupName] = useState('');
+  const [group, setGroup] = useState(null);
   const [loading, setLoading] = useState(true);
 
   // מודאלים
@@ -25,15 +28,20 @@ export default function JoinGroupPage() {
   // למניעת שליחה כפולה
   const postedOnceRef = useRef(false);
 
-  // טוען שם קבוצה לתצוגה במודאל
+  // טוען מידע על קבוצה ומחזיר את האובייקט
   const loadGroupInfo = useCallback(async () => {
     try {
       const { data } = await http.get(`/groups/${groupId}`);
+      setGroup(data || null);
       setGroupName(data?.name || '');
+      setError('');
+      return data;
     } catch (e) {
+      const msg = e?.response?.data?.message || 'קבוצה לא נמצאה';
+      setGroup(null);
       setGroupName('');
-      // אם לא קיימת קבוצה – אפשר להציג שגיאה ולהחזיר לרשימה
-      setError(e?.response?.data?.message || 'קבוצה לא נמצאה');
+      setError(msg);
+      return null;
     }
   }, [groupId]);
 
@@ -80,15 +88,17 @@ export default function JoinGroupPage() {
   // זרימה ראשית
   useEffect(() => {
     (async () => {
-      await loadGroupInfo();
+      setLoading(true);
 
-      // אם יש שגיאה בטעינת הקבוצה — עוצרים
-      if (error) {
+      // 1) טוענים מידע על הקבוצה
+      const g = await loadGroupInfo();
+      if (!g) {
+        // קבוצה לא נמצאה / שגיאה – אין טעם להמשיך
         setLoading(false);
         return;
       }
 
-      // לא מחובר/ת? נבקש התחברות
+      // 2) אם לא מחובר/ת – מבקשים להתחבר
       const loggedIn = !!(userId || userEmail);
       if (!loggedIn) {
         setShowLoginPrompt(true);
@@ -96,12 +106,47 @@ export default function JoinGroupPage() {
         return;
       }
 
-      // מחובר/ת → שולחים בקשה (פעם אחת)
+      // 3) בדיקת בעלות – אם זה המנהל, אין טעם בבקשה → ישר לעמוד הקבוצה
+      const myEmailLc = lc(userEmail);
+      const createdByEmailLc = lc(
+        g.createdBy ||
+        g.created_by ||
+        g.ownerEmail ||
+        g.owner
+      );
+
+      const isOwnerByEmail =
+        myEmailLc && createdByEmailLc && myEmailLc === createdByEmailLc;
+
+      const isOwnerById =
+        userId && g.createdById && String(userId) === String(g.createdById);
+
+      const isOwner = !!(isOwnerByEmail || isOwnerById || g.isOwner);
+
+      if (isOwner) {
+        navigate(`/groups/${groupId}`, { replace: true });
+        setLoading(false);
+        return;
+      }
+
+      // 4) בודקים מול השרת אם המשתמש כבר חבר בקבוצה
+      try {
+        const { data: mem } = await http.get(`/groups/${groupId}/my-membership`);
+        if (mem?.member) {
+          // כבר חבר/ה → הולכים ישר לעמוד הקבוצה
+          navigate(`/groups/${groupId}`, { replace: true });
+          setLoading(false);
+          return;
+        }
+      } catch (err) {
+        // אם נכשל (401/403 וכו') לא עוצרים – פשוט נעבור למסלול בקשת הצטרפות
+      }
+
+      // 5) אם הגענו לכאן → לא מנהל/ת, לא חבר/ה → שולחים בקשת הצטרפות
       await sendJoinRequest();
     })();
-    // שימי לב: לא נשים 'error' בתלות כדי לא ליצור לולאה, נבדוק אותו מיד אחרי הטעינה
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [userId, userEmail, loadGroupInfo, sendJoinRequest]);
+  }, [userId, userEmail, loadGroupInfo, sendJoinRequest, groupId, navigate]);
 
   const goLogin = () => {
     const redirect = encodeURIComponent(`/join/${groupId}`);

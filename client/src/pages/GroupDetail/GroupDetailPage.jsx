@@ -82,6 +82,7 @@ export default function GroupDetailPage() {
     name: c.name.length > 12 ? c.name.substring(0, 12) + '...' : c.name,
     votesCount: c.votesCount || 0
   }));
+const maxVotes = Math.max(...candidates.map(c => c.votesCount || 0));
 
   return (
     <div className="page-wrap dashboard">
@@ -122,6 +123,7 @@ export default function GroupDetailPage() {
 
             {!loadingCandidates && candidates.length > 0 && (
               <div className="candidates-grid">
+{/* <<<<<<< HEAD
                 {sortedCandidates.map((c, idx) => (
                   <div key={c._id} className={`candidate-card ${idx === 0 && totalVotes > 0 ? 'leader' : ''}`}>
                     {idx === 0 && totalVotes > 0 && <div className="current-leader">🏆</div>}
@@ -133,13 +135,43 @@ export default function GroupDetailPage() {
                         👤
                       </div>
                     )}
+======= */}
+             {sortedCandidates.map((c, idx) => {
+  const isLeader = (c.votesCount || 0) === maxVotes && totalVotes > 0;
+  return (
+    <div
+      key={c._id}
+      className={`candidate-card ${isLeader ? 'leader' : ''}`}
+    >
+      {isLeader && <div className="current-leader">🏆</div>}
 
-                    <h4>{c.name}</h4>
-                    {c.symbol && <span className="candidate-symbol">{c.symbol}</span>}
-                    {c.description && <p>{c.description}</p>}
-                    <div className="votes-count">{c.votesCount || 0} קולות</div>
-                  </div>
-                ))}
+      {c.photoUrl ? (
+        <img src={c.photoUrl} alt={c.name} className="candidate-photo" />
+      ) : (
+        <div
+          className="candidate-photo"
+          style={{
+            background: '#dbeafe',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: '30px',
+            color: '#1e40af'
+          }}
+        >
+          👤
+        </div>
+      )}
+
+      <h4>{c.name}</h4>
+      {c.symbol && <span className="candidate-symbol">{c.symbol}</span>}
+      {c.description && <p>{c.description}</p>}
+      <div className="votes-count">{c.votesCount || 0} קולות</div>
+    </div>
+  );
+})}
+{/* >>>>>>> 935e0f75da9f80fa48db560fe4f01336571ed266 */}
+
               </div>
             )}
 
