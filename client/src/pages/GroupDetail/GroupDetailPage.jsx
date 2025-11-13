@@ -93,9 +93,9 @@ const maxVotes = Math.max(...candidates.map(c => c.votesCount || 0));
 
       <div className="meta-and-button">
         <div className="group-meta">
-          <div><span className="meta-label">📅 תאריך יצירה:</span><span className="meta-value">{formatDate(group.creationDate)}</span></div>
-          <div><span className="meta-label">⏰ תאריך סיום:</span><span className="meta-value">{formatDate(group.endDate)}</span></div>
-          <div><span className="meta-label">🗳️ סך הצבעות:</span><span className="meta-value">{totalVotes}</span></div>
+          <div><span className="meta-label"> תאריך יצירה:</span><span className="meta-value">{formatDate(group.creationDate)}</span></div>
+          <div><span className="meta-label">תאריך סיום:</span><span className="meta-value">{formatDate(group.endDate)}</span></div>
+          <div><span className="meta-label">סך הצבעות:</span><span className="meta-value">{totalVotes}</span></div>
         </div>
 
         <button
@@ -109,7 +109,7 @@ const maxVotes = Math.max(...candidates.map(c => c.votesCount || 0));
             navigate(`/groups/${groupId}/candidates`);
           }}
         >
-          🗳️ לכו להצביע
+           להצבעה בקלפי
         </button>
       </div>
 
@@ -123,19 +123,7 @@ const maxVotes = Math.max(...candidates.map(c => c.votesCount || 0));
 
             {!loadingCandidates && candidates.length > 0 && (
               <div className="candidates-grid">
-{/* <<<<<<< HEAD
-                {sortedCandidates.map((c, idx) => (
-                  <div key={c._id} className={`candidate-card ${idx === 0 && totalVotes > 0 ? 'leader' : ''}`}>
-                    {idx === 0 && totalVotes > 0 && <div className="current-leader">🏆</div>}
 
-                    {c.photoUrl ? (
-                      <img src={c.photoUrl} alt={c.name} className="candidate-photo" />
-                    ) : (
-                      <div className="candidate-photo" style={{ background: '#dbeafe', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '30px', color: '#1e40af' }}>
-                        👤
-                      </div>
-                    )}
-======= */}
              {sortedCandidates.map((c, idx) => {
   const isLeader = (c.votesCount || 0) === maxVotes && totalVotes > 0;
   return (
@@ -143,7 +131,13 @@ const maxVotes = Math.max(...candidates.map(c => c.votesCount || 0));
       key={c._id}
       className={`candidate-card ${isLeader ? 'leader' : ''}`}
     >
-      {isLeader && <div className="current-leader">🏆</div>}
+      {isLeader && <div className="current-leader">
+          <img 
+      src="/src/assets/icons/trophy.png" 
+      alt="נעול" 
+      className="groups-badge-locked"
+      title="קבוצה נעולה"
+    /></div>}
 
       {c.photoUrl ? (
         <img src={c.photoUrl} alt={c.name} className="candidate-photo" />
@@ -187,7 +181,7 @@ const maxVotes = Math.max(...candidates.map(c => c.votesCount || 0));
           {!loadingCandidates && candidates.length > 0 && totalVotes > 0 ? (
             <div className="charts">
               <div className="pie-chart-container">
-                <h3>📊 אחוזי הצבעה</h3>
+                <h3> אחוזי הצבעה</h3>
                 <div className="chart-wrapper">
                   <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
@@ -203,7 +197,7 @@ const maxVotes = Math.max(...candidates.map(c => c.votesCount || 0));
               </div>
 
               <div className="bar-chart-container">
-                <h3>📈 מספר קולות</h3>
+                <h3> מספר קולות</h3>
                 <div className="chart-wrapper">
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart data={barData} margin={{ top: 5, right: 10, left: 0, bottom: 35 }}>
