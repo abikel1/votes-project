@@ -112,7 +112,15 @@ export default function GroupsPage() {
 
     if (loading) return <div className="loading-wrap">טוען קבוצות...</div>;
     if (err) return <div className="error">{err}</div>;
-    if (!groups?.length) return <div className="empty">אין קבוצות עדיין.</div>;
+    if (!groups?.length) return <div className="empty">אין קבוצות עדיין.
+
+        <button
+            className="add-group-btn"
+            onClick={() => navigate('/groups/create')}
+        >
+            <img src="/src/assets/icons/new-folder.png" alt="+" className="plus-icon" />
+            יצירת קבוצה חדשה
+        </button></div>;
 
     const myEmail = lc(authEmail) || lc(localStorage.getItem('userEmail'));
     const myId = String(authId ?? localStorage.getItem('userId') ?? '');
@@ -153,13 +161,13 @@ export default function GroupsPage() {
     return (
         <div className="page-wrap">
 
-                   <button
-                    className="add-group-btn"
-                    onClick={() => navigate('/groups/create')}
-                >
-                    <img src="/src/assets/icons/new-folder.png" alt="+" className="plus-icon" />
-                    יצירת קבוצה חדשה
-                </button>
+            <button
+                className="add-group-btn"
+                onClick={() => navigate('/groups/create')}
+            >
+                <img src="/src/assets/icons/new-folder.png" alt="+" className="plus-icon" />
+                יצירת קבוצה חדשה
+            </button>
 
             {/* 🎛️ סרגל חיפוש + סינון + מיון */}
             <div className="top-bar">
