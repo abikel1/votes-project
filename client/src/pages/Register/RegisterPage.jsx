@@ -55,7 +55,7 @@ const PasswordField = ({ placeholder, value, onChange, onFocus, error }) => {
             </svg>
           ) : (
             <svg width="22" height="22" viewBox="0 0 24 24">
-              <path d="M2 5.27 3.28 4 20 20.72 18.73 22l-2.63-2.63A12.5 12.5 0 0 1 12 19C6.5 19 2.5 14.5 2 12c.2-1 1-2.5 2.37-4.06L2 5.27zM12 5c5.5 0 9.5 4.5 10 7-.13.63-.58 1.6-1.36 2.67L18.3 13.3A5 5 0 0 0 12 7c-.65 0-1.27.12-1.84.33L8.46 5.63C9.55 5.2 10.74 5 12 5z"/>
+              <path d="M2 5.27 3.28 4 20 20.72 18.73 22l-2.63-2.63A12.5 12.5 0 0 1 12 19C6.5 19 2.5 14.5 2 12c.2-1 1-2.5 2.37-4.06L2 5.27zM12 5c5.5 0 9.5 4.5 10 7-.13.63-.58 1.6-1.36 2.67L18.3 13.3A5 5 0 0 0 12 7c-.65 0-1.27.12-1.84.33L8.46 5.63C9.55 5.2 10.74 5 12 5z" />
             </svg>
           )}
         </button>
@@ -84,62 +84,81 @@ export default function RegisterPage() {
   });
 
   const [errors, setErrors] = useState({});
-  const passwordsMismatch = form.confirmPassword && form.confirmPassword !== form.password;
+  const passwordsMismatch =
+    form.confirmPassword && form.confirmPassword !== form.password;
+
+    useEffect(() => {
+    if (form.confirmPassword && form.password && form.confirmPassword !== form.password) {
+      setErrors((e) => ({ ...e, confirmPassword: 'הסיסמאות אינן תואמות' }));
+    } else {
+      setErrors((e) => ({ ...e, confirmPassword: undefined }));
+    }
+  }, [form.password, form.confirmPassword]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     console.log('Submitting form...', form);
+   const newErrors = {};
+  const passwordsMismatch =
+    form.confirmPassword && form.confirmPassword !== form.password;
 
-    const newErrors = {};
+  if (form.firstName.trim().length < 2)
+    newErrors.firstName = 'שם פרטי חייב לפחות 2 תווים';
+  if (form.lastName.trim().length < 2)
+    newErrors.lastName = 'שם משפחה חייב לפחות 2 תווים';
+  if (!/^\S+@\S+\.\S+$/.test(form.email))
+    newErrors.email = 'אימייל לא תקין';
+  if (form.password.length < 6)
+    newErrors.password = 'סיסמה חייבת לפחות 6 תווים';
+  if (form.phone && !/^[\d+\-\s()]{6,20}$/.test(form.phone))
+    newErrors.phone = 'טלפון לא תקין';
+  if (!form.city) newErrors.city = 'עיר חובה';
+  if (!form.address) newErrors.address = 'כתובת חובה';
 
-    if (form.firstName.trim().length < 2) newErrors.firstName = 'שם פרטי חייב לפחות 2 תווים';
-    if (form.lastName.trim().length < 2) newErrors.lastName = 'שם משפחה חייב לפחות 2 תווים';
-    if (!/^\S+@\S+\.\S+$/.test(form.email)) newErrors.email = 'אימייל לא תקין';
-    if (form.password.length < 6) newErrors.password = 'סיסמה חייבת לפחות 6 תווים';
-    if (form.phone && !/^[\d+\-\s()]{6,20}$/.test(form.phone)) newErrors.phone = 'טלפון לא תקין';
-    if (!form.city) newErrors.city = 'עיר חובה';
-    if (!form.address) newErrors.address = 'כתובת חובה';
-    if (passwordsMismatch) newErrors.confirmPassword = 'הסיסמאות אינן תואמות';
+  // 🟡 עכשיו זה יעבוד:
+  if (passwordsMismatch)
+    newErrors.confirmPassword = 'הסיסמאות אינן תואמות';
 
-    if (Object.keys(newErrors).length) {
-      console.log('Client-side validation errors:', newErrors);
-      return setErrors(newErrors);
-    }
+  if (Object.keys(newErrors).length) {
+    setErrors(newErrors);
+    return;
+  }
+
 
     setErrors({});
     const { confirmPassword, ...payload } = form;
 
-try {
-  const result = await dispatch(register(payload)).unwrap();
-  console.log('Registration success:', result);
+    try {
+      const result = await dispatch(register(payload)).unwrap();
+      console.log('Registration success:', result);
 
-  // נווט ל-login מיד אחרי שההרשמה הצליחה
-  navigate('/login');
-} catch (err) {
-  console.log('Registration error from server:', err);
+      // נווט ל-login מיד אחרי שההרשמה הצליחה
+      navigate('/login');
+    } catch (err) {
+      console.log('Registration error from server:', err);
 
-  const apiErrors = {};
+      const apiErrors = {};
 
-  if (err?.errors) {
-    Object.keys(err.errors).forEach((key) => {
-      apiErrors[key] = err.errors[key];
-    });
-  } else if (err?.response?.data) {
-    const data = err.response.data;
-    if (data.errors) {
-      Object.keys(data.errors).forEach((key) => {
-        apiErrors[key] = data.errors[key];
-      });
-    } else if (data.message) {
-      apiErrors.form = data.message;
+      if (err?.errors) {
+        Object.keys(err.errors).forEach((key) => {
+          apiErrors[key] = err.errors[key];
+        });
+      } else if (err?.response?.data) {
+        const data = err.response.data;
+        if (data.errors) {
+          Object.keys(data.errors).forEach((key) => {
+            apiErrors[key] = data.errors[key];
+          });
+        } else if (data.message) {
+          apiErrors.form = data.message;
+        }
+      } else if (err?.message) apiErrors.form = err.message;
+      else if (typeof err === 'string') apiErrors.form = err;
+else apiErrors.email = 'מייל זה קיים במערכת';
+
+      console.log('Mapped errors:', apiErrors);
+      setErrors(apiErrors);
     }
-  } else if (err?.message) apiErrors.form = err.message;
-  else if (typeof err === 'string') apiErrors.form = err;
-  else apiErrors.form = ' מייל זה קיים במערכת';
-
-  console.log('Mapped errors:', apiErrors);
-  setErrors(apiErrors);
-}
 
 
   };
@@ -187,7 +206,10 @@ try {
         <InputField
           placeholder="*טלפון"
           value={form.phone}
-          onChange={(val) => setForm((f) => ({ ...f, phone: val }))}
+          onChange={(val) => {
+            setForm((f) => ({ ...f, phone: val }));
+            if (errors.phone) setErrors((e) => ({ ...e, phone: undefined }));
+          }}
           onFocus={() => setErrors((e) => ({ ...e, phone: undefined }))}
           error={errors.phone}
         />
