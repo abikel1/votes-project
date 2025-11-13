@@ -30,7 +30,7 @@ export default function LoginPage() {
     return newErrors;
   };
 
-  // ✅ חזרה מ־OAuth: אם קיבלנו token+email בפרמטרים, להתחבר ולנווט ל-redirect אם קיים
+  // ✅ חזרה מ־OAuth עם token+email → להתחבר ולנווט
   useEffect(() => {
     const token = params.get('token');
     const email = params.get('email');
@@ -41,6 +41,17 @@ export default function LoginPage() {
       navigate(redirect ? decodeURIComponent(redirect) : fallbackAfterLogin, { replace: true });
     }
   }, [params, dispatch, navigate, redirect]);
+
+  // ✅ פלבק: חזרנו מגוגל בלי token אבל עם email → להפנות להרשמה עם אימייל ממולא
+  useEffect(() => {
+    const token = params.get('token');
+    const email = params.get('email');
+    const from = params.get('from'); // במקרה שהשרת החזיר ?from=google
+    if (!token && email && (from === 'google' || true)) {
+      const extra = redirect ? `&redirect=${encodeURIComponent(redirect)}` : '';
+      navigate(`/register?email=${encodeURIComponent(email)}${extra}`, { replace: true });
+    }
+  }, [params, navigate, redirect]);
 
   const submit = async (e) => {
     e.preventDefault();
@@ -53,7 +64,6 @@ export default function LoginPage() {
 
     try {
       await dispatch(login(form)).unwrap();
-      // ✅ אחרי התחברות – לנווט בחזרה ל-redirect אם יש, אחרת לרשימת הקבוצות
       navigate(redirect ? decodeURIComponent(redirect) : fallbackAfterLogin, { replace: true });
     } catch (err) {
       setErrors(err || { form: 'אירעה שגיאה' });
@@ -81,7 +91,7 @@ export default function LoginPage() {
     </div>
   );
 
-  // ✅ קישור Google שומר redirect קדימה (כדי שנחזור ל-join אחר כך)
+  // ✅ קישור Google שומר redirect קדימה
   const googleHref = (() => {
     const base = 'http://localhost:3000/api/users/google';
     return redirect ? `${base}?redirect=${encodeURIComponent(redirect)}` : base;
@@ -104,14 +114,13 @@ export default function LoginPage() {
           <span className="text">{loading ? '...' : 'התחבר'}</span>
         </button>
 
-        {/* כפתור התחברות עם גוגל – שומר redirect */}
+        {/* התחברות עם גוגל */}
         <a href={googleHref}>
           <button type="button" className="btn google-btn">התחבר עם Google</button>
         </a>
 
         <Link to="/forgot-password">שכחתי סיסמה?</Link>
 
-        {/* למטה: "אם לא נרשמת – הירשם" */}
         <div className="bottom-cta" style={{ marginTop: 16, textAlign: 'center' }}>
           <span>עדיין לא נרשמת? </span>
           <Link to="/register" className="register-link">הירשם</Link>

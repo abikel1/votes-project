@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { register } from '../../slices/authSlice';
 import CityStreetAuto from '../../components/CityStreetAuto';
 import './RegisterPage.css';
@@ -55,7 +55,7 @@ const PasswordField = ({ placeholder, value, onChange, onFocus, error }) => {
             </svg>
           ) : (
             <svg width="22" height="22" viewBox="0 0 24 24">
-              <path d="M2 5.27 3.28 4 20 20.72 18.73 22l-2.63-2.63A12.5 12.5 0 0 1 12 19C6.5 19 2.5 14.5 2 12c.2-1 1-2.5 2.37-4.06L2 5.27zM12 5c5.5 0 9.5 4.5 10 7-.13.63-.58 1.6-1.36 2.67L18.3 13.3A5 5 0 0 0 12 7c-.65 0-1.27.12-1.84.33L8.46 5.63C9.55 5.2 10.74 5 12 5z" />
+              <path d="M2 5.27 3.28 4 20 20.72 18.73 22l-2.63-2.63A12.5 12.5 0 0 1 12 19C6.5 19 2.5 14.5 2 12c.2-1 1-2.5 2.37-4.06L2 5.27zM12 5c5.5 0 9.5 4.5 10 7-.13.63-.58 1.6-1.36 2.67L18.3 13.3A5 5 0 0 0 12 7c-.65 0-1.27.12-1.84.33L8.46 5.63C9.55 5.2 10.74 5 12 5z"/>
             </svg>
           )}
         </button>
@@ -70,6 +70,7 @@ const PasswordField = ({ placeholder, value, onChange, onFocus, error }) => {
 export default function RegisterPage() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const location = useLocation();
   const { loading, registeredOk } = useSelector((s) => s.auth);
 
   const [form, setForm] = useState({
@@ -87,7 +88,20 @@ export default function RegisterPage() {
   const passwordsMismatch =
     form.confirmPassword && form.confirmPassword !== form.password;
 
-    useEffect(() => {
+  // ✅ כניסה להרשמה מגוגל/עם אימייל → מנקים token וממלאים אימייל
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const email = params.get('email') || '';
+    const from = params.get('from') || '';
+    if (email) {
+      setForm((f) => ({ ...f, email }));
+    }
+    if (email || from === 'google') {
+      localStorage.removeItem('token');
+    }
+  }, [location.search]);
+
+  useEffect(() => {
     if (form.confirmPassword && form.password && form.confirmPassword !== form.password) {
       setErrors((e) => ({ ...e, confirmPassword: 'הסיסמאות אינן תואמות' }));
     } else {
@@ -97,48 +111,40 @@ export default function RegisterPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Submitting form...', form);
-   const newErrors = {};
-  const passwordsMismatch =
-    form.confirmPassword && form.confirmPassword !== form.password;
+    const newErrors = {};
+    const passwordsMismatchNow =
+      form.confirmPassword && form.confirmPassword !== form.password;
 
-  if (form.firstName.trim().length < 2)
-    newErrors.firstName = 'שם פרטי חייב לפחות 2 תווים';
-  if (form.lastName.trim().length < 2)
-    newErrors.lastName = 'שם משפחה חייב לפחות 2 תווים';
-  if (!/^\S+@\S+\.\S+$/.test(form.email))
-    newErrors.email = 'אימייל לא תקין';
-  if (form.password.length < 6)
-    newErrors.password = 'סיסמה חייבת לפחות 6 תווים';
-  if (form.phone && !/^[\d+\-\s()]{6,20}$/.test(form.phone))
-    newErrors.phone = 'טלפון לא תקין';
-  if (!form.city) newErrors.city = 'עיר חובה';
-  if (!form.address) newErrors.address = 'כתובת חובה';
+    if (form.firstName.trim().length < 2)
+      newErrors.firstName = 'שם פרטי חייב לפחות 2 תווים';
+    if (form.lastName.trim().length < 2)
+      newErrors.lastName = 'שם משפחה חייב לפחות 2 תווים';
+    if (!/^\S+@\S+\.\S+$/.test(form.email))
+      newErrors.email = 'אימייל לא תקין';
+    if (form.password.length < 6)
+      newErrors.password = 'סיסמה חייבת לפחות 6 תווים';
+    if (form.phone && !/^[\d+\-\s()]{6,20}$/.test(form.phone))
+      newErrors.phone = 'טלפון לא תקין';
+    if (!form.city) newErrors.city = 'עיר חובה';
+    if (!form.address) newErrors.address = 'כתובת חובה';
+    if (passwordsMismatchNow)
+      newErrors.confirmPassword = 'הסיסמאות אינן תואמות';
 
-  // 🟡 עכשיו זה יעבוד:
-  if (passwordsMismatch)
-    newErrors.confirmPassword = 'הסיסמאות אינן תואמות';
-
-  if (Object.keys(newErrors).length) {
-    setErrors(newErrors);
-    return;
-  }
-
+    if (Object.keys(newErrors).length) {
+      setErrors(newErrors);
+      return;
+    }
 
     setErrors({});
     const { confirmPassword, ...payload } = form;
 
     try {
-      const result = await dispatch(register(payload)).unwrap();
-      console.log('Registration success:', result);
-
-      // נווט ל-login מיד אחרי שההרשמה הצליחה
-      navigate('/login');
+      await dispatch(register(payload)).unwrap();
+      const params = new URLSearchParams(location.search);
+      const after = params.get('redirect');
+      navigate(after ? decodeURIComponent(after) : '/login');
     } catch (err) {
-      console.log('Registration error from server:', err);
-
       const apiErrors = {};
-
       if (err?.errors) {
         Object.keys(err.errors).forEach((key) => {
           apiErrors[key] = err.errors[key];
@@ -154,21 +160,22 @@ export default function RegisterPage() {
         }
       } else if (err?.message) apiErrors.form = err.message;
       else if (typeof err === 'string') apiErrors.form = err;
-else apiErrors.email = 'מייל זה קיים במערכת';
+      else apiErrors.email = 'מייל זה קיים במערכת';
 
-      console.log('Mapped errors:', apiErrors);
       setErrors(apiErrors);
     }
-
-
   };
 
   useEffect(() => {
     if (registeredOk) {
-      const t = setTimeout(() => navigate('/login'), 1500);
+      const t = setTimeout(() => {
+        const params = new URLSearchParams(location.search);
+        const after = params.get('redirect');
+        navigate(after ? decodeURIComponent(after) : '/login');
+      }, 1500);
       return () => clearTimeout(t);
     }
-  }, [registeredOk, navigate]);
+  }, [registeredOk, navigate, location.search]);
 
   return (
     <div className="form-container">
