@@ -100,24 +100,52 @@ async function getUsersBatch(ids = []) {
 }
 
 async function updateProfile(userId, updates) {
-    const allowedFields = ['firstName', 'lastName', 'email', 'phone', 'city', 'address', 'password'];
-    const dataToUpdate = {};
+  const allowedFields = ['firstName', 'lastName', 'email', 'phone', 'city', 'address', 'password'];
+  const dataToUpdate = {};
 
-    for (let key of allowedFields) {
-        if (updates[key] !== undefined) {
-            if (key === 'password') {
-                dataToUpdate.passwordHash = await bcrypt.hash(updates.password, 12);
-            } else {
-                dataToUpdate[key] = updates[key];
-            }
-        }
+  // ✅ אם מעדכנים אימייל – לבדוק אם קיים למשתמש אחר
+  if (updates.email !== undefined && updates.email !== null) {
+    const trimmedEmail = updates.email.trim();
+    if (trimmedEmail) {
+      const existing = await User.findOne({
+        email: trimmedEmail,
+        _id: { $ne: userId }  // לא אותו משתמש
+      });
+
+      if (existing) {
+        const err = new Error('Email already exists');
+        err.status = 409;
+        err.errors = { email: 'המייל כבר קיים במערכת' };
+        throw err;
+      }
+
+      dataToUpdate.email = trimmedEmail;
     }
+  }
 
-    const user = await User.findByIdAndUpdate(userId, dataToUpdate, { new: true }).select('-passwordHash');
-    if (!user) throw Object.assign(new Error('User not found'), { status: 404 });
+  // שאר השדות
+  for (let key of allowedFields) {
+    if (key === 'email') continue; // כבר טיפלנו למעלה
 
-    return user;
+    if (updates[key] !== undefined) {
+      if (key === 'password') {
+        dataToUpdate.passwordHash = await bcrypt.hash(updates.password, 12);
+      } else {
+        dataToUpdate[key] = updates[key];
+      }
+    }
+  }
+
+  const user = await User.findByIdAndUpdate(userId, dataToUpdate, { new: true }).select('-passwordHash');
+  if (!user) {
+    const err = new Error('User not found');
+    err.status = 404;
+    throw err;
+  }
+
+  return user;
 }
+
 
 module.exports = {
     register, login, getProfile, listUsers,

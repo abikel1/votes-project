@@ -53,13 +53,16 @@ exports.listUsers = async (_req, res) => {
 
 // ✅ חדש: עדכון פרופיל
 exports.updateProfile = async (req, res) => {
-    try {
-        const updatedUser = await userService.updateProfile(req.user._id, req.body);
-        res.json(updatedUser);
-    } catch (err) {
-        res.status(err.status || 500).json({ message: err.message || 'Server error' });
-    }
+  try {
+    const updatedUser = await userService.updateProfile(req.user._id, req.body);
+    res.json(updatedUser);
+  } catch (err) {
+    console.log('updateProfile error:', err);
+    const errors = err.errors || { form: err.message || 'Server error' };
+    res.status(err.status || 500).json({ errors });
+  }
 };
+
 
 // ✅ חדש: שליפת משתמש לפי id
 exports.getUserById = async (req, res) => {
