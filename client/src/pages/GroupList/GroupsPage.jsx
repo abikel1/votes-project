@@ -158,6 +158,8 @@ export default function GroupsPage() {
           return isMember;
         case 'owned':
           return isOwner;
+           case 'expired':  // <— כאן
+    return new Date(g.endDate) < new Date();
         default:
           return true;
       }
@@ -218,6 +220,17 @@ export default function GroupsPage() {
                   <input type="radio" name="filter" value="owned" checked={filter === 'owned'} onChange={(e) => setFilter(e.target.value)} />
                   קבוצות שאני מנהלת
                 </label>
+                <label>
+  <input 
+    type="radio" 
+    name="filter" 
+    value="expired" 
+    checked={filter === 'expired'} 
+    onChange={(e) => setFilter(e.target.value)} 
+  />
+  קבוצות שהסתיימו
+</label>
+
               </div>
             )}
 
