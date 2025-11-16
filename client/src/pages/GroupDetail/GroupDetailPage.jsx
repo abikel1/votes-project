@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
+import { HiClock, HiUserGroup, HiUser, HiOutlineBadgeCheck } from 'react-icons/hi';
 
 import {
   fetchMyGroups,
@@ -38,6 +39,7 @@ export default function GroupDetailPage() {
 
   const { userEmail: authEmail, userId: authId } = useSelector((s) => s.auth);
   const isAuthed = !!authId || !!authEmail || !!localStorage.getItem('authToken');
+  const iconColor = "#1e3a8a"; // צבע אחיד לכל האייקונים
 
   const myJoinedIdsSet = useSelector(selectMyJoinedIds);
 
@@ -203,68 +205,90 @@ export default function GroupDetailPage() {
         <div className="right-section" style={{ width: `${100 - leftWidth}%` }}>
 
           {!isExpired && (
-            <div className="group-details">
+            <div className="group-details-card">
 
-              {/* תיאור הקבוצה */}
-              <div className="group-description">
-                <h3>תיאור הקבוצה</h3>
-                <p>{group?.description || "אין תיאור לקבוצה הזו."}</p>
+              {/* כותרת ותיאור */}
+              <div className="group-header">
+                <h2>{group.name}</h2>
+                <p>{group.description || "אין תיאור לקבוצה הזו."}</p>
               </div>
 
+              {/* רשת מידע עם אייקונים */}
+              <div className="group-info-grid">
+                <div className="info-card">
+                  <HiClock size={28} color="#1e3a8a" />
+                  <p>זמן עד סיום</p>
+                  <h4>{Math.max(Math.floor((new Date(group.endDate) - new Date()) / (1000 * 60 * 60 * 24)), 0)} ימים</h4>
+                </div>
+                <div className="info-card">
+                  <HiUserGroup size={28} color="#1e3a8a" />
+                  <p>סך הצבעות</p>
+                  <h4>{totalVotes}</h4>
+                </div>
+                <div className="info-card">
+                  <HiUser size={28} color="#1e3a8a" />
+                  <p>מספר מועמדים</p>
+                  <h4>{candidates.length}</h4>
+                </div>
+                <div className="info-card">
+                  <HiOutlineBadgeCheck size={28} color="#1e3a8a" />
+                  <p>מספר מקומות לזוכים</p>
+                  <h4>{group.maxWinners}</h4>
+                </div>
+              </div>
 
-
-              {/* כפתור מעבר לעמוד הסקר */}
+              {/* כפתור מעבר לסקר */}
               <button
                 className="go-to-survey-btn"
                 onClick={() => navigate(`/groups/${groupId}/candidates`)}
               >
-                עבור לסקר
+                עבור להצבעה
               </button>
 
             </div>
           )}
-
-
-          {/* אחרי סיום — מציג גרפים */}
+          {/* גרפים לאחר סיום */}
           {isExpired && totalVotes > 0 && (
             <div className="charts">
               <div className="pie-chart-container">
                 <h3>אחוזי הצבעה</h3>
-                <div className="chart-wrapper">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <PieChart>
-                      <Pie data={pieData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius="60%">
-                        {pieData.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
-                      </Pie>
-                      <Tooltip formatter={(v) => `${v} קולות`} />
-                      <Legend verticalAlign="bottom" height={25} />
-                    </PieChart>
-                  </ResponsiveContainer>
-                </div>
+                <ResponsiveContainer width="100%" height={250}>
+                  <PieChart>
+                    <Pie data={pieData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius="80%">
+                      {pieData.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
+                    </Pie>
+                    <Tooltip formatter={(v) => `${v} קולות`} />
+                    <Legend verticalAlign="bottom" height={25} />
+                  </PieChart>
+                </ResponsiveContainer>
               </div>
 
               <div className="bar-chart-container">
                 <h3>מספר קולות</h3>
-                <div className="chart-wrapper">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={barData}>
-                      <XAxis dataKey="name" angle={-45} textAnchor="end" height={50} interval={0} />
-                      <YAxis />
-                      <Tooltip formatter={(v) => `${v} קולות`} />
-                      <Bar dataKey="votesCount" fill="#003366" />
-                    </BarChart>
-                  </ResponsiveContainer>
-                </div>
+                <ResponsiveContainer width="100%" height={250}>
+                  <BarChart data={barData}>
+                    <XAxis dataKey="name" angle={-45} textAnchor="end" height={50} interval={0} />
+                    <YAxis />
+                    <Tooltip formatter={(v) => `${v} קולות`} />
+                    <Bar dataKey="votesCount" fill="#003366" />
+                  </BarChart>
+                </ResponsiveContainer>
               </div>
             </div>
           )}
 
+          {/* הודעה אם אין הצבעות */}
           {isExpired && totalVotes === 0 && (
             <div className="no-votes-message">
               🕐 אין הצבעות — לא ניתן להציג גרפים
             </div>
           )}
         </div>
+
+
+
+
+
       </div>
     </div>
   );
