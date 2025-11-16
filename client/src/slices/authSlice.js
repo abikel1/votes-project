@@ -176,6 +176,9 @@ const authSlice = createSlice({
       state.error = null;
       state.updateErrors = null;
     },
+    clearMessage(state) {
+      state.message = null;
+    },
 
     logout(state) {
       state.token = null;
@@ -183,6 +186,11 @@ const authSlice = createSlice({
       state.lastName = null;
       state.userId = null;
       state.userEmail = null;
+
+      state.user = null;
+      state.error = null;
+      state.updateErrors = null;
+      state.message = '';
 
       localStorage.removeItem('token');
       localStorage.removeItem('firstName');
@@ -350,5 +358,5 @@ const authSlice = createSlice({
   }
 });
 
-export const { logout, loginSuccess, clearError } = authSlice.actions;
+export const { logout, loginSuccess, clearError, clearMessage } = authSlice.actions;
 export default authSlice.reducer;
