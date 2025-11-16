@@ -160,7 +160,6 @@ export default function GroupDetailPage() {
               <div className="candidates-grid">
 
                 {sortedCandidates.map((c) => {
-                  const isLeader = (c.votesCount || 0) === maxVotes && totalVotes > 0;
                   const isWinner = winners.some((w) => w._id === c._id);
 
                   return (
@@ -168,24 +167,26 @@ export default function GroupDetailPage() {
                       key={c._id}
                       className={`candidate-card ${isWinner ? "winner" : ""}`}
                     >
-                    {isExpired && isWinner && (
-  <div className="current-leader">
-    <img src="/src/assets/icons/trophy.png" className="groups-badge-locked" />
-  </div>
-)}
 
+                      {/* גביע יוצג רק אם הסתיים */}
+                      {isExpired && isWinner && (
+                        <div className="current-leader">
+                          <img src="/src/assets/icons/trophy.png" className="groups-badge-locked" />
+                        </div>
+                      )}
 
                       <h4>{c.name}</h4>
                       {c.description && <p>{c.description}</p>}
 
-                      {isExpired && totalVotes === 0 && (
-
+                      {/* מספר קולות יוצג לכל מועמד רק אם הסתיים */}
+                      {isExpired && (
                         <div className="votes-count">{c.votesCount || 0} קולות</div>
-
                       )}
+
                     </div>
                   );
                 })}
+
               </div>
             )}
 
