@@ -270,11 +270,20 @@
   font-weight: 500;
 }
 
-.groups-card-date-expired .groups-card-date-label,
+/* .groups-card-date-expired .groups-card-date-label,
 .groups-card-date-expired .groups-card-date-value {
   color: #bbb;
   text-decoration: line-through;
+} */
+
+.groups-card-date-expired-text {
+  color: #b70000;
+  font-weight: 3500;
+  margin-top: 10px;
+    font-size: 11px;
+
 }
+
 
 /* פעולות בכרטיס */
 .groups-card-actions {
