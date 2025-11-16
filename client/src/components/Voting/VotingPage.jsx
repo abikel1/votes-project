@@ -285,9 +285,9 @@ export default function VotingDragPage() {
                 <img src={selectedCandidate.photoUrl} alt={selectedCandidate.name} />
               </div>
             )}
-            <div className="vd-modal-votes">
+            {/* <div className="vd-modal-votes">
               קולות: <strong>{selectedCandidate.votesCount ?? 0}</strong>
-            </div>
+            </div> */}
           </div>
         </div>
       )}
