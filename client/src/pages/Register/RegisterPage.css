@@ -104,13 +104,30 @@ h1 { font-size: 23px; text-align: center; }
 .password-field input { padding-left: 46px; }   /* מקום לעין משמאל */
 
 .eye-btn{
-  position:absolute; left:10px; top:50%; transform:translateY(-50%);
-  background:transparent; border:none; cursor:pointer;
-  z-index:3; padding:0; line-height:0; display:flex; align-items:center; justify-content:center;
-  color:#003366; opacity:.6; transition:opacity .2s ease;
+  position:absolute;
+  left:10px;
+  top:50%;
+  transform:translateY(-50%);
+  background:transparent;
+  border:none;
+  cursor:pointer;
+  z-index:3;
+  padding:0;
+  line-height:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:#777;              /* 👈 אפור */
+  opacity:.8;
+  transition:opacity .2s ease;
 }
 .eye-btn:hover{ opacity:1; }
-.eye-btn svg { fill:#003366; }
+
+/* ה־svg לוקח את הצבע מה־color */
+.eye-btn svg {
+  fill: currentColor;
+}
+
 
 /* שורה בטופס: מחזיקה הודעת שגיאה מעל הקובייה והקובייה עצמה */
 .form-row { margin: 0 0 24px; }
@@ -181,21 +198,28 @@ h1 { font-size: 23px; text-align: center; }
   pointer-events: none;      /* שהשגיאה לא תפריע להקלדה */
   z-index: 5;
 }
-/* כפתור עין בתוך שדה הסיסמה */
 .block-cube.block-input .password-toggle {
   position: absolute;
   top: 50%;
-  left: 12px;          /* מיקום בצד ימין */
+  left: 12px;
   transform: translateY(-50%);
   cursor: pointer;
-  color: #003366;
+  color: #777;         /* 👈 אותו אפור כמו בהרשמה */
   font-size: 1rem;
   z-index: 10;
+  opacity: .8;
+  transition: opacity .2s ease;
 }
 
 .block-cube.block-input .password-toggle:hover {
-  color: #0077cc;
+  opacity: 1;
 }
+
+/* גם כאן ה־svg יקבל את הצבע מה־color */
+.block-cube.block-input .password-toggle svg {
+  fill: currentColor;
+}
+
 
 /* הודעת שגיאה בתוך התיבה */
 .msg.error {
@@ -236,3 +260,5 @@ a.btn.google-btn:hover,
   background-color: #003366;
   color: #ffffff;
 }
+
+

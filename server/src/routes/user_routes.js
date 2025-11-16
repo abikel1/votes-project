@@ -18,44 +18,51 @@ router.get('/google', (req, res, next) => {
   })(req, res, next);
 });
 
+/* ===== Google callback חדש ===== */
 router.get('/google/callback', (req, res, next) => {
-  passport.authenticate('google', { session: false }, (err, user, info) => {
-    if (err) {
-      console.error('Google OAuth error:', err);
+  passport.authenticate('google', { session: false }, (err, result, info) => {
+    if (err || !result) {
+      console.error('Google OAuth error:', err || info);
       return res.redirect(`${FRONT}/login?oauth=failed`);
     }
-    const stateRedirect = req.query.state ? decodeURIComponent(req.query.state) : '';
 
-    if (user && user.existing) {
-      const { token, user: u } = user;
-      const extra = stateRedirect ? `&redirect=${encodeURIComponent(stateRedirect)}` : '';
-      return res.redirect(
-        `${FRONT}/login?token=${encodeURIComponent(token)}&email=${encodeURIComponent(u.email)}${extra}`
-      );
-    }
+    const stateRedirect = req.query.state
+      ? decodeURIComponent(req.query.state)
+      : '';
 
-    // משתמש לא קיים או חשבון לא הושלם → להפנות ל-/register עם אימייל ממולא
-    const email = info?.prefill?.email || '';
-    const firstName = info?.prefill?.firstName || '';
-    const lastName = info?.prefill?.lastName || '';
-    const qs = new URLSearchParams({
-      email,
-      ...(firstName ? { firstName } : {}),
-      ...(lastName ? { lastName } : {}),
-      from: info?.reason || 'google',
-      ...(stateRedirect ? { redirect: stateRedirect } : {}),
-    }).toString();
+    const { token, user } = result;
+    const extra = stateRedirect
+      ? `&redirect=${encodeURIComponent(stateRedirect)}`
+      : '';
 
-    return res.redirect(`${FRONT}/register?${qs}`);
+    return res.redirect(
+      `${FRONT}/login?token=${encodeURIComponent(token)}&email=${encodeURIComponent(
+        user.email
+      )}${extra}`
+    );
   })(req, res, next);
 });
 
 router.post('/register', validate(schemas.register), ctrl.register);
 router.post('/login', validate(schemas.login), ctrl.login);
 router.get('/me', auth, ctrl.getProfile);
-router.patch('/me', auth, ctrl.updateProfile);
-router.get('/', ctrl.listUsers);
+
+router.patch(
+  '/me',
+  auth,
+  validate(schemas.updateProfile),
+  ctrl.updateProfile
+);
+
+router.post(
+  '/me/password',
+  auth,
+  validate(schemas.changePassword),
+  ctrl.changePassword
+);
+
+router.get('/',      ctrl.listUsers);
 router.get('/batch', ctrl.getUsersBatch);
-router.get('/:id', ctrl.getUserById);
+router.get('/:id',   ctrl.getUserById);
 
 module.exports = router;

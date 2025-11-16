@@ -135,6 +135,25 @@ export const resetPassword = createAsyncThunk(
   }
 );
 
+export const changePassword = createAsyncThunk(
+  'auth/changePassword',
+  async ({ currentPassword, newPassword }, { rejectWithValue }) => {
+    try {
+      const { data } = await http.post('/users/me/password', {
+        currentPassword,
+        newPassword,
+      });
+      return data.message || 'הסיסמה עודכנה בהצלחה';
+    } catch (err) {
+      const serverErrors = err?.response?.data?.errors;
+      if (serverErrors) return rejectWithValue(serverErrors);
+      const msg = err?.response?.data?.message || 'Change password failed';
+      return rejectWithValue({ form: msg });
+    }
+  }
+);
+
+
 /** ===== Slice ===== */
 const authSlice = createSlice({
   name: 'auth',
@@ -312,7 +331,22 @@ const authSlice = createSlice({
       .addCase(resetPassword.rejected, (s, a) => {
         s.loading = false;
         s.error = a.payload;
-      });
+      })
+      // שינוי סיסמה
+      .addCase(changePassword.pending, (s) => {
+        // לא נוגעים ב-loading כדי שהעמוד לא "יטען מחדש"
+        s.updateErrors = null;   // ✅ לנקות שגיאות קודמות מהשרת
+        s.message = '';
+      })
+      .addCase(changePassword.fulfilled, (s, a) => {
+        s.updateErrors = null;
+        s.message = a.payload;   // 'הסיסמה עודכנה בהצלחה.'
+      })
+      .addCase(changePassword.rejected, (s, a) => {
+        s.updateErrors = a.payload || { form: 'Change password failed' };
+      })
+
+
   }
 });
 
