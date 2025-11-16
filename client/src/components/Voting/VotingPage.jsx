@@ -88,13 +88,13 @@ export default function VotingDragPage() {
       })).unwrap();
 
       if (userId) {
-        localStorage.setItem(`voted:${groupId}:${userId}`, '1');
+        // localStorage.setItem(`voted:${groupId}:${userId}`, '1');
       }
       await dispatch(fetchCandidatesByGroup(groupId));
     } catch (err) {
       const msg = String(err || '');
       if (msg.includes('already voted') || msg.includes('כבר הצבעת')) {
-        if (userId) localStorage.setItem(`voted:${groupId}:${userId}`, '1');
+        // if (userId) localStorage.setItem(`voted:${groupId}:${userId}`, '1');
       } else {
         alert('שגיאה בהצבעה: ' + msg);
       }
