@@ -15,7 +15,7 @@ export default function CreateGroupPage() {
     description: '',
     endDate: '',
     maxWinners: 1,
-    isLocked: null, // חובה לבחור
+    isLocked: false, // false = פתוחה, true = נעולה
   });
 
   const [showModal, setShowModal] = useState(false);
@@ -32,16 +32,15 @@ export default function CreateGroupPage() {
     }));
   };
 
-  const onChangeLock = (e) => {
-    const v = e.target.value; // 'open' | 'locked'
-    setForm((prev) => ({ ...prev, isLocked: v === 'locked' }));
+  const toggleLock = () => {
+    setForm(prev => ({ ...prev, isLocked: !prev.isLocked }));
   };
 
   const onSubmit = (e) => {
     e.preventDefault();
     if (!form.name.trim()) return alert('שם קבוצה חובה');
+    if (!form.description.trim()) return alert('תיאור חובה');
     if (!form.endDate) return alert('תאריך סיום חובה');
-    if (form.isLocked === null) return alert('בחרי אם הקבוצה פתוחה או נעולה');
 
     const payload = {
       name: form.name.trim(),
@@ -60,7 +59,6 @@ export default function CreateGroupPage() {
   };
 
   const origin = typeof window !== 'undefined' ? window.location.origin : '';
-  // קישור יחיד: פתוחה → /groups/:id ; נעולה → /join/:id
   const shareUrl = selectedGroup?._id
     ? `${origin}${selectedGroup.isLocked ? `/join/${selectedGroup._id}` : `/groups/${selectedGroup._id}`}`
     : '';
@@ -68,7 +66,6 @@ export default function CreateGroupPage() {
   const finishToGroup = () => {
     setShowModal(false);
     dispatch(clearCreateState());
-    // מעבר לעמוד הקבוצה שנוצרה (גם אם נעולה – את היוצרת אז יש לך גישה)
     if (selectedGroup?._id) navigate(`/groups/${selectedGroup._id}`);
     else navigate('/groups');
   };
@@ -84,8 +81,15 @@ export default function CreateGroupPage() {
         </label>
 
         <label className="cg-label">
-          תיאור
-          <textarea className="cg-input" rows={3} name="description" value={form.description} onChange={onChange} />
+          תיאור *
+          <textarea
+            className="cg-input"
+            rows={3}
+            name="description"
+            value={form.description}
+            onChange={onChange}
+            required
+          />
         </label>
 
         <label className="cg-label">
@@ -95,36 +99,28 @@ export default function CreateGroupPage() {
 
         <label className="cg-label">
           מקסימום זוכים
-          <input className="cg-input" type="number" min={1} name="maxWinners" value={form.maxWinners} onChange={onChange} />
+          <input
+            className="cg-input"
+            type="number"
+            min={1}
+            max={10}
+            name="maxWinners"
+            value={form.maxWinners}
+            onChange={onChange}
+          />
         </label>
 
-        <fieldset className="cg-fieldset">
-          <legend className="cg-legend">מצב קבוצה *</legend>
-          <div className="cg-radio-row">
-            <label className="cg-radio">
-              <input
-                type="radio"
-                name="lockState"
-                value="open"
-                checked={form.isLocked === false}
-                onChange={onChangeLock}
-                required
-              />
-              פתוחה (קישור לעמוד הקבוצה)
+        <div className="cg-label">
+          מצב קבוצה *
+          <div className="switch-container">
+            <span>פתוחה</span>
+            <label className="switch">
+              <input type="checkbox" checked={form.isLocked} onChange={toggleLock} />
+              <span className="slider round"></span>
             </label>
-            <label className="cg-radio" style={{ marginInlineStart: 16 }}>
-              <input
-                type="radio"
-                name="lockState"
-                value="locked"
-                checked={form.isLocked === true}
-                onChange={onChangeLock}
-                required
-              />
-              🔒 נעולה (הקישור ידרוש התחברות לשם בקשת הצטרפות)
-            </label>
+            <span>נעולה </span>
           </div>
-        </fieldset>
+        </div>
 
         {createError && <div className="cg-error">{createError}</div>}
 
@@ -138,7 +134,6 @@ export default function CreateGroupPage() {
         </div>
       </form>
 
-      {/* מודאל קישור יחיד אחרי יצירה */}
       {showModal && selectedGroup?._id && (
         <div className="modal-backdrop" onClick={() => setShowModal(false)}>
           <div className="modal" onClick={(e) => e.stopPropagation()}>
