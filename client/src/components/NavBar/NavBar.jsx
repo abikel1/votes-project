@@ -43,7 +43,13 @@ const NavBar = () => {
         )}
       </div>
 
-      <div className="site-name">בחירות</div>
+<div 
+  className="site-name" 
+  onClick={() => navigate('/')} 
+  style={{ cursor: 'pointer' }} // מציג שהאלמנט לחיץ
+>
+  בחירות
+</div>
     </nav>
   );
 };
