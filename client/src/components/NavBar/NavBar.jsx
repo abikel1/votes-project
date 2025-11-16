@@ -32,7 +32,8 @@ const NavBar = () => {
         {/* קישורים שמוצגים לכולם */}
         <Link to="/">בית</Link>
         <Link to="/groups">קבוצות</Link>
-
+ <Link to="/about">אודות</Link>
+  <Link to="/user-guide">מדריך למשתמש</Link>
         {/* כפתור או קישור לפי מצב ההתחברות */}
         {isAuthed ? (
           <button type="button" className="logout-btn" onClick={onLogout}>
