@@ -358,7 +358,7 @@ export default function GroupsPage() {
              <div className="groups-card-footer">
   {isExpired ? (
     <div className="groups-card-date-expired-text">
-      התאריך עבר — לצפייה בתוצאות
+     תקופת ההצבעה הסתיימה — לצפייה בתוצאות
     </div>
   ) : (
     <div className="groups-card-date">
