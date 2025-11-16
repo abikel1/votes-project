@@ -73,6 +73,24 @@ export default function GroupsPage() {
   }, [dispatch, isAuthed]);
 
   useEffect(() => {
+  const handleClickOutside = (e) => {
+    // אם הקליק על כפתור סינון או מיון – לא לסגור
+    if (
+      e.target.closest('.groups-control-btn') || 
+      e.target.closest('.groups-dropdown')
+    ) return;
+
+    // אם אחד מהתפריטים פתוח – סוגרים אותם
+    if (showFilters) setShowFilters(false);
+    if (showSort) setShowSort(false);
+  };
+
+  document.addEventListener('click', handleClickOutside);
+  return () => document.removeEventListener('click', handleClickOutside);
+}, [showFilters, showSort]);
+
+
+  useEffect(() => {
     if (!isAuthed) return;
 
     const refresh = () => {
@@ -279,7 +297,7 @@ export default function GroupsPage() {
               return;
             }
             dispatch(clearRemovedNotice(gid));
-            dispatch(requestJoinGroup(gid)).unwrap().catch(() => {});
+            dispatch(requestJoinGroup(gid)).unwrap().catch(() => { });
           };
 
           const onCardClick = async () => {
@@ -295,7 +313,7 @@ export default function GroupsPage() {
                   navigate(`/groups/${gid}`);
                   return;
                 }
-              } catch {}
+              } catch { }
               alert('עדיין אינך מחוברת לקבוצה. הבקשה בהמתנה לאישור מנהלת.');
               return;
             }
@@ -326,25 +344,25 @@ export default function GroupsPage() {
               <div className="groups-card-header">
                 <h3 className="groups-card-title">{g.name}</h3>
                 <div className="groups-card-badges">
-{isLocked && (
-  <div style={{ position: 'relative', display: 'inline-block' }}>
-    <img 
-      src="/src/assets/icons/padlock.png" 
-      alt="נעול" 
-      className="groups-badge-locked"
-      title="קבוצה נעולה"
-    />
-    <span 
-      className={`groups-lock-status ${isMember || isOwner ? 'member' : 'not-member'}`}
-      title={isMember || isOwner ? 'מחוברת' : 'לא מחוברת'}
-    />
-  </div>
-)}
+                  {isLocked && (
+                    <div style={{ position: 'relative', display: 'inline-block' }}>
+                      <img
+                        src="/src/assets/icons/padlock.png"
+                        alt="נעול"
+                        className="groups-badge-locked"
+                        title="קבוצה נעולה"
+                      />
+                      <span
+                        className={`groups-lock-status ${isMember || isOwner ? 'member' : 'not-member'}`}
+                        title={isMember || isOwner ? 'מחוברת' : 'לא מחוברת'}
+                      />
+                    </div>
+                  )}
 
                   {isOwner && (
-                    <button 
-                      className="groups-settings-btn" 
-                      onClick={goSettings} 
+                    <button
+                      className="groups-settings-btn"
+                      onClick={goSettings}
                       title="הגדרות קבוצה"
                     >
                       <img src="/src/assets/icons/settings.png" alt="הגדרות" />
@@ -355,18 +373,18 @@ export default function GroupsPage() {
 
               {g.description && <p className="groups-card-desc">{g.description}</p>}
 
-             <div className="groups-card-footer">
-  {isExpired ? (
-    <div className="groups-card-date-expired-text">
-     תקופת ההצבעה הסתיימה — לצפייה בתוצאות
-    </div>
-  ) : (
-    <div className="groups-card-date">
-      <span className="groups-card-date-label">תאריך סיום:</span>
-      <span className="groups-card-date-value">{formatDate(g.endDate)}</span>
-    </div>
-  )}
-</div>
+              <div className="groups-card-footer">
+                {isExpired ? (
+                  <div className="groups-card-date-expired-text">
+                    תקופת ההצבעה הסתיימה — לצפייה בתוצאות
+                  </div>
+                ) : (
+                  <div className="groups-card-date">
+                    <span className="groups-card-date-label">תאריך סיום:</span>
+                    <span className="groups-card-date-value">{formatDate(g.endDate)}</span>
+                  </div>
+                )}
+              </div>
 
 
               {/* מצב נעולה ולא חברה */}
