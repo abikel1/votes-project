@@ -355,12 +355,19 @@ export default function GroupsPage() {
 
               {g.description && <p className="groups-card-desc">{g.description}</p>}
 
-              <div className="groups-card-footer">
-                <div className={`groups-card-date ${isExpired ? 'groups-card-date-expired' : ''}`}>
-                  <span className="groups-card-date-label">תאריך סיום:</span>
-                  <span className="groups-card-date-value">{formatDate(g.endDate)}</span>
-                </div>
-              </div>
+             <div className="groups-card-footer">
+  {isExpired ? (
+    <div className="groups-card-date-expired-text">
+      התאריך עבר — לצפייה בתוצאות
+    </div>
+  ) : (
+    <div className="groups-card-date">
+      <span className="groups-card-date-label">תאריך סיום:</span>
+      <span className="groups-card-date-value">{formatDate(g.endDate)}</span>
+    </div>
+  )}
+</div>
+
 
               {/* מצב נעולה ולא חברה */}
               {!isOwner && isLocked && (
