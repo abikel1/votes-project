@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { fetchProfile, updateProfile } from '../../slices/authSlice';
+import { fetchProfile, updateProfile, changePassword, clearError } from '../../slices/authSlice';
 import './ProfilePage.css';
 import { useNavigate } from 'react-router-dom';
 import CityStreetAuto from '../../components/CityStreetAuto';
@@ -11,6 +11,7 @@ export default function ProfilePage() {
   const user = useSelector((state) => state.auth.user);
   const loading = useSelector((state) => state.auth.loading);
   const updateErrors = useSelector((state) => state.auth.updateErrors); // שגיאות עדכון מה־slice
+  const message = useSelector((state) => state.auth.message);           // הודעת הצלחה כללית
   const [userGroups, setUserGroups] = useState({ created: [], joined: [] });
   const navigate = useNavigate();
 
@@ -24,6 +25,13 @@ export default function ProfilePage() {
     city: '',
     address: ''
   });
+
+  // 🔐 שינוי סיסמה – סטייטים
+  const [editPasswordMode, setEditPasswordMode] = useState(false);
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirm, setConfirm] = useState('');
+  const [pwErrors, setPwErrors] = useState({}); // שגיאות מקומיות: current/new/confirm
 
   useEffect(() => {
     if (!user && token) {
@@ -49,6 +57,17 @@ export default function ProfilePage() {
     }
   }, [user, token]);
 
+  // 💡 ולידציה "חיה" לאימות סיסמה – בדיוק כמו בהרשמה
+  useEffect(() => {
+    setPwErrors((prev) => ({
+      ...prev,
+      confirm:
+        confirm && newPassword && confirm !== newPassword
+          ? 'הסיסמאות אינן תואמות'
+          : undefined,
+    }));
+  }, [newPassword, confirm]);
+
   if (loading || !user) {
     return <p style={{ textAlign: 'center', marginTop: '50px' }}>טוען פרופיל...</p>;
   }
@@ -58,8 +77,6 @@ export default function ProfilePage() {
   };
 
   const handleSave = async () => {
-    const originalEmail = user.email; // לשחזור במקרה של שגיאה
-
     const payload = {
       ...formData,
       firstName: formData.firstName.trim(),
@@ -72,18 +89,64 @@ export default function ProfilePage() {
 
     try {
       await dispatch(updateProfile(payload)).unwrap();
-      // הצלחה – יוצאים ממצב עריכה, הנתונים בעמוד יתעדכנו מה־store
       setEditMode(false);
     } catch (err) {
       console.log('updateProfile error (client):', err);
-      const errors = err || {};
-      // לא סוגרים editMode – שהשגיאה תוצג בעמוד
     }
   };
+
+const handleChangePassword = async () => {
+  const localErrs = {};
+
+  if (!currentPassword) {
+    localErrs.currentPassword = 'יש להזין סיסמה נוכחית';
+  }
+
+  if (!newPassword) {
+    localErrs.newPassword = 'יש להזין סיסמה חדשה';
+  } else if (newPassword === currentPassword) {
+    localErrs.newPassword = 'הסיסמה החדשה חייבת להיות שונה מהסיסמה הנוכחית';
+  }
+
+  if (confirm && confirm !== newPassword) {
+    localErrs.confirm = 'הסיסמאות אינן תואמות';
+  }
+
+  if (Object.keys(localErrs).length) {
+    setPwErrors(localErrs);   // נשארים בדף, בלי שליחת בקשה
+    return;
+  }
+
+  // ✅ אין שגיאות מקומיות – מנקים ומתקדמים
+  setPwErrors({});
+  dispatch(clearError());     // ✅ לנקות updateErrors מהניסיון הקודם
+
+  try {
+    await dispatch(
+      changePassword({ currentPassword, newPassword })
+    ).unwrap();
+
+    setCurrentPassword('');
+    setNewPassword('');
+    setConfirm('');
+    setEditPasswordMode(false);
+  } catch (err) {
+    console.log('changePassword error (client):', err);
+    // השגיאות מהשרת יישבו ב-updateErrors ויוצגו מתחת לשדות
+  }
+};
+
 
   return (
     <div className="profile-container">
       <h1>הפרופיל שלי</h1>
+
+      {/* ✅ הודעת הצלחה גלובלית – למשל אחרי שינוי סיסמה */}
+      {message && (
+        <div className="top-msg success" style={{ marginBottom: 10 }}>
+          {message}
+        </div>
+      )}
 
       <div className="profile-top">
         <div className="profile-avatar">
@@ -103,6 +166,7 @@ export default function ProfilePage() {
                 </div>
               )}
 
+              {/* שם פרטי */}
               <p>
                 <strong>שם פרטי:</strong>{' '}
                 <input
@@ -110,7 +174,17 @@ export default function ProfilePage() {
                   value={formData.firstName}
                   onChange={handleChange}
                 />
+                {updateErrors?.firstName && (
+                  <span
+                    className="field-error"
+                    style={{ color: 'red', marginRight: 8 }}
+                  >
+                    {updateErrors.firstName}
+                  </span>
+                )}
               </p>
+
+              {/* שם משפחה */}
               <p>
                 <strong>שם משפחה:</strong>{' '}
                 <input
@@ -118,7 +192,17 @@ export default function ProfilePage() {
                   value={formData.lastName}
                   onChange={handleChange}
                 />
+                {updateErrors?.lastName && (
+                  <span
+                    className="field-error"
+                    style={{ color: 'red', marginRight: 8 }}
+                  >
+                    {updateErrors.lastName}
+                  </span>
+                )}
               </p>
+
+              {/* אימייל */}
               <p>
                 <strong>אימייל:</strong>{' '}
                 <input
@@ -126,7 +210,6 @@ export default function ProfilePage() {
                   value={formData.email}
                   onChange={handleChange}
                 />
-                {/* הודעת שגיאה ליד שדה האימייל */}
                 {updateErrors?.email && (
                   <span
                     className="field-error"
@@ -136,6 +219,8 @@ export default function ProfilePage() {
                   </span>
                 )}
               </p>
+
+              {/* טלפון */}
               <p>
                 <strong>טלפון:</strong>{' '}
                 <input
@@ -143,6 +228,14 @@ export default function ProfilePage() {
                   value={formData.phone}
                   onChange={handleChange}
                 />
+                {updateErrors?.phone && (
+                  <span
+                    className="field-error"
+                    style={{ color: 'red', marginRight: 8 }}
+                  >
+                    {updateErrors.phone}
+                  </span>
+                )}
               </p>
 
               <p style={{ borderBottom: 'none' }}>
@@ -195,6 +288,97 @@ export default function ProfilePage() {
             </>
           )}
         </div>
+      </div>
+
+      {/* 🔐 שינוי סיסמה */}
+      <div className="change-password-section">
+        {editPasswordMode ? (
+          <div className="change-password-box">
+            <h3>שינוי סיסמה</h3>
+
+            {/* שגיאה כללית מהשרת (אם יש) */}
+            {updateErrors?.form && (
+              <div className="error" style={{ color: 'red', marginBottom: 8 }}>
+                {updateErrors.form}
+              </div>
+            )}
+
+            <p>
+              <strong>סיסמה נוכחית:</strong>{' '}
+              <input
+                type="password"
+                value={currentPassword}
+                onChange={(e) => setCurrentPassword(e.target.value)}
+              />
+              {(pwErrors.currentPassword || updateErrors?.currentPassword) && (
+                <span
+                  className="field-error"
+                  style={{ color: 'red', marginRight: 8 }}
+                >
+                  {pwErrors.currentPassword || updateErrors.currentPassword}
+                </span>
+              )}
+            </p>
+
+            <p>
+              <strong>סיסמה חדשה:</strong>{' '}
+              <input
+                type="password"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+              />
+              {(pwErrors.newPassword || updateErrors?.newPassword) && (
+                <span
+                  className="field-error"
+                  style={{ color: 'red', marginRight: 8 }}
+                >
+                  {pwErrors.newPassword || updateErrors.newPassword}
+                </span>
+              )}
+            </p>
+
+            <p>
+              <strong>אימות סיסמה חדשה:</strong>{' '}
+              <input
+                type="password"
+                value={confirm}
+                onChange={(e) => setConfirm(e.target.value)}
+              />
+              {pwErrors.confirm && (
+                <span
+                  className="field-error"
+                  style={{ color: 'red', marginRight: 8 }}
+                >
+                  {pwErrors.confirm}
+                </span>
+              )}
+            </p>
+
+            <button className="edit-btn save" onClick={handleChangePassword}>
+              שמירת סיסמה חדשה
+            </button>
+            <button
+              className="edit-btn cancel"
+              onClick={() => {
+                setEditPasswordMode(false);
+                setCurrentPassword('');
+                setNewPassword('');
+                setConfirm('');
+                setPwErrors({});
+              }}
+            >
+              ביטול
+            </button>
+          </div>
+        ) : (
+          <button
+            className="edit-btn"
+            style={{ marginTop: '20px' }}
+            onClick={() => setEditPasswordMode(true)}
+          >
+            שינוי סיסמה
+          </button>
+        )}
       </div>
 
       <div className="profile-groups">
