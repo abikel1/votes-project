@@ -238,21 +238,25 @@ const authSlice = createSlice({
         s.loading = true;
         s.error = null;
       })
-      .addCase(login.fulfilled, (s, a) => {
-        s.loading = false;
-        s.token = a.payload.token;
-        s.userId = a.payload.user?._id ?? null;
-        s.userEmail = a.payload.user?.email ?? null;
+     .addCase(login.fulfilled, (s, a) => {
+    s.loading = false;
+    s.token = a.payload.token;
 
-        s.firstName = a.payload.user?.firstName ?? null;
-        s.lastName = a.payload.user?.lastName ?? null;
+    const user = a.payload.user ?? {};
+    s.user = user; // ✅ חשוב!
 
-        localStorage.setItem('token', s.token);
-        if (s.firstName) localStorage.setItem('firstName', s.firstName);
-        if (s.lastName) localStorage.setItem('lastName', s.lastName);
-        if (s.userId) localStorage.setItem('userId', s.userId);
-        if (s.userEmail) localStorage.setItem('userEmail', s.userEmail);
-      })
+    s.userId = user._id ?? null;
+    s.userEmail = user.email ?? null;
+    s.firstName = user.firstName ?? null;
+    s.lastName = user.lastName ?? null;
+
+    localStorage.setItem('token', s.token);
+    if (s.firstName) localStorage.setItem('firstName', s.firstName);
+    if (s.lastName) localStorage.setItem('lastName', s.lastName);
+    if (s.userId) localStorage.setItem('userId', s.userId);
+    if (s.userEmail) localStorage.setItem('userEmail', s.userEmail);
+})
+
       .addCase(login.rejected, (s, a) => {
         s.loading = false;
         s.error = a.payload;
