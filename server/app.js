@@ -12,7 +12,7 @@ const mailRoutes = require('./src/routes/mail_routes');
 const authRoutes = require('./src/routes/auth_routes');
 
 // ⬅️ חדש: רוט להעלאות
-const uploadRoutes = require('./src/routes/upload_routes');
+const uploadRoutes = require('./src/routes/upload_router');
 
 const app = express();
 

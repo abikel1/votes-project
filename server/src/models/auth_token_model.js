@@ -5,7 +5,12 @@ const AuthTokenSchema = new Schema({
   tokenHash: { type: String, unique: true, index: true, required: true },
   type: { type: String, enum: ['password_reset', 'email_verify', 'magic_link'], required: true },
   usedAt: Date,
-  expiresAt: { type: Date, index: true },
+  // ⬅️ expiresAt מקבל ברירת מחדל של 10 דקות קדימה
+  expiresAt: {
+    type: Date,
+    index: true,
+    default: () => new Date(Date.now() + 24 * 60 * 60 * 1000), // 24 שעות
+  },
   createdByIP: String,
 }, { timestamps: true });
 
