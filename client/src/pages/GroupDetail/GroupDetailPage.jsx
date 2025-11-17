@@ -238,12 +238,12 @@ export default function GroupDetailPage() {
               </div>
 
               {/* כפתור מעבר לסקר */}
-              {/* <button
+              <button
                 className="go-to-survey-btn"
                 onClick={() => navigate(`/groups/${groupId}/candidates`)}
               >
                 עבור להצבעה
-              </button> */}
+              </button>
 
             </div>
           )}
