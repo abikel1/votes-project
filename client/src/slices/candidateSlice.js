@@ -29,6 +29,19 @@ export const createCandidate = createAsyncThunk(
   }
 );
 
+// עדכון מועמד קיים
+export const updateCandidate = createAsyncThunk(
+  'candidates/update',
+  async ({ candidateId, groupId, patch }, { rejectWithValue }) => {
+    try {
+      const { data } = await http.put(`/candidates/${candidateId}`, patch);
+      return { groupId, candidate: data };
+    } catch (err) {
+      return rejectWithValue(err?.response?.data?.message || 'Failed to update candidate');
+    }
+  }
+);
+
 // מחיקת מועמד
 export const deleteCandidate = createAsyncThunk(
   'candidates/delete',
@@ -50,9 +63,12 @@ const candidateSlice = createSlice({
     errorByGroup: {},      // { [groupId]: string|null }
     creating: false,
     createError: null,
+
+    updatingById: {},      // { [candidateId]: boolean }
+    updateErrorById: {},   // { [candidateId]: string|null }
   },
   reducers: {
-    // ⬅️ חדש: אינקרמנט/דקרמנט אופטימי
+    // ⬅️ אינקרמנט/דקרמנט אופטימי לדוגמה להצבעות
     optimisticIncVote: (s, { payload }) => {
       const { groupId, candidateId, delta = 1 } = payload || {};
       const list = s.listByGroup[groupId];
@@ -66,6 +82,7 @@ const candidateSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
+      // fetch
       .addCase(fetchCandidatesByGroup.pending, (s, a) => {
         const gid = a.meta.arg;
         s.loadingByGroup[gid] = true;
@@ -81,6 +98,8 @@ const candidateSlice = createSlice({
         s.loadingByGroup[gid] = false;
         s.errorByGroup[gid] = a.payload;
       })
+
+      // create
       .addCase(createCandidate.pending, (s) => {
         s.creating = true; s.createError = null;
       })
@@ -93,22 +112,59 @@ const candidateSlice = createSlice({
       .addCase(createCandidate.rejected, (s, a) => {
         s.creating = false; s.createError = a.payload;
       })
+
+      // update
+      .addCase(updateCandidate.pending, (s, a) => {
+        const { candidateId } = a.meta.arg || {};
+        if (candidateId) {
+          s.updatingById[candidateId] = true;
+          s.updateErrorById[candidateId] = null;
+        }
+      })
+      .addCase(updateCandidate.fulfilled, (s, a) => {
+        const { groupId, candidate } = a.payload;
+        const list = s.listByGroup[groupId];
+        if (Array.isArray(list)) {
+          const idx = list.findIndex(c => String(c._id) === String(candidate._id));
+          if (idx !== -1) {
+            list[idx] = candidate;
+          }
+        }
+        s.updatingById[candidate._id] = false;
+      })
+      .addCase(updateCandidate.rejected, (s, a) => {
+        const { candidateId } = a.meta.arg || {};
+        if (candidateId) {
+          s.updatingById[candidateId] = false;
+          s.updateErrorById[candidateId] = a.payload;
+        }
+      })
+
+      // delete
       .addCase(deleteCandidate.fulfilled, (s, a) => {
         const { groupId, candidateId } = a.payload;
         const list = s.listByGroup[groupId];
         if (!Array.isArray(list)) return;
         s.listByGroup[groupId] = list.filter(c => String(c._id) !== String(candidateId));
+        // נקה שגיאות/סטטוסים ישנים
+        delete s.updatingById[candidateId];
+        delete s.updateErrorById[candidateId];
       });
   },
 });
 
-export const { optimisticIncVote } = candidateSlice.actions; // ⬅️ חדש
+export const { optimisticIncVote } = candidateSlice.actions;
 export default candidateSlice.reducer;
 
-// selectors (ללא שינוי)
+// selectors
 export const selectCandidatesForGroup = (groupId) => (state) =>
   state.candidates.listByGroup[groupId] || [];
 export const selectCandidatesLoadingForGroup = (groupId) => (state) =>
   !!state.candidates.loadingByGroup[groupId];
 export const selectCandidatesErrorForGroup = (groupId) => (state) =>
   state.candidates.errorByGroup[groupId] || null;
+
+export const selectCandidateUpdating = (candidateId) => (state) =>
+  !!state.candidates.updatingById[candidateId];
+export const selectCandidateUpdateError = (candidateId) => (state) =>
+  state.candidates.updateErrorById[candidateId] || null;
