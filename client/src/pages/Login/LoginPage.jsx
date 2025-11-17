@@ -55,8 +55,11 @@ export default function LoginPage() {
     setErrors({});
 
     try {
-      await dispatch(login(form)).unwrap();
-      navigate(
+   const result = await dispatch(login(form)).unwrap(); 
+    // ✅ כאן נוסיף עדכון של store עם המידע המוחזר
+    // נניח שה־login מחזיר משהו כזה: { token, user }
+    dispatch(loginSuccess(result)); 
+          navigate(
         redirect ? decodeURIComponent(redirect) : fallbackAfterLogin
       );
     } catch (err) {

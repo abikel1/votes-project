@@ -300,6 +300,7 @@ export default function GroupsPage() {
           const isExpired = endDate < new Date();
 
           const goSettings = (e) => { e.stopPropagation(); navigate(`/groups/${gid}/settings`); };
+const isNewUser = !joinedIdsSet.size && !pendingIdsSet.size && !rejectedIdsSet.size;
 
           const onRequestJoin = (e) => {
             e.stopPropagation();
@@ -401,42 +402,43 @@ export default function GroupsPage() {
 
 
               {/* מצב נעולה ולא חברה */}
-              {!isOwner && isLocked && (
-                <div className="groups-card-actions">
-                  {isMember ? (
-                    <span className="groups-status groups-status-member">מחוברת</span>
-                  ) : !isAuthed ? null : isRejected ? (
-                    <>
-                      <div className="groups-notice groups-notice-rejected">
-                        בקשתך נדחתה על ידי מנהלת הקבוצה. ניתן לשלוח בקשה חדשה.
-                      </div>
-                      <button className="groups-action-btn" onClick={onRequestJoin}>
-                        שלחי בקשה שוב
-                      </button>
-                    </>
-                  ) : isPending ? (
-                    <>
-                      <button className="groups-action-btn groups-action-btn-pending" disabled>
-                        בהמתנה...
-                      </button>
-                      <p className="groups-hint">הבקשה נשלחה וממתינה לאישור מנהלת</p>
-                    </>
-                  ) : wasRemoved ? (
-                    <>
-                      <div className="groups-notice groups-notice-removed">
-                        הוסרת מהקבוצה על ידי מנהלת. ניתן לשלוח בקשת הצטרפות חדשה.
-                      </div>
-                      <button className="groups-action-btn" onClick={onRequestJoin}>
-                        שלחי בקשת הצטרפות
-                      </button>
-                    </>
-                  ) : (
-                    <button className="groups-action-btn" onClick={onRequestJoin}>
-                      בקשי הצטרפות
-                    </button>
-                  )}
-                </div>
-              )}
+           {!isOwner && isLocked && (
+  <div className="groups-card-actions">
+    {isMember ? (
+      <span className="groups-status groups-status-member">מחוברת</span>
+    ) : !isAuthed ? null : isRejected ? (
+      <>
+        <div className="groups-notice groups-notice-rejected">
+          בקשתך נדחתה על ידי מנהלת הקבוצה. ניתן לשלוח בקשה חדשה.
+        </div>
+        <button className="groups-action-btn" onClick={onRequestJoin}>
+          שלחי בקשה שוב
+        </button>
+      </>
+    ) : isPending ? (
+      <>
+        <button className="groups-action-btn groups-action-btn-pending" disabled>
+          בהמתנה...
+        </button>
+        <p className="groups-hint">הבקשה נשלחה וממתינה לאישור מנהלת</p>
+      </>
+    ) : wasRemoved && !isNewUser ? (
+      <>
+        <div className="groups-notice groups-notice-removed">
+          הוסרת מהקבוצה על ידי מנהלת. ניתן לשלוח בקשת הצטרפות חדשה.
+        </div>
+        <button className="groups-action-btn" onClick={onRequestJoin}>
+          שלחי בקשת הצטרפות
+        </button>
+      </>
+    ) : (
+      <button className="groups-action-btn" onClick={onRequestJoin}>
+        בקשי הצטרפות
+      </button>
+    )}
+  </div>
+)}
+
             </div>
           );
         })}
