@@ -115,7 +115,8 @@ export default function GroupDetailPage() {
           className="back-btn"
           onClick={() => navigate('/groups')}
         >
-          כל הקבוצות  </button>
+          כל הקבוצות
+        </button>
 
         <h2 className="page-title">{group.name}</h2>
         <p className="group-description">{group.description}</p>
@@ -177,8 +178,20 @@ export default function GroupDetailPage() {
                         </div>
                       )}
 
-                      <h4>{c.name}</h4>
-                      {c.description && <p>{c.description}</p>}
+                      {/* --- פרופיל מועמד/ת --- */}
+                      <div className="candidate-header">
+                        {c.photoUrl && (
+                          <img
+                            src={c.photoUrl}
+                            alt={c.name || 'תמונת מועמד'}
+                            className="candidate-avatar"
+                          />
+                        )}
+                        <div className="candidate-text">
+                          <h4>{c.name}</h4>
+                          {c.description && <p>{c.description}</p>}
+                        </div>
+                      </div>
 
                       {/* מספר קולות יוצג לכל מועמד רק אם הסתיים */}
                       {isExpired && (
@@ -201,7 +214,7 @@ export default function GroupDetailPage() {
           <div className="resize-line"></div>
         </div>
 
-        {/* צד ימין – גרפים */}
+        {/* צד ימין – גרפים / מידע */}
         <div className="right-section" style={{ width: `${100 - leftWidth}%` }}>
 
           {!isExpired && (
@@ -237,16 +250,11 @@ export default function GroupDetailPage() {
                 </div>
               </div>
 
-              {/* כפתור מעבר לסקר */}
-              <button
-                className="go-to-survey-btn"
-                onClick={() => navigate(`/groups/${groupId}/candidates`)}
-              >
-                עבור להצבעה
-              </button>
+              {/* שימי לב: הכפתור "עבור להצבעה" הוסר מכאן */}
 
             </div>
           )}
+
           {/* גרפים לאחר סיום */}
           {isExpired && totalVotes > 0 && (
             <div className="charts">
@@ -284,10 +292,6 @@ export default function GroupDetailPage() {
             </div>
           )}
         </div>
-
-
-
-
 
       </div>
     </div>

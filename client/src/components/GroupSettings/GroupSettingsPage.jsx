@@ -140,6 +140,33 @@ const humanizeName = (raw, email) => {
   return parts.map(p => cap(p.toLowerCase())).join(' ') || s;
 };
 
+// ולידציה בסיסית למועמד/ת
+function validateCandidateFields({ name, description, symbol }) {
+  const errors = {};
+
+  const trimmedName = (name || '').trim();
+  const trimmedDesc = (description || '').trim();
+  const trimmedSymbol = (symbol || '').trim();
+
+  if (!trimmedName) {
+    errors.name = 'שם הוא שדה חובה';
+  } else if (trimmedName.length < 2) {
+    errors.name = 'השם צריך להיות לפחות באורך 2 תווים';
+  } else if (trimmedName.length > 50) {
+    errors.name = 'השם ארוך מדי (מקסימום 50 תווים)';
+  }
+
+  if (trimmedDesc && trimmedDesc.length > 500) {
+    errors.description = 'התיאור ארוך מדי (מקסימום 500 תווים)';
+  }
+
+  if (trimmedSymbol && trimmedSymbol.length > 3) {
+    errors.symbol = 'הסמל יכול להכיל עד 3 תווים';
+  }
+
+  return errors;
+}
+
 export default function GroupSettingsPage() {
   const { groupId } = useParams();
   const dispatch = useDispatch();
@@ -196,6 +223,7 @@ export default function GroupSettingsPage() {
     symbol: '',
     photoUrl: '',
   });
+  const [candErrors, setCandErrors] = useState({});
 
   // עריכת מועמד/ת
   const [editCandOpen, setEditCandOpen] = useState(false);
@@ -206,6 +234,7 @@ export default function GroupSettingsPage() {
     symbol: '',
     photoUrl: '',
   });
+  const [editCandErrors, setEditCandErrors] = useState({});
   const updatingThisCandidate = useSelector(selectCandidateUpdating(editCandForm._id || ''));
   const updateCandidateError = useSelector(selectCandidateUpdateError(editCandForm._id || ''));
 
@@ -381,10 +410,18 @@ export default function GroupSettingsPage() {
   // יצירת מועמד/ת
   const onAddCandidate = (e) => {
     e.preventDefault();
-    if (!candForm.name.trim()) return alert('שם מועמד/ת חובה');
+    const errors = validateCandidateFields(candForm);
+    setCandErrors(errors);
+    if (Object.keys(errors).length > 0) {
+      return;
+    }
+
     dispatch(createCandidate({ groupId, ...candForm }))
       .unwrap()
-      .then(() => setCandForm({ name: '', description: '', symbol: '', photoUrl: '' }))
+      .then(() => {
+        setCandForm({ name: '', description: '', symbol: '', photoUrl: '' });
+        setCandErrors({});
+      })
       .then(() => dispatch(fetchCandidatesByGroup(groupId)));
   };
 
@@ -419,18 +456,26 @@ export default function GroupSettingsPage() {
       symbol: c.symbol || '',
       photoUrl: c.photoUrl || '',
     });
+    setEditCandErrors({});
     setEditCandOpen(true);
   };
 
   const onEditCandChange = (e) => {
     const { name, value } = e.target;
     setEditCandForm(prev => ({ ...prev, [name]: value }));
+    // ניקוי שגיאה לשדה שנערך
+    setEditCandErrors(prev => ({ ...prev, [name]: undefined }));
   };
 
   const onSaveEditedCandidate = async (e) => {
     e.preventDefault();
     const { _id, name, description, symbol, photoUrl } = editCandForm;
-    if (!name?.trim()) return alert('שם מועמד/ת חובה');
+
+    const errors = validateCandidateFields({ name, description, symbol });
+    setEditCandErrors(errors);
+    if (Object.keys(errors).length > 0) {
+      return;
+    }
 
     const patch = {
       name: name.trim(),
@@ -442,13 +487,17 @@ export default function GroupSettingsPage() {
     try {
       await dispatch(updateCandidate({ candidateId: _id, groupId, patch })).unwrap();
       setEditCandOpen(false);
+      setEditCandErrors({});
       dispatch(fetchCandidatesByGroup(groupId));
     } catch (err) {
       alert(err || 'עדכון נכשל');
     }
   };
 
-  const onCancelEditCandidate = () => setEditCandOpen(false);
+  const onCancelEditCandidate = () => {
+    setEditCandOpen(false);
+    setEditCandErrors({});
+  };
 
   // העלאת תמונה (חדש/עריכה) - שולח לשרת גם שם קובץ ישן למחיקה
   const handleUpload = async (file, which) => {
@@ -775,34 +824,48 @@ export default function GroupSettingsPage() {
                   className="input"
                   name="name"
                   value={candForm.name}
-                  onChange={(e) =>
-                    setCandForm((p) => ({ ...p, name: e.target.value }))
-                  }
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    setCandForm((p) => ({ ...p, name: value }));
+                    setCandErrors((prev) => ({ ...prev, name: undefined }));
+                  }}
                   required
                 />
+                {candErrors.name && (
+                  <div className="err small-err">{candErrors.name}</div>
+                )}
+
                 <label>תיאור</label>
                 <textarea
                   className="input"
                   rows={3}
                   name="description"
                   value={candForm.description}
-                  onChange={(e) =>
-                    setCandForm((p) => ({
-                      ...p,
-                      description: e.target.value,
-                    }))
-                  }
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    setCandForm((p) => ({ ...p, description: value }));
+                    setCandErrors((prev) => ({ ...prev, description: undefined }));
+                  }}
                 />
+                {candErrors.description && (
+                  <div className="err small-err">{candErrors.description}</div>
+                )}
+
                 <label>סמל (אופציונלי)</label>
                 <input
                   className="input"
                   name="symbol"
                   value={candForm.symbol}
-                  onChange={(e) =>
-                    setCandForm((p) => ({ ...p, symbol: e.target.value }))
-                  }
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    setCandForm((p) => ({ ...p, symbol: value }));
+                    setCandErrors((prev) => ({ ...prev, symbol: undefined }));
+                  }}
                   placeholder="למשל: א׳"
                 />
+                {candErrors.symbol && (
+                  <div className="err small-err">{candErrors.symbol}</div>
+                )}
 
                 <label>תמונה</label>
 
@@ -1176,6 +1239,10 @@ export default function GroupSettingsPage() {
                 required
                 disabled={updatingThisCandidate}
               />
+              {editCandErrors.name && (
+                <div className="err small-err">{editCandErrors.name}</div>
+              )}
+
               <label>תיאור</label>
               <textarea
                 className="input"
@@ -1185,6 +1252,10 @@ export default function GroupSettingsPage() {
                 onChange={onEditCandChange}
                 disabled={updatingThisCandidate}
               />
+              {editCandErrors.description && (
+                <div className="err small-err">{editCandErrors.description}</div>
+              )}
+
               <label>סמל (אופציונלי)</label>
               <input
                 className="input"
@@ -1194,6 +1265,9 @@ export default function GroupSettingsPage() {
                 placeholder="למשל: א׳"
                 disabled={updatingThisCandidate}
               />
+              {editCandErrors.symbol && (
+                <div className="err small-err">{editCandErrors.symbol}</div>
+              )}
 
               <label>תמונה</label>
 
