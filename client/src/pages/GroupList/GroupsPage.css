@@ -155,13 +155,15 @@
   border: 1px solid #003366;
   padding: 18px;
   cursor: pointer;
-  transition: all 0.15s;
   position: relative;
+  /* אנימציה חלקה על גדילה / צל */
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
 }
 
 .groups-card:hover {
   border-color: #999;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+  transform: scale(1.02);   /* 👈 מגדיל קצת את הכרטיס */
 }
 
 .groups-card-disabled {
