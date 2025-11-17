@@ -472,3 +472,44 @@
   color: #fff;
 }
 
+/* כפתור צף ליצירת קבוצה */
+.groups-fab {
+  position: fixed;
+  bottom: 24px;
+  left: 24px;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  border: none;
+  background: #333;
+  color: #fff;
+  font-size: 32px;
+  line-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
+  z-index: 1000;
+  /* 👇 חשוב כדי שהגודל ישתנה חלק */
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+}
+
+
+.groups-fab:hover {
+  background: #000;
+  transform: scale(1.12);  /* 👈 מגדיל את הכפתור */
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.35);
+}
+
+@media (max-width: 768px) {
+  .groups-fab {
+    bottom: 16px;
+    left: 16px;
+    width: 50px;
+    height: 50px;
+    font-size: 26px;
+  }
+}
+
+

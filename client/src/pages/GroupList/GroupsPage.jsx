@@ -57,6 +57,15 @@ export default function GroupsPage() {
 
   const isAuthed = !!authId || !!authEmail || !!localStorage.getItem('authToken');
 
+  const onCreateGroupClick = () => {
+    if (!isAuthed) {
+      alert('כדי ליצור קבוצה יש להתחבר תחילה.');
+      navigate('/login', { state: { redirectTo: '/groups/create' } });
+      return;
+    }
+    navigate('/groups/create');
+  };
+
   useEffect(() => { dispatch(hydratePendingFromLocalStorage()); }, [dispatch]);
 
 
@@ -278,19 +287,7 @@ export default function GroupsPage() {
           </div>
         </div>
 
-        <button
-          className="groups-create-btn"
-          onClick={() => {
-            if (!isAuthed) {
-              alert('כדי ליצור קבוצה יש להתחבר תחילה.');
-              navigate('/login', { state: { redirectTo: '/groups/create' } });
-              return;
-            }
-            navigate('/groups/create');
-          }}
-        >
-          + יצירת קבוצה
-        </button>
+
       </div>
 
       {/* רשת קבוצות */}
@@ -361,6 +358,7 @@ export default function GroupsPage() {
 
             navigate(`/groups/${gid}`);
           };
+
 
           const cardDisabled = (!isOwner && isLocked && ((isPending && !isMember) || (!isPending && !isMember)));
 
@@ -458,6 +456,7 @@ export default function GroupsPage() {
           );
         })}
       </div>
+
       {/* 👇 פס פג'ינציה */}
       {filteredGroups.length > PAGE_SIZE && (
         <div className="groups-pagination">
@@ -488,6 +487,13 @@ export default function GroupsPage() {
           </button>
         </div>
       )}
+      <button
+        className="groups-fab"
+        onClick={onCreateGroupClick}
+        title="יצירת קבוצה חדשה"
+      >
+        +
+      </button>
     </div>
   );
 }
