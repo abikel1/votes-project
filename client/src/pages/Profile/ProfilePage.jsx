@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { fetchProfile, updateProfile, changePassword, clearError } from '../../slices/authSlice';
+import { fetchProfile, updateProfile, changePassword, clearError, clearMessage } from '../../slices/authSlice';
 import './ProfilePage.css';
 import { useNavigate } from 'react-router-dom';
 import CityStreetAuto from '../../components/CityStreetAuto';
@@ -68,6 +68,27 @@ export default function ProfilePage() {
     }));
   }, [newPassword, confirm]);
 
+  // כשפותחים את חלון שינוי הסיסמה – לנקות שגיאות ישנות
+  useEffect(() => {
+    if (editPasswordMode) {
+      setPwErrors({});
+      dispatch(clearError());
+    }
+  }, [editPasswordMode, dispatch]);
+
+  // ✅ להעלים את הודעת "סיסמה עודכנה" (או כל message) אחרי 3 שניות
+  useEffect(() => {
+    if (!message) return;   // אם אין הודעה – לא עושים כלום
+
+    const t = setTimeout(() => {
+      dispatch(clearMessage());
+    }, 3000); // 3000ms = 3 שניות
+
+    return () => clearTimeout(t); // ניקוי אם הקומפוננטה מתחלפת
+  }, [message, dispatch]);
+
+
+
   if (loading || !user) {
     return <p style={{ textAlign: 'center', marginTop: '50px' }}>טוען פרופיל...</p>;
   }
@@ -95,47 +116,44 @@ export default function ProfilePage() {
     }
   };
 
-const handleChangePassword = async () => {
-  const localErrs = {};
+  const handleChangePassword = async () => {
+    const localErrs = {};
 
-  if (!currentPassword) {
-    localErrs.currentPassword = 'יש להזין סיסמה נוכחית';
-  }
+    if (!currentPassword) {
+      localErrs.currentPassword = 'יש להזין סיסמה נוכחית';
+    }
 
-  if (!newPassword) {
-    localErrs.newPassword = 'יש להזין סיסמה חדשה';
-  } else if (newPassword === currentPassword) {
-    localErrs.newPassword = 'הסיסמה החדשה חייבת להיות שונה מהסיסמה הנוכחית';
-  }
+    if (!newPassword) {
+      localErrs.newPassword = 'יש להזין סיסמה חדשה';
+    }
 
-  if (confirm && confirm !== newPassword) {
-    localErrs.confirm = 'הסיסמאות אינן תואמות';
-  }
+    if (confirm && confirm !== newPassword) {
+      localErrs.confirm = 'הסיסמאות אינן תואמות';
+    }
 
-  if (Object.keys(localErrs).length) {
-    setPwErrors(localErrs);   // נשארים בדף, בלי שליחת בקשה
-    return;
-  }
+    if (Object.keys(localErrs).length) {
+      setPwErrors(localErrs);   // נשארים בדף, בלי שליחת בקשה
+      return;
+    }
 
-  // ✅ אין שגיאות מקומיות – מנקים ומתקדמים
-  setPwErrors({});
-  dispatch(clearError());     // ✅ לנקות updateErrors מהניסיון הקודם
+    // ✅ אין שגיאות מקומיות – מנקים ומתקדמים
+    setPwErrors({});
+    dispatch(clearError());     // לנקות updateErrors מהניסיון הקודם
 
-  try {
-    await dispatch(
-      changePassword({ currentPassword, newPassword })
-    ).unwrap();
+    try {
+      await dispatch(
+        changePassword({ currentPassword, newPassword })
+      ).unwrap();
 
-    setCurrentPassword('');
-    setNewPassword('');
-    setConfirm('');
-    setEditPasswordMode(false);
-  } catch (err) {
-    console.log('changePassword error (client):', err);
-    // השגיאות מהשרת יישבו ב-updateErrors ויוצגו מתחת לשדות
-  }
-};
-
+      setCurrentPassword('');
+      setNewPassword('');
+      setConfirm('');
+      setEditPasswordMode(false);
+    } catch (err) {
+      console.log('changePassword error (client):', err);
+      // השגיאות מהשרת יישבו ב-updateErrors ויוצגו מתחת לשדות
+    }
+  };
 
   return (
     <div className="profile-container">

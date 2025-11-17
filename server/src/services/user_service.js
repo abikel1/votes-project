@@ -206,6 +206,10 @@ async function changePassword(userId, currentPassword, newPassword) {
     throw { status: 401, errors: { currentPassword: 'הסיסמה הנוכחית שגויה' } };
   }
 
+    if (!newPassword || newPassword.length < 6) {
+    throw { status: 400, errors: { newPassword: 'סיסמה חייבת לפחות 6 תווים' } };
+  }
+
   // שלא תהיה זהה לישנה
   const same = await bcrypt.compare(newPassword, user.passwordHash);
   if (same) {
@@ -215,9 +219,6 @@ async function changePassword(userId, currentPassword, newPassword) {
     };
   }
 
-  if (!newPassword || newPassword.length < 6) {
-    throw { status: 400, errors: { newPassword: 'סיסמה חייבת לפחות 6 תווים' } };
-  }
 
   const newHash = await bcrypt.hash(newPassword, 12);
   user.passwordHash = newHash;
