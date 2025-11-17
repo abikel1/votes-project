@@ -135,6 +135,25 @@ export const resetPassword = createAsyncThunk(
   }
 );
 
+export const changePassword = createAsyncThunk(
+  'auth/changePassword',
+  async ({ currentPassword, newPassword }, { rejectWithValue }) => {
+    try {
+      const { data } = await http.post('/users/me/password', {
+        currentPassword,
+        newPassword,
+      });
+      return data.message || 'הסיסמה עודכנה בהצלחה';
+    } catch (err) {
+      const serverErrors = err?.response?.data?.errors;
+      if (serverErrors) return rejectWithValue(serverErrors);
+      const msg = err?.response?.data?.message || 'Change password failed';
+      return rejectWithValue({ form: msg });
+    }
+  }
+);
+
+
 /** ===== Slice ===== */
 const authSlice = createSlice({
   name: 'auth',
@@ -157,6 +176,9 @@ const authSlice = createSlice({
       state.error = null;
       state.updateErrors = null;
     },
+    clearMessage(state) {
+      state.message = null;
+    },
 
     logout(state) {
       state.token = null;
@@ -164,6 +186,11 @@ const authSlice = createSlice({
       state.lastName = null;
       state.userId = null;
       state.userEmail = null;
+
+      state.user = null;
+      state.error = null;
+      state.updateErrors = null;
+      state.message = '';
 
       localStorage.removeItem('token');
       localStorage.removeItem('firstName');
@@ -219,21 +246,25 @@ const authSlice = createSlice({
         s.loading = true;
         s.error = null;
       })
-      .addCase(login.fulfilled, (s, a) => {
-        s.loading = false;
-        s.token = a.payload.token;
-        s.userId = a.payload.user?._id ?? null;
-        s.userEmail = a.payload.user?.email ?? null;
+     .addCase(login.fulfilled, (s, a) => {
+    s.loading = false;
+    s.token = a.payload.token;
 
-        s.firstName = a.payload.user?.firstName ?? null;
-        s.lastName = a.payload.user?.lastName ?? null;
+    const user = a.payload.user ?? {};
+    s.user = user; // ✅ חשוב!
 
-        localStorage.setItem('token', s.token);
-        if (s.firstName) localStorage.setItem('firstName', s.firstName);
-        if (s.lastName) localStorage.setItem('lastName', s.lastName);
-        if (s.userId) localStorage.setItem('userId', s.userId);
-        if (s.userEmail) localStorage.setItem('userEmail', s.userEmail);
-      })
+    s.userId = user._id ?? null;
+    s.userEmail = user.email ?? null;
+    s.firstName = user.firstName ?? null;
+    s.lastName = user.lastName ?? null;
+
+    localStorage.setItem('token', s.token);
+    if (s.firstName) localStorage.setItem('firstName', s.firstName);
+    if (s.lastName) localStorage.setItem('lastName', s.lastName);
+    if (s.userId) localStorage.setItem('userId', s.userId);
+    if (s.userEmail) localStorage.setItem('userEmail', s.userEmail);
+})
+
       .addCase(login.rejected, (s, a) => {
         s.loading = false;
         s.error = a.payload;
@@ -312,9 +343,24 @@ const authSlice = createSlice({
       .addCase(resetPassword.rejected, (s, a) => {
         s.loading = false;
         s.error = a.payload;
-      });
+      })
+      // שינוי סיסמה
+      .addCase(changePassword.pending, (s) => {
+        // לא נוגעים ב-loading כדי שהעמוד לא "יטען מחדש"
+        s.updateErrors = null;   // ✅ לנקות שגיאות קודמות מהשרת
+        s.message = '';
+      })
+      .addCase(changePassword.fulfilled, (s, a) => {
+        s.updateErrors = null;
+        s.message = a.payload;   // 'הסיסמה עודכנה בהצלחה.'
+      })
+      .addCase(changePassword.rejected, (s, a) => {
+        s.updateErrors = a.payload || { form: 'Change password failed' };
+      })
+
+
   }
 });
 
-export const { logout, loginSuccess, clearError } = authSlice.actions;
+export const { logout, loginSuccess, clearError, clearMessage } = authSlice.actions;
 export default authSlice.reducer;

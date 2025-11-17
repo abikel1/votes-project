@@ -73,6 +73,24 @@ export default function GroupsPage() {
   }, [dispatch, isAuthed]);
 
   useEffect(() => {
+  const handleClickOutside = (e) => {
+    // אם הקליק על כפתור סינון או מיון – לא לסגור
+    if (
+      e.target.closest('.groups-control-btn') || 
+      e.target.closest('.groups-dropdown')
+    ) return;
+
+    // אם אחד מהתפריטים פתוח – סוגרים אותם
+    if (showFilters) setShowFilters(false);
+    if (showSort) setShowSort(false);
+  };
+
+  document.addEventListener('click', handleClickOutside);
+  return () => document.removeEventListener('click', handleClickOutside);
+}, [showFilters, showSort]);
+
+
+  useEffect(() => {
     if (!isAuthed) return;
 
     const refresh = () => {
@@ -101,28 +119,22 @@ export default function GroupsPage() {
     }
   }, [dispatch, joinedIdsSet]);
 
-  if (loading) return <div className="loading-wrap">טוען קבוצות...</div>;
-  if (err) return <div className="error">{err}</div>;
-if (!groups?.length)
-  return (
-    <div className="empty">
-      אין קבוצות עדיין.
-      {isAuthed ? (
-        <button
-          className="add-group-btn"
-          onClick={() => navigate('/groups/create')}
-        >
-          <img src="/src/assets/icons/new-folder.png" alt="+" className="plus-icon" />
-          יצירת קבוצה חדשה
-        </button>
-      ) : (
-        <div style={{ marginTop: '1rem', color: '#777' }}>
-          כדי ליצור קבוצה יש להתחבר תחילה.
-        </div>
-      )}
-    </div>
-  );
+  if (loading) return <div className="groups-loading">טוען קבוצות...</div>;
+  if (err) return <div className="groups-error">{err}</div>;
 
+  if (!groups?.length)
+    return (
+      <div className="groups-empty">
+        <p>אין קבוצות עדיין.</p>
+        {isAuthed ? (
+          <button className="groups-create-btn" onClick={() => navigate('/groups/create')}>
+            + יצירת קבוצה חדשה
+          </button>
+        ) : (
+          <p className="groups-empty-hint">כדי ליצור קבוצה יש להתחבר תחילה.</p>
+        )}
+      </div>
+    );
 
   const myEmail = lc(authEmail) || lc(localStorage.getItem('userEmail'));
   const myId = String(authId ?? localStorage.getItem('userId') ?? '');
@@ -146,6 +158,8 @@ if (!groups?.length)
           return isMember;
         case 'owned':
           return isOwner;
+           case 'expired':  // <— כאן
+    return new Date(g.endDate) < new Date();
         default:
           return true;
       }
@@ -161,78 +175,110 @@ if (!groups?.length)
     });
 
   return (
-    <div className="page-wrap">
-      <div className="top-bar">
-        <div className="filter-bar">
+    <div className="groups-page">
+      {/* סרגל עליון */}
+      <div className="groups-toolbar">
+        <div className="groups-toolbar-right">
           <input
             type="text"
             placeholder="חיפוש קבוצות..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="search-input"
+            className="groups-search"
           />
 
-          <div className="filter-actions">
-            <div className="icon-wrap">
-              <img
-                src="/src/assets/icons/filter.png"
-                alt="סינון"
-                className="icon-btn"
-                onClick={() => {
-                  setShowFilters((v) => !v);
-                  setShowSort(false);
-                }}
-              />
-              {showFilters && (
-                <div className="filters-dropdown">
-                  <label><input type="radio" name="filter" value="all" checked={filter === 'all'} onChange={(e) => setFilter(e.target.value)} />כל הקבוצות</label>
-                  <label><input type="radio" name="filter" value="open" checked={filter === 'open'} onChange={(e) => setFilter(e.target.value)} />פתוחות</label>
-                  <label><input type="radio" name="filter" value="locked" checked={filter === 'locked'} onChange={(e) => setFilter(e.target.value)} />נעולות</label>
-                  <label><input type="radio" name="filter" value="joined" checked={filter === 'joined'} onChange={(e) => setFilter(e.target.value)} />קבוצות שאני מחוברת אליהן</label>
-                  <label><input type="radio" name="filter" value="owned" checked={filter === 'owned'} onChange={(e) => setFilter(e.target.value)} />קבוצות שאני מנהלת</label>
-                </div>
-              )}
-            </div>
+          <div className="groups-controls">
+            <button
+              className="groups-control-btn"
+              onClick={() => {
+                setShowFilters((v) => !v);
+                setShowSort(false);
+              }}
+              title="סינון"
+            >
+              <img src="/src/assets/icons/filter.png" alt="סינון" />
+            </button>
+            {showFilters && (
+              <div className="groups-dropdown">
+                <label>
+                  <input type="radio" name="filter" value="all" checked={filter === 'all'} onChange={(e) => setFilter(e.target.value)} />
+                  כל הקבוצות
+                </label>
+                <label>
+                  <input type="radio" name="filter" value="open" checked={filter === 'open'} onChange={(e) => setFilter(e.target.value)} />
+                  פתוחות
+                </label>
+                <label>
+                  <input type="radio" name="filter" value="locked" checked={filter === 'locked'} onChange={(e) => setFilter(e.target.value)} />
+                  נעולות
+                </label>
+                <label>
+                  <input type="radio" name="filter" value="joined" checked={filter === 'joined'} onChange={(e) => setFilter(e.target.value)} />
+                  קבוצות שאני מחוברת אליהן
+                </label>
+                <label>
+                  <input type="radio" name="filter" value="owned" checked={filter === 'owned'} onChange={(e) => setFilter(e.target.value)} />
+                  קבוצות שאני מנהלת
+                </label>
+                <label>
+  <input 
+    type="radio" 
+    name="filter" 
+    value="expired" 
+    checked={filter === 'expired'} 
+    onChange={(e) => setFilter(e.target.value)} 
+  />
+  קבוצות שהסתיימו
+</label>
 
-            <div className="icon-wrap">
-              <img
-                src="/src/assets/icons/sort.png"
-                alt="מיון"
-                className="icon-btn"
-                onClick={() => {
-                  setShowSort((v) => !v);
-                  setShowFilters(false);
-                }}
-              />
-              {showSort && (
-                <div className="sort-dropdown">
-                  <label><input type="radio" name="sort" value="creationDate" checked={sortBy === 'creationDate'} onChange={(e) => setSortBy(e.target.value)} />תאריך יצירה (חדש קודם)</label>
-                  <label><input type="radio" name="sort" value="endDate" checked={sortBy === 'endDate'} onChange={(e) => setSortBy(e.target.value)} />תאריך סיום (מוקדם קודם)</label>
-                  <label><input type="radio" name="sort" value="name" checked={sortBy === 'name'} onChange={(e) => setSortBy(e.target.value)} />שם קבוצה (א-ת)</label>
-                </div>
-              )}
-            </div>
+              </div>
+            )}
+
+            <button
+              className="groups-control-btn"
+              onClick={() => {
+                setShowSort((v) => !v);
+                setShowFilters(false);
+              }}
+              title="מיון"
+            >
+              <img src="/src/assets/icons/sort.png" alt="מיון" />
+            </button>
+            {showSort && (
+              <div className="groups-dropdown">
+                <label>
+                  <input type="radio" name="sort" value="creationDate" checked={sortBy === 'creationDate'} onChange={(e) => setSortBy(e.target.value)} />
+                  תאריך יצירה (חדש קודם)
+                </label>
+                <label>
+                  <input type="radio" name="sort" value="endDate" checked={sortBy === 'endDate'} onChange={(e) => setSortBy(e.target.value)} />
+                  תאריך סיום (מוקדם קודם)
+                </label>
+                <label>
+                  <input type="radio" name="sort" value="name" checked={sortBy === 'name'} onChange={(e) => setSortBy(e.target.value)} />
+                  שם קבוצה (א-ת)
+                </label>
+              </div>
+            )}
           </div>
         </div>
 
-<button
-  className="add-group-btn"
-  onClick={() => {
-    if (!isAuthed) {
-      alert('כדי ליצור קבוצה יש להתחבר תחילה.');
-      navigate('/login', { state: { redirectTo: '/groups/create' } });
-      return;
-    }
-    navigate('/groups/create');
-  }}
->
-  <img src="/src/assets/icons/new-folder.png" alt="+" className="plus-icon" />
-  יצירת קבוצה חדשה
-</button>
-
-
+        <button
+          className="groups-create-btn"
+          onClick={() => {
+            if (!isAuthed) {
+              alert('כדי ליצור קבוצה יש להתחבר תחילה.');
+              navigate('/login', { state: { redirectTo: '/groups/create' } });
+              return;
+            }
+            navigate('/groups/create');
+          }}
+        >
+          + יצירת קבוצה
+        </button>
       </div>
 
+      {/* רשת קבוצות */}
       <div className="groups-grid">
         {filteredGroups.map((g) => {
           const gid = String(g._id);
@@ -250,7 +296,11 @@ if (!groups?.length)
           const isRejected = rejectedIdsSet.has(gid);
           const wasRemoved = !!removedMap[gid];
 
+          const endDate = new Date(g.endDate);
+          const isExpired = endDate < new Date();
+
           const goSettings = (e) => { e.stopPropagation(); navigate(`/groups/${gid}/settings`); };
+const isNewUser = !joinedIdsSet.size && !pendingIdsSet.size && !rejectedIdsSet.size;
 
           const onRequestJoin = (e) => {
             e.stopPropagation();
@@ -261,13 +311,13 @@ if (!groups?.length)
               return;
             }
             dispatch(clearRemovedNotice(gid));
-            dispatch(requestJoinGroup(gid)).unwrap().catch(() => {});
+            dispatch(requestJoinGroup(gid)).unwrap().catch(() => { });
           };
 
           const onCardClick = async () => {
             if (!isOwner && isLocked && isPending && !isMember) {
               if (!isAuthed) {
-                alert('הקבוצה נעולה. כדי לבקש הצטרפות — יש להתחבר');
+                alert('הקבוצה נעולה. כדי לבקש הצטרפות – יש להתחבר');
                 return;
               }
               try {
@@ -277,18 +327,18 @@ if (!groups?.length)
                   navigate(`/groups/${gid}`);
                   return;
                 }
-              } catch {}
-              alert('עדיין אינך מחובר/ת לקבוצה. הבקשה בהמתנה לאישור מנהל/ת.');
+              } catch { }
+              alert('עדיין אינך מחוברת לקבוצה. הבקשה בהמתנה לאישור מנהלת.');
               return;
             }
 
             if (!isOwner && isLocked && !isMember) {
               if (!isAuthed) {
-                alert('הקבוצה נעולה. כדי לבקש הצטרפות — יש להתחבר');
+                alert('הקבוצה נעולה. כדי לבקש הצטרפות – יש להתחבר');
                 return;
               }
               if (isRejected) {
-                alert('בקשתך נדחתה על ידי מנהל/ת הקבוצה. ניתן לשלוח בקשה חדשה.');
+                alert('בקשתך נדחתה על ידי מנהלת הקבוצה. ניתן לשלוח בקשה חדשה.');
                 return;
               }
               return;
@@ -300,68 +350,96 @@ if (!groups?.length)
           const cardDisabled = (!isOwner && isLocked && ((isPending && !isMember) || (!isPending && !isMember)));
 
           return (
-            <article
+            <div
               key={gid}
               onClick={onCardClick}
-              className={`group-card ${cardDisabled ? 'card-disabled' : ''}`}
-              title={cardDisabled ? 'אין גישה לקבוצה כרגע' : undefined}
+              className={`groups-card ${cardDisabled ? 'groups-card-disabled' : ''}`}
             >
-              <header className="card-header">
-                <h3 className="card-title">{g.name}</h3>
+              <div className="groups-card-header">
+                <h3 className="groups-card-title">{g.name}</h3>
+                <div className="groups-card-badges">
+                  {isLocked && (
+                    <div style={{ position: 'relative', display: 'inline-block' }}>
+                      <img
+                        src="/src/assets/icons/padlock.png"
+                        alt="נעול"
+                        className="groups-badge-locked"
+                        title="קבוצה נעולה"
+                      />
+                      <span
+                        className={`groups-lock-status ${isMember || isOwner ? 'member' : 'not-member'}`}
+                        title={isMember || isOwner ? 'מחוברת' : 'לא מחוברת'}
+                      />
+                    </div>
+                  )}
 
-                <div className="card-actions">
-                  <span className="badge">מקס׳ זוכים: <b>{g.maxWinners ?? 1}</b></span>
-                  {isLocked && <span className="chip">🔒</span>}
                   {isOwner && (
                     <button
-                      className="gear-btn"
+                      className="groups-settings-btn"
                       onClick={goSettings}
                       title="הגדרות קבוצה"
-                      onMouseDown={(e) => e.preventDefault()}
-                    >⚙️</button>
+                    >
+                      <img src="/src/assets/icons/settings.png" alt="הגדרות" />
+                    </button>
                   )}
                 </div>
-              </header>
-
-              {g.description && <p className="card-desc">{g.description}</p>}
-
-              <div className="meta-grid">
-                <div><small>נוצר:</small><b>{formatDate(g.creationDate)}</b></div>
-                <div><small>סיום:</small><b>{formatDate(g.endDate)}</b></div>
               </div>
 
-              {/* מצב נעולה ולא חבר/ה */}
-              {!isOwner && isLocked && (
-                <div className="actions" style={{ marginTop: 10 }}>
-                  {isMember ? (
-                    <span className="chip success">מחובר/ת</span>
-                  ) : !isAuthed ? (
-                    null
-                  ) : isRejected ? (
-                    <>
-                      <div className="removed-box" style={{ background: '#fff3f3' }}>
-                        בקשתך נדחתה ע״י מנהל/ת הקבוצה. ניתן לשלוח בקשה חדשה.
-                      </div>
-                      <button className="btn" onClick={onRequestJoin}>שלח/י בקשה שוב</button>
-                    </>
-                  ) : isPending ? (
-                    <>
-                      <button className="btn btn-pending" disabled>בהמתנה…</button>
-                      <div className="pending-hint">הבקשה נשלחה וממתינה לאישור מנהל/ת</div>
-                    </>
-                  ) : wasRemoved ? (
-                    <>
-                      <div className="removed-box">
-                        הוסרת מהקבוצה ע״י מנהל/ת. ניתן לשלוח בקשת הצטרפות חדשה.
-                      </div>
-                      <button className="btn" onClick={onRequestJoin}>שלח/י בקשת הצטרפות</button>
-                    </>
-                  ) : (
-                    <button className="btn" onClick={onRequestJoin}>בקש/י הצטרפות</button>
-                  )}
-                </div>
-              )}
-            </article>
+              {g.description && <p className="groups-card-desc">{g.description}</p>}
+
+              <div className="groups-card-footer">
+                {isExpired ? (
+                  <div className="groups-card-date-expired-text">
+                    תקופת ההצבעה הסתיימה — לצפייה בתוצאות
+                  </div>
+                ) : (
+                  <div className="groups-card-date">
+                    <span className="groups-card-date-label">תאריך סיום:</span>
+                    <span className="groups-card-date-value">{formatDate(g.endDate)}</span>
+                  </div>
+                )}
+              </div>
+
+
+              {/* מצב נעולה ולא חברה */}
+           {!isOwner && isLocked && (
+  <div className="groups-card-actions">
+    {isMember ? (
+      <span className="groups-status groups-status-member">מחוברת</span>
+    ) : !isAuthed ? null : isRejected ? (
+      <>
+        <div className="groups-notice groups-notice-rejected">
+          בקשתך נדחתה על ידי מנהלת הקבוצה. ניתן לשלוח בקשה חדשה.
+        </div>
+        <button className="groups-action-btn" onClick={onRequestJoin}>
+          שלחי בקשה שוב
+        </button>
+      </>
+    ) : isPending ? (
+      <>
+        <button className="groups-action-btn groups-action-btn-pending" disabled>
+          בהמתנה...
+        </button>
+        <p className="groups-hint">הבקשה נשלחה וממתינה לאישור מנהלת</p>
+      </>
+    ) : wasRemoved && !isNewUser ? (
+      <>
+        <div className="groups-notice groups-notice-removed">
+          הוסרת מהקבוצה על ידי מנהלת. ניתן לשלוח בקשת הצטרפות חדשה.
+        </div>
+        <button className="groups-action-btn" onClick={onRequestJoin}>
+          שלחי בקשת הצטרפות
+        </button>
+      </>
+    ) : (
+      <button className="groups-action-btn" onClick={onRequestJoin}>
+        בקשי הצטרפות
+      </button>
+    )}
+  </div>
+)}
+
+            </div>
           );
         })}
       </div>

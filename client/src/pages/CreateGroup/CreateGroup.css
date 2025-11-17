@@ -1,61 +1,104 @@
-/* client/src/pages/CreateGroup/CreateGroup.css */
 .cg-wrap {
-    padding: 16px;
-    max-width: 640px;
-    margin: 0 auto;
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 24px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 }
-
 .cg-title {
-    margin: 0 0 12px;
+  text-align: center;
+  margin-bottom: 20px;
+  font-size: 1.5rem;
 }
-
 .cg-form {
-    display: grid;
-    gap: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
-
 .cg-label {
-    display: grid;
-    gap: 6px;
-    font-weight: 500;
+  display: flex;
+  flex-direction: column;
+  font-weight: 500;
 }
-
-.cg-input {
-    border: 1px solid #e1e1e1;
-    border-radius: 10px;
-    padding: 10px 12px;
-    font: inherit;
+.cg-input, .cg-input:focus {
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 1rem;
 }
-
-.cg-actions {
-    display: flex;
-    gap: 8px;
-    margin-top: 6px;
+.cg-input[type="number"] {
+  width: 80px;
+  text-align: center;
 }
-
 .cg-btn {
-    background: #0b74da;
-    color: #fff;
-    border: none;
-    border-radius: 10px;
-    padding: 10px 14px;
-    cursor: pointer;
+  padding: 10px 16px;
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: 0.2s;
 }
-
-.cg-btn:disabled {
-    opacity: .7;
-    cursor: default;
+.cg-btn:hover {
+  background-color: #45a049;
 }
-
 .cg-btn-outline {
-    border: 1px solid #0b74da;
-    color: #0b74da;
-    background: transparent;
-    border-radius: 10px;
-    padding: 10px 14px;
-    cursor: pointer;
+  padding: 10px 16px;
+  border: 2px solid #4caf50;
+  border-radius: 8px;
+  background: white;
+  cursor: pointer;
+  font-weight: 500;
+  transition: 0.2s;
 }
-
+.cg-btn-outline:hover {
+  background-color: #f0f0f0;
+}
 .cg-error {
-    color: crimson;
+  color: red;
+  font-weight: 500;
+}
+.switch-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 50px;
+  height: 26px;
+}
+.switch input { 
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0; left: 0;
+  right: 0; bottom: 0;
+  background-color: #ccc;
+  transition: .4s;
+  border-radius: 34px;
+}
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 20px;
+  width: 20px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  transition: .4s;
+  border-radius: 50%;
+}
+input:checked + .slider {
+  background-color: #4caf50;
+}
+input:checked + .slider:before {
+  transform: translateX(24px);
 }
