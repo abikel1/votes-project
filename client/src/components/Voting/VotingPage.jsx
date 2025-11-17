@@ -1,7 +1,7 @@
 // client/src/pages/VotingDragPage.jsx
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 
 import { fetchGroupOnly } from '../../slices/groupsSlice';
 import {
@@ -17,8 +17,42 @@ import {
 
 import './VotingPage.css';
 
+import http from '../../api/http';
+
+
 export default function VotingDragPage() {
-  const { groupId } = useParams();
+  const { groupSlug } = useParams();
+  const location = useLocation();
+
+  // id שהגיע מניווט פנימי (כפתור "להצבעה בקלפי")
+  const navGroupId = location.state?.groupId || null;
+
+  // state פנימי ל-id
+  const [groupId, setGroupId] = useState(navGroupId);
+
+  // אם אין לנו id מ-state, נטען אותו מהשרת לפי ה-slug
+  useEffect(() => {
+    // אם הגיע id מהניווט – נשתמש בו
+    if (navGroupId) {
+      setGroupId(navGroupId);
+      return;
+    }
+
+    // אין slug ב-URL? אין מה לעשות
+    if (!groupSlug) return;
+
+    (async () => {
+      try {
+        const { data } = await http.get(`/groups/slug/${groupSlug}`);
+        setGroupId(data._id);   // שומר את ה-id של הקבוצה
+      } catch (err) {
+        console.error('failed to resolve group by slug', err);
+        setGroupId(null);
+      }
+    })();
+  }, [navGroupId, groupSlug]);
+
+
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -31,9 +65,9 @@ export default function VotingDragPage() {
   const [envelopePosition, setEnvelopePosition] = useState({ x: 0, y: 0 });
 
   const { selectedGroup: group } = useSelector(s => s.groups);
-  const candidates = useSelector(selectCandidatesForGroup(groupId));
-  const candLoading = useSelector(selectCandidatesLoadingForGroup(groupId));
-  const candError = useSelector(selectCandidatesErrorForGroup(groupId));
+  const candidates = useSelector(selectCandidatesForGroup(groupId || '')) || [];
+  const candLoading = useSelector(selectCandidatesLoadingForGroup(groupId || ''));
+  const candError = useSelector(selectCandidatesErrorForGroup(groupId || ''));
   const userId = useSelector(s => s.auth?.userId || null);
   const hasVoted = useSelector(s => s.votes.hasVoted);
 
@@ -130,6 +164,15 @@ export default function VotingDragPage() {
     setSelectedCandidate(null);
   };
 
+  if (!groupId) {
+    return (
+      <div className="vd-wrap">
+        <h2>דף הצבעה</h2>
+        <div>טוען...</div>
+      </div>
+    );
+  }
+
   if (candLoading) {
     return (
       <div className="vd-wrap">
@@ -162,10 +205,11 @@ export default function VotingDragPage() {
       <div className="vd-header">
         <button
           className="vd-back-button"
-          onClick={() => navigate(`/groups/${groupId}`)}
+          onClick={() => navigate(`/groups/${groupSlug}`, { state: { groupId } })}
         >
           ← חזור לפרטי הקבוצה
         </button>
+
         <h2>דף הצבעה</h2>
         {group && <div className="vd-group-name">{group.name}</div>}
       </div>
