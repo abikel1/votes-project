@@ -41,10 +41,10 @@ export default function App() {
         <Route path="/login" element={<LoginPage />} />
 
         <Route path="/groups" element={<GroupsPage />} />
-        <Route path="/groups/:groupId" element={<GroupDetailPage />} />
-        <Route path="/groups/:groupId/candidates" element={<VotingPage />} />
+        <Route path="/groups/:groupSlug" element={<GroupDetailPage />} />
+        <Route path="/groups/:groupSlug/candidates" element={<VotingPage />} />
         <Route path="/groups/create" element={<CreateGroupPage />} />
-        <Route path="/groups/:groupId/settings" element={<GroupSettingsPage />} />
+        <Route path="/groups/:groupSlug/settings" element={<GroupSettingsPage />} />
        
         <Route path="/about" element={<AboutPage />} />
         <Route path="/user-guide" element={<UserGuidePage />} />

@@ -31,6 +31,14 @@ function formatDate(d) {
 
 const lc = (s) => (s || '').trim().toLowerCase();
 
+const makeSlug = (name = '') =>
+  encodeURIComponent(
+    String(name)
+      .trim()
+      .toLowerCase()
+      .replace(/\s+/g, '-')        // רווחים ל-־
+  );
+
 export default function GroupsPage() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -294,6 +302,7 @@ export default function GroupsPage() {
       <div className="groups-grid">
         {pageGroups.map((g) => {
           const gid = String(g._id);
+          const slug = makeSlug(g.name || gid);
           const isLocked = !!g.isLocked;
 
           const createdByEmail = lc(g.createdBy ?? g.created_by ?? g.createdByEmail ?? g.ownerEmail ?? g.owner);
@@ -311,15 +320,19 @@ export default function GroupsPage() {
           const endDate = new Date(g.endDate);
           const isExpired = endDate < new Date();
 
-          const goSettings = (e) => { e.stopPropagation(); navigate(`/groups/${gid}/settings`); };
-          const isNewUser = !joinedIdsSet.size && !pendingIdsSet.size && !rejectedIdsSet.size;
+          const goSettings = (e) => {
+            e.stopPropagation();
+            navigate(`/groups/${slug}/settings`, {
+              state: { groupId: gid },
+            });
+          }; const isNewUser = !joinedIdsSet.size && !pendingIdsSet.size && !rejectedIdsSet.size;
 
           const onRequestJoin = (e) => {
             e.stopPropagation();
             if (isMember || isPending) return;
             if (!isAuthed) {
               alert('כדי לשלוח בקשת הצטרפות יש להתחבר תחילה.');
-              navigate('/login', { state: { redirectTo: `/groups/${gid}` } });
+              navigate('/login', { state: { redirectTo: `/groups/${slug}` } });
               return;
             }
             dispatch(clearRemovedNotice(gid));
@@ -336,7 +349,9 @@ export default function GroupsPage() {
                 const { data } = await http.get(`/groups/${gid}/my-membership`);
                 if (data?.member) {
                   dispatch(markJoinedLocally(gid));
-                  navigate(`/groups/${gid}`);
+                  navigate(`/groups/${slug}`, {
+                    state: { groupId: gid },
+                  });
                   return;
                 }
               } catch { }
@@ -356,7 +371,9 @@ export default function GroupsPage() {
               return;
             }
 
-            navigate(`/groups/${gid}`);
+            navigate(`/groups/${slug}`, {
+              state: { groupId: gid },
+            });
           };
 
 
@@ -366,7 +383,10 @@ export default function GroupsPage() {
             <div
               key={gid}
               onClick={onCardClick}
-              className={`groups-card ${cardDisabled ? 'groups-card-disabled' : ''}`}
+              className={`groups-card 
+    ${cardDisabled ? 'groups-card-disabled' : ''} 
+    ${isExpired ? 'groups-card-expired' : ''}`
+              }
             >
               <div className="groups-card-header">
                 <h3 className="groups-card-title">{g.name}</h3>
