@@ -438,3 +438,37 @@
 .groups-lock-status.not-member {
   background-color: #c0392b; /* אדום */
 }
+
+.groups-pagination {
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+}
+
+.groups-page-btn {
+  min-width: 32px;
+  padding: 6px 10px;
+  font-size: 13px;
+  border: 1px solid #d5d5d5;
+  background: #ffffff;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.groups-page-btn:hover:not(:disabled) {
+  background: #f5f5f5;
+  border-color: #999;
+}
+
+.groups-page-btn:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.groups-page-btn.active {
+  background: #333;
+  border-color: #333;
+  color: #fff;
+}
+
