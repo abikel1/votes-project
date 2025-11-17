@@ -279,13 +279,29 @@
 } */
 
 .groups-card-date-expired-text {
-  color: #b70000;
-  font-weight: 3500;
   margin-top: 10px;
-    font-size: 11px;
-
+  padding: 8px 10px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #b30000;
+  background: #ffe5e5;
+  border: 1px solid #ffb3b3;
+  border-radius: 4px;
+  text-align: center;
 }
 
+/* כרטיס שבו תקופת ההצבעה הסתיימה */
+.groups-card-expired {
+  border-color: #d93025;
+  background: #fff8f8;
+}
+
+/* גם בהובר – להישאר אדום ואפילו קצת יותר חזק */
+.groups-card.groups-card-expired:hover {
+  border-color: #b30000;
+  box-shadow: 0 4px 12px rgba(217, 48, 37, 0.3);
+  transform: scale(1.02);
+}
 
 /* פעולות בכרטיס */
 .groups-card-actions {

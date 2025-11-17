@@ -366,7 +366,10 @@ export default function GroupsPage() {
             <div
               key={gid}
               onClick={onCardClick}
-              className={`groups-card ${cardDisabled ? 'groups-card-disabled' : ''}`}
+              className={`groups-card 
+    ${cardDisabled ? 'groups-card-disabled' : ''} 
+    ${isExpired ? 'groups-card-expired' : ''}`
+              }
             >
               <div className="groups-card-header">
                 <h3 className="groups-card-title">{g.name}</h3>
