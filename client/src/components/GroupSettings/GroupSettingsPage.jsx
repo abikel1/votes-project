@@ -1,4 +1,5 @@
-import { useEffect, useMemo, useState } from 'react';
+// src/pages/GroupSettingsPage.jsx
+import { useEffect, useMemo, useState, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
 
@@ -15,7 +16,7 @@ import {
   fetchCandidatesByGroup,
   createCandidate,
   deleteCandidate,
-  updateCandidate, // ⬅️ חדש
+  updateCandidate,
   selectCandidatesForGroup,
   selectCandidatesLoadingForGroup,
   selectCandidatesErrorForGroup,
@@ -32,7 +33,6 @@ import {
   selectJoinRequestsError
 } from '../../slices/joinRequestsSlice';
 
-// מצביעים
 import {
   fetchVotersByGroup,
   selectVotersForGroup,
@@ -41,16 +41,20 @@ import {
 } from '../../slices/votesSlice';
 
 import { upsertUsers } from '../../slices/usersSlice';
+import http from '../../api/http';
 import './GroupSettingsPage.css';
 
 const EMPTY_ARR = Object.freeze([]);
 
+// עוזר לתאריך
 function toLocalDateInputValue(d) {
   if (!d) return '';
   try {
     const dt = new Date(d);
     return `${dt.getFullYear()}-${String(dt.getMonth() + 1).padStart(2, '0')}-${String(dt.getDate()).padStart(2, '0')}`;
-  } catch { return ''; }
+  } catch {
+    return '';
+  }
 }
 
 function getReqUserId(r) {
@@ -85,6 +89,57 @@ function MemberRow({ m, onRemove, isOwner }) {
   );
 }
 
+// מחלץ שם קובץ מתוך URL /uploads/... (לשרת אנחנו שולחים רק את שם הקובץ)
+function oldRelFromUrl(u = '') {
+  if (!u) return '';
+  try {
+    u = decodeURIComponent(String(u));
+  } catch {
+    // מתעלמים
+  }
+  const i = u.indexOf('/uploads/');
+  if (i !== -1) {
+    u = u.slice(i + '/uploads/'.length);
+  }
+  // להיפטר מפרמטרים / עוגנים
+  u = u.split('?')[0].split('#')[0];
+  return u.split('/').pop() || '';
+}
+
+// עוזר להצגת שם מצביע יפה
+const humanizeName = (raw, email) => {
+  const cap = (s) => (s ? s.charAt(0).toUpperCase() + s.slice(1) : '');
+  if (!raw && email) {
+    const local = String(email).split('@')[0] || '';
+    const parts = local.split(/[._\-]+/).filter(Boolean);
+    return parts.length ? parts.map(cap).join(' ') : local;
+  }
+  if (!raw) return '(ללא שם)';
+
+  let s = String(raw).trim();
+
+  if (/\s/.test(s)) {
+    return s.replace(/\s+/g, ' ')
+      .split(' ')
+      .map(w => cap(w.toLowerCase()))
+      .join(' ');
+  }
+
+  let parts = s.split(/[._\-]+/).filter(Boolean);
+
+  if (parts.length === 1) {
+    parts = s.split(/(?=[A-Z])/).filter(Boolean);
+  }
+
+  if (parts.length === 1 && email) {
+    const local = String(email).split('@')[0] || '';
+    const emailParts = local.split(/[._\-]+/).filter(Boolean);
+    if (emailParts.length > 1) parts = emailParts;
+  }
+
+  return parts.map(p => cap(p.toLowerCase())).join(' ') || s;
+};
+
 export default function GroupSettingsPage() {
   const { groupId } = useParams();
   const dispatch = useDispatch();
@@ -115,7 +170,13 @@ export default function GroupSettingsPage() {
   const votersError = useSelector(selectVotersErrorForGroup(groupId));
 
   const [form, setForm] = useState({
-    name: '', description: '', symbol: '', photoUrl: '', maxWinners: 1, endDate: '', isLocked: false,
+    name: '',
+    description: '',
+    symbol: '',
+    photoUrl: '',
+    maxWinners: 1,
+    endDate: '',
+    isLocked: false,
   });
   const [editMode, setEditMode] = useState(false);
 
@@ -128,13 +189,33 @@ export default function GroupSettingsPage() {
   }, [group]);
   const [typedSlug, setTypedSlug] = useState('');
 
-  const [candForm, setCandForm] = useState({ name: '', description: '', symbol: '', photoUrl: '' });
+  // טופס יצירת מועמד/ת
+  const [candForm, setCandForm] = useState({
+    name: '',
+    description: '',
+    symbol: '',
+    photoUrl: '',
+  });
 
-  // ⬅️ סטייט למודאל עריכת מועמד/ת
+  // עריכת מועמד/ת
   const [editCandOpen, setEditCandOpen] = useState(false);
-  const [editCandForm, setEditCandForm] = useState({ _id: '', name: '', description: '', symbol: '', photoUrl: '' });
+  const [editCandForm, setEditCandForm] = useState({
+    _id: '',
+    name: '',
+    description: '',
+    symbol: '',
+    photoUrl: '',
+  });
   const updatingThisCandidate = useSelector(selectCandidateUpdating(editCandForm._id || ''));
   const updateCandidateError = useSelector(selectCandidateUpdateError(editCandForm._id || ''));
+
+  // סטטוס העלאות
+  const [uploadingNew, setUploadingNew] = useState(false);
+  const [uploadingEdit, setUploadingEdit] = useState(false);
+
+  // קלטי קובץ חבויים לשינוי תמונה
+  const newFileInputRef = useRef(null);
+  const editFileInputRef = useRef(null);
 
   useEffect(() => {
     dispatch(fetchGroupWithMembers(groupId));
@@ -167,20 +248,27 @@ export default function GroupSettingsPage() {
     if (typeof group.isOwner === 'boolean') return group.isOwner;
 
     const byEmail =
-      group?.createdBy && userEmail &&
+      group?.createdBy &&
+      userEmail &&
       String(group.createdBy).trim().toLowerCase() === String(userEmail).trim().toLowerCase();
 
-    const byId = group?.createdById && userId && String(group.createdById) === String(userId);
+    const byId =
+      group?.createdById &&
+      userId &&
+      String(group.createdById) === String(userId);
 
     const byFullName =
-      group?.createdBy && firstName && lastName &&
+      group?.createdBy &&
+      firstName &&
+      lastName &&
       !String(group.createdBy).includes('@') &&
-      String(group.createdBy).trim().toLowerCase() === `${firstName} ${lastName}`.trim().toLowerCase();
+      String(group.createdBy).trim().toLowerCase() ===
+      `${firstName} ${lastName}`.trim().toLowerCase();
 
     return !!(byEmail || byId || byFullName);
   }, [group, userEmail, userId, firstName, lastName]);
 
-  // --- קישור שיתוף דינמי (נעולה → /join/:id, פתוחה → /groups/:id) ---
+  // קישורי שיתוף
   const sharePath = useMemo(() => {
     if (!group) return '';
     return group.isLocked ? `/join/${groupId}` : `/groups/${groupId}`;
@@ -210,9 +298,30 @@ export default function GroupSettingsPage() {
     }
   };
 
-  if (groupLoading) return (<div className="gs-wrap"><h2>הגדרות קבוצה</h2><div>טוען...</div></div>);
-  if (groupError) return (<div className="gs-wrap"><h2>הגדרות קבוצה</h2><div className="err">{groupError}</div></div>);
-  if (!group) return (<div className="gs-wrap"><h2>הגדרות קבוצה</h2><div>לא נמצאה קבוצה.</div></div>);
+  if (groupLoading) {
+    return (
+      <div className="gs-wrap">
+        <h2>הגדרות קבוצה</h2>
+        <div>טוען...</div>
+      </div>
+    );
+  }
+  if (groupError) {
+    return (
+      <div className="gs-wrap">
+        <h2>הגדרות קבוצה</h2>
+        <div className="err">{groupError}</div>
+      </div>
+    );
+  }
+  if (!group) {
+    return (
+      <div className="gs-wrap">
+        <h2>הגדרות קבוצה</h2>
+        <div>לא נמצאה קבוצה.</div>
+      </div>
+    );
+  }
 
   if (!isOwner) {
     return (
@@ -228,9 +337,12 @@ export default function GroupSettingsPage() {
     const { name, value, type, checked } = e.target;
     setForm(prev => ({
       ...prev,
-      [name]: name === 'maxWinners'
-        ? Number(value)
-        : (type === 'checkbox' ? checked : value)
+      [name]:
+        name === 'maxWinners'
+          ? Number(value)
+          : type === 'checkbox'
+            ? checked
+            : value,
     }));
   };
 
@@ -240,7 +352,6 @@ export default function GroupSettingsPage() {
       name: form.name.trim(),
       description: form.description.trim(),
       symbol: (form.symbol || '').trim(),
-      photoUrl: (form.photoUrl || '').trim(),
       maxWinners: Number(form.maxWinners) || 1,
       isLocked: !!form.isLocked,
       ...(form.endDate ? { endDate: new Date(form.endDate).toISOString() } : {}),
@@ -256,18 +367,18 @@ export default function GroupSettingsPage() {
     setEditMode(false);
     if (group) {
       setForm({
-        name: group.name || '', description: group.description || '', symbol: group.symbol || '',
-        photoUrl: group.photoUrl || '', maxWinners: group.maxWinners ?? 1,
-        endDate: toLocalDateInputValue(group.endDate), isLocked: !!group.isLocked,
+        name: group.name || '',
+        description: group.description || '',
+        symbol: group.symbol || '',
+        photoUrl: group.photoUrl || '',
+        maxWinners: group.maxWinners ?? 1,
+        endDate: toLocalDateInputValue(group.endDate),
+        isLocked: !!group.isLocked,
       });
     }
   };
 
-  const onCandChange = (e) => {
-    const { name, value } = e.target;
-    setCandForm(prev => ({ ...prev, [name]: value }));
-  };
-
+  // יצירת מועמד/ת
   const onAddCandidate = (e) => {
     e.preventDefault();
     if (!candForm.name.trim()) return alert('שם מועמד/ת חובה');
@@ -277,7 +388,8 @@ export default function GroupSettingsPage() {
       .then(() => dispatch(fetchCandidatesByGroup(groupId)));
   };
 
-  const onDeleteCandidate = (cid) => dispatch(deleteCandidate({ candidateId: cid, groupId }));
+  const onDeleteCandidate = (cid) =>
+    dispatch(deleteCandidate({ candidateId: cid, groupId }));
 
   const doDeleteGroup = async () => {
     try {
@@ -289,48 +401,16 @@ export default function GroupSettingsPage() {
     }
   };
 
-  // --- עזר להצגת שם מצביע בצורה יפה עם רווח בין פרטי למשפחה ---
-  const humanizeName = (raw, email) => {
-    const cap = (s) => (s ? s.charAt(0).toUpperCase() + s.slice(1) : '');
-    if (!raw && email) {
-      const local = String(email).split('@')[0] || '';
-      const parts = local.split(/[._\-]+/).filter(Boolean);
-      return parts.length ? parts.map(cap).join(' ') : local;
-    }
-    if (!raw) return '(ללא שם)';
-
-    let s = String(raw).trim();
-
-    if (/\s/.test(s)) {
-      return s.replace(/\s+/g, ' ')
-        .split(' ')
-        .map(w => cap(w.toLowerCase()))
-        .join(' ');
-    }
-
-    let parts = s.split(/[._\-]+/).filter(Boolean);
-
-    if (parts.length === 1) {
-      parts = s.split(/(?=[A-Z])/).filter(Boolean);
-    }
-
-    if (parts.length === 1 && email) {
-      const local = String(email).split('@')[0] || '';
-      const emailParts = local.split(/[._\-]+/).filter(Boolean);
-      if (emailParts.length > 1) parts = emailParts;
-    }
-
-    return parts.map(p => cap(p.toLowerCase())).join(' ') || s;
-  };
-
   const formatVoterTitle = (v) => {
     const composed =
       v?.name ||
-      [v?.firstName || v?.first_name, v?.lastName || v?.last_name].filter(Boolean).join(' ');
+      [v?.firstName || v?.first_name, v?.lastName || v?.last_name]
+        .filter(Boolean)
+        .join(' ');
     return humanizeName(composed, v?.email);
   };
 
-  // ======== לוגיקת עריכת מועמד/ת ========
+  // פתיחת מודאל עריכת מועמד/ת
   const openEditCandidate = (c) => {
     setEditCandForm({
       _id: String(c._id),
@@ -362,24 +442,71 @@ export default function GroupSettingsPage() {
     try {
       await dispatch(updateCandidate({ candidateId: _id, groupId, patch })).unwrap();
       setEditCandOpen(false);
-      // לא חובה, אבל אם יש עוד מקומות נסמכים – נרענן מהרשימה
       dispatch(fetchCandidatesByGroup(groupId));
     } catch (err) {
-      // השגיאה כבר תשב ב־updateErrorById, נוסיף גם alert מינימלי
       alert(err || 'עדכון נכשל');
     }
   };
 
-  const onCancelEditCandidate = () => {
-    setEditCandOpen(false);
+  const onCancelEditCandidate = () => setEditCandOpen(false);
+
+  // העלאת תמונה (חדש/עריכה) - שולח לשרת גם שם קובץ ישן למחיקה
+  const handleUpload = async (file, which) => {
+    if (!file) return;
+
+    const fd = new FormData();
+    fd.append('image', file);
+
+    const oldRel =
+      which === 'new'
+        ? oldRelFromUrl(candForm.photoUrl)
+        : oldRelFromUrl(editCandForm.photoUrl);
+
+    try {
+      if (which === 'new') setUploadingNew(true);
+      if (which === 'edit') setUploadingEdit(true);
+
+      // http baseURL = '/api' ⇒ זה ילך ל /api/upload
+      const { data } = await http.post(
+        `/upload?old=${encodeURIComponent(oldRel)}`,
+        fd,
+        { headers: { 'Content-Type': 'multipart/form-data' } }
+      );
+
+      const url = data?.url || '';
+      if (!url) throw new Error('Bad upload response');
+
+      if (which === 'new') {
+        setCandForm(prev => ({ ...prev, photoUrl: url }));
+      } else {
+        setEditCandForm(prev => ({ ...prev, photoUrl: url }));
+      }
+    } catch (e) {
+      alert(e?.response?.data?.message || e?.message || 'העלאה נכשלה');
+    } finally {
+      if (which === 'new') setUploadingNew(false);
+      if (which === 'edit') setUploadingEdit(false);
+    }
   };
+
+  const clearNewPhoto = () =>
+    setCandForm(prev => ({ ...prev, photoUrl: '' }));
+
+  const clearEditPhoto = () =>
+    setEditCandForm(prev => ({ ...prev, photoUrl: '' }));
 
   return (
     <div className="gs-wrap">
       <div className="gs-header">
         <h2>הגדרות קבוצה</h2>
-        <div className="gs-subtitle"><b>{group.name}</b> · מזהה: {group._id}</div>
-        <div className="gs-actions"><button className="gs-btn" onClick={() => navigate('/groups')}>לרשימת הקבוצות</button></div>
+        <div className="gs-subtitle">
+          <b>{group.name}</b> · מזהה: {group._id}
+        </div>
+        <div className="gs-actions">
+          <button className="gs-btn" onClick={() => navigate('/groups')}>
+            לרשימת הקבוצות
+          </button>
+        </div>
       </div>
 
       <div className="layout">
@@ -387,20 +514,67 @@ export default function GroupSettingsPage() {
         <section className="card">
           <div className="card-head">
             <h3>פרטי הקבוצה</h3>
-            {!editMode && (<button className="gs-btn-outline" onClick={() => setEditMode(true)}>עריכה</button>)}
+            {!editMode && (
+              <button
+                className="gs-btn-outline"
+                onClick={() => setEditMode(true)}
+              >
+                עריכה
+              </button>
+            )}
           </div>
 
           {!editMode ? (
             <div className="read-grid">
-              <div><small>שם</small><b>{group.name || '-'}</b></div>
-              <div><small>תיאור</small><div>{group.description || '-'}</div></div>
-              <div><small>מקס׳ זוכים</small><b>{group.maxWinners ?? 1}</b></div>
-              <div><small>תאריך סיום</small><b>{group.endDate ? new Date(group.endDate).toLocaleDateString('he-IL') : '-'}</b></div>
-              <div><small>נעילה</small><b>{group.isLocked ? '🔒 נעולה' : 'פתוחה'}</b></div>
-              {group.symbol && (<div><small>סמל</small><b>{group.symbol}</b></div>)}
-              {group.photoUrl && (<div><small>תמונה</small><a href={group.photoUrl} className="link" target="_blank" rel="noreferrer">פתיחה</a></div>)}
-              <div><small>נוצר ע״י</small><b>{group.createdBy || '-'}</b></div>
-              {/* קישור שיתוף קבוע */}
+              <div>
+                <small>שם</small>
+                <b>{group.name || '-'}</b>
+              </div>
+              <div>
+                <small>תיאור</small>
+                <div>{group.description || '-'}</div>
+              </div>
+              <div>
+                <small>מקס׳ זוכים</small>
+                <b>{group.maxWinners ?? 1}</b>
+              </div>
+              <div>
+                <small>תאריך סיום</small>
+                <b>
+                  {group.endDate
+                    ? new Date(group.endDate).toLocaleDateString('he-IL')
+                    : '-'}
+                </b>
+              </div>
+              <div>
+                <small>נעילה</small>
+                <b>{group.isLocked ? '🔒 נעולה' : 'פתוחה'}</b>
+              </div>
+              {group.symbol && (
+                <div>
+                  <small>סמל</small>
+                  <b>{group.symbol}</b>
+                </div>
+              )}
+              {group.photoUrl && (
+                <div>
+                  <small>תמונה</small>
+                  <a
+                    href={group.photoUrl}
+                    className="link"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    פתיחה
+                  </a>
+                </div>
+              )}
+              <div>
+                <small>נוצר ע״י</small>
+                <b>{group.createdBy || '-'}</b>
+              </div>
+
+              {/* קישור שיתוף */}
               <div>
                 <small>קישור שיתוף</small>
                 {shareUrl ? (
@@ -414,7 +588,11 @@ export default function GroupSettingsPage() {
                       aria-label="קישור לשיתוף"
                     />
                     <div className="share-actions">
-                      <button className="gs-btn" type="button" onClick={copyShareUrl}>
+                      <button
+                        className="gs-btn"
+                        type="button"
+                        onClick={copyShareUrl}
+                      >
                         {copied ? 'הועתק ✓' : 'העתק'}
                       </button>
                     </div>
@@ -430,37 +608,103 @@ export default function GroupSettingsPage() {
                 )}
               </div>
 
-              {updateError && <div className="err" style={{ marginTop: 6 }}>{updateError}</div>}
-              {updateSuccess && <div className="ok" style={{ marginTop: 6 }}>נשמר בהצלחה</div>}
+              {updateError && (
+                <div className="err" style={{ marginTop: 6 }}>
+                  {updateError}
+                </div>
+              )}
+              {updateSuccess && (
+                <div className="ok" style={{ marginTop: 6 }}>
+                  נשמר בהצלחה
+                </div>
+              )}
             </div>
           ) : (
             <form className="field" onSubmit={onSaveGroup}>
               <label>שם *</label>
-              <input className="input" name="name" required value={form.name} onChange={onGroupChange} />
+              <input
+                className="input"
+                name="name"
+                required
+                value={form.name}
+                onChange={onGroupChange}
+              />
               <label>תיאור</label>
-              <textarea className="input" rows={3} name="description" value={form.description} onChange={onGroupChange} />
+              <textarea
+                className="input"
+                rows={3}
+                name="description"
+                value={form.description}
+                onChange={onGroupChange}
+              />
               <div className="grid-2">
                 <div>
                   <label>מקס׳ זוכים</label>
-                  <input className="input" name="maxWinners" type="number" min={1} value={form.maxWinners} onChange={onGroupChange} />
+                  <input
+                    className="input"
+                    name="maxWinners"
+                    type="number"
+                    min={1}
+                    value={form.maxWinners}
+                    onChange={onGroupChange}
+                  />
                 </div>
                 <div>
                   <label>תאריך סיום</label>
-                  <input className="input" name="endDate" type="date" value={form.endDate} onChange={onGroupChange} />
+                  <input
+                    className="input"
+                    name="endDate"
+                    type="date"
+                    value={form.endDate}
+                    onChange={onGroupChange}
+                  />
                 </div>
               </div>
-              <label style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 6 }}>
-                <input type="checkbox" name="isLocked" checked={!!form.isLocked} onChange={onGroupChange} />
+              <label
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 8,
+                  marginTop: 6,
+                }}
+              >
+                <input
+                  type="checkbox"
+                  name="isLocked"
+                  checked={!!form.isLocked}
+                  onChange={onGroupChange}
+                />
                 קבוצה נעולה (חברים נכנסים דרך בקשות)
               </label>
               <label>סמל (אופציונלי)</label>
-              <input className="input" name="symbol" value={form.symbol} onChange={onGroupChange} placeholder="למשל: א׳" />
-              <label>קישור תמונה (אופציונלי)</label>
-              <input className="input" name="photoUrl" type="url" value={form.photoUrl} onChange={onGroupChange} placeholder="https://..." />
-              {updateError && <div className="err" style={{ marginTop: 6 }}>{updateError}</div>}
+              <input
+                className="input"
+                name="symbol"
+                value={form.symbol}
+                onChange={onGroupChange}
+                placeholder="למשל: א׳"
+              />
+              {updateError && (
+                <div className="err" style={{ marginTop: 6 }}>
+                  {updateError}
+                </div>
+              )}
               <div className="actions-row">
-                <button className="gs-btn" type="submit" disabled={updateLoading}>שמור</button>
-                <button className="gs-btn-outline" type="button" onClick={onCancelEdit} disabled={updateLoading}>ביטול</button>
+                <button
+                  className="gs-btn"
+                  type="submit"
+                  disabled={updateLoading}
+                >
+                  שמור
+                </button>
+                <button
+                  className="gs-btn-outline"
+                  type="button"
+                  onClick={onCancelEdit}
+                  disabled={updateLoading}
+                >
+                  ביטול
+                </button>
               </div>
             </form>
           )}
@@ -484,17 +728,35 @@ export default function GroupSettingsPage() {
                     <li key={String(c._id)} className="row">
                       <div className="row-main">
                         <div className="title">
-                          {c.name || '(ללא שם)'} {c.symbol ? `· ${c.symbol}` : ''}
+                          {c.photoUrl && (
+                            <img
+                              className="avatar"
+                              src={c.photoUrl}
+                              alt=""
+                            />
+                          )}
+                          {c.name || '(ללא שם)'}{' '}
+                          {c.symbol ? `· ${c.symbol}` : ''}
                         </div>
-                        {(c.description || c.photoUrl) && (
-                          <div className="sub">
-                            {c.description || ''}{c.photoUrl ? ` · ${c.photoUrl}` : ''}
-                          </div>
+                        {c.description && (
+                          <div className="sub">{c.description}</div>
                         )}
                       </div>
                       <div className="row-actions">
-                        <button className="small" onClick={() => openEditCandidate(c)}>עריכה</button>
-                        <button className="small danger" onClick={() => onDeleteCandidate(String(c._id))}>הסר/י</button>
+                        <button
+                          className="small"
+                          onClick={() => openEditCandidate(c)}
+                        >
+                          עריכה
+                        </button>
+                        <button
+                          className="small danger"
+                          onClick={() =>
+                            onDeleteCandidate(String(c._id))
+                          }
+                        >
+                          הסר/י
+                        </button>
                       </div>
                     </li>
                   ))}
@@ -509,15 +771,98 @@ export default function GroupSettingsPage() {
             <div className="acc-body">
               <form onSubmit={onAddCandidate} className="field">
                 <label>שם *</label>
-                <input className="input" name="name" value={candForm.name} onChange={onCandChange} required />
+                <input
+                  className="input"
+                  name="name"
+                  value={candForm.name}
+                  onChange={(e) =>
+                    setCandForm((p) => ({ ...p, name: e.target.value }))
+                  }
+                  required
+                />
                 <label>תיאור</label>
-                <textarea className="input" rows={3} name="description" value={candForm.description} onChange={onCandChange} />
+                <textarea
+                  className="input"
+                  rows={3}
+                  name="description"
+                  value={candForm.description}
+                  onChange={(e) =>
+                    setCandForm((p) => ({
+                      ...p,
+                      description: e.target.value,
+                    }))
+                  }
+                />
                 <label>סמל (אופציונלי)</label>
-                <input className="input" name="symbol" value={candForm.symbol} onChange={onCandChange} placeholder="למשל: א׳" />
-                <label>קישור תמונה (אופציונלי)</label>
-                <input className="input" name="photoUrl" type="url" value={candForm.photoUrl} onChange={onCandChange} placeholder="https://..." />
+                <input
+                  className="input"
+                  name="symbol"
+                  value={candForm.symbol}
+                  onChange={(e) =>
+                    setCandForm((p) => ({ ...p, symbol: e.target.value }))
+                  }
+                  placeholder="למשל: א׳"
+                />
+
+                <label>תמונה</label>
+
+                {/* קלט קובץ חבוי - עבור כפתור "שינוי תמונה" */}
+                <input
+                  ref={newFileInputRef}
+                  type="file"
+                  accept="image/*"
+                  style={{ display: 'none' }}
+                  onChange={(e) => handleUpload(e.target.files?.[0], 'new')}
+                  disabled={uploadingNew}
+                />
+
+                {!candForm.photoUrl ? (
+                  <div className="upload-row">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => handleUpload(e.target.files?.[0], 'new')}
+                      disabled={uploadingNew}
+                    />
+                    {uploadingNew && (
+                      <span className="muted">מעלה…</span>
+                    )}
+                  </div>
+                ) : (
+                  <div className="thumb-row">
+                    <img
+                      className="thumb"
+                      src={candForm.photoUrl}
+                      alt="תצוגה מקדימה"
+                    />
+                    <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                      <button
+                        type="button"
+                        className="gs-btn"
+                        onClick={() => newFileInputRef.current?.click()}
+                        disabled={uploadingNew}
+                      >
+                        שינוי תמונה
+                      </button>
+                      <button
+                        type="button"
+                        className="gs-btn-outline"
+                        onClick={clearNewPhoto}
+                        disabled={uploadingNew}
+                      >
+                        הסר תמונה
+                      </button>
+                    </div>
+                    {uploadingNew && (
+                      <span className="muted">מעלה…</span>
+                    )}
+                  </div>
+                )}
+
                 <div style={{ marginTop: 8 }}>
-                  <button className="gs-btn" type="submit">הוסף/י מועמד/ת</button>
+                  <button className="gs-btn" type="submit">
+                    הוסף/י מועמד/ת
+                  </button>
                 </div>
               </form>
             </div>
@@ -538,15 +883,25 @@ export default function GroupSettingsPage() {
                   {voters.map((v) => {
                     const titleName = formatVoterTitle(v);
                     const email = v.email;
-                    const when = v.lastVoteAt || v.votedAt || v.createdAt;
+                    const when =
+                      v.lastVoteAt || v.votedAt || v.createdAt;
 
                     return (
-                      <li key={String(v._id || v.userId || v.id)} className="row">
+                      <li
+                        key={String(
+                          v._id || v.userId || v.id
+                        )}
+                        className="row"
+                      >
                         <div className="row-main">
                           <div className="title">{titleName}</div>
                           <div className="sub">
                             {email ? `${email}` : ''}
-                            {when ? ` · ${new Date(when).toLocaleString('he-IL')}` : ''}
+                            {when
+                              ? ` · ${new Date(
+                                  when
+                                ).toLocaleString('he-IL')}`
+                              : ''}
                           </div>
                         </div>
                       </li>
@@ -562,47 +917,90 @@ export default function GroupSettingsPage() {
             <details className="acc">
               <summary className="acc-sum">בקשות הצטרפות</summary>
               <div className="acc-body">
-                {reqsLoading ? <div>טוען בקשות…</div>
-                  : reqsError ? <div className="err">{reqsError}</div>
-                    : !reqs.length ? <div className="muted">אין בקשות כרגע.</div>
-                      : (
-                        <ul className="list">
-                          {reqs.map((r) => (
-                            <li key={r._id} className="row">
-                              <div className="row-main">
-                                <div className="title">{r.name || r.email}</div>
-                                <div className="sub">{r.email} · {new Date(r.createdAt).toLocaleString('he-IL')}</div>
-                              </div>
-                              <div className="row-actions">
-                                <button
-                                  className="small"
-                                  onClick={() =>
-                                    dispatch(approveJoinRequest({ groupId, requestId: r._id }))
-                                      .unwrap()
-                                      .then(() => {
-                                        const uid = getReqUserId(r);
-                                        if (uid) dispatch(upsertUsers({ _id: uid, name: r.name, email: r.email }));
-                                        dispatch(fetchJoinRequests(groupId));
-                                        dispatch(fetchGroupWithMembers(groupId));
+                {reqsLoading ? (
+                  <div>טוען בקשות…</div>
+                ) : reqsError ? (
+                  <div className="err">{reqsError}</div>
+                ) : !reqs.length ? (
+                  <div className="muted">אין בקשות כרגע.</div>
+                ) : (
+                  <ul className="list">
+                    {reqs.map((r) => (
+                      <li key={r._id} className="row">
+                        <div className="row-main">
+                          <div className="title">
+                            {r.name || r.email}
+                          </div>
+                          <div className="sub">
+                            {r.email} ·{' '}
+                            {new Date(
+                              r.createdAt
+                            ).toLocaleString('he-IL')}
+                          </div>
+                        </div>
+                        <div className="row-actions">
+                          <button
+                            className="small"
+                            onClick={() =>
+                              dispatch(
+                                approveJoinRequest({
+                                  groupId,
+                                  requestId: r._id,
+                                })
+                              )
+                                .unwrap()
+                                .then(() => {
+                                  const uid = getReqUserId(r);
+                                  if (uid)
+                                    dispatch(
+                                      upsertUsers({
+                                        _id: uid,
+                                        name: r.name,
+                                        email: r.email,
                                       })
-                                  }
-                                >אשר/י</button>
-                                <button
-                                  className="small danger"
-                                  onClick={() =>
-                                    dispatch(rejectJoinRequest({ groupId, requestId: r._id }))
-                                      .unwrap()
-                                      .then(() => {
-                                        dispatch(fetchJoinRequests(groupId));
-                                        dispatch(fetchGroupWithMembers(groupId));
-                                      })
-                                  }
-                                >דחה/י</button>
-                              </div>
-                            </li>
-                          ))}
-                        </ul>
-                      )}
+                                    );
+                                  dispatch(
+                                    fetchJoinRequests(groupId)
+                                  );
+                                  dispatch(
+                                    fetchGroupWithMembers(
+                                      groupId
+                                    )
+                                  );
+                                })
+                            }
+                          >
+                            אשר/י
+                          </button>
+                          <button
+                            className="small danger"
+                            onClick={() =>
+                              dispatch(
+                                rejectJoinRequest({
+                                  groupId,
+                                  requestId: r._id,
+                                })
+                              )
+                                .unwrap()
+                                .then(() => {
+                                  dispatch(
+                                    fetchJoinRequests(groupId)
+                                  );
+                                  dispatch(
+                                    fetchGroupWithMembers(
+                                      groupId
+                                    )
+                                  );
+                                })
+                            }
+                          >
+                            דחה/י
+                          </button>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                )}
               </div>
             </details>
           )}
@@ -613,28 +1011,62 @@ export default function GroupSettingsPage() {
               <summary className="acc-sum">משתתפי הקבוצה</summary>
               <div className="acc-body">
                 {!enrichedMembers?.length ? (
-                  <div className="muted">אין משתתפים עדיין.</div>
+                  <div className="muted">
+                    אין משתתפים עדיין.
+                  </div>
                 ) : (
                   <ul className="list">
                     {enrichedMembers.map((m) => {
                       const mid = String(m._id || m.id);
-                      const removable = isOwner && String(group.createdById) !== mid;
-                      const onRemove = removable ? async () => {
-                        if (!window.confirm(`להסיר את ${m.name || m.email || mid} מהקבוצה?`)) return;
-                        try {
-                          await dispatch(removeGroupMember({
-                            groupId,
-                            memberId: mid,
-                            email: m.email || undefined,
-                          })).unwrap();
-                          if (group.isLocked) dispatch(fetchJoinRequests(groupId));
-                          dispatch(fetchGroupWithMembers(groupId));
-                        } catch (e) {
-                          alert(e || 'Failed to remove member');
-                        }
-                      } : undefined;
+                      const removable =
+                        isOwner &&
+                        String(group.createdById) !== mid;
+                      const onRemove = removable
+                        ? async () => {
+                            if (
+                              !window.confirm(
+                                `להסיר את ${
+                                  m.name || m.email || mid
+                                } מהקבוצה?`
+                              )
+                            )
+                              return;
+                            try {
+                              await dispatch(
+                                removeGroupMember({
+                                  groupId,
+                                  memberId: mid,
+                                  email: m.email || undefined,
+                                })
+                              ).unwrap();
+                              if (group.isLocked)
+                                dispatch(
+                                  fetchJoinRequests(
+                                    groupId
+                                  )
+                                );
+                              dispatch(
+                                fetchGroupWithMembers(
+                                  groupId
+                                )
+                              );
+                            } catch (e) {
+                              alert(
+                                e ||
+                                  'Failed to remove member'
+                              );
+                            }
+                          }
+                        : undefined;
 
-                      return <MemberRow key={mid} m={m} onRemove={onRemove} isOwner={isOwner} />;
+                      return (
+                        <MemberRow
+                          key={mid}
+                          m={m}
+                          onRemove={onRemove}
+                          isOwner={isOwner}
+                        />
+                      );
                     })}
                   </ul>
                 )}
@@ -647,9 +1079,16 @@ export default function GroupSettingsPage() {
             <summary className="acc-sum">מחיקת קבוצה</summary>
             <div className="acc-body">
               <p className="danger-text">
-                מחיקה היא פעולה בלתי הפיכה. כל נתוני הקבוצה יימחקו לכולם.
+                מחיקה היא פעולה בלתי הפיכה. כל נתוני
+                הקבוצה יימחקו לכולם.
               </p>
-              <button className="btn-danger" onClick={() => { setDeleteOpen(true); setTypedSlug(''); }}>
+              <button
+                className="btn-danger"
+                onClick={() => {
+                  setDeleteOpen(true);
+                  setTypedSlug('');
+                }}
+              >
                 מחיקת הקבוצה…
               </button>
             </div>
@@ -659,26 +1098,49 @@ export default function GroupSettingsPage() {
 
       {/* מודאל מחיקה */}
       {deleteOpen && (
-        <div className="modal-backdrop" onClick={() => setDeleteOpen(false)}>
-          <div className="modal" onClick={(e) => e.stopPropagation()}>
+        <div
+          className="modal-backdrop"
+          onClick={() => setDeleteOpen(false)}
+        >
+          <div
+            className="modal"
+            onClick={(e) => e.stopPropagation()}
+          >
             <h3>מחק/י את הקבוצה</h3>
             <p className="muted" style={{ marginTop: 6 }}>
-              כדי לאשר, הקלד/י בתיבה את <b>{confirmSlug}</b>
+              כדי לאשר, הקלד/י בתיבה את{' '}
+              <b>{confirmSlug}</b>
             </p>
             <input
               className="input"
               placeholder={confirmSlug}
               value={typedSlug}
-              onChange={(e) => setTypedSlug(e.target.value)}
+              onChange={(e) =>
+                setTypedSlug(e.target.value)
+              }
               style={{ direction: 'ltr' }}
             />
-            <div className="actions-row" style={{ marginTop: 12 }}>
-              <button className="gs-btn-outline" onClick={() => setDeleteOpen(false)}>ביטול</button>
+            <div
+              className="actions-row"
+              style={{ marginTop: 12 }}
+            >
+              <button
+                className="gs-btn-outline"
+                onClick={() => setDeleteOpen(false)}
+              >
+                ביטול
+              </button>
               <button
                 className="btn-danger"
-                disabled={typedSlug.trim() !== confirmSlug}
+                disabled={
+                  typedSlug.trim() !== confirmSlug
+                }
                 onClick={doDeleteGroup}
-                title={typedSlug.trim() !== confirmSlug ? 'יש להקליד בדיוק את הערך לעיל' : undefined}
+                title={
+                  typedSlug.trim() !== confirmSlug
+                    ? 'יש להקליד בדיוק את הערך לעיל'
+                    : undefined
+                }
               >
                 מחיקת הקבוצה לצמיתות
               </button>
@@ -689,10 +1151,22 @@ export default function GroupSettingsPage() {
 
       {/* מודאל עריכת מועמד/ת */}
       {editCandOpen && (
-        <div className="modal-backdrop" onClick={() => !updatingThisCandidate && setEditCandOpen(false)}>
-          <div className="modal" onClick={(e) => e.stopPropagation()}>
+        <div
+          className="modal-backdrop"
+          onClick={() =>
+            !updatingThisCandidate &&
+            setEditCandOpen(false)
+          }
+        >
+          <div
+            className="modal"
+            onClick={(e) => e.stopPropagation()}
+          >
             <h3>עריכת מועמד/ת</h3>
-            <form className="field" onSubmit={onSaveEditedCandidate}>
+            <form
+              className="field"
+              onSubmit={onSaveEditedCandidate}
+            >
               <label>שם *</label>
               <input
                 className="input"
@@ -720,26 +1194,100 @@ export default function GroupSettingsPage() {
                 placeholder="למשל: א׳"
                 disabled={updatingThisCandidate}
               />
-              <label>קישור תמונה (אופציונלי)</label>
+
+              <label>תמונה</label>
+
+              {/* קלט קובץ חבוי - עבור כפתור "שינוי תמונה" */}
               <input
-                className="input"
-                name="photoUrl"
-                type="url"
-                value={editCandForm.photoUrl}
-                onChange={onEditCandChange}
-                placeholder="https://..."
-                disabled={updatingThisCandidate}
+                ref={editFileInputRef}
+                type="file"
+                accept="image/*"
+                style={{ display: 'none' }}
+                onChange={(e) =>
+                  handleUpload(
+                    e.target.files?.[0],
+                    'edit'
+                  )
+                }
+                disabled={
+                  updatingThisCandidate || uploadingEdit
+                }
               />
 
+              {!editCandForm.photoUrl ? (
+                <div className="upload-row">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) =>
+                      handleUpload(
+                        e.target.files?.[0],
+                        'edit'
+                      )
+                    }
+                    disabled={
+                      updatingThisCandidate || uploadingEdit
+                    }
+                  />
+                  {(updatingThisCandidate ||
+                    uploadingEdit) && (
+                    <span className="muted">
+                      מעלה…
+                    </span>
+                  )}
+                </div>
+              ) : (
+                <div className="thumb-row">
+                  <img
+                    className="thumb"
+                    src={editCandForm.photoUrl}
+                    alt="תצוגה מקדימה"
+                  />
+                  <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                    <button
+                      type="button"
+                      className="gs-btn"
+                      onClick={() => editFileInputRef.current?.click()}
+                      disabled={updatingThisCandidate || uploadingEdit}
+                    >
+                      שינוי תמונה
+                    </button>
+                    <button
+                      type="button"
+                      className="gs-btn-outline"
+                      onClick={clearEditPhoto}
+                      disabled={updatingThisCandidate}
+                    >
+                      הסר תמונה
+                    </button>
+                  </div>
+                  {(updatingThisCandidate ||
+                    uploadingEdit) && (
+                    <span className="muted">
+                      מעלה…
+                    </span>
+                  )}
+                </div>
+              )}
+
               {updateCandidateError && (
-                <div className="err" style={{ marginTop: 6 }}>
+                <div
+                  className="err"
+                  style={{ marginTop: 6 }}
+                >
                   {updateCandidateError}
                 </div>
               )}
 
               <div className="actions-row">
-                <button className="gs-btn" type="submit" disabled={updatingThisCandidate}>
-                  {updatingThisCandidate ? 'שומר/ת…' : 'שמור/י'}
+                <button
+                  className="gs-btn"
+                  type="submit"
+                  disabled={updatingThisCandidate}
+                >
+                  {updatingThisCandidate
+                    ? 'שומר/ת…'
+                    : 'שמור/י'}
                 </button>
                 <button
                   className="gs-btn-outline"
