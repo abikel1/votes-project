@@ -8,6 +8,8 @@ import {
   selectMyJoinedIds,
   selectMyCreatedIds,
 } from '../../slices/groupsSlice';
+import { toast } from 'react-hot-toast';
+
 import {
   requestJoinGroup,
   markJoinedLocally,
@@ -65,14 +67,20 @@ export default function GroupsPage() {
 
   const isAuthed = !!authId || !!authEmail || !!localStorage.getItem('authToken');
 
-  const onCreateGroupClick = () => {
-    if (!isAuthed) {
-      alert('כדי ליצור קבוצה יש להתחבר תחילה.');
+
+
+const onCreateGroupClick = () => {
+  if (!isAuthed) {
+    toast.error('כדי ליצור קבוצה יש להתחבר תחילה.');
+    
+    // setTimeout(() => {
       navigate('/login', { state: { redirectTo: '/groups/create' } });
-      return;
-    }
-    navigate('/groups/create');
-  };
+    // }, 500); // חצי שנייה - מספיק כדי לראות את הטוסט
+    
+    return;
+  }
+  navigate('/groups/create');
+};
 
   useEffect(() => { dispatch(hydratePendingFromLocalStorage()); }, [dispatch]);
 
@@ -327,22 +335,26 @@ export default function GroupsPage() {
             });
           }; const isNewUser = !joinedIdsSet.size && !pendingIdsSet.size && !rejectedIdsSet.size;
 
-          const onRequestJoin = (e) => {
-            e.stopPropagation();
-            if (isMember || isPending) return;
-            if (!isAuthed) {
-              alert('כדי לשלוח בקשת הצטרפות יש להתחבר תחילה.');
-              navigate('/login', { state: { redirectTo: `/groups/${slug}` } });
-              return;
-            }
-            dispatch(clearRemovedNotice(gid));
-            dispatch(requestJoinGroup(gid)).unwrap().catch(() => { });
-          };
+        const onRequestJoin = (e) => {
+  e.stopPropagation();
+  if (isMember || isPending) return;
+  if (!isAuthed) {
+    toast.error('כדי לשלוח בקשת הצטרפות יש להתחבר תחילה.');
+    
+    // setTimeout(() => {
+      navigate('/login', { state: { redirectTo: `/groups/${slug}` } });
+    // }, 500);
+    
+    return;
+  }
+  dispatch(clearRemovedNotice(gid));
+  dispatch(requestJoinGroup(gid)).unwrap().catch(() => { });
+};
 
           const onCardClick = async () => {
             if (!isOwner && isLocked && isPending && !isMember) {
               if (!isAuthed) {
-                alert('הקבוצה נעולה. כדי לבקש הצטרפות – יש להתחבר');
+                toast.error('הקבוצה נעולה. כדי לבקש הצטרפות – יש להתחבר');
                 return;
               }
               try {
@@ -355,17 +367,18 @@ export default function GroupsPage() {
                   return;
                 }
               } catch { }
-              alert('עדיין אינך מחוברת לקבוצה. הבקשה בהמתנה לאישור מנהלת.');
+              toast.info('עדיין אינך מחוברת לקבוצה. הבקשה בהמתנה לאישור מנהלת.');
               return;
             }
 
             if (!isOwner && isLocked && !isMember) {
               if (!isAuthed) {
-                alert('הקבוצה נעולה. כדי לבקש הצטרפות – יש להתחבר');
+                toast.error('הקבוצה נעולה. כדי לבקש הצטרפות – יש להתחבר');
                 return;
               }
               if (isRejected) {
-                alert('בקשתך נדחתה על ידי מנהלת הקבוצה. ניתן לשלוח בקשה חדשה.');
+                toast.error('בקשתך נדחתה על ידי מנהלת הקבוצה. ניתן לשלוח בקשה חדשה.');
+
                 return;
               }
               return;

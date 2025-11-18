@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { createGroup, clearCreateState } from '../../slices/groupsSlice';
 import { useNavigate } from 'react-router-dom';
 import './CreateGroup.css';
+import toast from 'react-hot-toast';
 
 const makeSlug = (name = '') =>
   encodeURIComponent(
@@ -46,26 +47,44 @@ export default function CreateGroupPage() {
     setForm(prev => ({ ...prev, isLocked: !prev.isLocked }));
   };
 
-  const onSubmit = (e) => {
-    e.preventDefault();
-    if (!form.name.trim()) return alert('שם קבוצה חובה');
-    if (!form.description.trim()) return alert('תיאור חובה');
-    if (!form.endDate) return alert('תאריך סיום חובה');
 
-    const payload = {
-      name: form.name.trim(),
-      description: form.description.trim(),
-      maxWinners: Number(form.maxWinners) || 1,
-      isLocked: !!form.isLocked,
-      endDate: new Date(form.endDate).toISOString(),
-    };
+const onSubmit = (e) => {
+  e.preventDefault();
+  
+  if (!form.name.trim()) {
+    toast.error('שם קבוצה חובה');
+    return;
+  }
+  
+  if (!form.description.trim()) {
+    toast.error('תיאור חובה');
+    return;
+  }
+  
+  if (!form.endDate) {
+    toast.error('תאריך סיום חובה');
+    return;
+  }
 
-    dispatch(createGroup(payload));
+  const payload = {
+    name: form.name.trim(),
+    description: form.description.trim(),
+    maxWinners: Number(form.maxWinners) || 1,
+    isLocked: !!form.isLocked,
+    endDate: new Date(form.endDate).toISOString(),
   };
 
+  dispatch(createGroup(payload));
+  toast.success('הקבוצה נוצרה בהצלחה!');
+};
+
   const copy = async (text) => {
-    try { await navigator.clipboard.writeText(text); alert('הקישור הועתק'); }
-    catch { }
+try {
+  await navigator.clipboard.writeText(text);
+  toast.success('הקישור הועתק');
+} catch {
+  // אפשר להוסיף toast.error אם רוצים להתריע במקרה של שגיאה
+}
   };
 
   const origin = typeof window !== 'undefined' ? window.location.origin : '';
@@ -158,12 +177,12 @@ export default function CreateGroupPage() {
         <div className="cg-label">
           מצב קבוצה *
           <div className="switch-container">
-            <span>פתוחה</span>
+            <span>נעולה</span>
             <label className="switch">
               <input type="checkbox" checked={form.isLocked} onChange={toggleLock} />
               <span className="slider round"></span>
             </label>
-            <span>נעולה </span>
+            <span>פתוחה </span>
           </div>
         </div>
 

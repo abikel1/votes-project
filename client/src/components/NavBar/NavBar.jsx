@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { logout } from '../../slices/authSlice';
 import './NavBar.css';
@@ -7,6 +7,7 @@ import './NavBar.css';
 const NavBar = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const location = useLocation(); // <-- כאן מקבלים את הנתיב הנוכחי
 
   const { token, firstName, lastName } = useSelector((s) => s.auth);
   const isAuthed = Boolean(token);
@@ -19,9 +20,15 @@ const NavBar = () => {
   const fullName = firstName && lastName ? `${firstName} ${lastName}` : '';
   const initial = fullName ? fullName[0] : '';
 
+  const links = [
+    { name: 'בית', path: '/' },
+    { name: 'קבוצות', path: '/groups' },
+    { name: 'אודות', path: '/about' },
+    { name: 'מדריך למשתמש', path: '/user-guide' },
+  ];
+
   return (
     <nav className="navbar">
-      {/* עיגול פרופיל מוצג רק כשמחובר */}
       {isAuthed && (
         <Link to="/profile" className="profile">
           {initial}
@@ -29,12 +36,16 @@ const NavBar = () => {
       )}
 
       <div className="links">
-        {/* קישורים שמוצגים לכולם */}
-        <Link to="/">בית</Link>
-        <Link to="/groups">קבוצות</Link>
- <Link to="/about">אודות</Link>
-  <Link to="/user-guide">מדריך למשתמש</Link>
-        {/* כפתור או קישור לפי מצב ההתחברות */}
+        {links.map(link => (
+          <Link
+            key={link.path}
+            to={link.path}
+            className={location.pathname === link.path ? 'active-link' : ''}
+          >
+            {link.name}
+          </Link>
+        ))}
+
         {isAuthed ? (
           <button type="button" className="logout-btn" onClick={onLogout}>
             יציאה
@@ -44,13 +55,13 @@ const NavBar = () => {
         )}
       </div>
 
-<div 
-  className="site-name" 
-  onClick={() => navigate('/')} 
-  style={{ cursor: 'pointer' }} // מציג שהאלמנט לחיץ
->
-  בחירות
-</div>
+      <div
+        className="site-name"
+        onClick={() => navigate('/')}
+        style={{ cursor: 'pointer' }}
+      >
+        בחירות
+      </div>
     </nav>
   );
 };
