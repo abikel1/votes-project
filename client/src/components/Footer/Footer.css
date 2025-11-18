@@ -1,0 +1,253 @@
+/* ===== בסיס הפוטר ===== */
+
+.site-footer {
+    margin-top: auto;
+    background: #f5f5f7;
+    color: #111827;
+    padding: 1rem 1rem 0.5rem;
+    font-size: 0.85rem;
+    direction: rtl;
+    border-top: 1px solid #e5e7eb;
+}
+
+.footer-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: grid;
+    gap: 1.25rem;
+    grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr) minmax(0, 1.3fr);
+}
+
+.footer-col h4 {
+    margin: 0 0 0.4rem;
+    font-size: 0.95rem;
+    color: #111827;
+}
+
+.footer-col p {
+    margin: 0;
+    color: #4b5563;
+    line-height: 1.4;
+}
+
+.footer-tagline {
+    margin-top: 0.4rem;
+    font-size: 0.8rem;
+    color: #6b7280;
+}
+
+
+/* ===== קישורים שימושיים ===== */
+
+.footer-links {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.footer-links li+li {
+    margin-top: 0.2rem;
+}
+
+.footer-links a {
+    color: #2563eb;
+    text-decoration: none;
+    position: relative;
+    padding-bottom: 0.02rem;
+    font-size: 0.85rem;
+}
+
+.footer-links a::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    width: 0;
+    height: 1px;
+    background: linear-gradient(90deg, #2563eb, #7c3aed);
+    border-radius: 999px;
+    transition: width 0.15s ease;
+}
+
+.footer-links a:hover::after {
+    width: 100%;
+}
+
+
+/* ===== טופס יצירת קשר – פשוט ונקי ===== */
+
+.footer-contact-form {
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    padding: 0;
+}
+
+.footer-contact-form h4 {
+    margin-bottom: 0.6rem;
+    font-size: 1rem;
+    color: #111827;
+}
+
+.footer-field {
+    margin-bottom: 0.8rem;
+    display: flex;
+    flex-direction: column;
+}
+
+.footer-field label {
+    font-size: 0.8rem;
+    margin-bottom: 0.25rem;
+    color: #374151;
+}
+
+.footer-field input,
+.footer-field textarea {
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    background: white;
+    padding: 0.45rem 0.55rem;
+    font-size: 0.85rem;
+    color: #111827;
+}
+
+.footer-field textarea {
+    min-height: 65px;
+    resize: vertical;
+}
+
+.footer-field input::placeholder,
+.footer-field textarea::placeholder {
+    color: #b3b8c2;
+}
+
+.footer-field input:focus,
+.footer-field textarea:focus {
+    border-color: #2563eb;
+    outline: none;
+    box-shadow: 0 0 0 1px #2563eb33;
+}
+
+/* כפתור – עדין בלי יותר מדי דגש */
+.footer-btn {
+    width: 100%;
+    margin-top: 0.35rem;
+    background: #2563eb;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 0.55rem 0.7rem;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: background 0.15s ease;
+}
+
+.footer-btn:hover:not(:disabled) {
+    background: #1e40af;
+}
+
+.footer-btn:disabled {
+    opacity: 0.7;
+}
+
+/* הודעות */
+.footer-ok {
+    margin-top: 0.3rem;
+    color: #15803d;
+    font-size: 0.8rem;
+}
+
+.footer-err {
+    margin-top: 0.3rem;
+    color: #b91c1c;
+    font-size: 0.8rem;
+}
+
+/* שגיאות */
+.input-error {
+    border-color: #f87171 !important;
+}
+
+.footer-field-error {
+    font-size: 0.75rem;
+    color: #b91c1c;
+    margin-top: 0.15rem;
+}
+
+
+/* ===== רשתות חברתיות ===== */
+
+.footer-social {
+    margin-top: 0.5rem;
+}
+
+.footer-social-title {
+    font-size: 0.82rem;
+    color: #4b5563;
+    margin-bottom: 0.25rem;
+}
+
+.footer-social-icons {
+    display: flex;
+    gap: 0.45rem;
+    align-items: center;
+}
+
+.footer-social-icons a {
+    width: 1.7rem;
+    height: 1.7rem;
+    border-radius: 999px;
+    background: #e5e7eb;
+    color: #374151;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.12s ease, color 0.12s ease;
+}
+
+.footer-social-icons a svg {
+    font-size: 0.95rem;
+}
+
+.footer-social-icons a:hover {
+    background: #2563eb;
+    color: #fff;
+}
+
+
+/* ===== שורת תחתונה ===== */
+
+.footer-bottom {
+    max-width: 1100px;
+    margin: 0.6rem auto 0;
+    padding-top: 0.45rem;
+    border-top: 1px solid #e5e7eb;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.78rem;
+    color: #6b7280;
+}
+
+.footer-bottom-text {
+    display: flex;
+    gap: 0.6rem;
+}
+
+
+/* ===== רספונסיביות ===== */
+
+@media (max-width: 800px) {
+    .footer-inner {
+        grid-template-columns: 1fr;
+    }
+
+    .footer-bottom {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .footer-bottom-text {
+        flex-direction: column;
+    }
+}

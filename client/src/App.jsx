@@ -7,6 +7,7 @@ import GroupsPage from './pages/GroupList/GroupsPage.jsx';
 import GroupSettingsPage from './components/GroupSettings/GroupSettingsPage.jsx';
 import RegisterPage from './pages/Register/RegisterPage.jsx';
 import ProfilePage from './pages/Profile/ProfilePage.jsx';
+import Footer from './components/Footer/Footer';
 
 import VotingPage from './components/Voting/VotingPage.jsx';
 import NavBar from './components/NavBar/NavBar.jsx';
@@ -31,29 +32,34 @@ export default function App() {
   }, [token, dispatch]);
 
   return (
-    <div>
-      <NavBar />
-      <Routes>
-        <Route path="/" element={<HomeRoute />} />
-        <Route path="/profile" element={<ProfilePage />} />
+    <div className="app-root">
 
-        <Route path="/register" element={<RegisterPage />} />
-        <Route path="/login" element={<LoginPage />} />
+      <div>
+        <NavBar />
+        <Routes>
+          <Route path="/" element={<HomeRoute />} />
+          <Route path="/profile" element={<ProfilePage />} />
 
-        <Route path="/groups" element={<GroupsPage />} />
-        <Route path="/groups/:groupSlug" element={<GroupDetailPage />} />
-        <Route path="/groups/:groupSlug/candidates" element={<VotingPage />} />
-        <Route path="/groups/create" element={<CreateGroupPage />} />
-        <Route path="/groups/:groupSlug/settings" element={<GroupSettingsPage />} />
+          <Route path="/register" element={<RegisterPage />} />
+          <Route path="/login" element={<LoginPage />} />
 
-        <Route path="/about" element={<AboutPage />} />
-        <Route path="/user-guide" element={<UserGuidePage />} />
+          <Route path="/groups" element={<GroupsPage />} />
+          <Route path="/groups/:groupSlug" element={<GroupDetailPage />} />
+          <Route path="/groups/:groupSlug/candidates" element={<VotingPage />} />
+          <Route path="/groups/create" element={<CreateGroupPage />} />
+          <Route path="/groups/:groupSlug/settings" element={<GroupSettingsPage />} />
 
-        <Route path="/tools/send-email" element={<SendEmailPage />} />
-        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-        <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
-        <Route path="/join/:slug" element={<JoinGroupPage />} />
-      </Routes>
+          <Route path="/about" element={<AboutPage />} />
+          <Route path="/user-guide" element={<UserGuidePage />} />
+
+          <Route path="/tools/send-email" element={<SendEmailPage />} />
+          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+          <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
+          <Route path="/join/:slug" element={<JoinGroupPage />} />
+        </Routes>
+      </div>
+      <Footer />
     </div>
+
   );
 }
