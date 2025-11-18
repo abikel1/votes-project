@@ -198,7 +198,9 @@ export default function CreateGroupPage() {
                   readOnly
                   value={prettyShareUrl}
                   onFocus={(e) => e.target.select()}
+                  style={{ direction: 'ltr', textAlign: 'left' }}   
                 />
+
                 <button
                   className="gs-btn"
                   type="button"

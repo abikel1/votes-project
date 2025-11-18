@@ -346,15 +346,16 @@ export default function GroupSettingsPage() {
   }, [group, userEmail, userId, firstName, lastName]);
 
 
-const slug = group ? makeSlug(group.name || groupSlug || groupId) : groupSlug;
+  const slug = group ? makeSlug(group.name || groupSlug || groupId) : groupSlug;
 
-// קישורי שיתוף
-const sharePath = useMemo(() => {
-  if (!group) return '';
-  // נעולה → /join/slug
-  // פתוחה → /groups/slug
-  return group.isLocked ? `/join/${slug}` : `/groups/${slug}`;
-}, [group, slug]);
+  // קישורי שיתוף
+  const sharePath = useMemo(() => {
+    if (!group) return '';
+    // נעולה → /join/slug
+    // פתוחה → /groups/slug
+    if (group.isLocked) return `/join/${slug}`;
+    return `/groups/${slug}`;
+  }, [group, slug]);
 
 
 
