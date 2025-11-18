@@ -57,7 +57,7 @@ const HomePage = () => {
 
   const getTimeRemaining = (endDate) => {
     if (!endDate) return 'ללא מועד סיום';
-    
+
     const now = new Date();
     const end = new Date(endDate);
     const diff = end - now;
@@ -145,7 +145,7 @@ const HomePage = () => {
       {/* Main Content */}
       <div className="main-content">
         <div className="content-wrapper">
-          
+
           {/* Active Groups - Right Column */}
           <section className="groups-column active-column">
             <div className="column-header">
@@ -159,8 +159,8 @@ const HomePage = () => {
             {activeGroups.length > 0 ? (
               <div className="groups-list">
                 {activeGroups.map((group) => (
-                  <div 
-                    key={group._id} 
+                  <div
+                    key={group._id}
                     className="group-card active-card"
                     onClick={() => handleGroupClick(group)}
                   >
@@ -169,20 +169,23 @@ const HomePage = () => {
                       {group.description && (
                         <p className="card-description">{group.description}</p>
                       )}
-                      
+
                       <div className="card-meta">
                         <div className="meta-item">
                           <HiUserGroup className="meta-icon" />
-                          <span>{group.members?.length || 0}</span>
+                          <span>
+                          {group.votes?.length || 0}
+
+                          </span>
                         </div>
-                        
+
                         <div className="meta-item time-meta">
                           <HiClock className="meta-icon" />
                           <span className="time-text">{getTimeRemaining(group.endDate)}</span>
                         </div>
                       </div>
 
-                      <button 
+                      <button
                         className="card-action-btn active-btn"
                         onClick={(e) => handleVoteClick(group, e)}
                       >
@@ -213,8 +216,8 @@ const HomePage = () => {
             {recentlyClosedGroups.length > 0 ? (
               <div className="groups-list">
                 {recentlyClosedGroups.map((group) => (
-                  <div 
-                    key={group._id} 
+                  <div
+                    key={group._id}
                     className="group-card closed-card"
                     onClick={() => handleGroupClick(group)}
                   >
@@ -223,13 +226,17 @@ const HomePage = () => {
                       {group.description && (
                         <p className="card-description">{group.description}</p>
                       )}
-                      
+
                       <div className="card-meta">
                         <div className="meta-item">
                           <HiUserGroup className="meta-icon" />
-                          <span>{group.members?.length || 0}</span>
+                          <span>
+                         {group.votes?.length || 0}
+
+                          </span>
                         </div>
-                        
+
+
                         <div className="meta-item">
                           <HiXCircle className="meta-icon closed-icon" />
                           <span>הסתיים</span>
@@ -265,24 +272,26 @@ const HomePage = () => {
             </button>
           </div>
         )}
+
+        
       </div>
 
       {/* Quick Actions Footer */}
-    <section className="quick-actions">
-  <button className="action-btn" onClick={() => navigate('/groups')}>
-    <HiUserGroup className="btn-icon" /> כל חדרי ההצבעה
-  </button>
+      <section className="quick-actions">
+        <button className="action-btn" onClick={() => navigate('/groups')}>
+          <HiUserGroup className="btn-icon" /> כל חדרי ההצבעה
+        </button>
 
-  <button className="action-btn" onClick={() => navigate('/profile')}>
-    <HiUser className="btn-icon" /> הפרופיל שלי
-  </button>
+        <button className="action-btn" onClick={() => navigate('/profile')}>
+          <HiUser className="btn-icon" /> הפרופיל שלי
+        </button>
 
-  <button className="action-btn primary-action" onClick={onCreateGroupClick}>
-    <HiPlus className="btn-icon" /> יצירת קבוצה
-  </button>
+        <button className="action-btn primary-action" onClick={onCreateGroupClick}>
+          <HiPlus className="btn-icon" /> יצירת קבוצה
+        </button>
 
 
-</section>
+      </section>
     </div>
   );
 };
