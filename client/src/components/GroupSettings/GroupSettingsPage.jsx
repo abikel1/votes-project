@@ -346,24 +346,25 @@ export default function GroupSettingsPage() {
   }, [group, userEmail, userId, firstName, lastName]);
 
 
-  const slug = group ? makeSlug(group.name || groupSlug || groupId) : groupSlug;
+const slug = group ? makeSlug(group.name || groupSlug || groupId) : groupSlug;
 
 // קישורי שיתוף
 const sharePath = useMemo(() => {
   if (!group) return '';
-  // בקבוצה נעולה – נשאיר id (שלא לשבור מה שכבר עובד)
-  if (group.isLocked) return `/join/${groupId}`;
-  // קבוצה פתוחה – לינק רק לפי שם, בלי id
-  return `/groups/${slug}`;
-}, [group, groupId, slug]);
+  // נעולה → /join/slug
+  // פתוחה → /groups/slug
+  return group.isLocked ? `/join/${slug}` : `/groups/${slug}`;
+}, [group, slug]);
 
-const shareUrl = useMemo(() => {
-  if (!sharePath) return '';
-  return `${window.location.origin}${sharePath}`;
-}, [sharePath]);
 
-// 👇 זה צריך לבוא אחרי shareUrl
-const prettyShareUrl = shareUrl ? decodeURI(shareUrl) : '';
+
+  const shareUrl = useMemo(() => {
+    if (!sharePath) return '';
+    return `${window.location.origin}${sharePath}`;
+  }, [sharePath]);
+
+  // 👇 זה צריך לבוא אחרי shareUrl
+  const prettyShareUrl = shareUrl ? decodeURI(shareUrl) : '';
 
 
   const [copied, setCopied] = useState(false);
