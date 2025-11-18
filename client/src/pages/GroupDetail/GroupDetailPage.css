@@ -811,3 +811,26 @@
   background-color: #162b6b;
 }
 
+.candidate-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.candidate-avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.candidate-text h4 {
+  margin: 0 0 4px;
+}
+
+.candidate-text p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: #555;
+}

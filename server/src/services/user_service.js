@@ -3,8 +3,8 @@ const jwt = require('jsonwebtoken');
 const fetch = require('node-fetch'); // אם יש לך פונקציות כתובות לזה, אפשר להשאיר
 const User = require('../models/user_model');
 
-const JWT_SECRET  = process.env.JWT_SECRET  || 'dev_secret';
-const JWT_EXPIRES = process.env.JWT_EXPIRES || '7d';
+const JWT_SECRET = process.env.JWT_SECRET || 'dev_secret';
+const JWT_EXPIRES = process.env.JWT_EXPIRES || '24h';
 
 function generateToken(user) {
   return jwt.sign(
@@ -34,11 +34,11 @@ async function register({ firstName, lastName, email, phone, city, address, pass
     }
 
     // 👇 משתמש שנוצר רק דרך Google (בלי סיסמה) → משלימים עליו הרשמה
-    existing.firstName    = firstName;
-    existing.lastName     = lastName;
-    existing.phone        = phone;
-    existing.city         = city || '';
-    existing.address      = address;
+    existing.firstName = firstName;
+    existing.lastName = lastName;
+    existing.phone = phone;
+    existing.city = city || '';
+    existing.address = address;
     existing.passwordHash = await bcrypt.hash(password, 12);
     existing.authProvider = 'local'; // עכשיו יש לו גם סיסמה
 
@@ -206,7 +206,7 @@ async function changePassword(userId, currentPassword, newPassword) {
     throw { status: 401, errors: { currentPassword: 'הסיסמה הנוכחית שגויה' } };
   }
 
-    if (!newPassword || newPassword.length < 6) {
+  if (!newPassword || newPassword.length < 6) {
     throw { status: 400, errors: { newPassword: 'סיסמה חייבת לפחות 6 תווים' } };
   }
 
@@ -218,7 +218,6 @@ async function changePassword(userId, currentPassword, newPassword) {
       errors: { newPassword: 'הסיסמה החדשה חייבת להיות שונה מהסיסמה הנוכחית' },
     };
   }
-
 
   const newHash = await bcrypt.hash(newPassword, 12);
   user.passwordHash = newHash;
@@ -244,7 +243,7 @@ async function findOrCreateGoogleUser({ email, firstName, lastName }) {
     // משתמש חדש שנוצר אוטומטית מגוגל – בלי סיסמה
     user = await User.create({
       firstName: firstName || '',
-      lastName:  lastName || '',
+      lastName: lastName || '',
       email,
       phone: '',
       city: '',
