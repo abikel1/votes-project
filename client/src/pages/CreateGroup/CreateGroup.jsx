@@ -77,9 +77,10 @@ export default function CreateGroupPage() {
 
   const sharePath = selectedGroup?._id
     ? (selectedGroup.isLocked
-      ? `/join/${selectedGroup._id}`
-      : `/groups/${slug}`)
+      ? `/join/${slug}`      // 🔒 קבוצה נעולה – משתמשים בשם (slug)
+      : `/groups/${slug}`)   // 🌐 קבוצה פתוחה – גם כן בשם
     : '';
+
 
   const shareUrl = sharePath ? `${origin}${sharePath}` : '';
 

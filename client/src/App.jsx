@@ -17,9 +17,9 @@ import GroupDetailPage from './pages/GroupDetail/GroupDetailPage.jsx';
 import SendEmailPage from './pages/Tools/SendEmailPage.jsx';
 import ForgotPasswordPage from './pages/Login/ForgotPasswordPage.jsx';
 import ResetPasswordPage from './pages/Login/ResetPasswordPage.jsx';
-import JoinGroupPage from './pages/Join/JoinGroupPage.jsx'; 
-import AboutPage from './pages/About/AboutPage.jsx'; 
-import UserGuidePage from './pages/UserGuide/UserGuidePage.jsx'; 
+import JoinGroupPage from './pages/Join/JoinGroupPage.jsx';
+import AboutPage from './pages/About/AboutPage.jsx';
+import UserGuidePage from './pages/UserGuide/UserGuidePage.jsx';
 
 GroupDetailPage
 export default function App() {
@@ -45,14 +45,14 @@ export default function App() {
         <Route path="/groups/:groupSlug/candidates" element={<VotingPage />} />
         <Route path="/groups/create" element={<CreateGroupPage />} />
         <Route path="/groups/:groupSlug/settings" element={<GroupSettingsPage />} />
-       
+
         <Route path="/about" element={<AboutPage />} />
         <Route path="/user-guide" element={<UserGuidePage />} />
-       
+
         <Route path="/tools/send-email" element={<SendEmailPage />} />
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
         <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
-         <Route path="/join/:groupId" element={<JoinGroupPage />} />
+        <Route path="/join/:slug" element={<JoinGroupPage />} />
       </Routes>
     </div>
   );
