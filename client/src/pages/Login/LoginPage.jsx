@@ -111,7 +111,9 @@ export default function LoginPage() {
 
   const googleHref = (() => {
     const base = 'http://localhost:3000/api/users/google';
-    return redirect ? `${base}?redirect=${encodeURIComponent(redirect)}` : base;
+    // redirect כבר מקודד מה-URL (/login?redirect=...)
+    // אין צורך לקודד שוב, פשוט מעבירים אותו כמו שהוא
+    return redirect ? `${base}?redirect=${redirect}` : base;
   })();
 
   return (

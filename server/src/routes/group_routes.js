@@ -22,7 +22,14 @@ router.get('/:id/my-membership', auth, getMyMembership);
 
 router.patch('/:id/members/remove', auth, removeMember);
 
-// קבלת קבוצה לפי slug (שם בקישור) – למשל /api/groups/slug/קק
+function makeSlug(name = '') {
+  return String(name)
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, '-');   // רווחים → מקפים
+}
+
+// קבלת קבוצה לפי slug (שם בקישור) – למשל /api/groups/slug/אילה-סגורה
 router.get('/slug/:slug', async (req, res) => {
   try {
     const rawSlug = req.params.slug || '';
@@ -32,9 +39,25 @@ router.get('/slug/:slug', async (req, res) => {
       return res.status(400).json({ message: 'Missing slug' });
     }
 
-    const group = await Group.findOne({
-      name: { $regex: new RegExp(`^${slug}$`, 'i') }  // התאמה לפי שם, לא תלוי רישיות
-    });
+    // אותה פונקציית slug כמו בצד הקליינט
+    const makeSlug = (name = '') =>
+      String(name)
+        .trim()
+        .toLowerCase()
+        .replace(/\s+/g, '-');
+
+    let group = null;
+
+    // אם מה שהגיע "נראה כמו" ObjectId – תנסי קודם לפי id (תאימות לאחור)
+    if (/^[0-9a-fA-F]{24}$/.test(slug)) {
+      group = await Group.findById(slug);
+    }
+
+    // אם לא נמצא לפי id – מחפשים לפי שם -> slug
+    if (!group) {
+      const all = await Group.find().lean();
+      group = all.find((g) => makeSlug(g.name) === slug) || null;
+    }
 
     if (!group) {
       return res.status(404).json({ message: 'Group not found' });
@@ -46,6 +69,7 @@ router.get('/slug/:slug', async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 });
+
 
 router.get('/:id', getGroupById);
 router.get('/:id/members', getGroupMembers);

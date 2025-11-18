@@ -7,7 +7,7 @@ import http from '../../api/http';
 const lc = (s) => (s || '').trim().toLowerCase();
 
 export default function JoinGroupPage() {
-  // במקום groupId מה־URL – אנחנו עובדים עם slug
+  // בקישור יש שם קבוצה (slug), לא id
   const { slug } = useParams();
   const navigate = useNavigate();
 
@@ -36,8 +36,17 @@ export default function JoinGroupPage() {
 
   // טוען מידע על קבוצה לפי slug ומחזיר את האובייקט
   const loadGroupInfo = useCallback(async () => {
+    if (!slug) {
+      setGroup(null);
+      setGroupName('');
+      setError('קבוצה לא נמצאה');
+      return null;
+    }
+
     try {
-      const { data } = await http.get(`/groups/slug/${encodeURIComponent(slug)}`);
+      const { data } = await http.get(
+        `/groups/slug/${encodeURIComponent(slug)}`
+      );
       setGroup(data || null);
       setGroupName(data?.name || '');
       setError('');
@@ -66,7 +75,6 @@ export default function JoinGroupPage() {
       const { data } = await http.post(`/groups/${groupIdFromServer}/join`);
       // הצלחה רגילה
       setShowSuccess(true);
-      // אם השרת מחזיר טקסט שימושי, אפשר לשמור ב-hint
       if (data?.message && typeof data.message === 'string') {
         setHint(data.message);
       }
@@ -103,7 +111,6 @@ export default function JoinGroupPage() {
       // 1) טוענים מידע על הקבוצה לפי slug
       const g = await loadGroupInfo();
       if (!g) {
-        // קבוצה לא נמצאה / שגיאה – אין טעם להמשיך
         setLoading(false);
         return;
       }
@@ -133,8 +140,11 @@ export default function JoinGroupPage() {
       const isOwner = !!(isOwnerByEmail || isOwnerById || g.isOwner);
 
       if (isOwner) {
-        // ניווט לפי slug (שם הקבוצה ב־URL), לא לפי ID
-        navigate(`/groups/${encodeURIComponent(slug)}`, { replace: true });
+        // ניווט לפי slug, לא לפי ID
+        navigate(`/groups/${encodeURIComponent(slug)}`, {
+          replace: true,
+          state: { groupId: realGroupId },
+        });
         setLoading(false);
         return;
       }
@@ -145,8 +155,10 @@ export default function JoinGroupPage() {
           `/groups/${realGroupId}/my-membership`
         );
         if (mem?.member) {
-          // כבר חבר/ה → הולכים ישר לעמוד הקבוצה
-          navigate(`/groups/${encodeURIComponent(slug)}`, { replace: true });
+          navigate(`/groups/${encodeURIComponent(slug)}`, {
+            replace: true,
+            state: { groupId: realGroupId },
+          });
           setLoading(false);
           return;
         }
@@ -161,21 +173,23 @@ export default function JoinGroupPage() {
   }, [userId, userEmail, loadGroupInfo, sendJoinRequest, slug, navigate]);
 
   const goLogin = () => {
-    const redirect = encodeURIComponent(`/join/${encodeURIComponent(slug)}`);
+    // אחרי התחברות נחזור ל־/join/<slug>
+    const redirectPath = `/join/${slug}`;
+    const redirect = encodeURIComponent(redirectPath);
     navigate(`/login?redirect=${redirect}`);
   };
 
   const closeSuccess = () => {
     setShowSuccess(false);
-    // אחרי שליחה מוצלחת/עדכון מצב – אל רשימת הקבוצות
+    navigate('/groups');
+  };
+  const cancelAndBack = () => {
+    setShowLoginPrompt(false);
+    // בקבוצה נעולה, משתמש לא מחובר לא אמור לראות את הדף שלה
+    // לכן נחזור לרשימת הקבוצות
     navigate('/groups');
   };
 
-  const cancelAndBack = () => {
-    setShowLoginPrompt(false);
-    // חזרה לעמוד הקבוצה (צפייה)
-    navigate(`/groups/${encodeURIComponent(slug)}`);
-  };
 
   return (
     <div style={{ padding: 24 }}>
@@ -233,3 +247,4 @@ export default function JoinGroupPage() {
     </div>
   );
 }
+// סיום הקובץ JoinGroupPage.jsx
