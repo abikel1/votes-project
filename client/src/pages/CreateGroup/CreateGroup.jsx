@@ -157,12 +157,12 @@ export default function CreateGroupPage() {
         <div className="cg-label">
           מצב קבוצה *
           <div className="switch-container">
-            <span>פתוחה</span>
+            <span>נעולה</span>
             <label className="switch">
               <input type="checkbox" checked={form.isLocked} onChange={toggleLock} />
               <span className="slider round"></span>
             </label>
-            <span>נעולה </span>
+            <span>פתוחה </span>
           </div>
         </div>
 
