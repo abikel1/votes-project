@@ -171,13 +171,13 @@ const HomePage = () => {
                       )}
 
                       <div className="card-meta">
-                        <div className="meta-item">
+                        {/* <div className="meta-item">
                           <HiUserGroup className="meta-icon" />
                           <span>
                           {group.votes?.length || 0}
 
                           </span>
-                        </div>
+                        </div> */}
 
                         <div className="meta-item time-meta">
                           <HiClock className="meta-icon" />
@@ -228,13 +228,13 @@ const HomePage = () => {
                       )}
 
                       <div className="card-meta">
-                        <div className="meta-item">
+                        {/* <div className="meta-item">
                           <HiUserGroup className="meta-icon" />
                           <span>
                          {group.votes?.length || 0}
 
                           </span>
-                        </div>
+                        </div> */}
 
 
                         <div className="meta-item">
@@ -277,21 +277,22 @@ const HomePage = () => {
       </div>
 
       {/* Quick Actions Footer */}
-      <section className="quick-actions">
-        <button className="action-btn" onClick={() => navigate('/groups')}>
-          <HiUserGroup className="btn-icon" /> כל חדרי ההצבעה
-        </button>
+<section className="quick-actions">
+  <button className="action-btn" onClick={() => navigate('/groups')}>
+    <HiUserGroup className="btn-icon" /> כל חדרי ההצבעה
+  </button>
 
-        <button className="action-btn" onClick={() => navigate('/profile')}>
-          <HiUser className="btn-icon" /> הפרופיל שלי
-        </button>
+  {isAuthed && (
+    <button className="action-btn" onClick={() => navigate('/profile')}>
+      <HiUser className="btn-icon" /> הפרופיל שלי
+    </button>
+  )}
 
-        <button className="action-btn primary-action" onClick={onCreateGroupClick}>
-          <HiPlus className="btn-icon" /> יצירת קבוצה
-        </button>
+  <button className="action-btn primary-action" onClick={onCreateGroupClick}>
+    <HiPlus className="btn-icon" /> יצירת קבוצה
+  </button>
+</section>
 
-
-      </section>
     </div>
   );
 };
