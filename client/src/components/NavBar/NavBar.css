@@ -96,3 +96,9 @@ body {
 .logout-btn:hover {
   background: rgba(255, 255, 255, 0.15);
 }
+
+.links a.active-link {
+  color: #c8f4ff;
+  font-weight: bold;
+  border-bottom: 2px solid #c8f4ff;
+}
