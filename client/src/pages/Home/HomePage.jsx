@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { fetchGroups, selectGroupsWithOwnership } from '../../slices/groupsSlice';
-import { HiClock, HiUserGroup, HiCheckCircle, HiXCircle, HiPlus, HiChartBar } from 'react-icons/hi';
+import { HiClock, HiUserGroup, HiCheckCircle, HiXCircle, HiPlus, HiChartBar, HiUser, HiOutlineBadgeCheck } from 'react-icons/hi';
 import './HomePage.css';
 
 const HomePage = () => {
@@ -268,18 +268,21 @@ const HomePage = () => {
       </div>
 
       {/* Quick Actions Footer */}
-      <section className="quick-actions">
-        <button className="action-btn" onClick={() => navigate('/groups')}>
-          📋 כל חדרי ההצבעה
-        </button>
-        <button className="action-btn" onClick={() => navigate('/profile')}>
-          ⭐ הפרופיל שלי
-        </button>
-        <button className="action-btn primary-action" onClick={onCreateGroupClick}>
-          <HiPlus className="btn-icon" />
-          יצירת קבוצה
-        </button>
-      </section>
+    <section className="quick-actions">
+  <button className="action-btn" onClick={() => navigate('/groups')}>
+    <HiUserGroup className="btn-icon" /> כל חדרי ההצבעה
+  </button>
+
+  <button className="action-btn" onClick={() => navigate('/profile')}>
+    <HiUser className="btn-icon" /> הפרופיל שלי
+  </button>
+
+  <button className="action-btn primary-action" onClick={onCreateGroupClick}>
+    <HiPlus className="btn-icon" /> יצירת קבוצה
+  </button>
+
+
+</section>
     </div>
   );
 };
