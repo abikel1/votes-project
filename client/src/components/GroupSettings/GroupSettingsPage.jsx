@@ -590,43 +590,43 @@ const onCancelEditCandidate = () => {
 };
 
 // העלאת תמונה (חדש/עריכה) - שולח לשרת גם שם קובץ ישן למחיקה
-const handleUpload = async (file, which) => {
-  if (!file) return;
+// const handleUpload = async (file, which) => {
+//   if (!file) return;
 
-  const fd = new FormData();
-  fd.append('image', file);
+//   const fd = new FormData();
+//   fd.append('image', file);
 
-  const oldRel =
-    which === 'new'
-      ? oldRelFromUrl(candForm.photoUrl)
-      : oldRelFromUrl(editCandForm.photoUrl);
+//   const oldRel =
+//     which === 'new'
+//       ? oldRelFromUrl(candForm.photoUrl)
+//       : oldRelFromUrl(editCandForm.photoUrl);
 
-  try {
-    if (which === 'new') setUploadingNew(true);
-    if (which === 'edit') setUploadingEdit(true);
+//   try {
+//     if (which === 'new') setUploadingNew(true);
+//     if (which === 'edit') setUploadingEdit(true);
 
-    // http baseURL = '/api' ⇒ זה ילך ל /api/upload
-    const { data } = await http.post(
-      `/upload?old=${encodeURIComponent(oldRel)}`,
-      fd,
-      { headers: { 'Content-Type': 'multipart/form-data' } }
-    );
+//     // http baseURL = '/api' ⇒ זה ילך ל /api/upload
+//     const { data } = await http.post(
+//       `/upload?old=${encodeURIComponent(oldRel)}`,
+//       fd,
+//       { headers: { 'Content-Type': 'multipart/form-data' } }
+//     );
 
-    const url = data?.url || '';
-    if (!url) throw new Error('Bad upload response');
+//     const url = data?.url || '';
+//     if (!url) throw new Error('Bad upload response');
 
-    if (which === 'new') {
-      setCandForm(prev => ({ ...prev, photoUrl: url }));
-    } else {
-      setEditCandForm(prev => ({ ...prev, photoUrl: url }));
-    }
-  } catch (e) {
-    toast.error(e?.response?.data?.message || e?.message || 'העלאה נכשלה');
-  } finally {
-    if (which === 'new') setUploadingNew(false);
-    if (which === 'edit') setUploadingEdit(false);
-  }
-};
+//     if (which === 'new') {
+//       setCandForm(prev => ({ ...prev, photoUrl: url }));
+//     } else {
+//       setEditCandForm(prev => ({ ...prev, photoUrl: url }));
+//     }
+//   } catch (e) {
+//     toast.error(e?.response?.data?.message || e?.message || 'העלאה נכשלה');
+//   } finally {
+//     if (which === 'new') setUploadingNew(false);
+//     if (which === 'edit') setUploadingEdit(false);
+//   }
+// };
 
 
   // העלאת תמונה
