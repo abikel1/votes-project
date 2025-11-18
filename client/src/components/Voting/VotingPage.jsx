@@ -16,6 +16,7 @@ import {
 } from '../../slices/votesSlice';
 
 import './VotingPage.css';
+import { toast } from 'react-hot-toast';
 
 import http from '../../api/http';
 
@@ -130,7 +131,13 @@ export default function VotingDragPage() {
       if (msg.includes('already voted') || msg.includes('כבר הצבעת')) {
         // if (userId) localStorage.setItem(`voted:${groupId}:${userId}`, '1');
       } else {
-        alert('שגיאה בהצבעה: ' + msg);
+toast.error('שגיאה בהצבעה: ' + msg);
+
+
+
+
+
+
       }
     } finally {
       setIsSubmitting(false);

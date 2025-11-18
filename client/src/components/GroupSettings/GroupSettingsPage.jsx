@@ -2,6 +2,7 @@
 import { useEffect, useMemo, useState, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
+import { toast } from 'react-hot-toast';
 
 import {
   fetchGroupWithMembers,
@@ -346,15 +347,16 @@ export default function GroupSettingsPage() {
   }, [group, userEmail, userId, firstName, lastName]);
 
 
-const slug = group ? makeSlug(group.name || groupSlug || groupId) : groupSlug;
+  const slug = group ? makeSlug(group.name || groupSlug || groupId) : groupSlug;
 
-// קישורי שיתוף
-const sharePath = useMemo(() => {
-  if (!group) return '';
-  // נעולה → /join/slug
-  // פתוחה → /groups/slug
-  return group.isLocked ? `/join/${slug}` : `/groups/${slug}`;
-}, [group, slug]);
+  // קישורי שיתוף
+  const sharePath = useMemo(() => {
+    if (!group) return '';
+    // נעולה → /join/slug
+    // פתוחה → /groups/slug
+    if (group.isLocked) return `/join/${slug}`;
+    return `/groups/${slug}`;
+  }, [group, slug]);
 
 
 
@@ -477,22 +479,31 @@ const sharePath = useMemo(() => {
   };
 
   // יצירת מועמד/ת
-  const onAddCandidate = (e) => {
-    e.preventDefault();
-    const errors = validateCandidateFields(candForm);
-    setCandErrors(errors);
-    if (Object.keys(errors).length > 0) {
-      return;
-    }
+const onAddCandidate = (e) => {
+  e.preventDefault();
 
-    dispatch(createCandidate({ groupId, ...candForm }))
-      .unwrap()
-      .then(() => {
-        setCandForm({ name: '', description: '', symbol: '', photoUrl: '' });
-        setCandErrors({});
-      })
-      .then(() => dispatch(fetchCandidatesByGroup(groupId)));
-  };
+  const errors = validateCandidateFields(candForm);
+
+  // הצגת Toast אם השם ריק
+  if (!candForm.name.trim()) {
+    toast.error('שם מועמד/ת חובה');
+  }
+
+  setCandErrors(errors);
+
+  if (Object.keys(errors).length > 0) {
+    return;
+  }
+
+  dispatch(createCandidate({ groupId, ...candForm }))
+    .unwrap()
+    .then(() => {
+      setCandForm({ name: '', description: '', symbol: '', photoUrl: '' });
+      setCandErrors({});
+    })
+    .then(() => dispatch(fetchCandidatesByGroup(groupId)));
+};
+
 
   const onDeleteCandidate = (cid) =>
     dispatch(deleteCandidate({ candidateId: cid, groupId }));
@@ -503,7 +514,13 @@ const sharePath = useMemo(() => {
       setDeleteOpen(false);
       navigate('/groups');
     } catch (e) {
-      alert(e || 'מחיקה נכשלה');
+toast.error(e || 'מחיקה נכשלה');
+
+
+
+
+
+
     }
   };
 
@@ -533,37 +550,84 @@ const sharePath = useMemo(() => {
     setEditCandErrors((prev) => ({ ...prev, [name]: undefined }));
   };
 
-  const onSaveEditedCandidate = async (e) => {
-    e.preventDefault();
-    const { _id, name, description, symbol, photoUrl } = editCandForm;
+const onSaveEditedCandidate = async (e) => {
+  e.preventDefault();
+  const { _id, name, description, symbol, photoUrl } = editCandForm;
 
-    const errors = validateCandidateFields({ name, description, symbol });
-    setEditCandErrors(errors);
-    if (Object.keys(errors).length > 0) {
-      return;
-    }
+  // בדיקה והצגת Toast אם השם ריק
+  if (!name?.trim()) {
+    toast.error('שם מועמד/ת חובה');
+  }
 
-    const patch = {
-      name: name.trim(),
-      description: (description || '').trim(),
-      symbol: (symbol || '').trim(),
-      photoUrl: (photoUrl || '').trim(),
-    };
+  // בדיקה כללית של כל השדות
+  const errors = validateCandidateFields({ name, description, symbol });
+  setEditCandErrors(errors);
+  if (Object.keys(errors).length > 0) {
+    return;
+  }
 
-    try {
-      await dispatch(updateCandidate({ candidateId: _id, groupId, patch })).unwrap();
-      setEditCandOpen(false);
-      setEditCandErrors({});
-      dispatch(fetchCandidatesByGroup(groupId));
-    } catch (err) {
-      alert(err || 'עדכון נכשל');
-    }
+  const patch = {
+    name: name.trim(),
+    description: (description || '').trim(),
+    symbol: (symbol || '').trim(),
+    photoUrl: (photoUrl || '').trim(),
   };
 
-  const onCancelEditCandidate = () => {
+  try {
+    await dispatch(updateCandidate({ candidateId: _id, groupId, patch })).unwrap();
     setEditCandOpen(false);
     setEditCandErrors({});
-  };
+    dispatch(fetchCandidatesByGroup(groupId));
+  } catch (err) {
+    toast.error(err || 'עדכון נכשל');
+  }
+};
+
+
+const onCancelEditCandidate = () => {
+  setEditCandOpen(false);
+  setEditCandErrors({});
+};
+
+// העלאת תמונה (חדש/עריכה) - שולח לשרת גם שם קובץ ישן למחיקה
+// const handleUpload = async (file, which) => {
+//   if (!file) return;
+
+//   const fd = new FormData();
+//   fd.append('image', file);
+
+//   const oldRel =
+//     which === 'new'
+//       ? oldRelFromUrl(candForm.photoUrl)
+//       : oldRelFromUrl(editCandForm.photoUrl);
+
+//   try {
+//     if (which === 'new') setUploadingNew(true);
+//     if (which === 'edit') setUploadingEdit(true);
+
+//     // http baseURL = '/api' ⇒ זה ילך ל /api/upload
+//     const { data } = await http.post(
+//       `/upload?old=${encodeURIComponent(oldRel)}`,
+//       fd,
+//       { headers: { 'Content-Type': 'multipart/form-data' } }
+//     );
+
+//     const url = data?.url || '';
+//     if (!url) throw new Error('Bad upload response');
+
+//     if (which === 'new') {
+//       setCandForm(prev => ({ ...prev, photoUrl: url }));
+//     } else {
+//       setEditCandForm(prev => ({ ...prev, photoUrl: url }));
+//     }
+//   } catch (e) {
+//     toast.error(e?.response?.data?.message || e?.message || 'העלאה נכשלה');
+//   } finally {
+//     if (which === 'new') setUploadingNew(false);
+//     if (which === 'edit') setUploadingEdit(false);
+//   }
+// };
+
 
   // העלאת תמונה
   // העלאת תמונה לשרת
@@ -1097,7 +1161,10 @@ const sharePath = useMemo(() => {
                         isOwner && String(group.createdById) !== mid;
                       const onRemove = removable
                         ? async () => {
+                          toast.error(`הסרה נכשלה – נדרש אישור להסרה`);
+
                           if (
+                            
                             !window.confirm(
                               `להסיר את ${m.name || m.email || mid} מהקבוצה?`,
                               `להסיר את ${m.name || m.email || mid
@@ -1125,12 +1192,9 @@ const sharePath = useMemo(() => {
                                 groupId
                               )
                             );
-                          } catch (e) {
-                            alert(
-                              e ||
-                              'Failed to remove member'
-                            );
-                          }
+                          }catch (e) {
+  toast.error(e || 'Failed to remove member');
+}
                         }
                         : undefined;
 

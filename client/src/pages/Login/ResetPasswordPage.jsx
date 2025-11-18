@@ -8,7 +8,7 @@ import '../Register/RegisterPage.css'; // להשתמש באותו עיצוב ש�
 /** עטיפת שדה שמציגה שגיאה מעל הקובייה (כמו בהרשמה) */
 const FormRow = ({ error, children }) => (
   <div className={`form-row ${error ? 'has-error' : ''}`}>
-    {error && <div className="field-error-above" role="alert">{error}</div>}
+    {/* {error && <div className="field-error-above" role="alert">{error}</div>} */}
     {children}
   </div>
 );
