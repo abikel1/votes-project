@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { fetchGroups, selectGroupsWithOwnership } from '../../slices/groupsSlice';
 import { HiClock, HiUserGroup, HiCheckCircle, HiXCircle, HiPlus, HiChartBar, HiUser, HiOutlineBadgeCheck } from 'react-icons/hi';
 import './HomePage.css';
+import { toast } from 'react-hot-toast';
 
 const HomePage = () => {
   const dispatch = useDispatch();
@@ -85,7 +86,13 @@ const HomePage = () => {
 
   const onCreateGroupClick = () => {
     if (!isAuthed) {
-      alert('כדי ליצור קבוצה יש להתחבר תחילה.');
+toast.error('כדי ליצור קבוצה יש להתחבר תחילה.');
+
+
+
+
+
+
       navigate('/login', { state: { redirectTo: '/groups/create' } });
       return;
     }

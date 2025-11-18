@@ -2,6 +2,7 @@ import { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { HiClock, HiUserGroup, HiUser, HiOutlineBadgeCheck } from 'react-icons/hi';
+import toast from 'react-hot-toast';
 
 import {
   fetchMyGroups,
@@ -191,11 +192,11 @@ export default function GroupDetailPage() {
           <button
             className="vote-btn"
             onClick={() => {
-              if (!isAuthed) {
-                const goLogin = window.confirm('אינך מחובר/ת. כדי להצביע צריך להתחבר. לעבור למסך ההתחברות?');
-                if (goLogin) navigate('/login', { state: { redirectTo: `/groups/${slug}/candidates` } });
-                return;
-              }
+            if (!isAuthed) {
+  toast.error('אינך מחובר/ת. כדי להצביע צריך להתחבר.');
+  navigate('/login');
+  return;
+}
 
               navigate(`/groups/${slug}/candidates`, {
                 state: { groupId },

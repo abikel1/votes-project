@@ -2,6 +2,7 @@
 import { useEffect, useMemo, useState, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
+import { toast } from 'react-hot-toast';
 
 import {
   fetchGroupWithMembers,
@@ -417,7 +418,13 @@ const prettyShareUrl = shareUrl ? decodeURI(shareUrl) : '';
   // יצירת מועמד/ת
   const onAddCandidate = (e) => {
     e.preventDefault();
-    if (!candForm.name.trim()) return alert('שם מועמד/ת חובה');
+if (!candForm.name.trim()) return toast.error('שם מועמד/ת חובה');
+
+
+
+
+
+
     dispatch(createCandidate({ groupId, ...candForm }))
       .unwrap()
       .then(() => setCandForm({ name: '', description: '', symbol: '', photoUrl: '' }))
@@ -433,7 +440,13 @@ const prettyShareUrl = shareUrl ? decodeURI(shareUrl) : '';
       setDeleteOpen(false);
       navigate('/groups');
     } catch (e) {
-      alert(e || 'מחיקה נכשלה');
+toast.error(e || 'מחיקה נכשלה');
+
+
+
+
+
+
     }
   };
 
@@ -466,7 +479,13 @@ const prettyShareUrl = shareUrl ? decodeURI(shareUrl) : '';
   const onSaveEditedCandidate = async (e) => {
     e.preventDefault();
     const { _id, name, description, symbol, photoUrl } = editCandForm;
-    if (!name?.trim()) return alert('שם מועמד/ת חובה');
+if (!name?.trim()) return toast.error('שם מועמד/ת חובה');
+
+
+
+
+
+
 
     const patch = {
       name: name.trim(),
@@ -480,7 +499,13 @@ const prettyShareUrl = shareUrl ? decodeURI(shareUrl) : '';
       setEditCandOpen(false);
       dispatch(fetchCandidatesByGroup(groupId));
     } catch (err) {
-      alert(err || 'עדכון נכשל');
+toast.error(err || 'עדכון נכשל');
+
+
+
+
+
+
     }
   };
 
@@ -518,7 +543,13 @@ const prettyShareUrl = shareUrl ? decodeURI(shareUrl) : '';
         setEditCandForm(prev => ({ ...prev, photoUrl: url }));
       }
     } catch (e) {
-      alert(e?.response?.data?.message || e?.message || 'העלאה נכשלה');
+toast.error(e?.response?.data?.message || e?.message || 'העלאה נכשלה');
+
+
+
+
+
+
     } finally {
       if (which === 'new') setUploadingNew(false);
       if (which === 'edit') setUploadingEdit(false);
@@ -1059,7 +1090,10 @@ const prettyShareUrl = shareUrl ? decodeURI(shareUrl) : '';
                         String(group.createdById) !== mid;
                       const onRemove = removable
                         ? async () => {
+                          toast.error(`הסרה נכשלה – נדרש אישור להסרה`);
+
                           if (
+                            
                             !window.confirm(
                               `להסיר את ${m.name || m.email || mid
                               } מהקבוצה?`
@@ -1085,12 +1119,9 @@ const prettyShareUrl = shareUrl ? decodeURI(shareUrl) : '';
                                 groupId
                               )
                             );
-                          } catch (e) {
-                            alert(
-                              e ||
-                              'Failed to remove member'
-                            );
-                          }
+                          }catch (e) {
+  toast.error(e || 'Failed to remove member');
+}
                         }
                         : undefined;
 
