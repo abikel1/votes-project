@@ -20,19 +20,20 @@ import ResetPasswordPage from './pages/Login/ResetPasswordPage.jsx';
 import JoinGroupPage from './pages/Join/JoinGroupPage.jsx';
 import AboutPage from './pages/About/AboutPage.jsx';
 import UserGuidePage from './pages/UserGuide/UserGuidePage.jsx';
-import ToastDemo from './components/a.jsx'; // השארתי כי לא היה כפילות
+import ToastDemo from './components/a.jsx';
+import Footer from './components/Footer/Footer'; // אם הפוטר אצלך בתיקייה אחרת, עדכני את הנתיב
 
 export default function App() {
   const dispatch = useDispatch();
-  const token = useSelector(s => s.auth.token);
+  const token = useSelector((s) => s.auth.token);
 
   useEffect(() => {
     if (token) dispatch(fetchMe());
   }, [token, dispatch]);
 
   return (
-    <>
-      <Toaster 
+    <div className="app-root">
+      <Toaster
         position="top-center"
         reverseOrder={false}
         toastOptions={{
@@ -60,29 +61,41 @@ export default function App() {
         }}
       />
 
-      <div>
-        <NavBar />
-        <Routes>
-          <Route path="/" element={<HomeRoute />} />
-          <Route path="/a" element={<ToastDemo />} />
+      <NavBar />
 
-          <Route path="/groups" element={<GroupsPage />} />
-          <Route path="/groups/:groupSlug" element={<GroupDetailPage />} />
-          <Route path="/groups/:groupSlug/settings" element={<GroupSettingsPage />} />
-          <Route path="/groups/:groupSlug/candidates" element={<VotingPage />} />
-          <Route path="/groups/create" element={<CreateGroupPage />} />
+      <Routes>
+        <Route path="/" element={<HomeRoute />} />
+        <Route path="/a" element={<ToastDemo />} />
 
-          <Route path="/join/:slug" element={<JoinGroupPage />} />
-          <Route path="/register" element={<RegisterPage />} />
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-          <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
-          <Route path="/profile" element={<ProfilePage />} />
-          <Route path="/tools/send-email" element={<SendEmailPage />} />
-          <Route path="/about" element={<AboutPage />} />
-          <Route path="/user-guide" element={<UserGuidePage />} />
-        </Routes>
-      </div>
-    </>
+        <Route path="/groups" element={<GroupsPage />} />
+        <Route path="/groups/create" element={<CreateGroupPage />} />
+        <Route path="/groups/:groupSlug" element={<GroupDetailPage />} />
+        <Route
+          path="/groups/:groupSlug/settings"
+          element={<GroupSettingsPage />}
+        />
+        <Route
+          path="/groups/:groupSlug/candidates"
+          element={<VotingPage />}
+        />
+
+        <Route path="/join/:slug" element={<JoinGroupPage />} />
+
+        <Route path="/register" element={<RegisterPage />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+        <Route
+          path="/reset-password/:token"
+          element={<ResetPasswordPage />}
+        />
+
+        <Route path="/profile" element={<ProfilePage />} />
+        <Route path="/tools/send-email" element={<SendEmailPage />} />
+        <Route path="/about" element={<AboutPage />} />
+        <Route path="/user-guide" element={<UserGuidePage />} />
+      </Routes>
+
+      <Footer />
+    </div>
   );
 }

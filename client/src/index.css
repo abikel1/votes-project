@@ -34,5 +34,3 @@ html, body, #root {
   overflow: visible !important;
 }
 
-/* המלצה כללית נוחה: */
-* { box-sizing: border-box; }
