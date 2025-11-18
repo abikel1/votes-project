@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { HiClock, HiUserGroup, HiUser, HiOutlineBadgeCheck } from 'react-icons/hi';
 
@@ -23,19 +23,62 @@ import {
   PieChart, Pie, Cell, Legend
 } from 'recharts';
 
+import http from '../../api/http';
+
 // צבעים לגרפים
 const COLORS = ['#003366', '#8b5cf6', '#ec4899', '#f59e0b', '#10b981', '#06b6d4', '#6366f1', '#84cc16'];
 
+const makeSlug = (name = '') =>
+  encodeURIComponent(
+    String(name)
+      .trim()
+      .toLowerCase()
+      .replace(/\s+/g, '-')
+  );
+
 export default function GroupDetailPage() {
-  const { groupId } = useParams();
+  const { groupSlug } = useParams();
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const navGroupId = location.state?.groupId || null;
+
+  // state פנימי ל־groupId – מתחיל מהניווט (אם יש)
+  const [groupId, setGroupId] = useState(navGroupId);
+
+  // אם נכנסו עם /groups/:groupSlug בלי state – נטען id מהשרת לפי slug
+  useEffect(() => {
+    // אם יש id מהניווט הפנימי – נשתמש בו
+    if (navGroupId) {
+      setGroupId(navGroupId);
+      return;
+    }
+
+    // אם אין slug ב־URL – אין מה לעשות
+    if (!groupSlug) return;
+
+    // בקשת GET לראוט החדש /api/groups/slug/:slug
+    (async () => {
+      try {
+        const { data } = await http.get(`/groups/slug/${groupSlug}`);
+        setGroupId(data._id);          // שומרת את ה־id שהגיע מהשרת
+      } catch (err) {
+        console.error('failed to resolve group by slug', err);
+        setGroupId(null);
+      }
+    })();
+  }, [navGroupId, groupSlug]);
+
+
+
 
   const { selectedGroup: group, loading: groupLoading } = useSelector(s => s.groups);
 
-  const candidates = useSelector(selectCandidatesForGroup(groupId));
-  const loadingCandidates = useSelector(selectCandidatesLoadingForGroup(groupId));
-  const errorCandidates = useSelector(selectCandidatesErrorForGroup(groupId));
+  const candidates = useSelector(selectCandidatesForGroup(groupId || '')) || [];
+  const loadingCandidates = useSelector(selectCandidatesLoadingForGroup(groupId || ''));
+  const errorCandidates = useSelector(selectCandidatesErrorForGroup(groupId || ''));
+
 
   const { userEmail: authEmail, userId: authId } = useSelector((s) => s.auth);
   const isAuthed = !!authId || !!authEmail || !!localStorage.getItem('authToken');
@@ -50,7 +93,7 @@ export default function GroupDetailPage() {
   // טוען נתונים
   useEffect(() => {
     if (groupId) dispatch(fetchGroupWithMembers(groupId));
-    dispatch(fetchCandidatesByGroup(groupId));
+    if (groupId) dispatch(fetchCandidatesByGroup(groupId));
     if (isAuthed) dispatch(fetchMyGroups());
   }, [dispatch, groupId, isAuthed]);
 
@@ -77,8 +120,22 @@ export default function GroupDetailPage() {
     };
   }, [isDragging]);
 
-  if (groupLoading || !group)
+  if (!groupId) {
+    return (
+      <div className="loading-wrap">
+        טוען נתוני קבוצה…
+      </div>
+    );
+  }
+
+
+  if (groupLoading || !group) {
     return <div className="loading-wrap">טוען נתוני קבוצה…</div>;
+  }
+
+  // מכאן והלאה בטוח שיש group
+  const slug = makeSlug(group.name || groupSlug || groupId);
+
 
   // פונקציות עזר
   const formatDate = (dateString) => {
@@ -137,14 +194,18 @@ export default function GroupDetailPage() {
             onClick={() => {
               if (!isAuthed) {
                 const goLogin = window.confirm('אינך מחובר/ת. כדי להצביע צריך להתחבר. לעבור למסך ההתחברות?');
-                if (goLogin) navigate('/login', { state: { redirectTo: `/groups/${groupId}/candidates` } });
+                if (goLogin) navigate('/login', { state: { redirectTo: `/groups/${slug}/candidates` } });
                 return;
               }
-              navigate(`/groups/${groupId}/candidates`);
+
+              navigate(`/groups/${slug}/candidates`, {
+                state: { groupId },
+              });
             }}
           >
             להצבעה בקלפי
           </button>
+
         )}
       </div>
 
@@ -249,9 +310,6 @@ export default function GroupDetailPage() {
                   <h4>{group.maxWinners}</h4>
                 </div>
               </div>
-
-              {/* שימי לב: הכפתור "עבור להצבעה" הוסר מכאן */}
-
             </div>
           )}
 
@@ -292,7 +350,6 @@ export default function GroupDetailPage() {
             </div>
           )}
         </div>
-
       </div>
     </div>
   );

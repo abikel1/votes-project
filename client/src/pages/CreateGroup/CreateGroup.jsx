@@ -4,6 +4,15 @@ import { createGroup, clearCreateState } from '../../slices/groupsSlice';
 import { useNavigate } from 'react-router-dom';
 import './CreateGroup.css';
 
+const makeSlug = (name = '') =>
+  encodeURIComponent(
+    String(name)
+      .trim()
+      .toLowerCase()
+      .replace(/\s+/g, '-')
+  );
+
+
 export default function CreateGroupPage() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -19,6 +28,7 @@ export default function CreateGroupPage() {
   });
 
   const [showModal, setShowModal] = useState(false);
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     if (justCreated && selectedGroup?._id) setShowModal(true);
@@ -55,20 +65,54 @@ export default function CreateGroupPage() {
 
   const copy = async (text) => {
     try { await navigator.clipboard.writeText(text); alert('הקישור הועתק'); }
-    catch {}
+    catch { }
   };
 
   const origin = typeof window !== 'undefined' ? window.location.origin : '';
-  const shareUrl = selectedGroup?._id
-    ? `${origin}${selectedGroup.isLocked ? `/join/${selectedGroup._id}` : `/groups/${selectedGroup._id}`}`
+
+  const slug =
+    selectedGroup?.name
+      ? makeSlug(selectedGroup.name)
+      : '';
+
+  const sharePath = selectedGroup?._id
+    ? (selectedGroup.isLocked
+      ? `/join/${selectedGroup._id}`
+      : `/groups/${slug}`)
     : '';
+
+  const shareUrl = sharePath ? `${origin}${sharePath}` : '';
+
+  const prettyShareUrl = shareUrl ? decodeURI(shareUrl) : ''; // 👈 מה שמציגים בעין
+
+  const copyShareUrl = async () => {                         // 👈 במקום copy הישן
+    if (!shareUrl) return;
+    try {
+      await navigator.clipboard.writeText(prettyShareUrl);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    } catch {
+      // אפשר להשאיר ריק או לשים fallback עם input זמני אם תרצי
+    }
+  };
+
+
+
 
   const finishToGroup = () => {
     setShowModal(false);
     dispatch(clearCreateState());
-    if (selectedGroup?._id) navigate(`/groups/${selectedGroup._id}`);
-    else navigate('/groups');
+
+    if (selectedGroup?._id) {
+      const slug = makeSlug(selectedGroup.name || selectedGroup._id);
+      navigate(`/groups/${slug}`, {
+        state: { groupId: selectedGroup._id },
+      });
+    } else {
+      navigate('/groups');
+    }
   };
+
 
   return (
     <div className="cg-wrap">
@@ -148,13 +192,24 @@ export default function CreateGroupPage() {
             <div style={{ marginBottom: 12 }}>
               <div>קישור לשיתוף:</div>
               <div style={{ display: 'flex', gap: 8, marginTop: 6 }}>
-                <input className="cg-input" readOnly value={shareUrl} onFocus={(e)=>e.target.select()} />
-                <button className="gs-btn" type="button" onClick={() => copy(shareUrl)}>העתק</button>
+                <input
+                  className="cg-input"
+                  readOnly
+                  value={prettyShareUrl}
+                  onFocus={(e) => e.target.select()}
+                />
+                <button
+                  className="gs-btn"
+                  type="button"
+                  onClick={copyShareUrl}
+                >
+                  {copied ? 'הועתק ✓' : 'העתק'}
+                </button>
+
               </div>
             </div>
 
             <div className="actions-row" style={{ marginTop: 12, display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
-              <button className="gs-btn-outline" type="button" onClick={() => setShowModal(false)}>סגור</button>
               <button className="gs-btn" type="button" onClick={finishToGroup}>סיום</button>
             </div>
           </div>

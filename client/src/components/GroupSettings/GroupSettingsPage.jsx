@@ -1,7 +1,7 @@
 // src/pages/GroupSettingsPage.jsx
 import { useEffect, useMemo, useState, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useLocation } from 'react-router-dom';
 
 import {
   fetchGroupWithMembers,
@@ -62,6 +62,14 @@ async function uploadImage(file, oldUrl = '') {
   return data.url;
 }
 
+
+const makeSlug = (name = '') =>
+  encodeURIComponent(
+    String(name)
+      .trim()
+      .toLowerCase()
+      .replace(/\s+/g, '-')
+  );
 // עוזר לתאריך
 function toLocalDateInputValue(d) {
   if (!d) return '';
@@ -197,7 +205,10 @@ function validateCandidateFields({ name, description, symbol }) {
 }
 
 export default function GroupSettingsPage() {
-  const { groupId } = useParams();
+  const { groupSlug } = useParams();
+  const location = useLocation();
+  const groupId = location.state?.groupId || null;
+
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -280,22 +291,23 @@ export default function GroupSettingsPage() {
   const editFileInputRef = useRef(null);
 
   useEffect(() => {
+    if (!groupId) return;   // 👈 אם אין groupId – לא שולחים בקשות
     dispatch(fetchGroupWithMembers(groupId));
     dispatch(fetchCandidatesByGroup(groupId));
     dispatch(fetchVotersByGroup(groupId));
   }, [dispatch, groupId]);
 
-  useEffect(() => {
-    if (group?.isLocked) dispatch(fetchJoinRequests(groupId));
-  }, [dispatch, groupId, group?.isLocked]);
 
+  useEffect(() => {
+    if (!groupId || !group?.isLocked) return;  // 👈 בלי groupId או בלי נעילה – לא לעשות כלום
+    dispatch(fetchJoinRequests(groupId));
+  }, [dispatch, groupId, group?.isLocked]);
   useEffect(
     () => () => {
       dispatch(clearUpdateState());
     },
     [dispatch],
   );
-
   useEffect(() => {
     if (group) {
       setForm({
@@ -333,22 +345,32 @@ export default function GroupSettingsPage() {
     return !!(byEmail || byId || byFullName);
   }, [group, userEmail, userId, firstName, lastName]);
 
-  // קישורי שיתוף
-  const sharePath = useMemo(() => {
-    if (!group) return '';
-    return group.isLocked ? `/join/${groupId}` : `/groups/${groupId}`;
-  }, [group, groupId]);
 
-  const shareUrl = useMemo(() => {
-    if (!sharePath) return '';
-    return `${window.location.origin}${sharePath}`;
-  }, [sharePath]);
+  const slug = group ? makeSlug(group.name || groupSlug || groupId) : groupSlug;
+
+// קישורי שיתוף
+const sharePath = useMemo(() => {
+  if (!group) return '';
+  // בקבוצה נעולה – נשאיר id (שלא לשבור מה שכבר עובד)
+  if (group.isLocked) return `/join/${groupId}`;
+  // קבוצה פתוחה – לינק רק לפי שם, בלי id
+  return `/groups/${slug}`;
+}, [group, groupId, slug]);
+
+const shareUrl = useMemo(() => {
+  if (!sharePath) return '';
+  return `${window.location.origin}${sharePath}`;
+}, [sharePath]);
+
+// 👇 זה צריך לבוא אחרי shareUrl
+const prettyShareUrl = shareUrl ? decodeURI(shareUrl) : '';
+
 
   const [copied, setCopied] = useState(false);
   const copyShareUrl = async () => {
     if (!shareUrl) return;
     try {
-      await navigator.clipboard.writeText(shareUrl);
+      await navigator.clipboard.writeText(prettyShareUrl);
       setCopied(true);
       setTimeout(() => setCopied(false), 1500);
     } catch {
@@ -362,6 +384,19 @@ export default function GroupSettingsPage() {
       setTimeout(() => setCopied(false), 1500);
     }
   };
+
+  if (!groupId) {
+    return (
+      <div className="gs-wrap">
+        <h2>הגדרות קבוצה</h2>
+        <div>לא נמצא מזהה קבוצה.</div>
+        <button className="gs-btn" onClick={() => navigate('/groups')}>
+          חזרה לרשימת הקבוצות
+        </button>
+      </div>
+    );
+  }
+
 
   if (groupLoading) {
     return (
@@ -663,7 +698,7 @@ export default function GroupSettingsPage() {
                   <div className="share-row">
                     <input
                       className="input share-input"
-                      value={shareUrl}
+                      value={prettyShareUrl}
                       readOnly
                       style={{ direction: 'ltr' }}
                       onFocus={(e) => e.target.select()}
@@ -957,6 +992,7 @@ export default function GroupSettingsPage() {
                             {email ? `${email}` : ''}
                             {when
                               ? ` · ${new Date(when).toLocaleString('he-IL')}`
+
                               : ''}
                           </div>
                         </div>
@@ -1063,6 +1099,8 @@ export default function GroupSettingsPage() {
                           if (
                             !window.confirm(
                               `להסיר את ${m.name || m.email || mid} מהקבוצה?`,
+                              `להסיר את ${m.name || m.email || mid
+                              } מהקבוצה?`
                             )
                           )
                             return;
@@ -1072,13 +1110,25 @@ export default function GroupSettingsPage() {
                                 groupId,
                                 memberId: mid,
                                 email: m.email || undefined,
-                              }),
+
+                              })
                             ).unwrap();
                             if (group.isLocked)
-                              dispatch(fetchJoinRequests(groupId));
-                            dispatch(fetchGroupWithMembers(groupId));
+                              dispatch(
+                                fetchJoinRequests(
+                                  groupId
+                                )
+                              );
+                            dispatch(
+                              fetchGroupWithMembers(
+                                groupId
+                              )
+                            );
                           } catch (e) {
-                            alert(e || 'Failed to remove member');
+                            alert(
+                              e ||
+                              'Failed to remove member'
+                            );
                           }
                         }
                         : undefined;
@@ -1226,6 +1276,12 @@ export default function GroupSettingsPage() {
                   {(updatingThisCandidate || uploadingEdit) && (
                     <span className="muted">מעלה…</span>
                   )}
+                  {(updatingThisCandidate ||
+                    uploadingEdit) && (
+                      <span className="muted">
+                        מעלה…
+                      </span>
+                    )}
                 </div>
               ) : (
                 <div className="thumb-row">
@@ -1255,6 +1311,12 @@ export default function GroupSettingsPage() {
                   {(updatingThisCandidate || uploadingEdit) && (
                     <span className="muted">מעלה…</span>
                   )}
+                  {(updatingThisCandidate ||
+                    uploadingEdit) && (
+                      <span className="muted">
+                        מעלה…
+                      </span>
+                    )}
                 </div>
               )}
 
