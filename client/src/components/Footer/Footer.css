@@ -1,22 +1,21 @@
 /* Footer.css */
 
-/* פונט אחיד לכל הפוטר */
-.site-footer, 
+.site-footer,
 .site-footer * {
   font-family: 'Segoe UI', Roboto, Arial, sans-serif;
   color: #333;
   box-sizing: border-box;
 }
 
-/* גוף הפוטר */
 .site-footer {
   background-color: #f9f9f9;
   padding: 24px 20px;
   font-size: 14px;
   border-top: 1px solid #e0e0e0;
+  direction: rtl;
 }
 
-/* הפנימי - שתי או שלוש עמודות */
+/* שלוש עמודות */
 .footer-inner {
   display: flex;
   flex-wrap: wrap;
@@ -26,72 +25,82 @@
   margin: 0 auto 16px auto;
 }
 
-/* כל עמודה */
 .footer-col {
-  flex: 1 1 200px;
-  min-width: 180px;
+  flex: 1 1 220px;
+  min-width: 200px;
 }
 
-/* כותרות עמודות */
+/* טור טקסט רחב */
+.footer-col-main {
+  max-width: 420px;
+}
+
 .footer-col h4 {
   margin-bottom: 12px;
   font-weight: 600;
   color: #111;
 }
 
-/* טקסט רגיל */
 .footer-col p {
   margin: 6px 0;
   line-height: 1.5;
 }
 
-/* לינקים */
+.footer-tagline {
+  margin-top: 10px;
+  font-weight: 500;
+}
+
+/* שתי עמודות לקישורים */
 .footer-links {
   list-style: none;
   padding: 0;
   margin: 0;
 }
 
-.footer-links li {
-  margin-bottom: 8px;
+.footer-links-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 120px));
+  column-gap: 24px;
+  row-gap: 8px;
 }
 
 .footer-links a {
   color: #333;
   text-decoration: none;
-  transition: color 0.2s;
+  transition: color 0.2s, transform 0.15s;
 }
 
 .footer-links a:hover {
   color: #0077ff;
+  transform: translateY(-2px);
 }
 
-/* מדיה חברתית */
-.footer-social {
-  margin-top: 16px;
+/* טור רשתות חברתיות */
+.footer-col-social {
+  min-width: 200px;
 }
 
-.footer-social-title {
-  display: block;
-  font-weight: 600;
-  margin-bottom: 6px;
+.footer-col-social h4 {
+  margin-bottom: 14px;
 }
 
 .footer-social-icons a {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  margin-right: 10px;
+  margin-left: 12px;
+  font-size: 22px;
   color: #333;
-  font-size: 18px;
-  transition: color 0.2s;
+  transition: color 0.2s, transform 0.15s;
 }
 
 .footer-social-icons a:hover {
   color: #0077ff;
+  transform: translateY(-2px);
 }
 
-/* תחתית הפוטר */
+/* תחתית */
 .footer-bottom {
   border-top: 1px solid #e0e0e0;
   padding-top: 12px;
@@ -108,9 +117,18 @@
 @media (max-width: 768px) {
   .footer-inner {
     flex-direction: column;
-    gap: 24px;
+    gap: 30px;
   }
+
   .footer-col {
     min-width: 100%;
+  }
+
+  .footer-links-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .footer-social-icons a {
+    font-size: 24px;
   }
 }
