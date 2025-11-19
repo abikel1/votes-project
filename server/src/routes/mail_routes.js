@@ -16,7 +16,7 @@ const rateLimit = require('../middlewares/rate_limit_middleware');
 
 router.post(
   '/send',
-  authMiddleware,
+ // authMiddleware,
   rateLimit({ windowMs: 60_000, max: 3 }),
   sendGenericMail
 );
