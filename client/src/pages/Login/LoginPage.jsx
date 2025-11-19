@@ -223,7 +223,7 @@ export default function LoginPage() {
   const params = new URLSearchParams(location.search);
   const redirect = params.get('redirect');
   const expired = params.get('expired');
-  const fallbackAfterLogin = '/groups';
+  const fallbackAfterLogin = '/';
 
   const validateForm = () => {
     const newErrors = {};
