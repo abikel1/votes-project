@@ -48,9 +48,9 @@ export default function Footer() {
             </div>
 
             <div className="footer-bottom">
-                <span>© {year} מערכת ההצבעות</span>
-                <span>כל הזכויות שמורות</span>
+                <span>© {year} מערכת ההצבעות · כל הזכויות שמורות</span>
             </div>
+
         </footer>
     );
 }
