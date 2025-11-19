@@ -42,7 +42,6 @@ export default function VotingDragPage() {
     if (!groupSlug) return;
 if (!isAuthed) {
   toast.error('אינך מחובר/ת. כדי להצביע צריך להתחבר.');
-  // navigate('/login');
   return null;
 }
 
