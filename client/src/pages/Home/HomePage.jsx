@@ -130,7 +130,7 @@ const HomePage = () => {
       <section className="hero-section">
         <div className="hero-overlay"></div>
         <div className="hero-content">
-          <h1 className="hero-title">מערכת הצבעה דמוקרטית</h1>
+          <h1 className="hero-title">מערכת הצבעה דיגיטלית</h1>
           <p className="hero-subtitle">קולך נשמע • ההחלטה שלנו</p>
           <button className="hero-cta" onClick={onCreateGroupClick}>
             <HiPlus className="btn-icon" />
