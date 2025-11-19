@@ -22,22 +22,36 @@ import AboutPage from './pages/About/AboutPage.jsx';
 import UserGuidePage from './pages/UserGuide/UserGuidePage.jsx';
 import ToastDemo from './components/a.jsx';
 import Footer from './components/Footer/Footer'; // אם הפוטר אצלך בתיקייה אחרת, עדכני את הנתיב
+import ContactPage from './pages/ContactForm/ContactForm.jsx';
 
 export default function App() {
   const dispatch = useDispatch();
   const token = useSelector((s) => s.auth.token);
 
   // ניקוי לוקל סטורז אם אין טוקן
-  useEffect(() => {
-    const token = localStorage.getItem('authToken');
-    if (!token) {
-      localStorage.clear();
-    }
-  }, []);
-
-  useEffect(() => {
+ useEffect(() => {
     if (token) dispatch(fetchMe());
   }, [token, dispatch]);
+
+  // סינכרון בין טאבים
+  useEffect(() => {
+    const listener = (e) => {
+      if (e.key === 'token') {
+        const token = e.newValue;
+        if (token) {
+          const user = {
+            email: localStorage.getItem('userEmail'),
+            _id: localStorage.getItem('userId'),
+            firstName: localStorage.getItem('firstName'),
+            lastName: localStorage.getItem('lastName'),
+          };
+          dispatch(loginSuccess({ token, user }));
+        }
+      }
+    };
+    window.addEventListener('storage', listener);
+    return () => window.removeEventListener('storage', listener);
+  }, [dispatch]);
 
   return (
     <div className="app-root">
@@ -88,6 +102,7 @@ export default function App() {
         />
 
         <Route path="/join/:slug" element={<JoinGroupPage />} />
+  <Route path="/contact" element={<ContactPage />} />
 
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/login" element={<LoginPage />} />
