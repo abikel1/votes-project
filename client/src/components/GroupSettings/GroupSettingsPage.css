@@ -471,3 +471,132 @@ button.small.danger:hover {
   border-radius: 8px;
   border: 1px solid #eee;
 }
+/* Tabs bar */
+.gs-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 16px;
+  margin-bottom: 8px;
+  border-bottom: 1px solid #e6e6e6;
+  padding-bottom: 4px;
+  justify-content: flex-end; /* RTL – שישבו בצד ימין */
+}
+
+/* כפתורי טאב */
+.gs-tab-btn {
+  border: none;
+  background: transparent;
+  padding: 7px 14px;
+  border-radius: 999px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #555;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease, box-shadow 0.15s ease,
+    transform 0.05s ease;
+}
+
+.gs-tab-btn:hover {
+  background: #f3f7ff;
+}
+
+.gs-tab-btn:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(11, 116, 218, 0.25);
+}
+
+/* טאב פעיל */
+.gs-tab-btn.active {
+  background: #0b74da;
+  color: #fff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
+}
+
+/* אזור התוכן של הטאב */
+.gs-tab-panel {
+  margin-top: 10px;
+}
+
+/* ---- Sidebar Tabs ---- */
+
+.gs-sidebar-tabs {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 200px;
+  padding: 12px;
+  background: #fff;
+  border-radius: 14px;
+  border: 1px solid #eee;
+  height: fit-content;
+}
+
+.side-tab {
+  padding: 10px 14px;
+  border-radius: 10px;
+  text-align: right;
+  cursor: pointer;
+  background: #f7f7f7;
+  border: 1px solid #ddd;
+  font-weight: 600;
+  color: #333;
+  transition: .15s ease;
+}
+
+.side-tab:hover {
+  background: #eef4ff;
+  border-color: #c9dcff;
+}
+
+.side-tab.active {
+  background: #0b74da;
+  color: white;
+  border-color: #0b74da;
+}
+
+.side-tab.danger {
+  color: #b80d0d;
+  border-color: #ffcdcd;
+}
+
+.side-tab.danger.active {
+  background: #b80d0d;
+  color: #fff;
+}
+/* ----- Layout: תוכן + סיידבר ----- */
+
+.gs-main-layout {
+  display: flex;
+  flex-direction: row-reverse; /* כדי שהסיידבר יהיה בצד ימין */
+  gap: 16px;
+  align-items: flex-start;
+  margin-top: 16px;
+}
+
+/* התוכן יתפוס את כל הרוחב שנשאר */
+.gs-tab-panel {
+  flex: 1;
+  margin-top: 0; /* יש לך חוק קודם עם margin-top:10px – זה ידרוס אותו כאן */
+}
+
+/* רספונסיבי – במסכים צרים הסיידבר יירד מתחת לתוכן ויהפוך לשורה של כפתורים */
+@media (max-width: 900px) {
+  .gs-main-layout {
+    flex-direction: column;
+  }
+
+  .gs-sidebar-tabs {
+    width: 100%;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    gap: 8px;
+  }
+
+  .side-tab {
+    flex: 1 1 45%;
+    text-align: center;
+  }
+}
+
