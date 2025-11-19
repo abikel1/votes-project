@@ -27,6 +27,14 @@ export default function App() {
   const dispatch = useDispatch();
   const token = useSelector((s) => s.auth.token);
 
+  // ניקוי לוקל סטורז אם אין טוקן
+  useEffect(() => {
+    const token = localStorage.getItem('authToken');
+    if (!token) {
+      localStorage.clear();
+    }
+  }, []);
+
   useEffect(() => {
     if (token) dispatch(fetchMe());
   }, [token, dispatch]);

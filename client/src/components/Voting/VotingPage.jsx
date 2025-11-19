@@ -33,7 +33,6 @@ export default function VotingDragPage() {
 
   // אם אין לנו id מ-state, נטען אותו מהשרת לפי ה-slug
   useEffect(() => {
-    // אם הגיע id מהניווט – נשתמש בו
     if (navGroupId) {
       setGroupId(navGroupId);
       return;
@@ -41,6 +40,11 @@ export default function VotingDragPage() {
 
     // אין slug ב-URL? אין מה לעשות
     if (!groupSlug) return;
+if (!isAuthed) {
+  toast.error('אינך מחובר/ת. כדי להצביע צריך להתחבר.');
+  // navigate('/login');
+  return null;
+}
 
     (async () => {
       try {
