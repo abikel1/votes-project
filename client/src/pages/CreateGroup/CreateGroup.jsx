@@ -28,6 +28,8 @@ export default function CreateGroupPage() {
     isLocked: false, // false = פתוחה, true = נעולה
   });
 
+  const todayStr = new Date().toISOString().slice(0, 10);
+
   const [showModal, setShowModal] = useState(false);
   const [copied, setCopied] = useState(false);
 
@@ -48,43 +50,43 @@ export default function CreateGroupPage() {
   };
 
 
-const onSubmit = (e) => {
-  e.preventDefault();
-  
-  if (!form.name.trim()) {
-    toast.error('שם קבוצה חובה');
-    return;
-  }
-  
-  if (!form.description.trim()) {
-    toast.error('תיאור חובה');
-    return;
-  }
-  
-  if (!form.endDate) {
-    toast.error('תאריך סיום חובה');
-    return;
-  }
+  const onSubmit = (e) => {
+    e.preventDefault();
 
-  const payload = {
-    name: form.name.trim(),
-    description: form.description.trim(),
-    maxWinners: Number(form.maxWinners) || 1,
-    isLocked: !!form.isLocked,
-    endDate: new Date(form.endDate).toISOString(),
+    if (!form.name.trim()) {
+      toast.error('שם קבוצה חובה');
+      return;
+    }
+
+    if (!form.description.trim()) {
+      toast.error('תיאור חובה');
+      return;
+    }
+
+    if (!form.endDate) {
+      toast.error('תאריך סיום חובה');
+      return;
+    }
+
+    const payload = {
+      name: form.name.trim(),
+      description: form.description.trim(),
+      maxWinners: Number(form.maxWinners) || 1,
+      isLocked: !!form.isLocked,
+      endDate: new Date(form.endDate).toISOString(),
+    };
+
+    dispatch(createGroup(payload));
+    toast.success('הקבוצה נוצרה בהצלחה!');
   };
 
-  dispatch(createGroup(payload));
-  toast.success('הקבוצה נוצרה בהצלחה!');
-};
-
   const copy = async (text) => {
-try {
-  await navigator.clipboard.writeText(text);
-  toast.success('הקישור הועתק');
-} catch {
-  // אפשר להוסיף toast.error אם רוצים להתריע במקרה של שגיאה
-}
+    try {
+      await navigator.clipboard.writeText(text);
+      toast.success('הקישור הועתק');
+    } catch {
+      // אפשר להוסיף toast.error אם רוצים להתריע במקרה של שגיאה
+    }
   };
 
   const origin = typeof window !== 'undefined' ? window.location.origin : '';
@@ -158,7 +160,7 @@ try {
 
         <label className="cg-label">
           תאריך סיום *
-          <input className="cg-input" type="date" name="endDate" value={form.endDate} onChange={onChange} required />
+          <input min={todayStr} className="cg-input" type="date" name="endDate" value={form.endDate} onChange={onChange} required />
         </label>
 
         <label className="cg-label">
@@ -217,7 +219,7 @@ try {
                   readOnly
                   value={prettyShareUrl}
                   onFocus={(e) => e.target.select()}
-                  style={{ direction: 'ltr', textAlign: 'left' }}   
+                  style={{ direction: 'ltr', textAlign: 'left' }}
                 />
 
                 <button

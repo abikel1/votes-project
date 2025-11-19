@@ -86,7 +86,7 @@ export default function ContactPage() {
           </div>
 
           <div className="form-group">
-            <label>אימייל לחזרה *</label>
+            <label>אימייל *</label>
             <input
               type="email"
               name="fromEmail"

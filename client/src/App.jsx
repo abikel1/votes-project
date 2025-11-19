@@ -23,6 +23,7 @@ import UserGuidePage from './pages/UserGuide/UserGuidePage.jsx';
 import ToastDemo from './components/a.jsx';
 import Footer from './components/Footer/Footer'; // אם הפוטר אצלך בתיקייה אחרת, עדכני את הנתיב
 import ContactPage from './pages/ContactForm/ContactForm.jsx';
+import ScrollToTop from './components/ScrollToTop.jsx';
 
 export default function App() {
   const dispatch = useDispatch();
@@ -84,7 +85,7 @@ export default function App() {
       />
 
       <NavBar />
-
+      <ScrollToTop />
       <Routes>
         <Route path="/" element={<HomeRoute />} />
         <Route path="/a" element={<ToastDemo />} />
