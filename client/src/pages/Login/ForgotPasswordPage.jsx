@@ -39,7 +39,7 @@ export default function ForgotPasswordPage() {
           </div>
         )}
 
-        {error && (
+        {/* {error && (
           <div className="alert alert-error">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
               <circle cx="12" cy="12" r="10" strokeWidth="2"/>
@@ -48,7 +48,12 @@ export default function ForgotPasswordPage() {
             </svg>
             {error}
           </div>
-        )}
+        )} */}
+
+        {error && typeof error === 'string' && (
+  <div className="alert alert-error">{error}</div>
+)}
+
 
         <form onSubmit={onSubmit} className="auth-form">
           <div className="form-group">

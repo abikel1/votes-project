@@ -336,9 +336,14 @@ export default function LoginPage() {
             {errors.password && <span className="error-text">{errors.password}</span>}
           </div>
 
-          <Link to="/forgot-password" className="forgot-link">
-            שכחת סיסמה?
-          </Link>
+<Link
+  to="/forgot-password"
+  className="forgot-link"
+  onClick={() => setErrors({})} // ← מנקה את ה-state
+>
+  שכחת סיסמה?
+</Link>
+
 
           <button
             type="submit"
