@@ -195,7 +195,6 @@ export default function GroupDetailPage() {
             onClick={() => {
             if (!isAuthed) {
   toast.error('אינך מחובר/ת. כדי להצביע צריך להתחבר.');
-  // navigate('/login');
   return;
 }
 

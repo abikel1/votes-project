@@ -11,8 +11,8 @@ export default function ProfilePage() {
   const token = useSelector((state) => state.auth.token);
   const user = useSelector((state) => state.auth.user);
   const loading = useSelector((state) => state.auth.loading);
-  const updateErrors = useSelector((state) => state.auth.updateErrors); // שגיאות עדכון מה־slice
-  const message = useSelector((state) => state.auth.message);           // הודעת הצלחה כללית
+  const updateErrors = useSelector((state) => state.auth.updateErrors);
+  const message = useSelector((state) => state.auth.message);
   const [userGroups, setUserGroups] = useState({ created: [], joined: [] });
   const navigate = useNavigate();
 
@@ -32,7 +32,9 @@ export default function ProfilePage() {
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirm, setConfirm] = useState('');
-  const [pwErrors, setPwErrors] = useState({}); // שגיאות מקומיות: current/new/confirm
+  const [pwErrors, setPwErrors] = useState({});
+  // סטייט חדש
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
 
   useEffect(() => {
     if (!user && token) {
@@ -58,7 +60,7 @@ export default function ProfilePage() {
     }
   }, [user, token]);
 
-  // 💡 ולידציה "חיה" לאימות סיסמה – בדיוק כמו בהרשמה
+  // 💡 ולידציה "חיה" לאימות סיסמה
   useEffect(() => {
     setPwErrors((prev) => ({
       ...prev,
@@ -77,18 +79,16 @@ export default function ProfilePage() {
     }
   }, [editPasswordMode, dispatch]);
 
-  // ✅ להעלים את הודעת "סיסמה עודכנה" (או כל message) אחרי 3 שניות
+  // ✅ להעלים את הודעת "סיסמה עודכנה" אחרי 3 שניות
   useEffect(() => {
-    if (!message) return;   // אם אין הודעה – לא עושים כלום
+    if (!message) return;
 
     const t = setTimeout(() => {
       dispatch(clearMessage());
-    }, 3000); // 3000ms = 3 שניות
+    }, 3000);
 
-    return () => clearTimeout(t); // ניקוי אם הקומפוננטה מתחלפת
+    return () => clearTimeout(t);
   }, [message, dispatch]);
-
-
 
   if (loading || !user) {
     return <p style={{ textAlign: 'center', marginTop: '50px' }}>טוען פרופיל...</p>;
@@ -133,13 +133,12 @@ export default function ProfilePage() {
     }
 
     if (Object.keys(localErrs).length) {
-      setPwErrors(localErrs);   // נשארים בדף, בלי שליחת בקשה
+      setPwErrors(localErrs);
       return;
     }
 
-    // ✅ אין שגיאות מקומיות – מנקים ומתקדמים
     setPwErrors({});
-    dispatch(clearError());     // לנקות updateErrors מהניסיון הקודם
+    dispatch(clearError());
 
     try {
       await dispatch(
@@ -153,15 +152,71 @@ export default function ProfilePage() {
       toast.success('הסיסמה עודכנה בהצלחה');
     } catch (err) {
       console.log('changePassword error (client):', err);
-      // השגיאות מהשרת יישבו ב-updateErrors ויוצגו מתחת לשדות
     }
   };
+  {
+    showPasswordModal && (
+      <div className="modal-overlay">
+        <div className="modal-box">
+          <h3>שינוי סיסמה</h3>
+
+          {pwErrors.currentPassword && <div className="error">{pwErrors.currentPassword}</div>}
+          <p>
+            <strong>סיסמה נוכחית:</strong>
+            <input
+              type="password"
+              value={currentPassword}
+              onChange={(e) => setCurrentPassword(e.target.value)}
+            />
+          </p>
+
+          {pwErrors.newPassword && <div className="error">{pwErrors.newPassword}</div>}
+          <p>
+            <strong>סיסמה חדשה:</strong>
+            <input
+              type="password"
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+            />
+          </p>
+
+          {pwErrors.confirm && <div className="error">{pwErrors.confirm}</div>}
+          <p>
+            <strong>אימות סיסמה:</strong>
+            <input
+              type="password"
+              value={confirm}
+              onChange={(e) => setConfirm(e.target.value)}
+            />
+          </p>
+
+          <div className="modal-actions">
+            <button className="edit-btn save" onClick={handleChangePassword}>
+              שמור
+            </button>
+            <button
+              className="edit-btn cancel"
+              onClick={() => {
+                setShowPasswordModal(false);
+                setCurrentPassword('');
+                setNewPassword('');
+                setConfirm('');
+                setPwErrors({});
+              }}
+            >
+              ביטול
+            </button>
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="profile-container">
       <h1>הפרופיל שלי</h1>
 
-      {/* ✅ הודעת הצלחה גלובלית – למשל אחרי שינוי סיסמה */}
+      {/* ✅ הודעת הצלחה גלובלית */}
       {message && (
         <div className="top-msg success" style={{ marginBottom: 10 }}>
           {message}
@@ -176,17 +231,12 @@ export default function ProfilePage() {
         <div className="profile-details">
           {editMode ? (
             <>
-              {/* שגיאה כללית מטופס (אם קיימת) */}
               {updateErrors?.form && (
-                <div
-                  className="form-error"
-                  style={{ color: 'red', marginBottom: 8 }}
-                >
+                <div className="form-error" style={{ marginBottom: 8 }}>
                   {updateErrors.form}
                 </div>
               )}
 
-              {/* שם פרטי */}
               <p>
                 <strong>שם פרטי:</strong>{' '}
                 <input
@@ -195,16 +245,12 @@ export default function ProfilePage() {
                   onChange={handleChange}
                 />
                 {updateErrors?.firstName && (
-                  <span
-                    className="field-error"
-                    style={{ color: 'red', marginRight: 8 }}
-                  >
+                  <span className="field-error" style={{ marginRight: 8 }}>
                     {updateErrors.firstName}
                   </span>
                 )}
               </p>
 
-              {/* שם משפחה */}
               <p>
                 <strong>שם משפחה:</strong>{' '}
                 <input
@@ -213,16 +259,12 @@ export default function ProfilePage() {
                   onChange={handleChange}
                 />
                 {updateErrors?.lastName && (
-                  <span
-                    className="field-error"
-                    style={{ color: 'red', marginRight: 8 }}
-                  >
+                  <span className="field-error" style={{ marginRight: 8 }}>
                     {updateErrors.lastName}
                   </span>
                 )}
               </p>
 
-              {/* אימייל */}
               <p>
                 <strong>אימייל:</strong>{' '}
                 <input
@@ -231,16 +273,12 @@ export default function ProfilePage() {
                   onChange={handleChange}
                 />
                 {updateErrors?.email && (
-                  <span
-                    className="field-error"
-                    style={{ color: 'red', marginRight: 8 }}
-                  >
+                  <span className="field-error" style={{ marginRight: 8 }}>
                     {updateErrors.email}
                   </span>
                 )}
               </p>
 
-              {/* טלפון */}
               <p>
                 <strong>טלפון:</strong>{' '}
                 <input
@@ -249,10 +287,7 @@ export default function ProfilePage() {
                   onChange={handleChange}
                 />
                 {updateErrors?.phone && (
-                  <span
-                    className="field-error"
-                    style={{ color: 'red', marginRight: 8 }}
-                  >
+                  <span className="field-error" style={{ marginRight: 8 }}>
                     {updateErrors.phone}
                   </span>
                 )}
@@ -299,106 +334,98 @@ export default function ProfilePage() {
                 {user.city ? `${user.city}, ` : ''}
                 {user.address}
               </p>
-              <button
-                className="edit-btn"
-                onClick={() => setEditMode(true)}
-              >
-                עריכת משתמש
-              </button>
+              <div className="profile-actions">
+                <button className="edit-btn" onClick={() => setEditMode(true)}>
+                  עריכת משתמש
+                </button>
+                <button className="edit-btn" onClick={() => setShowPasswordModal(true)}>
+                  שינוי סיסמה
+                </button>
+              </div>
+
             </>
           )}
-        </div>
-      </div>
 
-      {/* 🔐 שינוי סיסמה */}
-      <div className="change-password-section">
-        {editPasswordMode ? (
-          <div className="change-password-box">
-            <h3>שינוי סיסמה</h3>
+          {/* 🔐 שינוי סיסמה - בתוך אותה קופסה */}
+          {/* <div className="change-password-section">
+            {editPasswordMode ? (
+              <div className="change-password-box">
+                <h3>שינוי סיסמה</h3>
 
-            {/* שגיאה כללית מהשרת (אם יש) */}
-            {updateErrors?.form && (
-              <div className="error" style={{ color: 'red', marginBottom: 8 }}>
-                {updateErrors.form}
+                {updateErrors?.form && (
+                  <div className="error" style={{ color: 'red', marginBottom: 8 }}>
+                    {updateErrors.form}
+                  </div>
+                )}
+
+                <p>
+                  <strong>סיסמה נוכחית:</strong>{' '}
+                  <input
+                    type="password"
+                    value={currentPassword}
+                    onChange={(e) => setCurrentPassword(e.target.value)}
+                  />
+                  {(pwErrors.currentPassword || updateErrors?.currentPassword) && (
+                    <span className="field-error" style={{ marginRight: 8 }}>
+                      {pwErrors.currentPassword || updateErrors.currentPassword}
+                    </span>
+                  )}
+                </p>
+
+                <p>
+                  <strong>סיסמה חדשה:</strong>{' '}
+                  <input
+                    type="password"
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                  />
+                  {(pwErrors.newPassword || updateErrors?.newPassword) && (
+                    <span className="field-error" style={{ marginRight: 8 }}>
+                      {pwErrors.newPassword || updateErrors.newPassword}
+                    </span>
+                  )}
+                </p>
+
+                <p>
+                  <strong>אימות סיסמה חדשה:</strong>{' '}
+                  <input
+                    type="password"
+                    value={confirm}
+                    onChange={(e) => setConfirm(e.target.value)}
+                  />
+                  {pwErrors.confirm && (
+                    <span className="field-error" style={{ marginRight: 8 }}>
+                      {pwErrors.confirm}
+                    </span>
+                  )}
+                </p>
+
+                <button className="edit-btn save" onClick={handleChangePassword}>
+                  שמירת סיסמה חדשה
+                </button>
+                <button
+                  className="edit-btn cancel"
+                  onClick={() => {
+                    setEditPasswordMode(false);
+                    setCurrentPassword('');
+                    setNewPassword('');
+                    setConfirm('');
+                    setPwErrors({});
+                  }}
+                >
+                  ביטול
+                </button>
               </div>
+            ) : (
+              <button
+                className="edit-btn"
+                onClick={() => setEditPasswordMode(true)}
+              >
+                שינוי סיסמה
+              </button>
             )}
-
-            <p>
-              <strong>סיסמה נוכחית:</strong>{' '}
-              <input
-                type="password"
-                value={currentPassword}
-                onChange={(e) => setCurrentPassword(e.target.value)}
-              />
-              {(pwErrors.currentPassword || updateErrors?.currentPassword) && (
-                <span
-                  className="field-error"
-                  style={{ color: 'red', marginRight: 8 }}
-                >
-                  {pwErrors.currentPassword || updateErrors.currentPassword}
-                </span>
-              )}
-            </p>
-
-            <p>
-              <strong>סיסמה חדשה:</strong>{' '}
-              <input
-                type="password"
-                value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
-              />
-              {(pwErrors.newPassword || updateErrors?.newPassword) && (
-                <span
-                  className="field-error"
-                  style={{ color: 'red', marginRight: 8 }}
-                >
-                  {pwErrors.newPassword || updateErrors.newPassword}
-                </span>
-              )}
-            </p>
-
-            <p>
-              <strong>אימות סיסמה חדשה:</strong>{' '}
-              <input
-                type="password"
-                value={confirm}
-                onChange={(e) => setConfirm(e.target.value)}
-              />
-              {pwErrors.confirm && (
-                <span
-                  className="field-error"
-                  style={{ color: 'red', marginRight: 8 }}
-                >
-                  {pwErrors.confirm}
-                </span>
-              )}
-            </p>
-
-            <button className="edit-btn save" onClick={handleChangePassword}>
-              שמירת סיסמה חדשה
-            </button>
-            <button
-              className="edit-btn cancel"
-              onClick={() => {
-                setEditPasswordMode(false);
-                setCurrentPassword('');
-                setNewPassword('');
-                setConfirm('');
-                setPwErrors({});
-              }}
-            >
-              ביטול
-            </button>
-          </div>
-        ) : (
-          <button
-            className="edit-btn"
-            style={{ marginTop: '20px' }}
-            onClick={() => setEditPasswordMode(true)}
-          >
-            שינוי סיסמה
-          </button>
-        )}
+          </div> */}
+        </div>
       </div>
 
       <div className="profile-groups">
@@ -430,6 +457,64 @@ export default function ProfilePage() {
             : <li>אין קבוצות</li>}
         </ul>
       </div>
+
+
+      {showPasswordModal && (
+  <div className="modal-overlay">
+    <div className="modal-box">
+      <h3>שינוי סיסמה</h3>
+
+      {pwErrors.currentPassword && <div className="error">{pwErrors.currentPassword}</div>}
+      <p>
+        <strong>סיסמה נוכחית:</strong>
+        <input
+          type="password"
+          value={currentPassword}
+          onChange={(e) => setCurrentPassword(e.target.value)}
+        />
+      </p>
+
+      {pwErrors.newPassword && <div className="error">{pwErrors.newPassword}</div>}
+      <p>
+        <strong>סיסמה חדשה:</strong>
+        <input
+          type="password"
+          value={newPassword}
+          onChange={(e) => setNewPassword(e.target.value)}
+        />
+      </p>
+
+      {pwErrors.confirm && <div className="error">{pwErrors.confirm}</div>}
+      <p>
+        <strong>אימות סיסמה:</strong>
+        <input
+          type="password"
+          value={confirm}
+          onChange={(e) => setConfirm(e.target.value)}
+        />
+      </p>
+
+      <div className="modal-actions">
+        <button className="edit-btn save" onClick={handleChangePassword}>
+          שמור
+        </button>
+        <button
+          className="edit-btn cancel"
+          onClick={() => {
+            setShowPasswordModal(false);
+            setCurrentPassword('');
+            setNewPassword('');
+            setConfirm('');
+            setPwErrors({});
+          }}
+        >
+          ביטול
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
     </div>
   );
 }

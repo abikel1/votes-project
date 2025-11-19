@@ -72,11 +72,7 @@ export default function GroupsPage() {
 const onCreateGroupClick = () => {
   if (!isAuthed) {
     toast.error('כדי ליצור קבוצה יש להתחבר תחילה.');
-    
-    // setTimeout(() => {
-      // navigate('/login', { state: { redirectTo: '/groups/create' } });
-    // }, 500); // חצי שנייה - מספיק כדי לראות את הטוסט
-    
+
     return;
   }
   navigate('/groups/create');
@@ -341,10 +337,7 @@ const onCreateGroupClick = () => {
   if (!isAuthed) {
     toast.error('כדי לשלוח בקשת הצטרפות יש להתחבר תחילה.');
     
-    // setTimeout(() => {
-      // navigate('/login', { state: { redirectTo: `/groups/${slug}` } });
-    // }, 500);
-    
+
     return;
   }
   dispatch(clearRemovedNotice(gid));

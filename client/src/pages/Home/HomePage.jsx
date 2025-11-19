@@ -88,7 +88,6 @@ const HomePage = () => {
     if (!isAuthed) {
       toast.error('כדי ליצור קבוצה יש להתחבר תחילה.');
 
-      // navigate('/login', { state: { redirectTo: '/groups/create' } });
       return;
     }
     navigate('/groups/create');

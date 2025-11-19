@@ -99,3 +99,12 @@
     padding: 30px 20px;
   }
 }
+/* וודא שכל הטקסטים בטופס משתמשים בפונט הראשי של האתר */
+.contact-form input,
+.contact-form textarea,
+.contact-form input::placeholder,
+.contact-form textarea::placeholder {
+  font-family: inherit; /* או הפונט הראשי של האתר, למשל "Arial, sans-serif" */
+  font-size: 16px;      /* אפשר להתאים לגודל הכללי */
+  font-weight: normal;  /* כדי שהטקסט לא יהיה מודגש */
+}

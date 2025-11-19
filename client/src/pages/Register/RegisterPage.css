@@ -448,3 +448,8 @@ body {
     height: 64px;
   }
 }
+
+
+.form-group.half input {
+  width: 100%;
+}
