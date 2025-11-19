@@ -51,7 +51,12 @@ const NavBar = () => {
             יציאה
           </button>
         ) : (
-          <Link to="/login">התחברות</Link>
+          <Link
+            to="/login"
+            className={location.pathname === '/login' ? 'active-link' : ''}
+          >
+            התחברות
+          </Link>
         )}
       </div>
 
