@@ -16,16 +16,17 @@ const uploadRoutes = require('./src/routes/upload_routes');
 const app = express();
 
 // 1. CORS
-app.use(cors());
+// app.use(cors());
 
 // 2. Static files for images
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+// app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // 3. Upload route — MUST come before express.json()
 app.use('/api/upload', uploadRoutes);
 
 // 4. JSON parser
-app.use(express.json());
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // 5. Google auth
 app.use(passport.initialize());
