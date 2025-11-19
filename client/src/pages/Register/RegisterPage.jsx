@@ -217,26 +217,45 @@ export default function RegisterPage() {
             error={errors.phone}
           />
 
-          <div className="form-group">
-            <label>עיר ורחוב*</label>
-            <CityStreetAuto
-              idPrefix="reg"
-              variant="modern"
-              city={form.city}
-              address={form.address}
-              onCityChange={val => {
-                setForm(f => ({ ...f, city: val }));
-                setErrors(e => ({ ...e, city: undefined }));
-              }}
-              onAddressChange={val => {
-                setForm(f => ({ ...f, address: val }));
-                setErrors(e => ({ ...e, address: undefined }));
-              }}
-            />
-            {(errors.city || errors.address) && (
-              <span className="error-text">{errors.city || errors.address}</span>
-            )}
+          <div className="form-row">
+            {/* עמודה 1 – עיר */}
+            <div className="form-group">
+              <label>עיר*</label>
+              <CityStreetAuto
+                idPrefix="reg-city"
+                className="citystreet--modern"
+                city={form.city}
+                onCityChange={(val) => {
+                  setForm((f) => ({ ...f, city: val }));
+                  setErrors((e) => ({ ...e, city: undefined }));
+                }}
+                cityInputProps={{ placeholder: 'עיר' }}
+                onlyCity
+              />
+              {errors.city && <span className="error-text">{errors.city}</span>}
+            </div>
+
+            {/* עמודה 2 – רחוב */}
+            <div className="form-group">
+              <label>רחוב*</label>
+              <CityStreetAuto
+                idPrefix="reg-street"
+                className="citystreet--modern"
+                city={form.city}          // כדי שידע לפי איזו עיר להביא רחובות
+                address={form.address}
+                onAddressChange={(val) => {
+                  setForm((f) => ({ ...f, address: val }));
+                  setErrors((e) => ({ ...e, address: undefined }));
+                }}
+                streetInputProps={{ placeholder: 'רחוב' }}
+                onlyStreet
+              />
+              {errors.address && (
+                <span className="error-text">{errors.address}</span>
+              )}
+            </div>
           </div>
+
 
           <PasswordField
             label="סיסמה*"
@@ -261,7 +280,7 @@ export default function RegisterPage() {
               <div className="strength-indicator">
                 <div
                   className={`strength-bar ${form.password.length < 6 ? 'weak' :
-                      form.password.length < 10 ? 'medium' : 'strong'
+                    form.password.length < 10 ? 'medium' : 'strong'
                     }`}
                   style={{
                     width: form.password.length < 6 ? '33%' :
