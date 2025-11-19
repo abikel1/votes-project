@@ -196,7 +196,7 @@ async function changePassword(userId, currentPassword, newPassword) {
   if (!user.passwordHash) {
     throw {
       status: 400,
-      errors: { form: 'לא ניתן לשנות סיסמה לחשבון שנוצר ללא סיסמה' },
+      errors: { form: 'חשבון זה נוצר דרך google ולכן לא קיימת סיסמא' },
     };
   }
 
