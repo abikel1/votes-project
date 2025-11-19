@@ -2,7 +2,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import http from '../api/http';
 
-/** ===== עזר: פענוח JWT ללא אימות חתימה (לצורכי UI בלבד) ===== */
+/** ===== עזר: פענוח JWT ללא אימות חתימה ===== */
 function decodeJwtNoVerify(token) {
   try {
     const [, payload] = token.split('.');
@@ -38,48 +38,32 @@ function scheduleAutoLogout(expUnixSeconds) {
   const expMs = expUnixSeconds * 1000;
   const delay = expMs - nowMs;
 
-  if (logoutTimer) {
-    clearTimeout(logoutTimer);
-    logoutTimer = null;
-  }
+  if (logoutTimer) clearTimeout(logoutTimer);
 
-  // כבר פג
   if (delay <= 0) {
     clearAuthStorage();
     redirectToExpiredLogin();
     return;
   }
 
-  // טיימר לניתוק אוטומטי
   logoutTimer = setTimeout(() => {
     clearAuthStorage();
     redirectToExpiredLogin();
   }, delay);
 }
 
-/** ===== קריאה ראשונית מערכי localStorage ===== */
 
-let initialToken = localStorage.getItem('token') || null;
-let initialFirstName = localStorage.getItem('firstName') || null;
-let initialLastName = localStorage.getItem('lastName') || null;
-let initialUserId = localStorage.getItem('userId') || null;
-let initialUserEmail = localStorage.getItem('userEmail') || null;
-let initialExp = Number(localStorage.getItem('token_exp') || '0');
+/** ===== קריאה ראשונית מערכי localStorage ===== */
+const initialToken = localStorage.getItem('token');
+const initialUserEmail = localStorage.getItem('userEmail');
+const initialUserId = localStorage.getItem('userId');
+const initialFirstName = localStorage.getItem('firstName');
+const initialLastName = localStorage.getItem('lastName');
+const initialExp = Number(localStorage.getItem('token_exp') || 0);
 
 // אם יש טוקן + exp – נבדוק אם כבר פג
-if (initialToken && initialExp) {
-  if (initialExp * 1000 <= Date.now()) {
-    clearAuthStorage();
-    initialToken = null;
-    initialFirstName = null;
-    initialLastName = null;
-    initialUserId = null;
-    initialUserEmail = null;
-    initialExp = 0;
-  } else {
-    // עדיין בתוקף – נקבע טיימר לניתוק
-    scheduleAutoLogout(initialExp);
-  }
+if (initialToken && initialExp * 1000 <= Date.now()) {
+  clearAuthStorage();
 }
 
 /** ===== Thunks ===== */
@@ -99,28 +83,7 @@ export const register = createAsyncThunk(
   }
 );
 
-// התחברות
-export const login = createAsyncThunk(
-  'auth/login',
-  async (formData, { rejectWithValue }) => {
-    try {
-      const { data } = await http.post('/users/login', formData);
-      return data; // { token, user }
-    } catch (err) {
-      console.log('--- Frontend error in thunk ---');
-      console.log('err:', err);
-      console.log('err.response:', err.response);
-      console.log('err.response?.data:', err.response?.data);
 
-      if (err.response && err.response.data) {
-        return rejectWithValue(
-          err.response.data.errors || { form: err.response.data.message }
-        );
-      }
-      return rejectWithValue({ form: err.message });
-    }
-  }
-);
 
 // פרופיל
 export const fetchProfile = createAsyncThunk(
@@ -153,20 +116,24 @@ export const updateProfile = createAsyncThunk(
   }
 );
 
-// fetchMe (להשלמת מידע אחרי ריענון)
-export const fetchMe = createAsyncThunk(
-  'auth/me',
-  async (_, thunkAPI) => {
-    try {
-      const { data } = await http.get('/users/me');
-      return data;
-    } catch (e) {
-      return thunkAPI.rejectWithValue(
-        e?.response?.data?.message || 'Load profile failed'
-      );
-    }
+export const login = createAsyncThunk('auth/login', async (formData, { rejectWithValue }) => {
+  try {
+    const { data } = await http.post('/users/login', formData);
+    return data;
+  } catch (err) {
+    return rejectWithValue(err?.response?.data?.errors || { form: 'שגיאה בשרת' });
   }
-);
+});
+
+export const fetchMe = createAsyncThunk('auth/me', async (_, { rejectWithValue }) => {
+  try {
+    const { data } = await http.get('/users/me');
+    return data;
+  } catch (err) {
+    return rejectWithValue(err?.response?.data?.message || 'Load profile failed');
+  }
+});
+
 
 // בקשת מייל איפוס
 export const requestPasswordReset = createAsyncThunk(
@@ -215,17 +182,14 @@ export const changePassword = createAsyncThunk(
 /** ===== Slice ===== */
 const authSlice = createSlice({
   name: 'auth',
-  initialState: {
+initialState: {
     token: initialToken,
     firstName: initialFirstName,
     lastName: initialLastName,
     userId: initialUserId,
     userEmail: initialUserEmail,
-
     loading: false,
     error: null,
-    updateErrors: null,
-    registeredOk: false,
     user: null,
     message: '',
   },
@@ -238,7 +202,7 @@ const authSlice = createSlice({
       state.message = null;
     },
 
-    logout(state) {
+     logout(state) {
       state.token = null;
       state.firstName = null;
       state.lastName = null;
@@ -246,32 +210,21 @@ const authSlice = createSlice({
       state.userEmail = null;
       state.user = null;
       state.error = null;
-      state.updateErrors = null;
       state.message = '';
 
-      if (logoutTimer) {
-        clearTimeout(logoutTimer);
-        logoutTimer = null;
-      }
+      if (logoutTimer) clearTimeout(logoutTimer);
       clearAuthStorage();
     },
 
     // משמש בעיקר לחזרה מגוגל OAuth
     loginSuccess(state, action) {
       const { token, user = {} } = action.payload;
-
       state.token = token;
 
       const payload = decodeJwtNoVerify(token);
 
       state.userEmail = user.email ?? payload.email ?? null;
-      state.userId =
-        user._id ??
-        payload.sub ??
-        payload.userId ??
-        payload.id ??
-        null;
-
+      state.userId = user._id ?? payload.sub ?? payload.userId ?? payload.id ?? null;
       state.firstName = user.firstName ?? payload.firstName ?? state.firstName;
       state.lastName = user.lastName ?? payload.lastName ?? state.lastName;
 
@@ -285,7 +238,7 @@ const authSlice = createSlice({
         localStorage.setItem('token_exp', String(payload.exp));
         scheduleAutoLogout(payload.exp);
       }
-    }
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -318,46 +271,33 @@ const authSlice = createSlice({
       })
 
       /** login */
-      .addCase(login.pending, (s) => {
-        s.loading = true;
-        s.error = null;
-      })
+      .addCase(login.pending, (s) => { s.loading = true; s.error = null; })
       .addCase(login.fulfilled, (s, a) => {
         s.loading = false;
-
-        const token = a.payload.token;
-        const user = a.payload.user ?? {};
-
-        s.token = token;
-        s.user = user;
+        s.token = a.payload.token;
+        s.user = a.payload.user ?? {};
+        const user = s.user;
 
         s.userId = user._id ?? null;
         s.userEmail = user.email ?? null;
         s.firstName = user.firstName ?? null;
         s.lastName = user.lastName ?? null;
 
-        localStorage.setItem('token', token);
+        localStorage.setItem('token', s.token);
         if (s.firstName) localStorage.setItem('firstName', s.firstName);
         if (s.lastName) localStorage.setItem('lastName', s.lastName);
         if (s.userId) localStorage.setItem('userId', s.userId);
         if (s.userEmail) localStorage.setItem('userEmail', s.userEmail);
 
-        const payload = decodeJwtNoVerify(token);
+        const payload = decodeJwtNoVerify(s.token);
         if (payload.exp) {
           localStorage.setItem('token_exp', String(payload.exp));
           scheduleAutoLogout(payload.exp);
         }
       })
-      .addCase(login.rejected, (s, a) => {
-        s.loading = false;
-        s.error = a.payload;
-      })
+      .addCase(login.rejected, (s, a) => { s.loading = false; s.error = a.payload; })
 
-      /** fetchMe */
-      .addCase(fetchMe.pending, (s) => {
-        s.loading = true;
-        s.error = null;
-      })
+      .addCase(fetchMe.pending, (s) => { s.loading = true; s.error = null; })
       .addCase(fetchMe.fulfilled, (s, a) => {
         s.loading = false;
         s.firstName = a.payload.firstName ?? s.firstName;
@@ -370,10 +310,7 @@ const authSlice = createSlice({
         if (s.userId) localStorage.setItem('userId', s.userId);
         if (s.userEmail) localStorage.setItem('userEmail', s.userEmail);
       })
-      .addCase(fetchMe.rejected, (s, a) => {
-        s.loading = false;
-        s.error = a.payload;
-      })
+      .addCase(fetchMe.rejected, (s, a) => { s.loading = false; s.error = a.payload; })
 
       /** updateProfile */
       .addCase(updateProfile.pending, (s) => {

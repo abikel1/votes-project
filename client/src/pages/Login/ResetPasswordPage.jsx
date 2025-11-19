@@ -1,59 +1,46 @@
-// client/src/pages/Reset/ResetPasswordPage.jsx
 import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams, useNavigate } from 'react-router-dom';
 import { resetPassword } from '../../slices/authSlice';
-import '../Register/RegisterPage.css'; // להשתמש באותו עיצוב של ההרשמה
+import '../Register/RegisterPage.css'
 
-/** עטיפת שדה שמציגה שגיאה מעל הקובייה (כמו בהרשמה) */
-const FormRow = ({ error, children }) => (
-  <div className={`form-row ${error ? 'has-error' : ''}`}>
-    {/* {error && <div className="field-error-above" role="alert">{error}</div>} */}
-    {children}
-  </div>
-);
-
-/** שדה סיסמה עם "עין" בצד שמאל (כמו בהרשמה) */
-const PasswordField = ({ placeholder, value, onChange, error, autoComplete = 'new-password' }) => {
+const PasswordField = ({ label, placeholder, value, onChange, error }) => {
   const [show, setShow] = useState(false);
+  
   return (
-    <FormRow error={error}>
-      <div className="control block-cube block-input password-field" style={{ position: 'relative' }}>
+    <div className="form-group">
+      <label>{label}</label>
+      <div className="password-input">
         <input
           type={show ? 'text' : 'password'}
           placeholder={placeholder}
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          autoComplete={autoComplete}
-          aria-invalid={!!error}
+          className={error ? 'error' : ''}
           minLength={6}
           required
         />
-
-        {/* כפתור העין בצד שמאל */}
         <button
           type="button"
-          className="eye-btn"
-          aria-label={show ? 'הסתר סיסמה' : 'הצג סיסמה'}
+          className="toggle-password"
           onClick={() => setShow(s => !s)}
+          aria-label={show ? 'הסתר סיסמה' : 'הצג סיסמה'}
         >
           {show ? (
-            <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M12 5c-5.5 0-9.5 4.5-10 7 .5 2.5 4.5 7 10 7s9.5-4.5 10-7c-.5-2.5-4.5-7-10-7zm0 12a5 5 0 1 1 0-10 5 5 0 0 1 0 10z"/>
-              <circle cx="12" cy="12" r="2.5"/>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" strokeWidth="2" strokeLinecap="round"/>
+              <line x1="1" y1="1" x2="23" y2="23" strokeWidth="2" strokeLinecap="round"/>
             </svg>
           ) : (
-            <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M2 5.27 3.28 4 20 20.72 18.73 22l-2.63-2.63A12.5 12.5 0 0 1 12 19C6.5 19 2.5 14.5 2 12c.2-1 1-2.5 2.37-4.06L2 5.27zM12 5c5.5 0 9.5 4.5 10 7-.13.63-.58 1.6-1.36 2.67L18.3 13.3A5 5 0 0 0 12 7c-.65 0-1.27.12-1.84.33L8.46 5.63C9.55 5.2 10.74 5 12 5z"/>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" strokeWidth="2" strokeLinecap="round"/>
+              <circle cx="12" cy="12" r="3" strokeWidth="2"/>
             </svg>
           )}
         </button>
-
-        <div className="bg-top"><div className="bg-inner" /></div>
-        <div className="bg-right"><div className="bg-inner" /></div>
-        <div className="bg"><div className="bg-inner" /></div>
       </div>
-    </FormRow>
+      {error && <span className="error-text">{error}</span>}
+    </div>
   );
 };
 
@@ -61,10 +48,10 @@ export default function ResetPasswordPage() {
   const { token } = useParams();
   const dispatch = useDispatch();
   const nav = useNavigate();
-  const { loading, error, message } = useSelector((s) => s.auth);
+  const { loading, error, message } = useSelector(s => s.auth);
 
   const [password, setPassword] = useState('');
-  const [confirm,  setConfirm]  = useState('');
+  const [confirm, setConfirm] = useState('');
   const [errors, setErrors] = useState({});
 
   const passwordsMismatch = confirm.length > 0 && confirm !== password;
@@ -72,47 +59,102 @@ export default function ResetPasswordPage() {
   const submit = async (e) => {
     e.preventDefault();
     const newErrors = {};
-    if (password.length < 6) newErrors.password = 'סיסמה חייבת לפחות 6 תווים';
-    if (passwordsMismatch)  newErrors.confirm  = 'הסיסמאות אינן תואמות';
-    if (Object.keys(newErrors).length) return setErrors(newErrors);
+    
+    if (password.length < 6) 
+      newErrors.password = 'סיסמה חייבת לפחות 6 תווים';
+    if (passwordsMismatch) 
+      newErrors.confirm = 'הסיסמאות אינן תואמות';
+      
+    if (Object.keys(newErrors).length) {
+      setErrors(newErrors);
+      return;
+    }
+    
     setErrors({});
 
     const action = await dispatch(resetPassword({ token, password }));
     if (resetPassword.fulfilled.match(action)) {
-      nav('/login');
+      setTimeout(() => nav('/login'), 2000);
     }
   };
 
   const disabled = loading || password.length < 6 || passwordsMismatch;
 
   return (
-    <div className="form-container">
-      <form className="form" autoComplete="off" onSubmit={submit}>
-        <h1>איפוס סיסמה</h1>
+    <div className="auth-container">
+      <div className="auth-card">
+        <div className="auth-header">
+          <div className="icon-wrapper">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" strokeWidth="2"/>
+              <path d="M9 12l2 2 4-4" strokeWidth="2" strokeLinecap="round"/>
+            </svg>
+          </div>
+          <h1>איפוס סיסמה</h1>
+          <p>הכנס סיסמה חדשה לחשבון שלך</p>
+        </div>
 
-        {message && <div className="top-msg success">{message}</div>}
-        {error &&   <div className="top-msg error">{error}</div>}
+        {message && (
+          <div className="alert alert-success">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" strokeWidth="2" strokeLinecap="round"/>
+              <polyline points="22 4 12 14.01 9 11.01" strokeWidth="2" strokeLinecap="round"/>
+            </svg>
+            {message}
+          </div>
+        )}
 
-        <PasswordField
-          placeholder="*סיסמה חדשה (מינימום 6 תווים)"
-          value={password}
-          onChange={setPassword}
-          error={errors.password}
-        />
-        <PasswordField
-          placeholder="*אימות סיסמה"
-          value={confirm}
-          onChange={setConfirm}
-          error={errors.confirm || (passwordsMismatch ? 'הסיסמאות אינן תואמות' : '')}
-        />
+        {error && (
+          <div className="alert alert-error">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <circle cx="12" cy="12" r="10" strokeWidth="2"/>
+              <line x1="12" y1="8" x2="12" y2="12" strokeWidth="2" strokeLinecap="round"/>
+              <line x1="12" y1="16" x2="12.01" y2="16" strokeWidth="2" strokeLinecap="round"/>
+            </svg>
+            {error}
+          </div>
+        )}
 
-        <button type="submit" className="btn block-cube block-cube-hover" disabled={disabled}>
-          <div className="bg-top"><div className="bg-inner" /></div>
-          <div className="bg-right"><div className="bg-inner" /></div>
-          <div className="bg"><div className="bg-inner" /></div>
-          <span className="text">{loading ? '...' : 'איפוס סיסמא'}</span>
-        </button>
-      </form>
+        <form onSubmit={submit} className="auth-form">
+          <PasswordField
+            label="סיסמה חדשה*"
+            placeholder="לפחות 6 תווים"
+            value={password}
+            onChange={setPassword}
+            error={errors.password}
+          />
+
+          <PasswordField
+            label="אימות סיסמה*"
+            placeholder="הכנס את הסיסמה שוב"
+            value={confirm}
+            onChange={setConfirm}
+            error={errors.confirm || (passwordsMismatch ? 'הסיסמאות אינן תואמות' : '')}
+          />
+
+          <div className="password-strength">
+            {password.length > 0 && (
+              <div className="strength-indicator">
+                <div className={`strength-bar ${
+                  password.length < 6 ? 'weak' : 
+                  password.length < 10 ? 'medium' : 'strong'
+                }`} style={{
+                  width: password.length < 6 ? '33%' : 
+                        password.length < 10 ? '66%' : '100%'
+                }} />
+              </div>
+            )}
+          </div>
+
+          <button 
+            type="submit" 
+            className="btn btn-primary" 
+            disabled={disabled}
+          >
+            {loading ? 'מאפס סיסמה...' : 'איפוס סיסמה'}
+          </button>
+        </form>
+      </div>
     </div>
   );
 }

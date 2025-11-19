@@ -4,6 +4,7 @@ import { fetchProfile, updateProfile, changePassword, clearError, clearMessage }
 import './ProfilePage.css';
 import { useNavigate } from 'react-router-dom';
 import CityStreetAuto from '../../components/CityStreetAuto';
+import toast from 'react-hot-toast';
 
 export default function ProfilePage() {
   const dispatch = useDispatch();
@@ -149,6 +150,7 @@ export default function ProfilePage() {
       setNewPassword('');
       setConfirm('');
       setEditPasswordMode(false);
+      toast.success('הסיסמה עודכנה בהצלחה');
     } catch (err) {
       console.log('changePassword error (client):', err);
       // השגיאות מהשרת יישבו ב-updateErrors ויוצגו מתחת לשדות

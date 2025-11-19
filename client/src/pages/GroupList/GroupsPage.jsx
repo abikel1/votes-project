@@ -74,7 +74,7 @@ const onCreateGroupClick = () => {
     toast.error('כדי ליצור קבוצה יש להתחבר תחילה.');
     
     // setTimeout(() => {
-      navigate('/login', { state: { redirectTo: '/groups/create' } });
+      // navigate('/login', { state: { redirectTo: '/groups/create' } });
     // }, 500); // חצי שנייה - מספיק כדי לראות את הטוסט
     
     return;
@@ -342,7 +342,7 @@ const onCreateGroupClick = () => {
     toast.error('כדי לשלוח בקשת הצטרפות יש להתחבר תחילה.');
     
     // setTimeout(() => {
-      navigate('/login', { state: { redirectTo: `/groups/${slug}` } });
+      // navigate('/login', { state: { redirectTo: `/groups/${slug}` } });
     // }, 500);
     
     return;

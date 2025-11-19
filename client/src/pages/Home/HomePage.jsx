@@ -86,14 +86,9 @@ const HomePage = () => {
 
   const onCreateGroupClick = () => {
     if (!isAuthed) {
-toast.error('כדי ליצור קבוצה יש להתחבר תחילה.');
+      toast.error('כדי ליצור קבוצה יש להתחבר תחילה.');
 
-
-
-
-
-
-      navigate('/login', { state: { redirectTo: '/groups/create' } });
+      // navigate('/login', { state: { redirectTo: '/groups/create' } });
       return;
     }
     navigate('/groups/create');
@@ -140,8 +135,7 @@ toast.error('כדי ליצור קבוצה יש להתחבר תחילה.');
           <p className="hero-subtitle">קולך נשמע • ההחלטה שלנו</p>
           <button className="hero-cta" onClick={onCreateGroupClick}>
             <HiPlus className="btn-icon" />
-            יצירת הצבעה חדשה
-          </button>
+            יצירת חדר הצבעות חדש          </button>
         </div>
         <div className="scroll-indicator">
           <span>גלול למטה</span>
@@ -192,13 +186,13 @@ toast.error('כדי ליצור קבוצה יש להתחבר תחילה.');
                         </div>
                       </div>
 
-                      <button
+                      {/* <button
                         className="card-action-btn active-btn"
                         onClick={(e) => handleVoteClick(group, e)}
                       >
                         הצבע עכשיו
                         <span className="btn-arrow">←</span>
-                      </button>
+                      </button> */}
                     </div>
                   </div>
                 ))}
@@ -244,10 +238,10 @@ toast.error('כדי ליצור קבוצה יש להתחבר תחילה.');
                         </div> */}
 
 
-                        <div className="meta-item">
+                        {/* <div className="meta-item">
                           <HiXCircle className="meta-icon closed-icon" />
                           <span>הסתיים</span>
-                        </div>
+                        </div> */}
                       </div>
 
                       <button className="card-action-btn closed-btn">
@@ -280,25 +274,25 @@ toast.error('כדי ליצור קבוצה יש להתחבר תחילה.');
           </div>
         )}
 
-        
+
       </div>
 
       {/* Quick Actions Footer */}
-<section className="quick-actions">
-  <button className="action-btn" onClick={() => navigate('/groups')}>
-    <HiUserGroup className="btn-icon" /> כל חדרי ההצבעה
-  </button>
+      <section className="quick-actions">
+        <button className="action-btn" onClick={() => navigate('/groups')}>
+          <HiUserGroup className="btn-icon" /> כל חדרי ההצבעה
+        </button>
 
-  {isAuthed && (
-    <button className="action-btn" onClick={() => navigate('/profile')}>
-      <HiUser className="btn-icon" /> הפרופיל שלי
-    </button>
-  )}
+        {isAuthed && (
+          <button className="action-btn" onClick={() => navigate('/profile')}>
+            <HiUser className="btn-icon" /> הפרופיל שלי
+          </button>
+        )}
 
-  <button className="action-btn primary-action" onClick={onCreateGroupClick}>
-    <HiPlus className="btn-icon" /> יצירת קבוצה
-  </button>
-</section>
+        <button className="action-btn primary-action" onClick={onCreateGroupClick}>
+          <HiPlus className="btn-icon" /> יצירת קבוצה
+        </button>
+      </section>
 
     </div>
   );

@@ -164,7 +164,7 @@
 }
 
 .active-column {
-  border-top: 4px solid #27ae60;
+  border-top: 4px solid #003366;
 }
 
 .closed-column {
@@ -197,7 +197,7 @@
 }
 
 .header-icon.active {
-  color: #27ae60;
+  color: #003366;
 }
 
 .header-icon.closed {
@@ -212,8 +212,8 @@
 }
 
 .active-badge {
-  background: #e8f8f0;
-  color: #27ae60;
+  background: #e5edf6;
+  color: #003366;
 }
 
 .closed-badge {
@@ -230,25 +230,26 @@
 
 .group-card {
   background: #ffffff;
-  border: 1px solid #e5e5e5;
-  border-radius: 4px;
-  padding: 20px;
+  border: 1px solid #003366;
+  padding: 18px;
   cursor: pointer;
   transition: all 0.2s ease;
+
 }
+
 
 .group-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 12px rgba(0, 8, 85, 0.1);
 }
 
 .active-card {
-  border-right: 4px solid #27ae60;
+  border-right: 4px solid #003366;
 }
 
 .active-card:hover {
-  border-color: #1e8449;
-  box-shadow: 0 4px 12px rgba(39,174,96,0.2);
+  border-color: #003366;
+  box-shadow: 0 4px 12px rgba(0, 8, 85, 0.1);
 }
 
 .closed-card {
@@ -333,12 +334,12 @@
 }
 
 .active-btn {
-  background: #27ae60;
+  background: #003366;
   color: #ffffff;
 }
 
 .active-btn:hover {
-  background: #1e8449;
+  background: #002040;
   transform: translateX(-3px);
 }
 
