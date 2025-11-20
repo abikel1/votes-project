@@ -4,7 +4,7 @@
     height: 100vh;
     margin: 0;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: #f8fafc;
+    /* background: #ffffff; */
     overflow: hidden;
     display: flex;
     flex-direction: column;
@@ -114,8 +114,8 @@
     overflow: hidden;
     min-height: 0;
     gap: 0;
-    border: 1px solid #e2e8f0;
-    background: white;
+    /* border: 1px solid #e2e8f0; */
+    /* background: white; */
 }
 
 .resize-handle {
@@ -163,7 +163,7 @@
 }
 
 .candidates-container {
-    background: #f8fafc;
+    background: #ffffff;
     padding: 12px;
     overflow-y: auto;
     flex: 1;
@@ -272,7 +272,7 @@
     gap: 12px;
     height: 100%;
     padding: 12px;
-    background: #f8fafc;
+    background: #ffffff;
     overflow: hidden;
 }
 
