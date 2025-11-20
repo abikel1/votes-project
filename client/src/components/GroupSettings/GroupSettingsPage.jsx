@@ -41,7 +41,7 @@ import {
 } from '../../slices/votesSlice';
 
 import { upsertUsers } from '../../slices/usersSlice';
-
+import ConfirmModal  from '../../components/ConfirmModal/ConfirmModal'
 import GeneralTab from './GeneralTab';
 import CandidatesTab from './CandidatesTab';
 import VotersTab from './VotersTab';
@@ -87,6 +87,11 @@ export default function GroupSettingsPage() {
   const candidates = useSelector(selectCandidatesForGroup(groupId)) || EMPTY_ARR;
   const candLoading = useSelector(selectCandidatesLoadingForGroup(groupId));
   const candError = useSelector(selectCandidatesErrorForGroup(groupId));
+
+
+  const [showConfirm, setShowConfirm] = useState(false);
+const [selectedMember, setSelectedMember] = useState(null);
+
 
   const reqs = useSelector(selectJoinRequestsForGroup(groupId)) || EMPTY_ARR;
   const reqsLoading = useSelector(selectJoinRequestsLoading(groupId));
@@ -514,25 +519,56 @@ export default function GroupSettingsPage() {
         dispatch(fetchGroupWithMembers(groupId));
       });
 
-  const handleRemoveMember = async (m, mid) => {
-    const name = m.name || m.email || mid;
+  // const handleRemoveMember = async (m, mid) => {
+  //   const name = m.name || m.email || mid;
 
-    if (!window.confirm(`להסיר את ${name} מהקבוצה?`)) return;
+  //   if (!window.confirm(`להסיר את ${name} מהקבוצה?`)) return;
 
-    try {
-      await dispatch(
-        removeGroupMember({
-          groupId,
-          memberId: mid,
-          email: m.email || undefined,
-        }),
-      ).unwrap();
-      if (group.isLocked) dispatch(fetchJoinRequests(groupId));
-      dispatch(fetchGroupWithMembers(groupId));
-    } catch (e) {
-      toast.error(e || 'Failed to remove member');
-    }
-  };
+  //   try {
+  //     await dispatch(
+  //       removeGroupMember({
+  //         groupId,
+  //         memberId: mid,
+  //         email: m.email || undefined,
+  //       }),
+  //     ).unwrap();
+  //     if (group.isLocked) dispatch(fetchJoinRequests(groupId));
+  //     dispatch(fetchGroupWithMembers(groupId));
+  //   } catch (e) {
+  //     toast.error(e || 'Failed to remove member');
+  //   }
+  // };
+
+const handleRemoveMember = (m, mid) => {
+  setSelectedMember({ member: m, memberId: mid });
+  setShowConfirm(true);
+};
+const confirmDelete = async () => {
+  const { member, memberId } = selectedMember;
+  setShowConfirm(false);
+
+  try {
+    await dispatch(
+      removeGroupMember({
+        groupId,
+        memberId,
+        email: member.email || undefined,
+      })
+    ).unwrap();
+
+    if (group.isLocked) dispatch(fetchJoinRequests(groupId));
+    dispatch(fetchGroupWithMembers(groupId));
+
+  } catch (e) {
+    toast.error(e || 'Failed to remove member');
+  }
+};
+
+const cancelDelete = () => {
+  setShowConfirm(false);
+  setSelectedMember(null);
+};
+
 
 
   return (
@@ -702,6 +738,18 @@ export default function GroupSettingsPage() {
         editFileInputRef={editFileInputRef}
         clearEditPhoto={clearEditPhoto}
       />
+
+      <ConfirmModal
+  open={showConfirm}
+  message={
+    selectedMember
+      ? `להסיר את ${selectedMember.member.name || selectedMember.member.email || selectedMember.memberId} מהקבוצה?`
+      : ''
+  }
+  onConfirm={confirmDelete}
+  onCancel={cancelDelete}
+/>
+
     </div>
   );
 }

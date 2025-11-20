@@ -13,31 +13,54 @@
 
 .confirm-modal {
   background: #fff;
-  padding: 20px;
-  border-radius: 12px;
-  width: 320px;
+  padding: 24px;
+  width: 330px;
   text-align: center;
-  box-shadow: 0 4px 13px rgba(0,0,0,0.2);
+  box-shadow: 0 4px 13px rgba(0,0,0,0.18);
+}
+
+.confirm-modal h3 {
+  margin-bottom: 12px;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.confirm-modal p {
+  margin: 0;
+  font-size: 15px;
+  color: #333;
 }
 
 .actions {
-  margin-top: 20px;
+  margin-top: 24px;
   display: flex;
-  justify-content: space-around;
+  justify-content: center;
+  gap: 10px;
 }
 
-.yes, .no {
-  padding: 8px 18px;
+.yes,
+.no {
+  padding: 10px 20px;
   border: none;
   cursor: pointer;
-  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 600;
 }
 
 .yes {
-  background: #d9534f;
+  background: #003366;       /* ← הכחול שלך */
   color: white;
 }
 
+.yes:hover {
+  background: #003366;
+}
+
 .no {
-  background: #ccc;
+  background: #e5e7eb;
+  color: #333;
+}
+
+.no:hover {
+  background: #d5d7da;
 }
