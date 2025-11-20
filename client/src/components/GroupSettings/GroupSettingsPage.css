@@ -209,7 +209,7 @@ textarea.input {
     align-items: center;
     background: #fafafa;
     border: 1px solid #eee;
-    border-radius: 8px;
+    /* border-radius: 8px; */
     padding: 8px 10px;
 }
 
@@ -236,7 +236,7 @@ button.small {
     background: #f0f0f0;
     border: 1px solid #e4e4e4;
     color: #333;
-    border-radius: 6px;
+    /* border-radius: 6px; */
     cursor: pointer;
     font-size: .85em;
     padding: 4px 8px;
@@ -261,7 +261,7 @@ button.small.danger:hover {
     color: #b92c28;
     background: #fdeaea;
     border: 1px solid #f3c0c0;
-    border-radius: 8px;
+    /* border-radius: 8px; */
     padding: 6px 10px;
     font-weight: 500;
 }
@@ -270,7 +270,7 @@ button.small.danger:hover {
     color: #1a7f37;
     background: #e9f7ee;
     border: 1px solid #c9e7d2;
-    border-radius: 8px;
+    /* border-radius: 8px; */
     padding: 6px 10px;
     font-weight: 500;
 }
@@ -320,7 +320,7 @@ button.small.danger:hover {
     color: #fff;
     border: none;
     padding: 8px 12px;
-    border-radius: 10px;
+    /* border-radius: 10px; */
     cursor: pointer;
 }
 

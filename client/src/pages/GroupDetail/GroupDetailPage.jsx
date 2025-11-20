@@ -79,6 +79,7 @@ export default function GroupDetailPage() {
   const candidates = useSelector(selectCandidatesForGroup(groupId || '')) || [];
   const loadingCandidates = useSelector(selectCandidatesLoadingForGroup(groupId || ''));
   const errorCandidates = useSelector(selectCandidatesErrorForGroup(groupId || ''));
+const getWinnerLabel = (index) => ` ${index + 1}`;
 
 
   const { userEmail: authEmail, userId: authId } = useSelector((s) => s.auth);
@@ -233,11 +234,19 @@ export default function GroupDetailPage() {
                     >
 
                       {/* גביע יוצג רק אם הסתיים */}
-                      {isExpired && isWinner && (
+                      {/* {isExpired && isWinner && (
                         <div className="current-leader">
                           <img src="/src/assets/icons/trophy.png" className="groups-badge-locked" />
                         </div>
-                      )}
+                      )} */}
+
+                      {isExpired && isWinner && (
+  <div className="current-leader">
+    {getWinnerLabel(winners.findIndex(w => w._id === c._id))}
+  </div>
+)}
+
+
 
                       {/* --- פרופיל מועמד/ת --- */}
                       <div className="candidate-header">
