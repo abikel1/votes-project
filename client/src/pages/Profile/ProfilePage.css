@@ -491,3 +491,14 @@
 .modal-actions .edit-btn.cancel:hover {
   background-color: #e0e0e0;
 }
+
+/* קו מפריד באמצע קופסת הקבוצות */
+.profile-groups-divider {
+  margin: 32px 0;
+  height: 5px;
+  background: linear-gradient(to right, #003366, #4a7bbd, #003366);
+  border-radius: 3px;
+}
+
+
+

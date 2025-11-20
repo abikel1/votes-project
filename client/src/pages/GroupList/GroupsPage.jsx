@@ -242,19 +242,19 @@ export default function GroupsPage() {
                 </label>
                 <label>
                   <input type="radio" name="filter" value="open" checked={filter === 'open'} onChange={(e) => setFilter(e.target.value)} />
-                  פתוחות
+                 קבוצות פתוחות 
                 </label>
                 <label>
                   <input type="radio" name="filter" value="locked" checked={filter === 'locked'} onChange={(e) => setFilter(e.target.value)} />
-                  נעולות
+                  קבוצות נעולות
                 </label>
                 <label>
                   <input type="radio" name="filter" value="joined" checked={filter === 'joined'} onChange={(e) => setFilter(e.target.value)} />
-                  קבוצות שאני מחוברת אליהן
+                  קבוצות שאני מחובר/ת
                 </label>
                 <label>
                   <input type="radio" name="filter" value="owned" checked={filter === 'owned'} onChange={(e) => setFilter(e.target.value)} />
-                  קבוצות שאני מנהלת
+                  קבוצות שאני מנהל/ת
                 </label>
                 <label>
                   <input
@@ -360,7 +360,7 @@ export default function GroupsPage() {
                   return;
                 }
               } catch { }
-              toast.info('עדיין אינך מחוברת לקבוצה. הבקשה בהמתנה לאישור מנהלת.');
+              toast.info('עדיין אינך מחובר/ת לקבוצה. הבקשה בהמתנה לאישור מנהל/ת.');
               return;
             }
 
@@ -370,7 +370,7 @@ export default function GroupsPage() {
                 return;
               }
               if (isRejected) {
-                toast.error('בקשתך נדחתה על ידי מנהלת הקבוצה. ניתן לשלוח בקשה חדשה.');
+                toast.error('בקשתך נדחתה על ידי מנהל/ת הקבוצה. ניתן לשלוח בקשה חדשה.');
 
                 return;
               }
@@ -407,7 +407,7 @@ export default function GroupsPage() {
                       />
                       <span
                         className={`groups-lock-status ${isMember || isOwner ? 'member' : 'not-member'}`}
-                        title={isMember || isOwner ? 'מחוברת' : 'לא מחוברת'}
+                        title={isMember || isOwner ? 'מחובר/ת' : 'לא מחובר/ת'}
                       />
                     </div>
                   )}
@@ -444,14 +444,14 @@ export default function GroupsPage() {
               {!isOwner && isLocked && (
                 <div className="groups-card-actions">
                   {isMember ? (
-                    <span className="groups-status groups-status-member">מחוברת</span>
+                    <span className="groups-status groups-status-member">מחובר/ת</span>
                   ) : !isAuthed ? null : isRejected ? (
                     <>
                       <div className="groups-notice groups-notice-rejected">
-                        בקשתך נדחתה על ידי מנהלת הקבוצה. ניתן לשלוח בקשה חדשה.
+                        בקשתך נדחתה על ידי מנהל/ת הקבוצה. ניתן לשלוח בקשה חדשה.
                       </div>
                       <button className="groups-action-btn" onClick={onRequestJoin}>
-                        שלחי בקשה שוב
+                        שלח/י בקשה שוב
                       </button>
                     </>
                   ) : isPending ? (
@@ -459,21 +459,19 @@ export default function GroupsPage() {
                       <button className="groups-action-btn groups-action-btn-pending" disabled>
                         בהמתנה...
                       </button>
-                      <p className="groups-hint">הבקשה נשלחה וממתינה לאישור מנהלת</p>
+                      <p className="groups-hint">בקשתך נשלחה וממתינה לאישור מנהל/ת</p>
                     </>
                   ) : wasRemoved && !isMember && !isPending ? (
                     <>
                       <div className="groups-notice groups-notice-removed">
-                        הוסרת מהקבוצה על ידי מנהלת. ניתן לשלוח בקשת הצטרפות חדשה.
+                        הוסרת מהקבוצה על ידי מנהל/ת. ניתן לשלוח בקשת הצטרפות חדשה.
                       </div>
                       <button className="groups-action-btn" onClick={onRequestJoin}>
-                        שלחי בקשת הצטרפות
-                      </button>
+בקשת הצטרפות                      </button>
                     </>
                   ) : (
                     <button className="groups-action-btn" onClick={onRequestJoin}>
-                      בקשי הצטרפות
-                    </button>
+בקשת הצטרפות                    </button>
                   )}
                 </div>
               )}
