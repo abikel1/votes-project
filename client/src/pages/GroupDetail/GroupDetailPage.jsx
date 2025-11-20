@@ -9,34 +9,51 @@ import { BiArrowBack } from 'react-icons/bi'
 import {
   fetchMyGroups,
   fetchGroupWithMembers,
-  selectMyJoinedIds
+  selectMyJoinedIds,
 } from '../../slices/groupsSlice';
 
 import {
   fetchCandidatesByGroup,
   selectCandidatesForGroup,
   selectCandidatesLoadingForGroup,
-  selectCandidatesErrorForGroup
+  selectCandidatesErrorForGroup,
 } from '../../slices/candidateSlice';
 
 import './GroupDetailPage.css';
 
 import {
-  BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer,
-  PieChart, Pie, Cell, Legend
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+  PieChart,
+  Pie,
+  Cell,
+  Legend,
 } from 'recharts';
 
 import http from '../../api/http';
 
 // צבעים לגרפים
-const COLORS = ['#003366', '#8b5cf6', '#ec4899', '#f59e0b', '#10b981', '#06b6d4', '#6366f1', '#84cc16'];
+const COLORS = [
+  '#003366',
+  '#8b5cf6',
+  '#ec4899',
+  '#f59e0b',
+  '#10b981',
+  '#06b6d4',
+  '#6366f1',
+  '#84cc16',
+];
 
 const makeSlug = (name = '') =>
   encodeURIComponent(
     String(name)
       .trim()
       .toLowerCase()
-      .replace(/\s+/g, '-')
+      .replace(/\s+/g, '-'),
   );
 
 export default function GroupDetailPage() {
@@ -46,38 +63,24 @@ export default function GroupDetailPage() {
   const location = useLocation();
 
   const navGroupId = location.state?.groupId || null;
-
-  // state פנימי ל־groupId – מתחיל מהניווט (אם יש)
   const [groupId, setGroupId] = useState(navGroupId);
 
-  // אם נכנסו עם /groups/:groupSlug בלי state – נטען id מהשרת לפי slug
-  useEffect(() => {
-    // אם יש id מהניווט הפנימי – נשתמש בו
-    if (navGroupId) {
-      setGroupId(navGroupId);
-      return;
-    }
-
-    // אם אין slug ב־URL – אין מה לעשות
-    if (!groupSlug) return;
-
-    // בקשת GET לראוט החדש /api/groups/slug/:slug
-    (async () => {
-      try {
-        const { data } = await http.get(`/groups/slug/${groupSlug}`);
-        setGroupId(data._id);          // שומרת את ה־id שהגיע מהשרת
-      } catch (err) {
-        console.error('failed to resolve group by slug', err);
-        setGroupId(null);
-      }
-    })();
-  }, [navGroupId, groupSlug]);
-
-  const { selectedGroup: group, loading: groupLoading } = useSelector(s => s.groups);
-
+  const { selectedGroup: group, loading: groupLoading, error: groupError } = useSelector(
+    (s) => s.groups,
+  );
   const candidates = useSelector(selectCandidatesForGroup(groupId || '')) || [];
   const loadingCandidates = useSelector(selectCandidatesLoadingForGroup(groupId || ''));
   const errorCandidates = useSelector(selectCandidatesErrorForGroup(groupId || ''));
+
+  const joinedIdsSet = useSelector(selectMyJoinedIds);
+
+  // const { userEmail: authEmail, userId: authId } = useSelector((s) => s.auth);
+  // const isAuthed = !!authId || !!authEmail;
+
+  // const [leftWidth, setLeftWidth] = useState(35);
+  // const [isDragging, setIsDragging] = useState(false);
+  // const containerRef = useRef(null);
+
 const getWinnerLabel = (index) => ` ${index + 1}`;
 
   const { userEmail: authEmail, userId: authId } = useSelector((s) => s.auth);
@@ -90,15 +93,63 @@ const getWinnerLabel = (index) => ` ${index + 1}`;
   const [isDragging, setIsDragging] = useState(false);
   const containerRef = useRef(null);
 
-  // טוען נתונים
-  useEffect(() => {
-    if (groupId) dispatch(fetchGroupWithMembers(groupId));
-    if (groupId) dispatch(fetchCandidatesByGroup(groupId));
-    if (isAuthed) dispatch(fetchMyGroups());
-  }, [dispatch, groupId, isAuthed]);
 
-  // חישוב אם עבר תאריך סיום
-  const isExpired = group?.endDate ? new Date(group.endDate) < new Date() : false;
+
+
+
+
+
+
+  // אם נכנסו עם /groups/:groupSlug בלי state – נטען id מהשרת לפי slug
+  useEffect(() => {
+    if (navGroupId) {
+      setGroupId(navGroupId);
+      return;
+    }
+    if (!groupSlug) return;
+
+    (async () => {
+      try {
+        const { data } = await http.get(`/groups/slug/${groupSlug}`);
+        setGroupId(data._id);
+      } catch (err) {
+        console.error('failed to resolve group by slug', err);
+        setGroupId(null);
+      }
+    })();
+  }, [navGroupId, groupSlug]);
+
+// <<<<<<< HEAD
+//   // טוען נתוני קבוצה ומועמדים
+// =======
+//   const { selectedGroup: group, loading: groupLoading } = useSelector(s => s.groups);
+
+//   const candidates = useSelector(selectCandidatesForGroup(groupId || '')) || [];
+//   const loadingCandidates = useSelector(selectCandidatesLoadingForGroup(groupId || ''));
+//   const errorCandidates = useSelector(selectCandidatesErrorForGroup(groupId || ''));
+// const getWinnerLabel = (index) => ` ${index + 1}`;
+
+//   const { userEmail: authEmail, userId: authId } = useSelector((s) => s.auth);
+//   const isAuthed = !!authId || !!authEmail || !!localStorage.getItem('authToken');
+//   const iconColor = "#1e3a8a"; // צבע אחיד לכל האייקונים
+
+//   const myJoinedIdsSet = useSelector(selectMyJoinedIds);
+
+//   const [leftWidth, setLeftWidth] = useState(35);
+//   const [isDragging, setIsDragging] = useState(false);
+//   const containerRef = useRef(null);
+
+//   // טוען נתונים
+// >>>>>>> fd09d35ac375e1d72d983305dcc67a256b38f216
+  useEffect(() => {
+    if (groupId) {
+      dispatch(fetchGroupWithMembers(groupId));
+      dispatch(fetchCandidatesByGroup(groupId));
+    }
+    if (isAuthed) {
+      dispatch(fetchMyGroups());
+    }
+  }, [dispatch, groupId, isAuthed]);
 
   // Resize bar
   useEffect(() => {
@@ -120,27 +171,46 @@ const getWinnerLabel = (index) => ` ${index + 1}`;
     };
   }, [isDragging]);
 
-  if (!groupId) {
+  if (groupError) {
     return (
-      <div className="loading-wrap">
-        טוען נתוני קבוצה…
+      <div className="group-detail-error">
+        שגיאה בטעינת הקבוצה.
+        <button
+          className="group-detail-back-btn"
+          onClick={() => navigate('/groups')}
+        >
+          חזרה לרשימת הקבוצות
+        </button>
       </div>
     );
+  }
+
+  if (!groupId) {
+    return <div className="loading-wrap">טוען נתוני קבוצה…</div>;
   }
 
   if (groupLoading || !group) {
     return <div className="loading-wrap">טוען נתוני קבוצה…</div>;
   }
 
-  // מכאן והלאה בטוח שיש group
-  const slug = makeSlug(group.name || groupSlug || groupId);
+  // ---- חישובי הרשאות אחרי שיש group ----
+  const gidStr = String(group._id);
+  const slug = makeSlug(group.name || groupSlug || gidStr);
+  const isLocked = !!group.isLocked;
 
-  // זיהוי המשתמש/ת המחוברת
-  const myEmail = (authEmail || localStorage.getItem('userEmail') || '').trim().toLowerCase();
+  const myEmail = (authEmail || localStorage.getItem('userEmail') || '')
+    .trim()
+    .toLowerCase();
   const myId = String(authId ?? localStorage.getItem('userId') ?? '');
 
-  // זיהוי מנהלת הקבוצה (כמו ב-GroupsPage)
-  const createdByEmail = (group.createdBy ?? group.created_by ?? group.createdByEmail ?? group.ownerEmail ?? group.owner ?? '')
+  const createdByEmail = (
+    group.createdBy ??
+    group.created_by ??
+    group.createdByEmail ??
+    group.ownerEmail ??
+    group.owner ??
+    ''
+  )
     .trim()
     .toLowerCase();
   const createdById = String(group.createdById ?? '');
@@ -150,22 +220,89 @@ const getWinnerLabel = (index) => ` ${index + 1}`;
     (!!myEmail && !!createdByEmail && myEmail === createdByEmail) ||
     (!!myId && !!createdById && myId === createdById);
 
+  const isMember =
+    !!joinedIdsSet && typeof joinedIdsSet.has === 'function' && joinedIdsSet.has(gidStr);
+
+  const isExpired = group?.endDate ? new Date(group.endDate) < new Date() : false;
+
+  // 🔒 קבוצה נעולה + לא מחובר כלל
+  if (isLocked && !isAuthed) {
+    return (
+      <div className="page-wrap dashboard">
+        <div className="page-header">
+          <button
+            className="back-btn"
+            onClick={() => navigate('/groups')}
+          >
+            כל הקבוצות
+          </button>
+
+          <h2 className="page-title">קבוצה נעולה</h2>
+          <p className="group-description">
+            קבוצה זו נעולה. כדי לבקש הצטרפות עליה יש להתחבר למערכת ולאחר מכן לשלוח
+            בקשת הצטרפות מעמוד &quot;קבוצות&quot;.
+          </p>
+        </div>
+
+        <div className="meta-and-button">
+          <button
+            className="vote-btn"
+            onClick={() =>
+              navigate('/login', {
+                state: {
+                  from: `/groups/${slug}`,
+                  joinGroupId: gidStr,
+                },
+              })
+            }
+          >
+            בקשת הצטרפות
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // 🔒 קבוצה נעולה + משתמש מחובר אבל *לא* חבר בקבוצה (ולא מנהלת)
+  if (isLocked && isAuthed && !isOwner && !isMember) {
+    return (
+      <div className="page-wrap dashboard">
+        <div className="page-header">
+          <button
+            className="back-btn"
+            onClick={() => navigate('/groups')}
+          >
+            כל הקבוצות
+          </button>
+
+          <h2 className="page-title">קבוצה נעולה</h2>
+          <p className="group-description">
+            אינך מחובר/ת לקבוצה זו. כדי להצטרף, חזור/י לעמוד הקבוצות ולחץ/י על
+            &quot;בקשת הצטרפות&quot; בקבוצה המתאימה.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  // ---- מכאן והלאה: או קבוצה פתוחה, או נעולה שהמשתמש חבר/מנהלת ----
+
   const goSettings = () => {
     navigate(`/groups/${slug}/settings`, {
       state: { groupId },
     });
   };
 
-  // פונקציות עזר
   const formatDate = (dateString) => {
     if (!dateString) return 'לא זמין';
     const date = new Date(dateString);
     return date.toLocaleDateString('he-IL');
   };
 
-  // נתוני הצבעות
   const totalVotes = candidates.reduce((sum, c) => sum + (c.votesCount || 0), 0);
-  const sortedCandidates = [...candidates].sort((a, b) => (b.votesCount || 0) - (a.votesCount || 0));
+  const sortedCandidates = [...candidates].sort(
+    (a, b) => (b.votesCount || 0) - (a.votesCount || 0),
+  );
 
   const pieData = candidates
     .filter((c) => c.votesCount > 0)
@@ -173,20 +310,39 @@ const getWinnerLabel = (index) => ` ${index + 1}`;
 
   const barData = sortedCandidates.map((c) => ({
     name: c.name.length > 12 ? c.name.substring(0, 12) + '...' : c.name,
-    votesCount: c.votesCount || 0
+    votesCount: c.votesCount || 0,
   }));
 
-  // מציאת זוכים לפי maxWinners
   const winners = sortedCandidates.slice(0, group.maxWinners);
-  const maxVotes = Math.max(...candidates.map(c => c.votesCount || 0));
+  const maxVotes = Math.max(...candidates.map((c) => c.votesCount || 0));
 
   return (
     <div className="page-wrap dashboard">
+{/* <<<<<<< HEAD
+      <div className="page-header">
+        <button
+          className="back-btn"
+          onClick={() => navigate('/groups')}
+        >
+          כל הקבוצות
+        </button>
 
-   
+        {isOwner && (
+          <button
+            className="group-settings-btn-left"
+            onClick={goSettings}
+            title="הגדרות קבוצה"
+          >
+            <img src="/src/assets/icons/settings.png" alt="הגדרות" />
+          </button>
+        )}
+=======
+
+    */}
 
 <div className="page-header clean-header">
 
+{/* >>>>>>> fd09d35ac375e1d72d983305dcc67a256b38f216 */}
 
   {/* כותרת מרכזית */}
   <div className="header-title">
@@ -224,7 +380,6 @@ const getWinnerLabel = (index) => ` ${index + 1}`;
           </div>
         </div>
 
-        {/* כפתור הצבעה — רק לפני סיום */}
         {!isExpired && (
           <button
             className="vote-btn"
@@ -247,7 +402,6 @@ const getWinnerLabel = (index) => ` ${index + 1}`;
       {errorCandidates && <p className="err">❌ שגיאה: {errorCandidates}</p>}
 
       <div className="main-content-resizable" ref={containerRef}>
-
         {/* צד שמאל – מועמדים */}
         <div className="left-section" style={{ width: `${leftWidth}%` }}>
           <div className="candidates-container">
@@ -265,10 +419,14 @@ const getWinnerLabel = (index) => ` ${index + 1}`;
                       key={c._id}
                       className={`candidate-card ${isWinner ? 'winner' : ''}`}
                     >
+                      {/* {isExpired && isWinner && ( */}
                       {/* גביע יוצג רק אם הסתיים */}
                       {/* {isExpired && isWinner && (
                         <div className="current-leader">
-                          <img src="/src/assets/icons/trophy.png" className="groups-badge-locked" />
+                          <img
+                            src="/src/assets/icons/trophy.png"
+                            className="groups-badge-locked"
+                          />
                         </div>
                       )} */}
 
@@ -280,7 +438,6 @@ const getWinnerLabel = (index) => ` ${index + 1}`;
 
 
 
-                      {/* --- פרופיל מועמד/ת --- */}
                       <div className="candidate-header">
                         {c.photoUrl && (
                           <img
@@ -295,7 +452,6 @@ const getWinnerLabel = (index) => ` ${index + 1}`;
                         </div>
                       </div>
 
-                      {/* מספר קולות יוצג לכל מועמד רק אם הסתיים */}
                       {isExpired && (
                         <div className="votes-count">{c.votesCount || 0} קולות</div>
                       )}
@@ -310,23 +466,31 @@ const getWinnerLabel = (index) => ` ${index + 1}`;
         </div>
 
         {/* פס גרירה */}
-        <div className="resize-handle" onMouseDown={() => setIsDragging(true)}>
-          <div className="resize-line"></div>
+        <div
+          className="resize-handle"
+          onMouseDown={() => setIsDragging(true)}
+        >
+          <div className="resize-line" />
         </div>
 
-        {/* צד ימין – גרפים / מידע */}
-        <div className="right-section" style={{ width: `${100 - leftWidth}%` }}>
-
+        {/* צד ימין – מידע / גרפים */}
+        <div
+          className="right-section"
+          style={{ width: `${100 - leftWidth}%` }}
+        >
           {!isExpired && (
             <div className="group-details-card">
+{/* <<<<<<< HEAD
+              <div className="group-header">
+======= */}
 
               {/* כותרת ותיאור */}
               {/* <div className="group-header">
+>>>>>>> fd09d35ac375e1d72d983305dcc67a256b38f216
                 <h2>{group.name}</h2>
                 <p>{group.description || 'אין תיאור לקבוצה הזו.'}</p>
               </div> */}
 
-              {/* רשת מידע עם אייקונים */}
               <div className="group-info-grid">
                 <div className="info-card">
                   <HiClock size={28} color="#1e3a8a" />
@@ -334,10 +498,9 @@ const getWinnerLabel = (index) => ` ${index + 1}`;
                   <h4>
                     {Math.max(
                       Math.floor(
-                        (new Date(group.endDate) - new Date()) /
-                          (1000 * 60 * 60 * 24)
+                        (new Date(group.endDate) - new Date()) / (1000 * 60 * 60 * 24),
                       ),
-                      0
+                      0,
                     )}{' '}
                     ימים
                   </h4>
@@ -361,7 +524,6 @@ const getWinnerLabel = (index) => ` ${index + 1}`;
             </div>
           )}
 
-          {/* גרפים לאחר סיום */}
           {isExpired && totalVotes > 0 && (
             <div className="charts">
               <div className="pie-chart-container">
@@ -409,11 +571,8 @@ const getWinnerLabel = (index) => ` ${index + 1}`;
             </div>
           )}
 
-          {/* הודעה אם אין הצבעות */}
           {isExpired && totalVotes === 0 && (
-            <div className="no-votes-message">
-              🕐 אין הצבעות — לא ניתן להציג גרפים
-            </div>
+            <div className="no-votes-message">🕐 אין הצבעות — לא ניתן להציג גרפים</div>
           )}
         </div>
       </div>

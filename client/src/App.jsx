@@ -1,8 +1,9 @@
+// src/App.jsx
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Routes, Route } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
-import { fetchMe } from './slices/authSlice';
+import { fetchMe, loginSuccess } from './slices/authSlice';
 
 import GroupsPage from './pages/GroupList/GroupsPage.jsx';
 import GroupSettingsPage from './components/GroupSettings/GroupSettingsPage.jsx';
@@ -21,20 +22,23 @@ import JoinGroupPage from './pages/Join/JoinGroupPage.jsx';
 import AboutPage from './pages/About/AboutPage.jsx';
 import UserGuidePage from './pages/UserGuide/UserGuidePage.jsx';
 import ToastDemo from './components/a.jsx';
-import Footer from './components/Footer/Footer'; // אם הפוטר אצלך בתיקייה אחרת, עדכני את הנתיב
+import Footer from './components/Footer/Footer';
 import ContactPage from './pages/ContactForm/ContactForm.jsx';
 import ScrollToTop from './components/ScrollToTop.jsx';
+
+// 👇 ה־Guard
+import RequireAuth from './components/RequireAuth/RequireAuth.jsx';
 
 export default function App() {
   const dispatch = useDispatch();
   const token = useSelector((s) => s.auth.token);
 
-  // ניקוי לוקל סטורז אם אין טוקן
- useEffect(() => {
+  // אם יש טוקן – טוענים פרופיל
+  useEffect(() => {
     if (token) dispatch(fetchMe());
   }, [token, dispatch]);
 
-  // סינכרון בין טאבים
+  // סינכרון בין טאבים – התחברות בטאב אחד תפעיל התחברות גם באחרים
   useEffect(() => {
     const listener = (e) => {
       if (e.key === 'token') {
@@ -86,37 +90,38 @@ export default function App() {
 
       <NavBar />
       <ScrollToTop />
+
       <Routes>
+        {/* ראוטים פתוחים */}
         <Route path="/" element={<HomeRoute />} />
         <Route path="/a" element={<ToastDemo />} />
-
         <Route path="/groups" element={<GroupsPage />} />
-        <Route path="/groups/create" element={<CreateGroupPage />} />
-        <Route path="/groups/:groupSlug" element={<GroupDetailPage />} />
-        <Route
-          path="/groups/:groupSlug/settings"
-          element={<GroupSettingsPage />}
-        />
-        <Route
-          path="/groups/:groupSlug/candidates"
-          element={<VotingPage />}
-        />
-
         <Route path="/join/:slug" element={<JoinGroupPage />} />
-  <Route path="/contact" element={<ContactPage />} />
-
+        <Route path="/contact" element={<ContactPage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-        <Route
-          path="/reset-password/:token"
-          element={<ResetPasswordPage />}
-        />
-
-        <Route path="/profile" element={<ProfilePage />} />
-        <Route path="/tools/send-email" element={<SendEmailPage />} />
+        <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
         <Route path="/about" element={<AboutPage />} />
         <Route path="/user-guide" element={<UserGuidePage />} />
+
+        {/* דף פרטי קבוצה – פתוח לכולם */}
+        <Route path="/groups/:groupSlug" element={<GroupDetailPage />} />
+
+        {/* ראוטים שדורשים התחברות */}
+        <Route element={<RequireAuth />}>
+          <Route path="/groups/create" element={<CreateGroupPage />} />
+          <Route
+            path="/groups/:groupSlug/settings"
+            element={<GroupSettingsPage />}
+          />
+          <Route
+            path="/groups/:groupSlug/candidates"
+            element={<VotingPage />}
+          />
+          <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/tools/send-email" element={<SendEmailPage />} />
+        </Route>
       </Routes>
 
       <Footer />
