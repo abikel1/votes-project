@@ -69,14 +69,14 @@ export default function GroupsPage() {
 
 
 
-const onCreateGroupClick = () => {
-  if (!isAuthed) {
-    toast.error('כדי ליצור קבוצה יש להתחבר תחילה.');
+  const onCreateGroupClick = () => {
+    if (!isAuthed) {
+      toast.error('כדי ליצור קבוצה יש להתחבר תחילה.');
 
-    return;
-  }
-  navigate('/groups/create');
-};
+      return;
+    }
+    navigate('/groups/create');
+  };
 
   useEffect(() => { dispatch(hydratePendingFromLocalStorage()); }, [dispatch]);
 
@@ -331,18 +331,18 @@ const onCreateGroupClick = () => {
             });
           }; const isNewUser = !joinedIdsSet.size && !pendingIdsSet.size && !rejectedIdsSet.size;
 
-        const onRequestJoin = (e) => {
-  e.stopPropagation();
-  if (isMember || isPending) return;
-  if (!isAuthed) {
-    toast.error('כדי לשלוח בקשת הצטרפות יש להתחבר תחילה.');
-    
+          const onRequestJoin = (e) => {
+            e.stopPropagation();
+            if (isMember || isPending) return;
+            if (!isAuthed) {
+              toast.error('כדי לשלוח בקשת הצטרפות יש להתחבר תחילה.');
 
-    return;
-  }
-  dispatch(clearRemovedNotice(gid));
-  dispatch(requestJoinGroup(gid)).unwrap().catch(() => { });
-};
+
+              return;
+            }
+            dispatch(clearRemovedNotice(gid));
+            dispatch(requestJoinGroup(gid)).unwrap().catch(() => { });
+          };
 
           const onCardClick = async () => {
             if (!isOwner && isLocked && isPending && !isMember) {
@@ -461,7 +461,7 @@ const onCreateGroupClick = () => {
                       </button>
                       <p className="groups-hint">הבקשה נשלחה וממתינה לאישור מנהלת</p>
                     </>
-                  ) : wasRemoved && !isNewUser ? (
+                  ) : wasRemoved && !isMember && !isPending ? (
                     <>
                       <div className="groups-notice groups-notice-removed">
                         הוסרת מהקבוצה על ידי מנהלת. ניתן לשלוח בקשת הצטרפות חדשה.
