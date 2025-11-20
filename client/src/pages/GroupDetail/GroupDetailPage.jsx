@@ -4,7 +4,8 @@ import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { HiClock, HiUserGroup, HiUser, HiOutlineBadgeCheck } from 'react-icons/hi';
 import toast from 'react-hot-toast';
-
+import { FiSettings } from 'react-icons/fi';
+import { BiArrowBack } from 'react-icons/bi'
 import {
   fetchMyGroups,
   fetchGroupWithMembers,
@@ -182,33 +183,31 @@ const getWinnerLabel = (index) => ` ${index + 1}`;
   return (
     <div className="page-wrap dashboard">
 
-      {/* כותרת */}
-      <div className="page-header">
+   
 
-        {/* כפתור חזרה לעמוד קבוצות */}
-        <button
-          className="back-btn"
-          onClick={() => navigate('/groups')}
-        >
-          כל הקבוצות
-        </button>
+<div className="page-header clean-header">
 
-        {/* כפתור הגדרות בצד שמאל – רק למנהלת הקבוצה */}
-        {isOwner && (
-          <button
-            className="group-settings-btn-left"
-            onClick={goSettings}
-            title="הגדרות קבוצה"
-          >
-            <img src="/src/assets/icons/settings.png" alt="הגדרות" />
-          </button>
-        )}
 
-        <h2 className="page-title">{group.name}</h2>
-        <p className="group-description">{group.description}</p>
-      </div>
+  {/* כותרת מרכזית */}
+  <div className="header-title">
+    <h2>{group.name}</h2>
+    <p>{group.description}</p>
+  </div>
 
-      {/* מידע על הקבוצה */}
+    {isOwner && (
+    <button className="icon-btn" onClick={goSettings} title="הגדרות קבוצה">
+      <FiSettings size={20} />
+    </button>
+  )}
+
+  {/* כפתור חזרה ימין */}
+  <button className="icon-btn" onClick={() => navigate('/groups')} title="חזרה לקבוצות">
+    <BiArrowBack size={20} />
+  </button>
+
+
+</div>
+
       <div className="meta-and-button">
         <div className="group-meta">
           <div>
@@ -322,10 +321,10 @@ const getWinnerLabel = (index) => ` ${index + 1}`;
             <div className="group-details-card">
 
               {/* כותרת ותיאור */}
-              <div className="group-header">
+              {/* <div className="group-header">
                 <h2>{group.name}</h2>
                 <p>{group.description || 'אין תיאור לקבוצה הזו.'}</p>
-              </div>
+              </div> */}
 
               {/* רשת מידע עם אייקונים */}
               <div className="group-info-grid">

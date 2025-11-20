@@ -4,7 +4,7 @@
     height: 100vh;
     margin: 0;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: #f8fafc;
+    /* background: #ffffff; */
     overflow: hidden;
     display: flex;
     flex-direction: column;
@@ -114,8 +114,8 @@
     overflow: hidden;
     min-height: 0;
     gap: 0;
-    border: 1px solid #e2e8f0;
-    background: white;
+    /* border: 1px solid #e2e8f0; */
+    /* background: white; */
 }
 
 .resize-handle {
@@ -163,7 +163,7 @@
 }
 
 .candidates-container {
-    background: #f8fafc;
+    background: #ffffff;
     padding: 12px;
     overflow-y: auto;
     flex: 1;
@@ -272,7 +272,7 @@
     gap: 12px;
     height: 100%;
     padding: 12px;
-    background: #f8fafc;
+    background: #ffffff;
     overflow: hidden;
 }
 
@@ -901,3 +901,69 @@
     height: 16px;
   }
 }
+
+
+.clean-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  background: white;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.header-title {
+  flex: 1;
+  text-align: center;
+}
+
+.header-title h2 {
+  font-size: 24px;
+  margin: 0;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.header-title p {
+  font-size: 13px;
+  color: #64748b;
+  margin: 2px 0 0 0;
+}
+
+.icon-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+}
+
+.icon-btn img {
+  width: 20px;
+  height: 20px;
+}
+
+.back-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #f2f2f2;
+  border: 1px solid #ccc;
+  padding: 6px 10px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: 0.2s;
+}
+
+.back-btn img {
+  width: 16px;
+  height: 16px;
+}
+
+.back-btn:hover {
+  background: #e6e6e6;
+}
+
+
+

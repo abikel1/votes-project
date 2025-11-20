@@ -40,6 +40,7 @@ import {
   selectVotersLoadingForGroup,
   selectVotersErrorForGroup,
 } from '../../slices/votesSlice';
+import { BiArrowBack } from 'react-icons/bi';
 
 import { upsertUsers } from '../../slices/usersSlice';
 import ConfirmModal from '../../components/ConfirmModal/ConfirmModal'
@@ -574,14 +575,14 @@ export default function GroupSettingsPage() {
 
   return (
     <div className="gs-wrap">
-      <div className="gs-header">
+      
+      {/* <div className="gs-header">
         <h2>הגדרות קבוצה</h2>
         <div className="gs-actions">
           <button className="gs-btn" onClick={() => navigate('/groups')}>
             לרשימת הקבוצות
           </button>
 
-          {/* כפתור מעבר לדף פרטי הקבוצה */}
           <button
             className="gs-btn"
             onClick={() =>
@@ -593,7 +594,42 @@ export default function GroupSettingsPage() {
             פרטי הקבוצה
           </button>
         </div>
-      </div>
+      </div> */}
+
+      <div className="gs-header clean-header">
+ 
+
+  {/* כותרת מרכזית */}
+  <div className="header-title">
+    <h2>{group.name}</h2>
+    <p>{group.description}</p>
+  </div>
+
+  {/* כפתור פרטי הקבוצה */}
+  <button
+    className="icon-btn"
+    onClick={() =>
+      navigate(`/groups/${slug}`, {
+        state: { groupId },
+      })
+    }
+    title="פרטי הקבוצה"
+  >
+    <FaInfoCircle size={24} />
+  </button>
+
+   {/* כפתור חזרה */}
+  <button
+    className="icon-btn"
+    onClick={() => navigate('/groups')}
+    title="חזרה לקבוצות"
+  >
+    <BiArrowBack size={24} />
+  </button>
+</div>
+
+
+      
 
 
       {/* layout: תוכן משמאל + סיידבר מימין */}
