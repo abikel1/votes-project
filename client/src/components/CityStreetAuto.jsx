@@ -162,9 +162,12 @@ export default function CityStreetAuto({
       value={cityInput}
       onChange={(e) => pickCity(e.target.value)}
       placeholder="*עיר"
+      autoComplete="off"              // <<< הוספנו
+      name={`${idPrefix}-city`}       // <<< שם ייחודי, שלא יבלבל את כרום
       {...cityInputProps}
     />
   );
+
   const StreetInput = (
     <input
       list={`${idPrefix}-streets`}
@@ -172,9 +175,12 @@ export default function CityStreetAuto({
       onChange={(e) => pickStreet(e.target.value)}
       placeholder={isExactCity ? "*כתובת / רחוב" : "בחרי עיר מהרשימה"}
       disabled={!isExactCity}
+      autoComplete="off"              // <<< הוספנו
+      name={`${idPrefix}-street`}     // <<< שם ייחודי
       {...streetInputProps}
     />
   );
+
 
   return (
     <div className={className}>

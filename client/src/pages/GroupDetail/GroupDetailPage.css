@@ -832,6 +832,12 @@
   font-size: 0.9rem;
   color: #555;
 }
+
+
+/* כדי שאפשר יהיה למקם את כפתור ההגדרות באופן מוחלט בתוך ההדר */
+.page-header {
+  position: relative;
+}
 .current-leader {
   position: absolute;
   top: -10px;
@@ -846,5 +852,52 @@
   font-size: 14px;
   font-weight: 700;
   border: 2px solid white;
-  /* border-radius: 4px; */
+  /* border-radius: 4px; */}
+
+
+/* כפתור הגדרות בצד שמאל למעלה */
+.group-settings-btn-left {
+  position: absolute;
+  left: 12px;
+  top: 12px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  padding: 6px 8px;
+  border-radius: 999px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+  transition: background 0.2s ease, box-shadow 0.2s ease, transform 0.1s ease;
+}
+
+.group-settings-btn-left img {
+  width: 18px;
+  height: 18px;
+}
+
+.group-settings-btn-left:hover {
+  background: #f1f5f9;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+  transform: translateY(-1px);
+}
+
+.group-settings-btn-left:active {
+  transform: translateY(0);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+/* במובייל – קצת להתקרב לקצה כדי שלא יתנגש עם הטקסט */
+@media (max-width: 768px) {
+  .group-settings-btn-left {
+    left: 8px;
+    top: 8px;
+    padding: 4px 6px;
+  }
+
+  .group-settings-btn-left img {
+    width: 16px;
+    height: 16px;
+  }
 }

@@ -1,3 +1,4 @@
+// src/pages/GroupDetail/GroupDetailPage.jsx
 import { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
@@ -71,16 +72,12 @@ export default function GroupDetailPage() {
     })();
   }, [navGroupId, groupSlug]);
 
-
-
-
   const { selectedGroup: group, loading: groupLoading } = useSelector(s => s.groups);
 
   const candidates = useSelector(selectCandidatesForGroup(groupId || '')) || [];
   const loadingCandidates = useSelector(selectCandidatesLoadingForGroup(groupId || ''));
   const errorCandidates = useSelector(selectCandidatesErrorForGroup(groupId || ''));
 const getWinnerLabel = (index) => ` ${index + 1}`;
-
 
   const { userEmail: authEmail, userId: authId } = useSelector((s) => s.auth);
   const isAuthed = !!authId || !!authEmail || !!localStorage.getItem('authToken');
@@ -130,7 +127,6 @@ const getWinnerLabel = (index) => ` ${index + 1}`;
     );
   }
 
-
   if (groupLoading || !group) {
     return <div className="loading-wrap">טוען נתוני קבוצה…</div>;
   }
@@ -138,6 +134,26 @@ const getWinnerLabel = (index) => ` ${index + 1}`;
   // מכאן והלאה בטוח שיש group
   const slug = makeSlug(group.name || groupSlug || groupId);
 
+  // זיהוי המשתמש/ת המחוברת
+  const myEmail = (authEmail || localStorage.getItem('userEmail') || '').trim().toLowerCase();
+  const myId = String(authId ?? localStorage.getItem('userId') ?? '');
+
+  // זיהוי מנהלת הקבוצה (כמו ב-GroupsPage)
+  const createdByEmail = (group.createdBy ?? group.created_by ?? group.createdByEmail ?? group.ownerEmail ?? group.owner ?? '')
+    .trim()
+    .toLowerCase();
+  const createdById = String(group.createdById ?? '');
+
+  const isOwner =
+    !!group.isOwner ||
+    (!!myEmail && !!createdByEmail && myEmail === createdByEmail) ||
+    (!!myId && !!createdById && myId === createdById);
+
+  const goSettings = () => {
+    navigate(`/groups/${slug}/settings`, {
+      state: { groupId },
+    });
+  };
 
   // פונקציות עזר
   const formatDate = (dateString) => {
@@ -177,6 +193,17 @@ const getWinnerLabel = (index) => ` ${index + 1}`;
           כל הקבוצות
         </button>
 
+        {/* כפתור הגדרות בצד שמאל – רק למנהלת הקבוצה */}
+        {isOwner && (
+          <button
+            className="group-settings-btn-left"
+            onClick={goSettings}
+            title="הגדרות קבוצה"
+          >
+            <img src="/src/assets/icons/settings.png" alt="הגדרות" />
+          </button>
+        )}
+
         <h2 className="page-title">{group.name}</h2>
         <p className="group-description">{group.description}</p>
       </div>
@@ -184,9 +211,18 @@ const getWinnerLabel = (index) => ` ${index + 1}`;
       {/* מידע על הקבוצה */}
       <div className="meta-and-button">
         <div className="group-meta">
-          <div><span className="meta-label">תאריך יצירה:</span> <span className="meta-value">{formatDate(group.creationDate)}</span></div>
-          <div><span className="meta-label">תאריך סיום:</span> <span className="meta-value">{formatDate(group.endDate)}</span></div>
-          <div><span className="meta-label">סך הצבעות:</span> <span className="meta-value">{totalVotes}</span></div>
+          <div>
+            <span className="meta-label">תאריך יצירה:</span>
+            <span className="meta-value">{formatDate(group.creationDate)}</span>
+          </div>
+          <div>
+            <span className="meta-label">תאריך סיום:</span>
+            <span className="meta-value">{formatDate(group.endDate)}</span>
+          </div>
+          <div>
+            <span className="meta-label">סך הצבעות:</span>
+            <span className="meta-value">{totalVotes}</span>
+          </div>
         </div>
 
         {/* כפתור הצבעה — רק לפני סיום */}
@@ -194,10 +230,10 @@ const getWinnerLabel = (index) => ` ${index + 1}`;
           <button
             className="vote-btn"
             onClick={() => {
-            if (!isAuthed) {
-  toast.error('אינך מחובר/ת. כדי להצביע צריך להתחבר.');
-  return;
-}
+              if (!isAuthed) {
+                toast.error('אינך מחובר/ת. כדי להצביע צריך להתחבר.');
+                return;
+              }
 
               navigate(`/groups/${slug}/candidates`, {
                 state: { groupId },
@@ -206,7 +242,6 @@ const getWinnerLabel = (index) => ` ${index + 1}`;
           >
             להצבעה בקלפי
           </button>
-
         )}
       </div>
 
@@ -223,16 +258,14 @@ const getWinnerLabel = (index) => ` ${index + 1}`;
 
             {!loadingCandidates && candidates.length > 0 && (
               <div className="candidates-grid">
-
                 {sortedCandidates.map((c) => {
                   const isWinner = winners.some((w) => w._id === c._id);
 
                   return (
                     <div
                       key={c._id}
-                      className={`candidate-card ${isWinner ? "winner" : ""}`}
+                      className={`candidate-card ${isWinner ? 'winner' : ''}`}
                     >
-
                       {/* גביע יוצג רק אם הסתיים */}
                       {/* {isExpired && isWinner && (
                         <div className="current-leader">
@@ -267,11 +300,9 @@ const getWinnerLabel = (index) => ` ${index + 1}`;
                       {isExpired && (
                         <div className="votes-count">{c.votesCount || 0} קולות</div>
                       )}
-
                     </div>
                   );
                 })}
-
               </div>
             )}
 
@@ -293,7 +324,7 @@ const getWinnerLabel = (index) => ` ${index + 1}`;
               {/* כותרת ותיאור */}
               <div className="group-header">
                 <h2>{group.name}</h2>
-                <p>{group.description || "אין תיאור לקבוצה הזו."}</p>
+                <p>{group.description || 'אין תיאור לקבוצה הזו.'}</p>
               </div>
 
               {/* רשת מידע עם אייקונים */}
@@ -301,7 +332,16 @@ const getWinnerLabel = (index) => ` ${index + 1}`;
                 <div className="info-card">
                   <HiClock size={28} color="#1e3a8a" />
                   <p>זמן עד סיום</p>
-                  <h4>{Math.max(Math.floor((new Date(group.endDate) - new Date()) / (1000 * 60 * 60 * 24)), 0)} ימים</h4>
+                  <h4>
+                    {Math.max(
+                      Math.floor(
+                        (new Date(group.endDate) - new Date()) /
+                          (1000 * 60 * 60 * 24)
+                      ),
+                      0
+                    )}{' '}
+                    ימים
+                  </h4>
                 </div>
                 <div className="info-card">
                   <HiUserGroup size={28} color="#1e3a8a" />
@@ -329,8 +369,20 @@ const getWinnerLabel = (index) => ` ${index + 1}`;
                 <h3>אחוזי הצבעה</h3>
                 <ResponsiveContainer width="100%" height={250}>
                   <PieChart>
-                    <Pie data={pieData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius="80%">
-                      {pieData.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
+                    <Pie
+                      data={pieData}
+                      dataKey="value"
+                      nameKey="name"
+                      cx="50%"
+                      cy="50%"
+                      outerRadius="80%"
+                    >
+                      {pieData.map((_, i) => (
+                        <Cell
+                          key={i}
+                          fill={COLORS[i % COLORS.length]}
+                        />
+                      ))}
                     </Pie>
                     <Tooltip formatter={(v) => `${v} קולות`} />
                     <Legend verticalAlign="bottom" height={25} />
@@ -342,7 +394,13 @@ const getWinnerLabel = (index) => ` ${index + 1}`;
                 <h3>מספר קולות</h3>
                 <ResponsiveContainer width="100%" height={250}>
                   <BarChart data={barData}>
-                    <XAxis dataKey="name" angle={-45} textAnchor="end" height={50} interval={0} />
+                    <XAxis
+                      dataKey="name"
+                      angle={-45}
+                      textAnchor="end"
+                      height={50}
+                      interval={0}
+                    />
                     <YAxis />
                     <Tooltip formatter={(v) => `${v} קולות`} />
                     <Bar dataKey="votesCount" fill="#003366" />

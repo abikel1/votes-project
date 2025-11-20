@@ -42,7 +42,7 @@ import {
 } from '../../slices/votesSlice';
 
 import { upsertUsers } from '../../slices/usersSlice';
-import ConfirmModal  from '../../components/ConfirmModal/ConfirmModal'
+import ConfirmModal from '../../components/ConfirmModal/ConfirmModal'
 import GeneralTab from './GeneralTab';
 import CandidatesTab from './CandidatesTab';
 import VotersTab from './VotersTab';
@@ -62,7 +62,7 @@ import {
   humanizeName,
   validateCandidateFields,
 } from './groupSettingsHelpers';
- 
+
 // ---------- קומפוננטה ראשית ----------
 
 export default function GroupSettingsPage() {
@@ -91,7 +91,7 @@ export default function GroupSettingsPage() {
 
 
   const [showConfirm, setShowConfirm] = useState(false);
-const [selectedMember, setSelectedMember] = useState(null);
+  const [selectedMember, setSelectedMember] = useState(null);
 
 
   const reqs = useSelector(selectJoinRequestsForGroup(groupId)) || EMPTY_ARR;
@@ -199,7 +199,7 @@ const [selectedMember, setSelectedMember] = useState(null);
       group?.createdBy &&
       userEmail &&
       String(group.createdBy).trim().toLowerCase() ===
-        String(userEmail).trim().toLowerCase();
+      String(userEmail).trim().toLowerCase();
 
     const byId =
       group?.createdById && userId && String(group.createdById) === String(userId);
@@ -210,7 +210,7 @@ const [selectedMember, setSelectedMember] = useState(null);
       lastName &&
       !String(group.createdBy).includes('@') &&
       String(group.createdBy).trim().toLowerCase() ===
-        `${firstName} ${lastName}`.trim().toLowerCase();
+      `${firstName} ${lastName}`.trim().toLowerCase();
 
     return !!(byEmail || byId || byFullName);
   }, [group, userEmail, userId, firstName, lastName]);
@@ -540,35 +540,35 @@ const [selectedMember, setSelectedMember] = useState(null);
   //   }
   // };
 
-const handleRemoveMember = (m, mid) => {
-  setSelectedMember({ member: m, memberId: mid });
-  setShowConfirm(true);
-};
-const confirmDelete = async () => {
-  const { member, memberId } = selectedMember;
-  setShowConfirm(false);
+  const handleRemoveMember = (m, mid) => {
+    setSelectedMember({ member: m, memberId: mid });
+    setShowConfirm(true);
+  };
+  const confirmDelete = async () => {
+    const { member, memberId } = selectedMember;
+    setShowConfirm(false);
 
-  try {
-    await dispatch(
-      removeGroupMember({
-        groupId,
-        memberId,
-        email: member.email || undefined,
-      })
-    ).unwrap();
+    try {
+      await dispatch(
+        removeGroupMember({
+          groupId,
+          memberId,
+          email: member.email || undefined,
+        })
+      ).unwrap();
 
-    if (group.isLocked) dispatch(fetchJoinRequests(groupId));
-    dispatch(fetchGroupWithMembers(groupId));
+      if (group.isLocked) dispatch(fetchJoinRequests(groupId));
+      dispatch(fetchGroupWithMembers(groupId));
 
-  } catch (e) {
-    toast.error(e || 'Failed to remove member');
-  }
-};
+    } catch (e) {
+      toast.error(e || 'Failed to remove member');
+    }
+  };
 
-const cancelDelete = () => {
-  setShowConfirm(false);
-  setSelectedMember(null);
-};
+  const cancelDelete = () => {
+    setShowConfirm(false);
+    setSelectedMember(null);
+  };
 
 
 
@@ -580,8 +580,21 @@ const cancelDelete = () => {
           <button className="gs-btn" onClick={() => navigate('/groups')}>
             לרשימת הקבוצות
           </button>
+
+          {/* כפתור מעבר לדף פרטי הקבוצה */}
+          <button
+            className="gs-btn"
+            onClick={() =>
+              navigate(`/groups/${slug}`, {
+                state: { groupId },
+              })
+            }
+          >
+            פרטי הקבוצה
+          </button>
         </div>
       </div>
+
 
       {/* layout: תוכן משמאל + סיידבר מימין */}
       <div className="gs-main-layout">
@@ -748,15 +761,15 @@ const cancelDelete = () => {
       />
 
       <ConfirmModal
-  open={showConfirm}
-  message={
-    selectedMember
-      ? `להסיר את ${selectedMember.member.name || selectedMember.member.email || selectedMember.memberId} מהקבוצה?`
-      : ''
-  }
-  onConfirm={confirmDelete}
-  onCancel={cancelDelete}
-/>
+        open={showConfirm}
+        message={
+          selectedMember
+            ? `להסיר את ${selectedMember.member.name || selectedMember.member.email || selectedMember.memberId} מהקבוצה?`
+            : ''
+        }
+        onConfirm={confirmDelete}
+        onCancel={cancelDelete}
+      />
 
     </div>
   );
