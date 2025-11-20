@@ -429,7 +429,7 @@ export default function ProfilePage() {
       </div>
 
       <div className="profile-groups">
-        <h2>קבוצות שאני מנהלת</h2>
+        <h2>קבוצות שאני מנהל/ת</h2>
         <ul>
           {userGroups.created.length > 0
             ? userGroups.created.map(g => (
@@ -443,7 +443,9 @@ export default function ProfilePage() {
             : <li>אין קבוצות</li>}
         </ul>
 
-        <h2>קבוצות שאני משתתפת בהן</h2>
+        <div className="profile-groups-divider" />
+
+        <h2>קבוצות שאני מחובר/ת</h2>
         <ul>
           {userGroups.joined.length > 0
             ? userGroups.joined.map(g => (
@@ -460,60 +462,60 @@ export default function ProfilePage() {
 
 
       {showPasswordModal && (
-  <div className="modal-overlay">
-    <div className="modal-box">
-      <h3>שינוי סיסמה</h3>
+        <div className="modal-overlay">
+          <div className="modal-box">
+            <h3>שינוי סיסמה</h3>
 
-      {pwErrors.currentPassword && <div className="error">{pwErrors.currentPassword}</div>}
-      <p>
-        <strong>סיסמה נוכחית:</strong>
-        <input
-          type="password"
-          value={currentPassword}
-          onChange={(e) => setCurrentPassword(e.target.value)}
-        />
-      </p>
+            {pwErrors.currentPassword && <div className="error">{pwErrors.currentPassword}</div>}
+            <p>
+              <strong>סיסמה נוכחית:</strong>
+              <input
+                type="password"
+                value={currentPassword}
+                onChange={(e) => setCurrentPassword(e.target.value)}
+              />
+            </p>
 
-      {pwErrors.newPassword && <div className="error">{pwErrors.newPassword}</div>}
-      <p>
-        <strong>סיסמה חדשה:</strong>
-        <input
-          type="password"
-          value={newPassword}
-          onChange={(e) => setNewPassword(e.target.value)}
-        />
-      </p>
+            {pwErrors.newPassword && <div className="error">{pwErrors.newPassword}</div>}
+            <p>
+              <strong>סיסמה חדשה:</strong>
+              <input
+                type="password"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+              />
+            </p>
 
-      {pwErrors.confirm && <div className="error">{pwErrors.confirm}</div>}
-      <p>
-        <strong>אימות סיסמה:</strong>
-        <input
-          type="password"
-          value={confirm}
-          onChange={(e) => setConfirm(e.target.value)}
-        />
-      </p>
+            {pwErrors.confirm && <div className="error">{pwErrors.confirm}</div>}
+            <p>
+              <strong>אימות סיסמה:</strong>
+              <input
+                type="password"
+                value={confirm}
+                onChange={(e) => setConfirm(e.target.value)}
+              />
+            </p>
 
-      <div className="modal-actions">
-        <button className="edit-btn save" onClick={handleChangePassword}>
-          שמור
-        </button>
-        <button
-          className="edit-btn cancel"
-          onClick={() => {
-            setShowPasswordModal(false);
-            setCurrentPassword('');
-            setNewPassword('');
-            setConfirm('');
-            setPwErrors({});
-          }}
-        >
-          ביטול
-        </button>
-      </div>
-    </div>
-  </div>
-)}
+            <div className="modal-actions">
+              <button className="edit-btn save" onClick={handleChangePassword}>
+                שמור
+              </button>
+              <button
+                className="edit-btn cancel"
+                onClick={() => {
+                  setShowPasswordModal(false);
+                  setCurrentPassword('');
+                  setNewPassword('');
+                  setConfirm('');
+                  setPwErrors({});
+                }}
+              >
+                ביטול
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
     </div>
   );
