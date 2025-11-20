@@ -1,3 +1,4 @@
+// src/components/GroupSettings/GroupSettingsPage.jsx
 import { useEffect, useMemo, useState, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
@@ -41,7 +42,7 @@ import {
 } from '../../slices/votesSlice';
 
 import { upsertUsers } from '../../slices/usersSlice';
-import ConfirmModal from '../../components/ConfirmModal/ConfirmModal'
+import ConfirmModal from '../../components/ConfirmModal/ConfirmModal';
 import GeneralTab from './GeneralTab';
 import CandidatesTab from './CandidatesTab';
 import VotersTab from './VotersTab';
@@ -62,12 +63,20 @@ import {
   validateCandidateFields,
 } from './groupSettingsHelpers';
 
+import http from '../../api/http';
+
 // ---------- קומפוננטה ראשית ----------
 
 export default function GroupSettingsPage() {
   const { groupSlug } = useParams();
   const location = useLocation();
-  const groupId = location.state?.groupId || null;
+
+  // id שהועבר בניווט פנימי (מכרטיס קבוצה)
+  const navGroupId = location.state?.groupId || null;
+
+  // state פנימי ל-id של הקבוצה
+  const [groupId, setGroupId] = useState(navGroupId);
+  const [slugResolved, setSlugResolved] = useState(!!navGroupId); // האם ניסינו לפתור slug ל-id
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -84,22 +93,33 @@ export default function GroupSettingsPage() {
   const enrichedMembers = useSelector(selectSelectedGroupMembersEnriched);
   const { userId, userEmail, firstName, lastName } = useSelector((s) => s.auth);
 
-  const candidates = useSelector(selectCandidatesForGroup(groupId)) || EMPTY_ARR;
-  const candLoading = useSelector(selectCandidatesLoadingForGroup(groupId));
-  const candError = useSelector(selectCandidatesErrorForGroup(groupId));
-
+  const candidates =
+    useSelector(selectCandidatesForGroup(groupId || '')) || EMPTY_ARR;
+  const candLoading = useSelector(
+    selectCandidatesLoadingForGroup(groupId || ''),
+  );
+  const candError = useSelector(
+    selectCandidatesErrorForGroup(groupId || ''),
+  );
 
   const [showConfirm, setShowConfirm] = useState(false);
   const [selectedMember, setSelectedMember] = useState(null);
 
+  const reqs =
+    useSelector(selectJoinRequestsForGroup(groupId || '')) || EMPTY_ARR;
+  const reqsLoading = useSelector(
+    selectJoinRequestsLoading(groupId || ''),
+  );
+  const reqsError = useSelector(selectJoinRequestsError(groupId || ''));
 
-  const reqs = useSelector(selectJoinRequestsForGroup(groupId)) || EMPTY_ARR;
-  const reqsLoading = useSelector(selectJoinRequestsLoading(groupId));
-  const reqsError = useSelector(selectJoinRequestsError(groupId));
-
-  const voters = useSelector(selectVotersForGroup(groupId)) || EMPTY_ARR;
-  const votersLoading = useSelector(selectVotersLoadingForGroup(groupId));
-  const votersError = useSelector(selectVotersErrorForGroup(groupId));
+  const voters =
+    useSelector(selectVotersForGroup(groupId || '')) || EMPTY_ARR;
+  const votersLoading = useSelector(
+    selectVotersLoadingForGroup(groupId || ''),
+  );
+  const votersError = useSelector(
+    selectVotersErrorForGroup(groupId || ''),
+  );
 
   // טאב נבחר
   const [activeTab, setActiveTab] = useState('general');
@@ -157,6 +177,31 @@ export default function GroupSettingsPage() {
   // שיתוף
   const [copied, setCopied] = useState(false);
 
+  // ---- פתרון slug ל-id כשנכנסים ישירות ל-URL ----
+  useEffect(() => {
+    // אם הגיע id בניווט – לא צריך פתרון דרך slug
+    if (navGroupId) {
+      setGroupId(navGroupId);
+      setSlugResolved(true);
+      return;
+    }
+
+    if (!groupSlug) return;
+
+    (async () => {
+      try {
+        const { data } = await http.get(`/groups/slug/${groupSlug}`);
+        setGroupId(data._id);
+      } catch (err) {
+        console.error('failed to resolve group by slug', err);
+        setGroupId(null);
+      } finally {
+        setSlugResolved(true);
+      }
+    })();
+  }, [navGroupId, groupSlug]);
+
+  // טעינת נתונים לפי groupId
   useEffect(() => {
     if (!groupId) return;
     dispatch(fetchGroupWithMembers(groupId));
@@ -198,10 +243,12 @@ export default function GroupSettingsPage() {
       group?.createdBy &&
       userEmail &&
       String(group.createdBy).trim().toLowerCase() ===
-      String(userEmail).trim().toLowerCase();
+        String(userEmail).trim().toLowerCase();
 
     const byId =
-      group?.createdById && userId && String(group.createdById) === String(userId);
+      group?.createdById &&
+      userId &&
+      String(group.createdById) === String(userId);
 
     const byFullName =
       group?.createdBy &&
@@ -209,7 +256,7 @@ export default function GroupSettingsPage() {
       lastName &&
       !String(group.createdBy).includes('@') &&
       String(group.createdBy).trim().toLowerCase() ===
-      `${firstName} ${lastName}`.trim().toLowerCase();
+        `${firstName} ${lastName}`.trim().toLowerCase();
 
     return !!(byEmail || byId || byFullName);
   }, [group, userEmail, userId, firstName, lastName]);
@@ -254,13 +301,24 @@ export default function GroupSettingsPage() {
     }
   };
 
-  // ---------- הגנות ----------
+  // ---------- הגנות / מצבי טעינה ----------
 
-  if (!groupId) {
+  // עדיין פותרים את ה-slug ל-id
+  if (!slugResolved && !groupId) {
     return (
       <div className="gs-wrap">
         <h2>הגדרות קבוצה</h2>
-        <div>לא נמצא מזהה קבוצה.</div>
+        <div>טוען נתוני קבוצה...</div>
+      </div>
+    );
+  }
+
+  // ניסינו לפתור slug ואין groupId בכלל – כנראה קבוצה לא קיימת
+  if (slugResolved && !groupId) {
+    return (
+      <div className="gs-wrap">
+        <h2>הגדרות קבוצה</h2>
+        <div className="err">הקבוצה לא נמצאה.</div>
         <button className="gs-btn" onClick={() => navigate('/groups')}>
           חזרה לרשימת הקבוצות
         </button>
@@ -282,6 +340,9 @@ export default function GroupSettingsPage() {
       <div className="gs-wrap">
         <h2>הגדרות קבוצה</h2>
         <div className="err">{groupError}</div>
+        <button className="gs-btn" onClick={() => navigate('/groups')}>
+          חזרה לרשימת הקבוצות
+        </button>
       </div>
     );
   }
@@ -291,17 +352,27 @@ export default function GroupSettingsPage() {
       <div className="gs-wrap">
         <h2>הגדרות קבוצה</h2>
         <div>לא נמצאה קבוצה.</div>
+        <button className="gs-btn" onClick={() => navigate('/groups')}>
+          חזרה לרשימת הקבוצות
+        </button>
       </div>
     );
   }
 
+  // משתמש מחובר אבל לא מנהל – הודעה נעימה
   if (!isOwner) {
     return (
       <div className="gs-wrap">
         <h2>הגדרות קבוצה</h2>
-        <div className="err">רק יוצר/ת הקבוצה יכול/ה לערוך את ההגדרות.</div>
-        <button className="gs-btn" onClick={() => navigate(-1)}>
-          חזרה
+        <div className="err">
+          אין לך הרשאות ניהול לקבוצה זו.
+          <br />
+          רק מנהל/ת הקבוצה יכול/ה לצפות ולהתאים את ההגדרות.
+          <br />
+          אם את/ה צריך/ה שינוי, אפשר לפנות למנהל/ת הקבוצה.
+        </div>
+        <button className="gs-btn" onClick={() => navigate('/groups')}>
+          חזרה לרשימת הקבוצות
         </button>
       </div>
     );
@@ -313,7 +384,12 @@ export default function GroupSettingsPage() {
     const { name, value, type, checked } = e.target;
     setForm((prev) => ({
       ...prev,
-      [name]: name === 'maxWinners' ? Number(value) : type === 'checkbox' ? checked : value,
+      [name]:
+        name === 'maxWinners'
+          ? Number(value)
+          : type === 'checkbox'
+          ? checked
+          : value,
     }));
   };
 
@@ -325,7 +401,9 @@ export default function GroupSettingsPage() {
       symbol: (form.symbol || '').trim(),
       maxWinners: Number(form.maxWinners) || 1,
       isLocked: !!form.isLocked,
-      ...(form.endDate ? { endDate: new Date(form.endDate).toISOString() } : {}),
+      ...(form.endDate
+        ? { endDate: new Date(form.endDate).toISOString() }
+        : {}),
     };
     await dispatch(updateGroup({ groupId, patch })).unwrap();
     setEditMode(false);
@@ -367,7 +445,12 @@ export default function GroupSettingsPage() {
     dispatch(createCandidate({ groupId, ...candForm }))
       .unwrap()
       .then(() => {
-        setCandForm({ name: '', description: '', symbol: '', photoUrl: '' });
+        setCandForm({
+          name: '',
+          description: '',
+          symbol: '',
+          photoUrl: '',
+        });
         setCandErrors({});
       })
       .then(() => dispatch(fetchCandidatesByGroup(groupId)));
@@ -435,7 +518,9 @@ export default function GroupSettingsPage() {
     };
 
     try {
-      await dispatch(updateCandidate({ candidateId: _id, groupId, patch })).unwrap();
+      await dispatch(
+        updateCandidate({ candidateId: _id, groupId, patch }),
+      ).unwrap();
       setEditCandOpen(false);
       setEditCandErrors({});
       dispatch(fetchCandidatesByGroup(groupId));
@@ -490,7 +575,8 @@ export default function GroupSettingsPage() {
     }
   }
 
-  const clearNewPhoto = () => setCandForm((prev) => ({ ...prev, photoUrl: '' }));
+  const clearNewPhoto = () =>
+    setCandForm((prev) => ({ ...prev, photoUrl: '' }));
   const clearEditPhoto = () =>
     setEditCandForm((prev) => ({ ...prev, photoUrl: '' }));
 
@@ -519,30 +605,11 @@ export default function GroupSettingsPage() {
         dispatch(fetchGroupWithMembers(groupId));
       });
 
-  // const handleRemoveMember = async (m, mid) => {
-  //   const name = m.name || m.email || mid;
-
-  //   if (!window.confirm(`להסיר את ${name} מהקבוצה?`)) return;
-
-  //   try {
-  //     await dispatch(
-  //       removeGroupMember({
-  //         groupId,
-  //         memberId: mid,
-  //         email: m.email || undefined,
-  //       }),
-  //     ).unwrap();
-  //     if (group.isLocked) dispatch(fetchJoinRequests(groupId));
-  //     dispatch(fetchGroupWithMembers(groupId));
-  //   } catch (e) {
-  //     toast.error(e || 'Failed to remove member');
-  //   }
-  // };
-
   const handleRemoveMember = (m, mid) => {
     setSelectedMember({ member: m, memberId: mid });
     setShowConfirm(true);
   };
+
   const confirmDelete = async () => {
     const { member, memberId } = selectedMember;
     setShowConfirm(false);
@@ -553,12 +620,11 @@ export default function GroupSettingsPage() {
           groupId,
           memberId,
           email: member.email || undefined,
-        })
+        }),
       ).unwrap();
 
       if (group.isLocked) dispatch(fetchJoinRequests(groupId));
       dispatch(fetchGroupWithMembers(groupId));
-
     } catch (e) {
       toast.error(e || 'Failed to remove member');
     }
@@ -569,7 +635,7 @@ export default function GroupSettingsPage() {
     setSelectedMember(null);
   };
 
-
+  // ---------- JSX ----------
 
   return (
     <div className="gs-wrap">
@@ -593,7 +659,6 @@ export default function GroupSettingsPage() {
           </button>
         </div>
       </div>
-
 
       {/* layout: תוכן משמאל + סיידבר מימין */}
       <div className="gs-main-layout">
@@ -709,7 +774,9 @@ export default function GroupSettingsPage() {
               </button>
 
               <button
-                className={`side-tab ${activeTab === 'members' ? 'active' : ''}`}
+                className={`side-tab ${
+                  activeTab === 'members' ? 'active' : ''
+                }`}
                 onClick={() => setActiveTab('members')}
               >
                 משתתפי הקבוצה
@@ -718,7 +785,9 @@ export default function GroupSettingsPage() {
           )}
 
           <button
-            className={`side-tab danger ${activeTab === 'danger' ? 'active' : ''}`}
+            className={`side-tab danger ${
+              activeTab === 'danger' ? 'active' : ''
+            }`}
             onClick={() => setActiveTab('danger')}
           >
             מחיקה
@@ -756,13 +825,16 @@ export default function GroupSettingsPage() {
         open={showConfirm}
         message={
           selectedMember
-            ? `להסיר את ${selectedMember.member.name || selectedMember.member.email || selectedMember.memberId} מהקבוצה?`
+            ? `להסיר את ${
+                selectedMember.member.name ||
+                selectedMember.member.email ||
+                selectedMember.memberId
+              } מהקבוצה?`
             : ''
         }
         onConfirm={confirmDelete}
         onCancel={cancelDelete}
       />
-
     </div>
   );
 }
