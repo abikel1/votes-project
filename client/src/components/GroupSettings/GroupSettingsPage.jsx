@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
+import { FaUsers, FaUserPlus, FaUserCheck, FaUserTimes, FaExclamationTriangle, FaInfoCircle } from 'react-icons/fa';
 
 import {
   fetchGroupWithMembers,
@@ -40,6 +41,7 @@ import {
   selectVotersLoadingForGroup,
   selectVotersErrorForGroup,
 } from '../../slices/votesSlice';
+import { BiArrowBack } from 'react-icons/bi';
 
 import { upsertUsers } from '../../slices/usersSlice';
 import ConfirmModal from '../../components/ConfirmModal/ConfirmModal';
@@ -639,14 +641,14 @@ export default function GroupSettingsPage() {
 
   return (
     <div className="gs-wrap">
-      <div className="gs-header">
+      
+      {/* <div className="gs-header">
         <h2>הגדרות קבוצה</h2>
         <div className="gs-actions">
           <button className="gs-btn" onClick={() => navigate('/groups')}>
             לרשימת הקבוצות
           </button>
 
-          {/* כפתור מעבר לדף פרטי הקבוצה */}
           <button
             className="gs-btn"
             onClick={() =>
@@ -658,7 +660,42 @@ export default function GroupSettingsPage() {
             פרטי הקבוצה
           </button>
         </div>
-      </div>
+      </div> */}
+
+      <div className="gs-header clean-header">
+ 
+
+  {/* כותרת מרכזית */}
+  <div className="header-title">
+    <h2>{group.name}</h2>
+    <p>{group.description}</p>
+  </div>
+
+  {/* כפתור פרטי הקבוצה */}
+  <button
+    className="icon-btn"
+    onClick={() =>
+      navigate(`/groups/${slug}`, {
+        state: { groupId },
+      })
+    }
+    title="פרטי הקבוצה"
+  >
+    <FaInfoCircle size={24} />
+  </button>
+
+   {/* כפתור חזרה */}
+  <button
+    className="icon-btn"
+    onClick={() => navigate('/groups')}
+    title="חזרה לקבוצות"
+  >
+    <BiArrowBack size={24} />
+  </button>
+</div>
+
+
+      
 
       {/* layout: תוכן משמאל + סיידבר מימין */}
       <div className="gs-main-layout">
@@ -742,37 +779,43 @@ export default function GroupSettingsPage() {
         </div>
 
         {/* סיידבר הניווט מימין */}
-        <aside className="gs-sidebar-tabs">
-          <button
-            className={`side-tab ${activeTab === 'general' ? 'active' : ''}`}
-            onClick={() => setActiveTab('general')}
-          >
-            פרטי קבוצה
-          </button>
+      
+<aside className="gs-sidebar-tabs">
+  <button
+    className={`side-tab ${activeTab === 'general' ? 'active' : ''}`}
+    onClick={() => setActiveTab('general')}
+  >
+    <FaInfoCircle style={{ marginInlineEnd: 6 }} />
+    פרטי קבוצה
+  </button>
 
-          <button
-            className={`side-tab ${activeTab === 'candidates' ? 'active' : ''}`}
-            onClick={() => setActiveTab('candidates')}
-          >
-            מועמדים
-          </button>
+  <button
+    className={`side-tab ${activeTab === 'candidates' ? 'active' : ''}`}
+    onClick={() => setActiveTab('candidates')}
+  >
+    <FaUserPlus style={{ marginInlineEnd: 6 }} />
+    מועמדים
+  </button>
 
-          <button
-            className={`side-tab ${activeTab === 'voters' ? 'active' : ''}`}
-            onClick={() => setActiveTab('voters')}
-          >
-            מצביעים
-          </button>
+  <button
+    className={`side-tab ${activeTab === 'voters' ? 'active' : ''}`}
+    onClick={() => setActiveTab('voters')}
+  >
+    <FaUserCheck style={{ marginInlineEnd: 6 }} />
+    מצביעים
+  </button>
 
-          {group.isLocked && (
-            <>
-              <button
-                className={`side-tab ${activeTab === 'join' ? 'active' : ''}`}
-                onClick={() => setActiveTab('join')}
-              >
-                בקשות הצטרפות
-              </button>
+  {group.isLocked && (
+    <>
+      <button
+        className={`side-tab ${activeTab === 'join' ? 'active' : ''}`}
+        onClick={() => setActiveTab('join')}
+      >
+        <FaUserPlus style={{ marginInlineEnd: 6 }} />
+        בקשות הצטרפות
+      </button>
 
+{/* <<<<<<< HEAD
               <button
                 className={`side-tab ${
                   activeTab === 'members' ? 'active' : ''
@@ -793,6 +836,26 @@ export default function GroupSettingsPage() {
             מחיקה
           </button>
         </aside>
+======= */}
+      <button
+        className={`side-tab ${activeTab === 'members' ? 'active' : ''}`}
+        onClick={() => setActiveTab('members')}
+      >
+        <FaUsers style={{ marginInlineEnd: 6 }} />
+        משתתפי הקבוצה
+      </button>
+    </>
+  )}
+
+  <button
+    className={`side-tab danger ${activeTab === 'danger' ? 'active' : ''}`}
+    onClick={() => setActiveTab('danger')}
+  >
+    <FaExclamationTriangle style={{ marginInlineEnd: 6 }} />
+    מחיקה
+  </button>
+</aside>
+{/* >>>>>>> fd09d35ac375e1d72d983305dcc67a256b38f216 */}
       </div>
 
       {/* מודאל מחיקת קבוצה */}

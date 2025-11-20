@@ -52,8 +52,8 @@ export default function GeneralTab({
             </b>
           </div>
           <div>
-            <small>נעילה</small>
-            <b>{group.isLocked ? '🔒 נעולה' : 'פתוחה'}</b>
+            <small>סטטוס</small>
+            <b>{group.isLocked ? ' נעולה' : 'פתוחה'}</b>
           </div>
           {group.symbol && (
             <div>

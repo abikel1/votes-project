@@ -2,35 +2,89 @@
 import { createSlice, createAsyncThunk, createSelector } from '@reduxjs/toolkit';
 import http from '../api/http';
 
-/* ===== LocalStorage helpers ===== */
-const LS_KEY = 'join_pending_groups';
-const LS_REMOVED = 'removed_by_owner_groups'; // { [groupId]: timestamp }
+// === helpers לשם מפתח שמבוסס על המשתמש הנוכחי ===
+function getUserKey() {
+    try {
+        return (
+            localStorage.getItem('userId') ||
+            localStorage.getItem('userEmail') ||
+            'anon'
+        );
+    } catch {
+        return 'anon';
+    }
+}
 
+function getPendingKey() {
+    return `join_pending_groups_${getUserKey()}`;
+}
+
+function getRemovedKey() {
+    return `removed_by_owner_groups_${getUserKey()}`;
+}
+
+function getRejectedKey() {
+    return `rejected_groups_${getUserKey()}`;
+}
+
+function loadRejectedMap() {
+    try {
+        const raw = localStorage.getItem(getRejectedKey());
+        if (!raw) return {};
+        const obj = JSON.parse(raw);
+        return obj && typeof obj === 'object' ? obj : {};
+    } catch {
+        return {};
+    }
+}
+
+function saveRejectedMap(map) {
+    try {
+        localStorage.setItem(getRejectedKey(), JSON.stringify(map || {}));
+    } catch { }
+}
+
+
+// ===== LocalStorage helpers =====
 function loadPendingFromLS() {
     try {
-        const raw = localStorage.getItem(LS_KEY);
+        const raw = localStorage.getItem(getPendingKey());
         if (!raw) return new Set();
         const arr = JSON.parse(raw);
         if (!Array.isArray(arr)) return new Set();
         return new Set(arr.map(String));
-    } catch { return new Set(); }
+    } catch {
+        return new Set();
+    }
 }
+
 function savePendingToLS(pendingSet) {
-    try { localStorage.setItem(LS_KEY, JSON.stringify(Array.from(pendingSet))); }
-    catch { }
+    try {
+        localStorage.setItem(
+            getPendingKey(),
+            JSON.stringify(Array.from(pendingSet))
+        );
+    } catch { }
 }
 
 function loadRemovedMap() {
     try {
-        const raw = localStorage.getItem(LS_REMOVED);
+        const raw = localStorage.getItem(getRemovedKey());
         if (!raw) return {};
         const obj = JSON.parse(raw);
-        return (obj && typeof obj === 'object') ? obj : {};
-    } catch { return {}; }
+        return obj && typeof obj === 'object' ? obj : {};
+    } catch {
+        return {};
+    }
 }
+
 function saveRemovedMap(map) {
-    try { localStorage.setItem(LS_REMOVED, JSON.stringify(map || {})); } catch { }
+    try {
+        localStorage.setItem(getRemovedKey(), JSON.stringify(map || {}));
+    } catch { }
 }
+
+
 
 /* ===== Thunks ===== */
 
@@ -114,27 +168,61 @@ const joinReqSlice = createSlice({
         actionError: null,
         // [groupId]: { requesting, status: 'none'|'pending'|'member'|'rejected'|'error', error?, rejectedAt? }
         my: {},
-        removedNotice: loadRemovedMap(), // { [groupId]: timestamp } מי שסומן כהוסר
+        removedNotice: {}, // { [groupId]: timestamp } מי שסומן כהוסר
     },
     reducers: {
         clearJoinRequestsError(s) { s.actionError = null; },
 
         hydratePendingFromLocalStorage(s) {
+            // pending לפי המשתמש הנוכחי
             const set = loadPendingFromLS();
             set.forEach((gid) => {
                 const prev = s.my[gid] || {};
                 s.my[gid] = { ...prev, requesting: false, status: 'pending', error: null };
             });
+
+            // “הוסרת מהקבוצה” לפי המשתמש הנוכחי
+            s.removedNotice = loadRemovedMap();
+
+            // קבוצות שנדחינו מהן (rejected) לפי המשתמש הנוכחי
+            const rejectedMap = loadRejectedMap();
+            Object.entries(rejectedMap).forEach(([gid, ts]) => {
+                const prev = s.my[gid] || {};
+                s.my[gid] = {
+                    ...prev,
+                    requesting: false,
+                    status: 'rejected',
+                    error: null,
+                    rejectedAt: ts || prev.rejectedAt || Date.now(),
+                };
+            });
         },
+
 
         markJoinedLocally(s, a) {
             const gid = String(a.payload);
             s.my[gid] = { requesting: false, status: 'member', error: null };
+
             const set = loadPendingFromLS();
-            if (set.has(gid)) { set.delete(gid); savePendingToLS(set); }
+            if (set.has(gid)) {
+                set.delete(gid);
+                savePendingToLS(set);
+            }
+
             // אם היה דגל "הוסרת" — ננקה אותו
-            if (s.removedNotice[gid]) { delete s.removedNotice[gid]; saveRemovedMap(s.removedNotice); }
+            if (s.removedNotice[gid]) {
+                delete s.removedNotice[gid];
+                saveRemovedMap(s.removedNotice);
+            }
+
+            // ואם הייתה חותמת "נדחית" — ננקה גם אותה
+            const rejectedMap = loadRejectedMap();
+            if (rejectedMap[gid]) {
+                delete rejectedMap[gid];
+                saveRejectedMap(rejectedMap);
+            }
         },
+
 
         // לנקות הודעת "הוסרת" ידנית (למשל אחרי SEND שוב)
         clearRemovedNotice(s, a) {
@@ -149,7 +237,13 @@ const joinReqSlice = createSlice({
             if (prev.status === 'rejected') {
                 s.my[gid] = { requesting: false, status: 'none', error: null };
             }
+            const rejectedMap = loadRejectedMap();
+            if (rejectedMap[gid]) {
+                delete rejectedMap[gid];
+                saveRejectedMap(rejectedMap);
+            }
         },
+
     },
     extraReducers: (b) => {
         b
@@ -198,9 +292,26 @@ const joinReqSlice = createSlice({
                 const gid = String(a.meta.arg);
                 // אם היה rejected – נעבור מייד ל-pending ונאפס rejectedAt
                 s.my[gid] = { requesting: true, status: 'pending', error: null };
-                const set = loadPendingFromLS(); set.add(gid); savePendingToLS(set);
-                if (s.removedNotice[gid]) { delete s.removedNotice[gid]; saveRemovedMap(s.removedNotice); }
+
+                // pending ל־LS של המשתמש הנוכחי
+                const set = loadPendingFromLS();
+                set.add(gid);
+                savePendingToLS(set);
+
+                // אם הייתה עליו חותמת "הוסרת" – ננקה
+                if (s.removedNotice[gid]) {
+                    delete s.removedNotice[gid];
+                    saveRemovedMap(s.removedNotice);
+                }
+
+                // אם הייתה עליו חותמת "נדחית" – ננקה גם אותה
+                const rejectedMap = loadRejectedMap();
+                if (rejectedMap[gid]) {
+                    delete rejectedMap[gid];
+                    saveRejectedMap(rejectedMap);
+                }
             })
+
             .addCase(requestJoinGroup.fulfilled, (s, a) => {
                 const gid = String(a.payload.groupId);
                 s.my[gid] = { requesting: false, status: 'pending', error: null };
@@ -256,18 +367,33 @@ const joinReqSlice = createSlice({
                 });
 
                 const localSet = loadPendingFromLS();
+                const rejectedMap = loadRejectedMap();
+
                 // מי שהיה pending מקומית אך לא בשרת → נדחה
                 for (const [gid, st] of Object.entries(s.my)) {
                     if (st?.status === 'pending' && !serverSet.has(String(gid))) {
-                        s.my[gid] = { requesting: false, status: 'rejected', error: null, rejectedAt: Date.now() };
+                        const ts = Date.now();
+                        s.my[gid] = { requesting: false, status: 'rejected', error: null, rejectedAt: ts };
                         if (localSet.has(gid)) localSet.delete(gid);
+                        rejectedMap[gid] = ts; // ← נשמור ל־LS
                     }
                 }
 
                 // שמירת LS אחרי ניקוי הדחויים
                 const union = new Set([...localSet, ...serverSet]);
                 savePendingToLS(union);
+                saveRejectedMap(rejectedMap);
+            })
+
+            .addCase('auth/logout', (s) => {
+                // מאפסים state בזיכרון כדי שלא ידלוף בין משתמשים
+                s.byGroup = {};
+                s.actionError = null;
+                s.my = {};
+                s.removedNotice = {};
+                // לא נוגעים ב-localStorage – הוא ממילא מופרד לפי משתמש (userId/email)
             });
+
     }
 });
 

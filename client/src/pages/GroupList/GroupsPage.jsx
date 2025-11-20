@@ -70,17 +70,32 @@ export default function GroupsPage() {
 
   const isAuthed = !!authId || !!authEmail;
 
+  // const onCreateGroupClick = () => {
+  //   if (!isAuthed) {
+  //     toast.error('כדי ליצור קבוצה יש להתחבר תחילה.');
+  //     return;
+  //   }
+  //   navigate('/groups/create');
+  // };
+
+// <<<<<<< HEAD
+//   useEffect(() => {
+//     dispatch(hydratePendingFromLocalStorage());
+//   }, [dispatch]);
+// =======
+
   const onCreateGroupClick = () => {
     if (!isAuthed) {
       toast.error('כדי ליצור קבוצה יש להתחבר תחילה.');
+
       return;
     }
     navigate('/groups/create');
   };
 
-  useEffect(() => {
-    dispatch(hydratePendingFromLocalStorage());
-  }, [dispatch]);
+  useEffect(() => { dispatch(hydratePendingFromLocalStorage()); }, [dispatch]);
+
+// >>>>>>> fd09d35ac375e1d72d983305dcc67a256b38f216
 
   useEffect(() => {
     dispatch(fetchGroups());
@@ -251,6 +266,7 @@ export default function GroupsPage() {
                   כל הקבוצות
                 </label>
                 <label>
+{/* <<<<<<< HEAD
                   <input
                     type="radio"
                     name="filter"
@@ -289,6 +305,22 @@ export default function GroupsPage() {
                     onChange={(e) => setFilter(e.target.value)}
                   />
                   קבוצות שאני מנהלת
+======= */}
+                  <input type="radio" name="filter" value="open" checked={filter === 'open'} onChange={(e) => setFilter(e.target.value)} />
+                 קבוצות פתוחות 
+                </label>
+                <label>
+                  <input type="radio" name="filter" value="locked" checked={filter === 'locked'} onChange={(e) => setFilter(e.target.value)} />
+                  קבוצות נעולות
+                </label>
+                <label>
+                  <input type="radio" name="filter" value="joined" checked={filter === 'joined'} onChange={(e) => setFilter(e.target.value)} />
+                  קבוצות שאני מחובר/ת
+                </label>
+                <label>
+                  <input type="radio" name="filter" value="owned" checked={filter === 'owned'} onChange={(e) => setFilter(e.target.value)} />
+                  קבוצות שאני מנהל/ת
+{/* >>>>>>> fd09d35ac375e1d72d983305dcc67a256b38f216 */}
                 </label>
                 <label>
                   <input
@@ -386,18 +418,32 @@ export default function GroupsPage() {
             });
           };
 
-          const isNewUser =
-            !joinedIdsSet.size && !pendingIdsSet.size && !rejectedIdsSet.size;
+// <<<<<<< HEAD
+//           const isNewUser =
+//             !joinedIdsSet.size && !pendingIdsSet.size && !rejectedIdsSet.size;
 
+//           const onRequestJoin = (e) => {
+//             e.stopPropagation();
+//             if (isMember || isPending) return;
+//             if (!isAuthed) {
+//               toast.error('כדי לשלוח בקשת הצטרפות יש להתחבר תחילה.');
+//               return;
+//             }
+//             dispatch(clearRemovedNotice(gid));
+//             dispatch(requestJoinGroup(gid)).unwrap().catch(() => {});
+// =======
           const onRequestJoin = (e) => {
             e.stopPropagation();
             if (isMember || isPending) return;
             if (!isAuthed) {
               toast.error('כדי לשלוח בקשת הצטרפות יש להתחבר תחילה.');
+
+
               return;
             }
             dispatch(clearRemovedNotice(gid));
-            dispatch(requestJoinGroup(gid)).unwrap().catch(() => {});
+            dispatch(requestJoinGroup(gid)).unwrap().catch(() => { });
+// >>>>>>> fd09d35ac375e1d72d983305dcc67a256b38f216
           };
 
           const onCardClick = async () => {
@@ -426,10 +472,13 @@ export default function GroupsPage() {
                   });
                   return;
                 }
+// <<<<<<< HEAD
               } catch {}
-              toast.info(
-                'עדיין אינך מחוברת לקבוצה. הבקשה בהמתנה לאישור מנהלת.',
-              );
+              toast.info('עדיין אינך מחובר/ת לקבוצה. הבקשה בהמתנה לאישור מנהל/ת.');
+// =======
+              // } catch { }
+              // toast.info('עדיין אינך מחובר/ת לקבוצה. הבקשה בהמתנה לאישור מנהל/ת.');
+// >>>>>>> fd09d35ac375e1d72d983305dcc67a256b38f216
               return;
             }
 
@@ -440,9 +489,14 @@ export default function GroupsPage() {
                 return;
               }
               if (isRejected) {
-                toast.error(
-                  'בקשתך נדחתה על ידי מנהלת הקבוצה. ניתן לשלוח בקשה חדשה.',
-                );
+// <<<<<<< HEAD
+//                 toast.error(
+//                   'בקשתך נדחתה על ידי מנהלת הקבוצה. ניתן לשלוח בקשה חדשה.',
+//                 );
+// =======
+                toast.error('בקשתך נדחתה על ידי מנהל/ת הקבוצה. ניתן לשלוח בקשה חדשה.');
+
+// >>>>>>> fd09d35ac375e1d72d983305dcc67a256b38f216
                 return;
               }
               return;
@@ -484,10 +538,14 @@ export default function GroupsPage() {
                         title="קבוצה נעולה"
                       />
                       <span
-                        className={`groups-lock-status ${
-                          isMember || isOwner ? 'member' : 'not-member'
-                        }`}
-                        title={isMember || isOwner ? 'מחוברת' : 'לא מחוברת'}
+// <<<<<<< HEAD
+//                         className={`groups-lock-status ${
+//                           isMember || isOwner ? 'member' : 'not-member'
+//                         }`}
+//                         title={isMember || isOwner ? 'מחוברת' : 'לא מחוברת'}
+// =======
+                        className={`groups-lock-status ${isMember || isOwner ? 'member' : 'not-member'}`}
+                        title={isMember || isOwner ? 'מחובר/ת' : 'לא מחובר/ת'}
                       />
                     </div>
                   )}
@@ -527,20 +585,31 @@ export default function GroupsPage() {
               {!isOwner && isLocked && (
                 <div className="groups-card-actions">
                   {isMember ? (
-                    <span className="groups-status groups-status-member">
-                      מחוברת
-                    </span>
+// <<<<<<< HEAD
+//                     <span className="groups-status groups-status-member">
+//                       מחוברת
+//                     </span>
+//                   ) : !isAuthed ? null : isRejected ? (
+//                     <>
+//                       <div className="groups-notice groups-notice-rejected">
+//                         בקשתך נדחתה על ידי מנהלת הקבוצה. ניתן לשלוח בקשה
+//                         חדשה.
+//                       </div>
+//                       <button
+//                         className="groups-action-btn"
+//                         onClick={onRequestJoin}
+//                       >
+//                         שלחי בקשה שוב
+// =======
+                    <span className="groups-status groups-status-member">מחובר/ת</span>
                   ) : !isAuthed ? null : isRejected ? (
                     <>
                       <div className="groups-notice groups-notice-rejected">
-                        בקשתך נדחתה על ידי מנהלת הקבוצה. ניתן לשלוח בקשה
-                        חדשה.
+                        בקשתך נדחתה על ידי מנהל/ת הקבוצה. ניתן לשלוח בקשה חדשה.
                       </div>
-                      <button
-                        className="groups-action-btn"
-                        onClick={onRequestJoin}
-                      >
-                        שלחי בקשה שוב
+                      <button className="groups-action-btn" onClick={onRequestJoin}>
+                        שלח/י בקשה שוב
+{/* >>>>>>> fd09d35ac375e1d72d983305dcc67a256b38f216 */}
                       </button>
                     </>
                   ) : isPending ? (
@@ -551,13 +620,18 @@ export default function GroupsPage() {
                       >
                         בהמתנה...
                       </button>
+{/* <<<<<<< HEAD
                       <p className="groups-hint">
                         הבקשה נשלחה וממתינה לאישור מנהלת
                       </p>
+======= */}
+                      <p className="groups-hint">בקשתך נשלחה וממתינה לאישור מנהל/ת</p>
+{/* >>>>>>> fd09d35ac375e1d72d983305dcc67a256b38f216 */}
                     </>
-                  ) : wasRemoved && !isNewUser ? (
+                  ) : wasRemoved && !isMember && !isPending ? (
                     <>
                       <div className="groups-notice groups-notice-removed">
+{/* <<<<<<< HEAD
                         הוסרת מהקבוצה על ידי מנהלת. ניתן לשלוח בקשת הצטרפות
                         חדשה.
                       </div>
@@ -575,6 +649,16 @@ export default function GroupsPage() {
                     >
                       בקשי הצטרפות
                     </button>
+======= */}
+                        הוסרת מהקבוצה על ידי מנהל/ת. ניתן לשלוח בקשת הצטרפות חדשה.
+                      </div>
+                      <button className="groups-action-btn" onClick={onRequestJoin}>
+בקשת הצטרפות                      </button>
+                    </>
+                  ) : (
+                    <button className="groups-action-btn" onClick={onRequestJoin}>
+בקשת הצטרפות                    </button>
+// >>>>>>> fd09d35ac375e1d72d983305dcc67a256b38f216
                   )}
                 </div>
               )}
