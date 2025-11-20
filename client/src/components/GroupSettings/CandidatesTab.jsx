@@ -45,7 +45,7 @@ export default function CandidatesTab({
                       className="small danger"
                       onClick={() => onDeleteCandidate(String(c._id))}
                     >
-                      הסר/י
+                      הסרה
                     </button>
                   </div>
                 </li>
@@ -150,8 +150,7 @@ export default function CandidatesTab({
                     onClick={clearNewPhoto}
                     disabled={uploadingNew}
                   >
-                    הסר תמונה
-                  </button>
+הסרת תמונה                  </button>
                 </div>
                 {uploadingNew && <span className="muted">מעלה…</span>}
               </div>

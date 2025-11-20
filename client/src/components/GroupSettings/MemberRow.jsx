@@ -20,7 +20,7 @@ export default function MemberRow({ m, onRemove, isOwner }) {
       {isOwner && onRemove && (
         <div className="row-actions">
           <button className="small danger" onClick={onRemove}>
-            הסר/י
+ הסרה
           </button>
         </div>
       )}

@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
+import { FaUsers, FaUserPlus, FaUserCheck, FaUserTimes, FaExclamationTriangle, FaInfoCircle } from 'react-icons/fa';
 
 import {
   fetchGroupWithMembers,
@@ -664,53 +665,60 @@ const cancelDelete = () => {
         </div>
 
         {/* סיידבר הניווט מימין */}
-        <aside className="gs-sidebar-tabs">
-          <button
-            className={`side-tab ${activeTab === 'general' ? 'active' : ''}`}
-            onClick={() => setActiveTab('general')}
-          >
-            פרטי קבוצה
-          </button>
+      
+<aside className="gs-sidebar-tabs">
+  <button
+    className={`side-tab ${activeTab === 'general' ? 'active' : ''}`}
+    onClick={() => setActiveTab('general')}
+  >
+    <FaInfoCircle style={{ marginInlineEnd: 6 }} />
+    פרטי קבוצה
+  </button>
 
-          <button
-            className={`side-tab ${activeTab === 'candidates' ? 'active' : ''}`}
-            onClick={() => setActiveTab('candidates')}
-          >
-            מועמדים
-          </button>
+  <button
+    className={`side-tab ${activeTab === 'candidates' ? 'active' : ''}`}
+    onClick={() => setActiveTab('candidates')}
+  >
+    <FaUserPlus style={{ marginInlineEnd: 6 }} />
+    מועמדים
+  </button>
 
-          <button
-            className={`side-tab ${activeTab === 'voters' ? 'active' : ''}`}
-            onClick={() => setActiveTab('voters')}
-          >
-            מצביעים
-          </button>
+  <button
+    className={`side-tab ${activeTab === 'voters' ? 'active' : ''}`}
+    onClick={() => setActiveTab('voters')}
+  >
+    <FaUserCheck style={{ marginInlineEnd: 6 }} />
+    מצביעים
+  </button>
 
-          {group.isLocked && (
-            <>
-              <button
-                className={`side-tab ${activeTab === 'join' ? 'active' : ''}`}
-                onClick={() => setActiveTab('join')}
-              >
-                בקשות הצטרפות
-              </button>
+  {group.isLocked && (
+    <>
+      <button
+        className={`side-tab ${activeTab === 'join' ? 'active' : ''}`}
+        onClick={() => setActiveTab('join')}
+      >
+        <FaUserPlus style={{ marginInlineEnd: 6 }} />
+        בקשות הצטרפות
+      </button>
 
-              <button
-                className={`side-tab ${activeTab === 'members' ? 'active' : ''}`}
-                onClick={() => setActiveTab('members')}
-              >
-                משתתפי הקבוצה
-              </button>
-            </>
-          )}
+      <button
+        className={`side-tab ${activeTab === 'members' ? 'active' : ''}`}
+        onClick={() => setActiveTab('members')}
+      >
+        <FaUsers style={{ marginInlineEnd: 6 }} />
+        משתתפי הקבוצה
+      </button>
+    </>
+  )}
 
-          <button
-            className={`side-tab danger ${activeTab === 'danger' ? 'active' : ''}`}
-            onClick={() => setActiveTab('danger')}
-          >
-            מחיקה
-          </button>
-        </aside>
+  <button
+    className={`side-tab danger ${activeTab === 'danger' ? 'active' : ''}`}
+    onClick={() => setActiveTab('danger')}
+  >
+    <FaExclamationTriangle style={{ marginInlineEnd: 6 }} />
+    מחיקה
+  </button>
+</aside>
       </div>
 
       {/* מודאל מחיקת קבוצה */}

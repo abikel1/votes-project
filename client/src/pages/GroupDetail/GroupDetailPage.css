@@ -57,7 +57,6 @@
   background: #f2f2f2;
   border: 1px solid #ccc;
   padding: 6px 12px;
-  border-radius: 8px;
   cursor: pointer;
   font-size: 14px;
   margin-bottom: 10px;
@@ -801,7 +800,6 @@
   color: #fff;
   background-color: #1e3a8a;
   border: none;
-  /* border-radius: 8px; */
   cursor: pointer;
   transition: all 0.15s;
   width: 100%;
