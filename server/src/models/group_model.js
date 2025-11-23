@@ -1,5 +1,7 @@
 const mongoose = require('mongoose');
 
+
+
 // סכמת בקשת הצטרפות
 const joinRequestSchema = new mongoose.Schema({
   userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
@@ -26,6 +28,17 @@ const groupSchema = new mongoose.Schema({
   isLocked: { type: Boolean, default: false },
   members: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
   joinRequests: [joinRequestSchema],
+
+
+
+  candidateRequests: [{
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  email: String,
+  name: String,
+  description: String,
+  status: { type: String, default: 'pending' }, // pending / approved / rejected
+}]
+
 });
 
 module.exports = mongoose.model('Group', groupSchema);

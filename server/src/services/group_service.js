@@ -1,6 +1,8 @@
 // server/src/services/group_service.js
 const mongoose = require('mongoose');
 const Group = require('../models/group_model');
+const Candidate = require('../models/candidate_model');
+const User = require('../models/user_model');
 
 function toBoolStrict(v) {
   if (typeof v === 'boolean') return v;
@@ -209,6 +211,88 @@ async function removeGroupMemberService(groupId, ownerId, { memberId, email }) {
   return updated;
 }
 
+
+//=============================================================================
+async function applyCandidateService(groupId, user, data) {
+  const g = await Group.findById(groupId);
+  if (!g) throw new Error('Group not found');
+
+  // האם כבר חבר?
+  const alreadyCandidate = await Candidate.findOne({
+    groupId,
+    userId: user._id
+  }).lean();
+  if (alreadyCandidate) throw new Error('Already a candidate');
+
+  // האם כבר הגיש בקשה?
+  const exists = g.candidateRequests?.find(r =>
+    String(r.userId) === String(user._id) && r.status === 'pending'
+  );
+  if (exists) return g;
+
+  g.candidateRequests.push({
+    userId: user._id,
+    email: (user.email || '').trim().toLowerCase(),
+    name: data.name || user.name,
+    description: data.description || '',
+    status: 'pending'
+  });
+
+  await g.save();
+  return g;
+}
+async function approveCandidateRequestService(groupId, ownerId, requestId) {
+  const g = await Group.findById(groupId);
+  if (!g) throw new Error('Group not found');
+  if (String(g.createdById) !== String(ownerId)) throw new Error('Not owner');
+
+  const req = g.candidateRequests.id(requestId);
+  if (!req) throw new Error('Request not found');
+
+  req.status = 'approved';
+
+  // יצירת מועמד
+  const candidate = await Candidate.create({
+    userId: req.userId,
+    name: req.name,
+    description: req.description,
+    photoUrl: '',
+    symbol: '',
+    groupId: groupId
+  });
+
+  // מחיקה מהרשימה
+  req.deleteOne();
+  await g.save();
+
+  return candidate;
+}
+
+async function addCandidateByEmailService(groupId, ownerId, email, data = {}) {
+  const g = await Group.findById(groupId);
+  if (!g) throw new Error('Group not found');
+  if (String(g.createdById) !== String(ownerId)) throw new Error('Not owner');
+
+  const norm = email.trim().toLowerCase();
+  const user = await User.findOne({ email: norm });
+  if (!user) throw new Error('User not found');
+
+  // לבדוק שלא קיים כבר
+  const exists = await Candidate.findOne({ groupId, userId: user._id });
+  if (exists) throw new Error('Candidate already exists');
+
+  const candidate = await Candidate.create({
+    userId: user._id,
+    name: data.name || user.name,
+    description: data.description || '',
+    photoUrl: data.photoUrl || '',
+    symbol: data.symbol || '',
+    groupId
+  });
+
+  return candidate;
+}
+
 module.exports = {
   createGroupService,
   updateGroupService,
@@ -221,5 +305,8 @@ module.exports = {
   getUserGroupsService,
   getMyJoinStatusesService,
   isMemberOfGroupService,
-  removeGroupMemberService, // ✅ export תקין
+  removeGroupMemberService, 
+  applyCandidateService,
+  approveCandidateRequestService,
+  addCandidateByEmailService,
 };
