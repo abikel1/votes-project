@@ -966,4 +966,82 @@
 }
 
 
+.chat-toggle-row {
+  margin-top: 1rem;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.chat-toggle-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.45rem 1rem;
+  border-radius: 999px;
+  border: 1px solid #d1d5db;
+  background-color: #f1f5f9;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: 0.2s;
+}
+
+.chat-toggle-btn:hover {
+  background-color: #e2e8f0;
+}
+
+.chat-toggle-btn svg {
+  font-size: 1.1rem;
+}
+/* כפתור צ'אט צף */
+.chat-fab {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  width: 48px;
+  height: 48px;
+  border-radius: 999px;
+  border: none;
+  background-color: #1e3a8a;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.25);
+  cursor: pointer;
+  z-index: 1000;
+}
+
+/* חלון הצ'אט */
+.chat-panel {
+  position: fixed;
+  bottom: 88px; /* קצת מעל הכפתור */
+  right: 24px;
+  width: 380px;
+  max-height: 70vh;
+  background-color: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.3);
+  padding: 0.75rem;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+}
+
+/* כותרת החלון */
+.chat-panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+}
+
+.chat-panel-close {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 
