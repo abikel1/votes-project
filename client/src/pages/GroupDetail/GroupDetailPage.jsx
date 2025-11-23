@@ -4,8 +4,11 @@ import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { HiClock, HiUserGroup, HiUser, HiOutlineBadgeCheck } from 'react-icons/hi';
 import toast from 'react-hot-toast';
-import { FiSettings } from 'react-icons/fi';
-import { BiArrowBack } from 'react-icons/bi'
+import { FiSettings, FiMessageSquare, FiX } from 'react-icons/fi';
+import { BiArrowBack } from 'react-icons/bi';
+
+import GroupChat from '../../components/GroupChat/GroupChat';
+
 import {
   fetchMyGroups,
   fetchGroupWithMembers,
@@ -74,31 +77,17 @@ export default function GroupDetailPage() {
 
   const joinedIdsSet = useSelector(selectMyJoinedIds);
 
-  // const { userEmail: authEmail, userId: authId } = useSelector((s) => s.auth);
-  // const isAuthed = !!authId || !!authEmail;
-
-  // const [leftWidth, setLeftWidth] = useState(35);
-  // const [isDragging, setIsDragging] = useState(false);
-  // const containerRef = useRef(null);
-
-const getWinnerLabel = (index) => ` ${index + 1}`;
+  const getWinnerLabel = (index) => ` ${index + 1}`;
 
   const { userEmail: authEmail, userId: authId } = useSelector((s) => s.auth);
   const isAuthed = !!authId || !!authEmail || !!localStorage.getItem('authToken');
-  const iconColor = "#1e3a8a"; // צבע אחיד לכל האייקונים
-
-  const myJoinedIdsSet = useSelector(selectMyJoinedIds);
 
   const [leftWidth, setLeftWidth] = useState(35);
   const [isDragging, setIsDragging] = useState(false);
   const containerRef = useRef(null);
 
-
-
-
-
-
-
+  // צ'אט פתוח/סגור (חלון קטן בצד)
+  const [isChatOpen, setIsChatOpen] = useState(false);
 
   // אם נכנסו עם /groups/:groupSlug בלי state – נטען id מהשרת לפי slug
   useEffect(() => {
@@ -119,28 +108,7 @@ const getWinnerLabel = (index) => ` ${index + 1}`;
     })();
   }, [navGroupId, groupSlug]);
 
-// <<<<<<< HEAD
-//   // טוען נתוני קבוצה ומועמדים
-// =======
-//   const { selectedGroup: group, loading: groupLoading } = useSelector(s => s.groups);
-
-//   const candidates = useSelector(selectCandidatesForGroup(groupId || '')) || [];
-//   const loadingCandidates = useSelector(selectCandidatesLoadingForGroup(groupId || ''));
-//   const errorCandidates = useSelector(selectCandidatesErrorForGroup(groupId || ''));
-// const getWinnerLabel = (index) => ` ${index + 1}`;
-
-//   const { userEmail: authEmail, userId: authId } = useSelector((s) => s.auth);
-//   const isAuthed = !!authId || !!authEmail || !!localStorage.getItem('authToken');
-//   const iconColor = "#1e3a8a"; // צבע אחיד לכל האייקונים
-
-//   const myJoinedIdsSet = useSelector(selectMyJoinedIds);
-
-//   const [leftWidth, setLeftWidth] = useState(35);
-//   const [isDragging, setIsDragging] = useState(false);
-//   const containerRef = useRef(null);
-
-//   // טוען נתונים
-// >>>>>>> fd09d35ac375e1d72d983305dcc67a256b38f216
+  // טוען נתוני קבוצה ומועמדים + הקבוצות שלי
   useEffect(() => {
     if (groupId) {
       dispatch(fetchGroupWithMembers(groupId));
@@ -222,6 +190,8 @@ const getWinnerLabel = (index) => ` ${index + 1}`;
 
   const isMember =
     !!joinedIdsSet && typeof joinedIdsSet.has === 'function' && joinedIdsSet.has(gidStr);
+
+  const canChat = isOwner || isMember;
 
   const isExpired = group?.endDate ? new Date(group.endDate) < new Date() : false;
 
@@ -314,55 +284,27 @@ const getWinnerLabel = (index) => ` ${index + 1}`;
   }));
 
   const winners = sortedCandidates.slice(0, group.maxWinners);
-  const maxVotes = Math.max(...candidates.map((c) => c.votesCount || 0));
 
   return (
     <div className="page-wrap dashboard">
-{/* <<<<<<< HEAD
-      <div className="page-header">
-        <button
-          className="back-btn"
-          onClick={() => navigate('/groups')}
-        >
-          כל הקבוצות
-        </button>
+      <div className="page-header clean-header">
+        {/* כותרת מרכזית */}
+        <div className="header-title">
+          <h2>{group.name}</h2>
+          <p>{group.description}</p>
+        </div>
 
         {isOwner && (
-          <button
-            className="group-settings-btn-left"
-            onClick={goSettings}
-            title="הגדרות קבוצה"
-          >
-            <img src="/src/assets/icons/settings.png" alt="הגדרות" />
+          <button className="icon-btn" onClick={goSettings} title="הגדרות קבוצה">
+            <FiSettings size={20} />
           </button>
         )}
-=======
 
-    */}
-
-<div className="page-header clean-header">
-
-{/* >>>>>>> fd09d35ac375e1d72d983305dcc67a256b38f216 */}
-
-  {/* כותרת מרכזית */}
-  <div className="header-title">
-    <h2>{group.name}</h2>
-    <p>{group.description}</p>
-  </div>
-
-    {isOwner && (
-    <button className="icon-btn" onClick={goSettings} title="הגדרות קבוצה">
-      <FiSettings size={20} />
-    </button>
-  )}
-
-  {/* כפתור חזרה ימין */}
-  <button className="icon-btn" onClick={() => navigate('/groups')} title="חזרה לקבוצות">
-    <BiArrowBack size={20} />
-  </button>
-
-
-</div>
+        {/* כפתור חזרה ימין */}
+        <button className="icon-btn" onClick={() => navigate('/groups')} title="חזרה לקבוצות">
+          <BiArrowBack size={20} />
+        </button>
+      </div>
 
       <div className="meta-and-button">
         <div className="group-meta">
@@ -419,24 +361,11 @@ const getWinnerLabel = (index) => ` ${index + 1}`;
                       key={c._id}
                       className={`candidate-card ${isWinner ? 'winner' : ''}`}
                     >
-                      {/* {isExpired && isWinner && ( */}
-                      {/* גביע יוצג רק אם הסתיים */}
-                      {/* {isExpired && isWinner && (
-                        <div className="current-leader">
-                          <img
-                            src="/src/assets/icons/trophy.png"
-                            className="groups-badge-locked"
-                          />
-                        </div>
-                      )} */}
-
                       {isExpired && isWinner && (
-  <div className="current-leader">
-    {getWinnerLabel(winners.findIndex(w => w._id === c._id))}
-  </div>
-)}
-
-
+                        <div className="current-leader">
+                          {getWinnerLabel(winners.findIndex(w => w._id === c._id))}
+                        </div>
+                      )}
 
                       <div className="candidate-header">
                         {c.photoUrl && (
@@ -480,17 +409,6 @@ const getWinnerLabel = (index) => ` ${index + 1}`;
         >
           {!isExpired && (
             <div className="group-details-card">
-{/* <<<<<<< HEAD
-              <div className="group-header">
-======= */}
-
-              {/* כותרת ותיאור */}
-              {/* <div className="group-header">
->>>>>>> fd09d35ac375e1d72d983305dcc67a256b38f216
-                <h2>{group.name}</h2>
-                <p>{group.description || 'אין תיאור לקבוצה הזו.'}</p>
-              </div> */}
-
               <div className="group-info-grid">
                 <div className="info-card">
                   <HiClock size={28} color="#1e3a8a" />
@@ -576,6 +494,39 @@ const getWinnerLabel = (index) => ` ${index + 1}`;
           )}
         </div>
       </div>
+
+      {/* כפתור צ'אט צף בצד ימין למטה */}
+      <>
+        <button
+          type="button"
+          className="chat-fab"
+          onClick={() => setIsChatOpen(prev => !prev)}
+        >
+          {isChatOpen ? <FiX size={20} /> : <FiMessageSquare size={20} />}
+        </button>
+
+        {isChatOpen && (
+          <div className="chat-panel">
+            <div className="chat-panel-header">
+              <span>צ'אט הקבוצה</span>
+              <button
+                type="button"
+                className="chat-panel-close"
+                onClick={() => setIsChatOpen(false)}
+              >
+                <FiX size={16} />
+              </button>
+            </div>
+
+            <GroupChat
+              groupId={groupId}
+              canChat={canChat}     // כאן עדיין אפשר להשתמש בהרשאות
+              currentUserId={myId}
+            />
+          </div>
+        )}
+      </>
+
     </div>
   );
 }
