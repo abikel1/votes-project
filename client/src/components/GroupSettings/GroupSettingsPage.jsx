@@ -53,6 +53,10 @@ import MembersTab from './MembersTab';
 import DangerTab from './DangerTab';
 import EditCandidateModal from './EditCandidateModal';
 import DeleteGroupModal from './DeleteGroupModal';
+import CandidateRequestsTab from './CandidateRequestsTab';
+import { approveCandidateRequest, rejectCandidateRequest, selectCandidateRequestsForGroup } from '../../slices/candidateSlice';
+
+
 
 import './GroupSettingsPage.css';
 
@@ -176,7 +180,13 @@ export default function GroupSettingsPage() {
   const newFileInputRef = useRef(null);
   const editFileInputRef = useRef(null);
 
-  // שיתוף
+
+
+const candidateRequests = group?.candidateRequests || [];
+const requestsLoading = false; // או selector מתאים
+const requestsError = null; // או selector מתאים
+
+// שיתוף
   const [copied, setCopied] = useState(false);
 
   // ---- פתרון slug ל-id כשנכנסים ישירות ל-URL ----
@@ -381,6 +391,17 @@ export default function GroupSettingsPage() {
   }
 
   // ---------- handlers ----------
+const handleApprove = (req) => {
+  dispatch(approveCandidateRequest({ groupId, requestId: req._id }))
+    .unwrap()
+    .then(() => dispatch(fetchCandidatesByGroup(groupId)));
+};
+
+const handleReject = (req) => {
+  dispatch(rejectCandidateRequest({ groupId, requestId: req._id }))
+    .unwrap()
+    .then(() => dispatch(fetchCandidatesByGroup(groupId)));
+};
 
   const onGroupChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -738,6 +759,18 @@ export default function GroupSettingsPage() {
               clearNewPhoto={clearNewPhoto}
             />
           )}
+
+{activeTab === 'candidates' && (
+  <CandidateRequestsTab
+    groupId={groupId}
+    requests={candidateRequests}
+    loading={groupLoading} // או false אם אין טעינה נפרדת
+    error={groupError}    // או null אם אין שגיאה נפרדת
+    onApprove={handleApprove}
+    onReject={handleReject}
+  />
+)}
+
 
           {activeTab === 'voters' && (
             <VotersTab

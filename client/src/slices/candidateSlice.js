@@ -69,12 +69,41 @@ export const applyCandidate = createAsyncThunk(
   }
 );
 
+
+// אישור בקשת מועמד
+export const approveCandidateRequest = createAsyncThunk(
+  'candidates/approveCandidateRequest',
+  async ({ groupId, requestId }, { rejectWithValue }) => {
+    try {
+      const { data } = await http.post(`/groups/${groupId}/candidates/${requestId}/approve`);
+      return data.candidate; // מועמד מאושר
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.message || err.message);
+    }
+  }
+);
+
+// דחיית בקשת מועמד
+export const rejectCandidateRequest = createAsyncThunk(
+  'candidates/rejectCandidateRequest',
+  async ({ groupId, requestId }, { rejectWithValue }) => {
+    try {
+      await http.post(`/groups/${groupId}/candidates/${requestId}/reject`);
+      return requestId; // מחזיר את ה-id כדי להסיר מהרשימה
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.message || err.message);
+    }
+  }
+);
+
 const candidateSlice = createSlice({
   name: 'candidates',
   initialState: {
     listByGroup: {},       // { [groupId]: Candidate[] }
     loadingByGroup: {},    // { [groupId]: boolean }
-    errorByGroup: {},      // { [groupId]: string|null }
+    errorByGroup: {},   
+        candidateRequestsByGroup: {}, // { [groupId]: [] }
+   // { [groupId]: string|null }
     creating: false,
     createError: null,
   applying: false,
@@ -178,6 +207,41 @@ const candidateSlice = createSlice({
       .addCase(applyCandidate.rejected, (state, action) => {
         state.applying = false;
         state.applyError = action.payload;
+      })
+          .addCase(approveCandidateRequest.pending, (state) => {
+        state.loadingRequests = true;
+        state.requestsError = null;
+      })
+      .addCase(approveCandidateRequest.fulfilled, (state, action) => {
+        state.loadingRequests = false;
+        const candidate = action.payload;
+        const groupId = candidate.groupId;
+        state.candidateRequestsByGroup[groupId] = state.candidateRequestsByGroup[groupId]?.filter(
+          (r) => r._id !== candidate._id
+        ) || [];
+      })
+      .addCase(approveCandidateRequest.rejected, (state, action) => {
+        state.loadingRequests = false;
+        state.requestsError = action.payload;
+      })
+
+      // דחיית בקשה
+      .addCase(rejectCandidateRequest.pending, (state) => {
+        state.loadingRequests = true;
+        state.requestsError = null;
+      })
+      .addCase(rejectCandidateRequest.fulfilled, (state, action) => {
+        state.loadingRequests = false;
+        const requestId = action.payload;
+        for (const groupId in state.candidateRequestsByGroup) {
+          state.candidateRequestsByGroup[groupId] = state.candidateRequestsByGroup[groupId].filter(
+            (r) => r._id !== requestId
+          );
+        }
+      })
+      .addCase(rejectCandidateRequest.rejected, (state, action) => {
+        state.loadingRequests = false;
+        state.requestsError = action.payload;
       });
   },
 });
@@ -200,3 +264,6 @@ export const selectCandidateUpdateError = (candidateId) => (state) =>
 // selectors
 export const selectApplyingCandidate = (state) => state.candidates.applying;
 export const selectApplyCandidateError = (state) => state.candidates.applyError;
+
+export const selectCandidateRequestsForGroup = (state, groupId) =>
+  state.candidates.candidateRequestsByGroup[groupId] || [];

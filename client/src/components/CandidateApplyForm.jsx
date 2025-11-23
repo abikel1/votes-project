@@ -3,15 +3,17 @@ import { applyCandidate, selectApplyingCandidate, selectApplyCandidateError } fr
 import { useState } from 'react';
 import toast from 'react-hot-toast';
 
-export default function CandidateApplyForm({ groupId }) {
-      if (!groupId) {
-    return <p>❌ אין ID של קבוצה. נסי לרענן את העמוד.</p>;
-  }
+export default function CandidateApplyForm({ groupId, candidateRequests = [] }) {
   const dispatch = useDispatch();
   const loading = useSelector(selectApplyingCandidate);
   const error = useSelector(selectApplyCandidateError);
 
   const [form, setForm] = useState({ name: '', description: '', symbol: '', photoUrl: '' });
+
+  const userId = localStorage.getItem('userId') || '';
+
+  // בדיקה אם המשתמש כבר הגיש מועמדות
+  const existingRequest = candidateRequests.find(req => req.userId === userId);
 
   const handleChange = (e) => setForm(prev => ({ ...prev, [e.target.name]: e.target.value }));
 
@@ -22,9 +24,22 @@ export default function CandidateApplyForm({ groupId }) {
       toast.success('בקשת מועמדות הוגשה בהצלחה!');
       setForm({ name: '', description: '', symbol: '', photoUrl: '' });
     } catch (err) {
-      toast.error(err);
+      const message = err?.message || 'שגיאה בלתי צפויה';
+      toast.error(message);
     }
   };
+
+  if (!groupId) {
+    return <p>❌ אין ID של קבוצה. נסי לרענן את העמוד.</p>;
+  }
+
+  if (existingRequest) {
+    return (
+      <div className="candidate-requested">
+        📝 בקשת מועמדות שלך נמצאת בבדיקה על ידי המנהל
+      </div>
+    );
+  }
 
   return (
     <form onSubmit={handleSubmit}>
