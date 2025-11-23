@@ -7,6 +7,7 @@ import toast from 'react-hot-toast';
 import { FiSettings, FiMessageSquare, FiX } from 'react-icons/fi';
 import { BiArrowBack } from 'react-icons/bi';
 
+import CountdownTimer from '../../components/CountdownTimer/CountdownTimer';
 import GroupChat from '../../components/GroupChat/GroupChat';
 
 import {
@@ -193,7 +194,19 @@ export default function GroupDetailPage() {
 
   const canChat = !isLocked || isOwner || isMember;
 
-  const isExpired = group?.endDate ? new Date(group.endDate) < new Date() : false;
+  // סוף יום ההצבעה – 23:59:59 של אותו יום
+  let endAt = group?.endDate ? new Date(group.endDate) : null;
+
+  if (endAt) {
+    endAt = new Date(
+      endAt.getFullYear(),
+      endAt.getMonth(),
+      endAt.getDate(),
+      23, 59, 59, 999
+    );
+  }
+
+  const isExpired = endAt ? endAt < new Date() : false;
 
   // 🔒 קבוצה נעולה + לא מחובר כלל
   if (isLocked && !isAuthed) {
@@ -413,16 +426,10 @@ export default function GroupDetailPage() {
                 <div className="info-card">
                   <HiClock size={28} color="#1e3a8a" />
                   <p>זמן עד סיום</p>
-                  <h4>
-                    {Math.max(
-                      Math.floor(
-                        (new Date(group.endDate) - new Date()) / (1000 * 60 * 60 * 24),
-                      ),
-                      0,
-                    )}{' '}
-                    ימים
-                  </h4>
+                  <CountdownTimer endDate={group.endDate} />
                 </div>
+
+
                 <div className="info-card">
                   <HiUserGroup size={28} color="#1e3a8a" />
                   <p>סך הצבעות</p>
