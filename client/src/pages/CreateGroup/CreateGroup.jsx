@@ -24,6 +24,8 @@ export default function CreateGroupPage() {
     name: '',
     description: '',
     endDate: '',
+      candidateEndDate: '', // <-- חדש
+
     maxWinners: 1,
     isLocked: false, // false = פתוחה, true = נעולה
   });
@@ -68,13 +70,21 @@ export default function CreateGroupPage() {
       return;
     }
 
-    const payload = {
-      name: form.name.trim(),
-      description: form.description.trim(),
-      maxWinners: Number(form.maxWinners) || 1,
-      isLocked: !!form.isLocked,
-      endDate: new Date(form.endDate).toISOString(),
-    };
+    if (new Date(form.candidateEndDate) > new Date(form.endDate)) {
+  toast.error('תאריך סיום הגשת מועמדות לא יכול להיות אחרי תאריך סיום הקבוצה');
+  return;
+}
+
+
+   const payload = {
+  name: form.name.trim(),
+  description: form.description.trim(),
+  maxWinners: Number(form.maxWinners) || 1,
+  isLocked: !!form.isLocked,
+  endDate: new Date(form.endDate).toISOString(),
+  candidateEndDate: new Date(form.candidateEndDate).toISOString(), // <-- חדש
+};
+
 
     dispatch(createGroup(payload));
     toast.success('הקבוצה נוצרה בהצלחה!');
@@ -162,6 +172,20 @@ export default function CreateGroupPage() {
           תאריך סיום *
           <input min={todayStr} className="cg-input" type="date" name="endDate" value={form.endDate} onChange={onChange} required />
         </label>
+
+        <label className="cg-label">
+  תאריך סיום הגשת מועמדות *
+  <input
+    min={todayStr}
+    className="cg-input"
+    type="date"
+    name="candidateEndDate"
+    value={form.candidateEndDate}
+    onChange={onChange}
+    required
+  />
+</label>
+
 
         <label className="cg-label">
           מקסימום זוכים

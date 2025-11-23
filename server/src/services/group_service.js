@@ -16,8 +16,18 @@ function toBoolStrict(v) {
 
 async function createGroupService(data, user) {
   if (!user || !user.email) throw new Error('Missing user.email');
+
   const parsedIsLocked = toBoolStrict(data.isLocked);
-  if (parsedIsLocked === null) { const err = new Error('MISSING_IS_LOCKED'); err.code = 'MISSING_IS_LOCKED'; throw err; }
+  if (parsedIsLocked === null) {
+    const err = new Error('MISSING_IS_LOCKED');
+    err.code = 'MISSING_IS_LOCKED';
+    throw err;
+  }
+
+  // בדיקה: תאריך סיום הגשת מועמדות לא יכול להיות אחרי תאריך הסיום של הקבוצה
+  if (new Date(data.candidateEndDate) > new Date(data.endDate)) {
+    throw new Error('Candidate end date cannot be after group end date');
+  }
 
   const group = await Group.create({
     name: data.name,
@@ -25,20 +35,32 @@ async function createGroupService(data, user) {
     createdBy: (user.email || '').trim().toLowerCase(),
     createdById: user._id,
     endDate: data.endDate,
+    candidateEndDate: data.candidateEndDate, // <-- חדש
     maxWinners: data.maxWinners ?? 1,
     shareLink: data.shareLink || undefined,
     isLocked: parsedIsLocked,
   });
+
   return group;
 }
+
 
 async function updateGroupService(groupId, updateData) {
   if (updateData && Object.prototype.hasOwnProperty.call(updateData, 'isLocked')) {
     const v = toBoolStrict(updateData.isLocked);
     if (v !== null) updateData.isLocked = v;
   }
+
+  // אם מגיע candidateEndDate לבדוק שזה לפני endDate
+  if (updateData.candidateEndDate && updateData.endDate) {
+    if (new Date(updateData.candidateEndDate) > new Date(updateData.endDate)) {
+      throw new Error('Candidate end date cannot be after group end date');
+    }
+  }
+
   return Group.findByIdAndUpdate(groupId, updateData, { new: true, runValidators: true });
 }
+
 
 async function deleteGroupService(groupId) {
   return Group.findByIdAndDelete(groupId);

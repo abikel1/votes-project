@@ -56,6 +56,10 @@ const makeSlug = (name = '') =>
       .replace(/\s+/g, '-'),
   );
 
+
+
+
+
 export default function GroupDetailPage() {
   const { groupSlug } = useParams();
   const dispatch = useDispatch();
@@ -74,12 +78,7 @@ export default function GroupDetailPage() {
 
   const joinedIdsSet = useSelector(selectMyJoinedIds);
 
-  // const { userEmail: authEmail, userId: authId } = useSelector((s) => s.auth);
-  // const isAuthed = !!authId || !!authEmail;
 
-  // const [leftWidth, setLeftWidth] = useState(35);
-  // const [isDragging, setIsDragging] = useState(false);
-  // const containerRef = useRef(null);
 
 const getWinnerLabel = (index) => ` ${index + 1}`;
 
@@ -189,9 +188,35 @@ const getWinnerLabel = (index) => ` ${index + 1}`;
     return <div className="loading-wrap">טוען נתוני קבוצה…</div>;
   }
 
-  if (groupLoading || !group) {
-    return <div className="loading-wrap">טוען נתוני קבוצה…</div>;
+  // if (groupLoading || !group) {
+  //   return <div className="loading-wrap">טוען נתוני קבוצה…</div>;
+  // }
+
+  const now = new Date();
+let creationDate, candidateEndDate, endDate;
+let isCandidatePhase = false, isVotingPhase = false, isGroupExpired = false;
+
+if (group) {
+  creationDate = group.creationDate ? new Date(group.creationDate) : null;
+  candidateEndDate = group.candidateEndDate ? new Date(group.candidateEndDate) : null;
+  endDate = group.endDate ? new Date(group.endDate) : null;
+
+  if (creationDate && candidateEndDate) {
+    isCandidatePhase = now >= creationDate && now <= candidateEndDate;
   }
+  if (candidateEndDate && endDate) {
+    isVotingPhase = now > candidateEndDate && now <= endDate;
+  }
+  if (endDate) {
+    isGroupExpired = now > endDate;
+  }
+}
+if (groupLoading || !group) {
+  return <div className="loading-wrap">טוען נתוני קבוצה…</div>;
+}
+
+// עכשיו בטוח להשתמש ב-group._id
+
 
   // ---- חישובי הרשאות אחרי שיש group ----
   const gidStr = String(group._id);
@@ -318,31 +343,13 @@ const getWinnerLabel = (index) => ` ${index + 1}`;
 
   return (
     <div className="page-wrap dashboard">
-{/* <<<<<<< HEAD
-      <div className="page-header">
-        <button
-          className="back-btn"
-          onClick={() => navigate('/groups')}
-        >
-          כל הקבוצות
-        </button>
 
-        {isOwner && (
-          <button
-            className="group-settings-btn-left"
-            onClick={goSettings}
-            title="הגדרות קבוצה"
-          >
-            <img src="/src/assets/icons/settings.png" alt="הגדרות" />
-          </button>
-        )}
-=======
 
-    */}
+
+
 
 <div className="page-header clean-header">
 
-{/* >>>>>>> fd09d35ac375e1d72d983305dcc67a256b38f216 */}
 
   {/* כותרת מרכזית */}
   <div className="header-title">
@@ -398,6 +405,19 @@ const getWinnerLabel = (index) => ` ${index + 1}`;
           </button>
         )}
       </div>
+
+
+      <div className="phase-message">
+  {isCandidatePhase && (
+    <p>📝 אפשר להגיש מועמדות כעת</p>
+  )}
+  {isVotingPhase && (
+    <p>🗳️ הגשת מועמדות הסתיימה — אפשר להצביע עכשיו</p>
+  )}
+  {isGroupExpired && (
+    <p>⏰ זמן הבחירות הסתיים</p>
+  )}
+</div>
 
       {errorCandidates && <p className="err">❌ שגיאה: {errorCandidates}</p>}
 
