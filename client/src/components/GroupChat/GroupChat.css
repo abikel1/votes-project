@@ -274,3 +274,33 @@
     color: #ffffff;
     background-color: #4f46e5;
 }
+
+.group-chat-avatar-fallback {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #ffffff;
+    /* background-color: #4f46e5;  <-- להסיר/להגיב, הצבע בא מג'אווהסקריפט */
+}
+
+.group-chat {
+    margin-top: 0;
+    /* במקום 1.5rem */
+    padding-top: 0.25rem;
+    /* קטן ועדין */
+}
+
+.group-chat-top-title {
+    font-size: 1.4rem;
+    color: #64748b;
+    text-align: right;
+    /* מיושר לימין */
+    margin-bottom: 0.25rem;
+    padding-right: 4px;
+    /* טיפה רווח מהקצה */
+    line-height: 1;
+}

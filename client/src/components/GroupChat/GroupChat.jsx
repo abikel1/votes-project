@@ -4,9 +4,33 @@ import { FiMoreVertical } from 'react-icons/fi';
 import http from '../../api/http';
 import './GroupChat.css';
 
+const AVATAR_COLORS = [
+  '#4f46e5', // סגול
+  '#2563eb', // כחול
+  '#0d9488', // טורקיז
+  '#16a34a', // ירוק
+  '#ca8a04', // צהוב-זהוב
+  '#db2777', // ורוד
+  '#ea580c', // כתום
+  '#7c3aed', // סגול אחר
+  '#0ea5e9', // תכלת
+  '#059669', // ירוק כהה
+];
+
+// פונקציה שמחזירה צבע קבוע לפי מזהה משתמש / מייל
+function getColorForUser(key) {
+  if (!key) return AVATAR_COLORS[0];
+  let hash = 0;
+  for (let i = 0; i < key.length; i += 1) {
+    hash = (hash * 31 + key.charCodeAt(i)) | 0;
+  }
+  const index = Math.abs(hash) % AVATAR_COLORS.length;
+  return AVATAR_COLORS[index];
+}
+
 export default function GroupChat({
   groupId,
-  canChat,        // האם מותר לכתוב (חבר קבוצה / בעלים)
+  canChat,        // האם מותר לכתוב (חבר קבוצה / בעלים / בקבוצה פתוחה)
   currentUserId,  // מזהה המשתמש – בשביל לסמן הודעות "שלי"
 }) {
   const [messages, setMessages] = useState([]);
@@ -172,13 +196,15 @@ export default function GroupChat({
 
   return (
     <div className="group-chat">
-      <div className="group-chat-header">
-        {!canChat && (
-          <span className="group-chat-note">
-            ניתן לקרוא הודעות בלבד. רק חברי קבוצה יכולים לכתוב.
-          </span>
-        )}
-      </div>
+      {/* כותרת קטנה קבועה למעלה */}
+      <div className="group-chat-top-title">צ'אט</div>
+
+      {/* הודעת הרשאות אם אי אפשר לכתוב */}
+      {!canChat && (
+        <div className="group-chat-note">
+          ניתן לקרוא הודעות בלבד. רק חברי קבוצה יכולים לכתוב.
+        </div>
+      )}
 
       <div className="group-chat-body">
         {loading && messages.length === 0 && (
@@ -212,6 +238,16 @@ export default function GroupChat({
 
             const textToShow = isDeleted ? 'הודעה נמחקה' : (msg.text || '');
             const initial = displayName ? displayName.trim().charAt(0) : '?';
+
+            // מפתח לצבע – עדיף id, ואם אין אז מייל או שם
+            const colorKey =
+              msg.userId ||
+              msg.senderId ||
+              msg.senderEmail ||
+              msg.senderName ||
+              displayName;
+
+            const bgColor = getColorForUser(String(colorKey || ''));
 
             return (
               <div
@@ -276,7 +312,10 @@ export default function GroupChat({
                     {avatarUrl ? (
                       <img src={avatarUrl} alt={displayName} />
                     ) : (
-                      <div className="group-chat-avatar-fallback">
+                      <div
+                        className="group-chat-avatar-fallback"
+                        style={{ backgroundColor: bgColor }}
+                      >
                         {initial}
                       </div>
                     )}

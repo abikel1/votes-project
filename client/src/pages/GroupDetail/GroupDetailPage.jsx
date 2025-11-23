@@ -507,16 +507,8 @@ export default function GroupDetailPage() {
 
         {isChatOpen && (
           <div className="chat-panel">
-            <div className="chat-panel-header">
-              <span>צ'אט הקבוצה</span>
-              <button
-                type="button"
-                className="chat-panel-close"
-                onClick={() => setIsChatOpen(false)}
-              >
-                <FiX size={16} />
-              </button>
-            </div>
+            <div className="chat-panel-header"></div>
+
 
             <GroupChat
               groupId={groupId}
