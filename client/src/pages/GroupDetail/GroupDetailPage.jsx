@@ -47,7 +47,6 @@ const COLORS = [
   '#6366f1',
   '#84cc16',
 ];
-
 const makeSlug = (name = '') =>
   encodeURIComponent(
     String(name)
@@ -55,10 +54,6 @@ const makeSlug = (name = '') =>
       .toLowerCase()
       .replace(/\s+/g, '-'),
   );
-
-
-
-
 
 export default function GroupDetailPage() {
   const { groupSlug } = useParams();
@@ -80,7 +75,7 @@ export default function GroupDetailPage() {
 
 
 
-const getWinnerLabel = (index) => ` ${index + 1}`;
+  const getWinnerLabel = (index) => ` ${index + 1}`;
 
   const { userEmail: authEmail, userId: authId } = useSelector((s) => s.auth);
   const isAuthed = !!authId || !!authEmail || !!localStorage.getItem('authToken');
@@ -91,12 +86,6 @@ const getWinnerLabel = (index) => ` ${index + 1}`;
   const [leftWidth, setLeftWidth] = useState(35);
   const [isDragging, setIsDragging] = useState(false);
   const containerRef = useRef(null);
-
-
-
-
-
-
 
 
   // אם נכנסו עם /groups/:groupSlug בלי state – נטען id מהשרת לפי slug
@@ -118,28 +107,28 @@ const getWinnerLabel = (index) => ` ${index + 1}`;
     })();
   }, [navGroupId, groupSlug]);
 
-// <<<<<<< HEAD
-//   // טוען נתוני קבוצה ומועמדים
-// =======
-//   const { selectedGroup: group, loading: groupLoading } = useSelector(s => s.groups);
+  // <<<<<<< HEAD
+  //   // טוען נתוני קבוצה ומועמדים
+  // =======
+  //   const { selectedGroup: group, loading: groupLoading } = useSelector(s => s.groups);
 
-//   const candidates = useSelector(selectCandidatesForGroup(groupId || '')) || [];
-//   const loadingCandidates = useSelector(selectCandidatesLoadingForGroup(groupId || ''));
-//   const errorCandidates = useSelector(selectCandidatesErrorForGroup(groupId || ''));
-// const getWinnerLabel = (index) => ` ${index + 1}`;
+  //   const candidates = useSelector(selectCandidatesForGroup(groupId || '')) || [];
+  //   const loadingCandidates = useSelector(selectCandidatesLoadingForGroup(groupId || ''));
+  //   const errorCandidates = useSelector(selectCandidatesErrorForGroup(groupId || ''));
+  // const getWinnerLabel = (index) => ` ${index + 1}`;
 
-//   const { userEmail: authEmail, userId: authId } = useSelector((s) => s.auth);
-//   const isAuthed = !!authId || !!authEmail || !!localStorage.getItem('authToken');
-//   const iconColor = "#1e3a8a"; // צבע אחיד לכל האייקונים
+  //   const { userEmail: authEmail, userId: authId } = useSelector((s) => s.auth);
+  //   const isAuthed = !!authId || !!authEmail || !!localStorage.getItem('authToken');
+  //   const iconColor = "#1e3a8a"; // צבע אחיד לכל האייקונים
 
-//   const myJoinedIdsSet = useSelector(selectMyJoinedIds);
+  //   const myJoinedIdsSet = useSelector(selectMyJoinedIds);
 
-//   const [leftWidth, setLeftWidth] = useState(35);
-//   const [isDragging, setIsDragging] = useState(false);
-//   const containerRef = useRef(null);
+  //   const [leftWidth, setLeftWidth] = useState(35);
+  //   const [isDragging, setIsDragging] = useState(false);
+  //   const containerRef = useRef(null);
 
-//   // טוען נתונים
-// >>>>>>> fd09d35ac375e1d72d983305dcc67a256b38f216
+  //   // טוען נתונים
+  // >>>>>>> fd09d35ac375e1d72d983305dcc67a256b38f216
   useEffect(() => {
     if (groupId) {
       dispatch(fetchGroupWithMembers(groupId));
@@ -192,9 +181,12 @@ const getWinnerLabel = (index) => ` ${index + 1}`;
   //   return <div className="loading-wrap">טוען נתוני קבוצה…</div>;
   // }
 
-  const now = new Date();
+const now = new Date();
 let creationDate, candidateEndDate, endDate;
-let isCandidatePhase = false, isVotingPhase = false, isGroupExpired = false;
+
+let isCandidatePhase = false;
+let isVotingPhase = false;
+let isGroupExpired = false;
 
 if (group) {
   creationDate = group.creationDate ? new Date(group.creationDate) : null;
@@ -204,18 +196,20 @@ if (group) {
   if (creationDate && candidateEndDate) {
     isCandidatePhase = now >= creationDate && now <= candidateEndDate;
   }
+
   if (candidateEndDate && endDate) {
     isVotingPhase = now > candidateEndDate && now <= endDate;
   }
+
   if (endDate) {
     isGroupExpired = now > endDate;
   }
 }
-if (groupLoading || !group) {
-  return <div className="loading-wrap">טוען נתוני קבוצה…</div>;
-}
+  if (groupLoading || !group) {
+    return <div className="loading-wrap">טוען נתוני קבוצה…</div>;
+  }
 
-// עכשיו בטוח להשתמש ב-group._id
+  // עכשיו בטוח להשתמש ב-group._id
 
 
   // ---- חישובי הרשאות אחרי שיש group ----
@@ -248,7 +242,7 @@ if (groupLoading || !group) {
   const isMember =
     !!joinedIdsSet && typeof joinedIdsSet.has === 'function' && joinedIdsSet.has(gidStr);
 
-  const isExpired = group?.endDate ? new Date(group.endDate) < new Date() : false;
+  // const isExpired = group?.endDate ? new Date(group.endDate) < new Date() : false;
 
   // 🔒 קבוצה נעולה + לא מחובר כלל
   if (isLocked && !isAuthed) {
@@ -348,28 +342,28 @@ if (groupLoading || !group) {
 
 
 
-<div className="page-header clean-header">
+      <div className="page-header clean-header">
 
 
-  {/* כותרת מרכזית */}
-  <div className="header-title">
-    <h2>{group.name}</h2>
-    <p>{group.description}</p>
-  </div>
+        {/* כותרת מרכזית */}
+        <div className="header-title">
+          <h2>{group.name}</h2>
+          <p>{group.description}</p>
+        </div>
 
-    {isOwner && (
-    <button className="icon-btn" onClick={goSettings} title="הגדרות קבוצה">
-      <FiSettings size={20} />
-    </button>
-  )}
+        {isOwner && (
+          <button className="icon-btn" onClick={goSettings} title="הגדרות קבוצה">
+            <FiSettings size={20} />
+          </button>
+        )}
 
-  {/* כפתור חזרה ימין */}
-  <button className="icon-btn" onClick={() => navigate('/groups')} title="חזרה לקבוצות">
-    <BiArrowBack size={20} />
-  </button>
+        {/* כפתור חזרה ימין */}
+        <button className="icon-btn" onClick={() => navigate('/groups')} title="חזרה לקבוצות">
+          <BiArrowBack size={20} />
+        </button>
 
 
-</div>
+      </div>
 
       <div className="meta-and-button">
         <div className="group-meta">
@@ -387,7 +381,7 @@ if (groupLoading || !group) {
           </div>
         </div>
 
-        {!isExpired && (
+        {isVotingPhase  && (
           <button
             className="vote-btn"
             onClick={() => {
@@ -407,17 +401,6 @@ if (groupLoading || !group) {
       </div>
 
 
-      <div className="phase-message">
-  {isCandidatePhase && (
-    <p>📝 אפשר להגיש מועמדות כעת</p>
-  )}
-  {isVotingPhase && (
-    <p>🗳️ הגשת מועמדות הסתיימה — אפשר להצביע עכשיו</p>
-  )}
-  {isGroupExpired && (
-    <p>⏰ זמן הבחירות הסתיים</p>
-  )}
-</div>
 
       {errorCandidates && <p className="err">❌ שגיאה: {errorCandidates}</p>}
 
@@ -450,11 +433,11 @@ if (groupLoading || !group) {
                         </div>
                       )} */}
 
-                      {isExpired && isWinner && (
-  <div className="current-leader">
-    {getWinnerLabel(winners.findIndex(w => w._id === c._id))}
-  </div>
-)}
+                      {isGroupExpired  && isWinner && (
+                        <div className="current-leader">
+                          {getWinnerLabel(winners.findIndex(w => w._id === c._id))}
+                        </div>
+                      )}
 
 
 
@@ -472,7 +455,7 @@ if (groupLoading || !group) {
                         </div>
                       </div>
 
-                      {isExpired && (
+                      {isGroupExpired  && (
                         <div className="votes-count">{c.votesCount || 0} קולות</div>
                       )}
                     </div>
@@ -498,18 +481,63 @@ if (groupLoading || !group) {
           className="right-section"
           style={{ width: `${100 - leftWidth}%` }}
         >
-          {!isExpired && (
-            <div className="group-details-card">
-{/* <<<<<<< HEAD
-              <div className="group-header">
-======= */}
 
-              {/* כותרת ותיאור */}
-              {/* <div className="group-header">
->>>>>>> fd09d35ac375e1d72d983305dcc67a256b38f216
-                <h2>{group.name}</h2>
-                <p>{group.description || 'אין תיאור לקבוצה הזו.'}</p>
-              </div> */}
+
+      <div className="phase-message">
+        {isCandidatePhase && (
+          <p>📝 אפשר להגיש מועמדות כעת</p>
+        )}
+        {isVotingPhase && (
+          <p>🗳️ הגשת מועמדות הסתיימה — אפשר להצביע עכשיו</p>
+        )}
+        {isGroupExpired && (
+          <p>⏰ זמן הבחירות הסתיים</p>
+        )}
+      </div>
+ {isCandidatePhase && (
+    <div className="candidate-form-card">
+      <h2>הגש מועמדות</h2>
+      {/* <form onSubmit={handleSubmitCandidate}>
+        <label>
+          שם המועמד/ת *
+          <input
+            type="text"
+            name="name"
+            value={candidateForm.name}
+            onChange={handleCandidateChange}
+            required
+          />
+        </label>
+
+        <label>
+          תיאור קצר *
+          <textarea
+            name="description"
+            value={candidateForm.description}
+            onChange={handleCandidateChange}
+            required
+          />
+        </label>
+
+        <label>
+          סימול (למשל שם קוד או כינוי) *
+          <input
+            type="text"
+            name="symbol"
+            value={candidateForm.symbol}
+            onChange={handleCandidateChange}
+            required
+          />
+        </label>
+
+        <button type="submit">הגש מועמדות</button>
+      </form> */}
+    </div>
+  )}
+
+          {isVotingPhase  && (
+            <div className="group-details-card">
+
 
               <div className="group-info-grid">
                 <div className="info-card">
@@ -544,7 +572,7 @@ if (groupLoading || !group) {
             </div>
           )}
 
-          {isExpired && totalVotes > 0 && (
+          {isGroupExpired  && totalVotes > 0 && (
             <div className="charts">
               <div className="pie-chart-container">
                 <h3>אחוזי הצבעה</h3>
@@ -591,7 +619,7 @@ if (groupLoading || !group) {
             </div>
           )}
 
-          {isExpired && totalVotes === 0 && (
+          {isGroupExpired  && totalVotes === 0 && (
             <div className="no-votes-message">🕐 אין הצבעות — לא ניתן להציג גרפים</div>
           )}
         </div>
