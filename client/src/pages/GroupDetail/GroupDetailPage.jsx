@@ -35,7 +35,7 @@ import {
 } from 'recharts';
 
 import http from '../../api/http';
-
+import CandidateApplyForm from '../../components/CandidateApplyForm'
 // צבעים לגרפים
 const COLORS = [
   '#003366',
@@ -326,11 +326,12 @@ if (group) {
   const pieData = candidates
     .filter((c) => c.votesCount > 0)
     .map((c) => ({ name: c.name, value: c.votesCount || 0 }));
+const barData = (sortedCandidates || []).map((c) => ({
+  name: c.name ? (c.name.length > 12 ? c.name.substring(0, 12) + '...' : c.name) : 'לא ידוע',
+  votesCount: c.votesCount || 0,
+}));
 
-  const barData = sortedCandidates.map((c) => ({
-    name: c.name.length > 12 ? c.name.substring(0, 12) + '...' : c.name,
-    votesCount: c.votesCount || 0,
-  }));
+
 
   const winners = sortedCandidates.slice(0, group.maxWinners);
   const maxVotes = Math.max(...candidates.map((c) => c.votesCount || 0));
@@ -422,17 +423,7 @@ if (group) {
                       key={c._id}
                       className={`candidate-card ${isWinner ? 'winner' : ''}`}
                     >
-                      {/* {isExpired && isWinner && ( */}
-                      {/* גביע יוצג רק אם הסתיים */}
-                      {/* {isExpired && isWinner && (
-                        <div className="current-leader">
-                          <img
-                            src="/src/assets/icons/trophy.png"
-                            className="groups-badge-locked"
-                          />
-                        </div>
-                      )} */}
-
+                 
                       {isGroupExpired  && isWinner && (
                         <div className="current-leader">
                           {getWinnerLabel(winners.findIndex(w => w._id === c._id))}
@@ -498,40 +489,13 @@ if (group) {
     <div className="candidate-form-card">
       <h2>הגש מועמדות</h2>
       {/* <form onSubmit={handleSubmitCandidate}>
-        <label>
-          שם המועמד/ת *
-          <input
-            type="text"
-            name="name"
-            value={candidateForm.name}
-            onChange={handleCandidateChange}
-            required
-          />
-        </label>
-
-        <label>
-          תיאור קצר *
-          <textarea
-            name="description"
-            value={candidateForm.description}
-            onChange={handleCandidateChange}
-            required
-          />
-        </label>
-
-        <label>
-          סימול (למשל שם קוד או כינוי) *
-          <input
-            type="text"
-            name="symbol"
-            value={candidateForm.symbol}
-            onChange={handleCandidateChange}
-            required
-          />
-        </label>
-
-        <button type="submit">הגש מועמדות</button>
+     
       </form> */}
+
+      {isCandidatePhase && (
+  <CandidateApplyForm groupId={group._id} />
+)}
+
     </div>
   )}
 

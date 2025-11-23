@@ -26,7 +26,7 @@ router.post('/:id/votes', incrementVotes);           // להוסיף הצבעו�
 
 
 // 1️⃣ משתמש מגיש בקשת מועמדות
-router.post('/groups/:id/candidates/apply',auth, applyCandidate);
+router.post('/:id/applyCandidate',auth, applyCandidate);
 
 // 2️⃣ מנהל מאשר / דוחה (כרגע רק approve)
 router.post('/groups/:id/candidates/approve/:requestId',auth,  approveCandidate);

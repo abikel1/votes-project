@@ -55,6 +55,20 @@ export const deleteCandidate = createAsyncThunk(
   }
 );
 
+export const applyCandidate = createAsyncThunk(
+  'candidates/apply',
+  async ({ groupId, name, description, symbol, photoUrl }, { rejectWithValue }) => {
+    try {
+      const { data } = await http.post(`/candidates/${groupId}/applyCandidate`, {
+        name, description, symbol, photoUrl
+      });
+      return { groupId, candidate: data };
+    } catch (err) {
+      return rejectWithValue(err?.response?.data?.message || 'Failed to apply candidate');
+    }
+  }
+);
+
 const candidateSlice = createSlice({
   name: 'candidates',
   initialState: {
@@ -63,7 +77,8 @@ const candidateSlice = createSlice({
     errorByGroup: {},      // { [groupId]: string|null }
     creating: false,
     createError: null,
-
+  applying: false,
+    applyError: null,
     updatingById: {},      // { [candidateId]: boolean }
     updateErrorById: {},   // { [candidateId]: string|null }
   },
@@ -149,6 +164,20 @@ const candidateSlice = createSlice({
         // נקה שגיאות/סטטוסים ישנים
         delete s.updatingById[candidateId];
         delete s.updateErrorById[candidateId];
+      })
+         .addCase(applyCandidate.pending, (state, action) => {
+        state.applying = true;
+        state.applyError = null;
+      })
+      .addCase(applyCandidate.fulfilled, (state, action) => {
+        state.applying = false;
+        const { groupId, candidate } = action.payload;
+        if (!Array.isArray(state.listByGroup[groupId])) state.listByGroup[groupId] = [];
+        state.listByGroup[groupId].unshift(candidate); // מוסיף את המועמד לראש הרשימה
+      })
+      .addCase(applyCandidate.rejected, (state, action) => {
+        state.applying = false;
+        state.applyError = action.payload;
       });
   },
 });
@@ -168,3 +197,6 @@ export const selectCandidateUpdating = (candidateId) => (state) =>
   !!state.candidates.updatingById[candidateId];
 export const selectCandidateUpdateError = (candidateId) => (state) =>
   state.candidates.updateErrorById[candidateId] || null;
+// selectors
+export const selectApplyingCandidate = (state) => state.candidates.applying;
+export const selectApplyCandidateError = (state) => state.candidates.applyError;
