@@ -181,30 +181,30 @@ export default function GroupDetailPage() {
   //   return <div className="loading-wrap">טוען נתוני קבוצה…</div>;
   // }
 
-const now = new Date();
-let creationDate, candidateEndDate, endDate;
+  const now = new Date();
+  let creationDate, candidateEndDate, endDate;
 
-let isCandidatePhase = false;
-let isVotingPhase = false;
-let isGroupExpired = false;
+  let isCandidatePhase = false;
+  let isVotingPhase = false;
+  let isGroupExpired = false;
 
-if (group) {
-  creationDate = group.creationDate ? new Date(group.creationDate) : null;
-  candidateEndDate = group.candidateEndDate ? new Date(group.candidateEndDate) : null;
-  endDate = group.endDate ? new Date(group.endDate) : null;
+  if (group) {
+    creationDate = group.creationDate ? new Date(group.creationDate) : null;
+    candidateEndDate = group.candidateEndDate ? new Date(group.candidateEndDate) : null;
+    endDate = group.endDate ? new Date(group.endDate) : null;
 
-  if (creationDate && candidateEndDate) {
-    isCandidatePhase = now >= creationDate && now <= candidateEndDate;
+    if (creationDate && candidateEndDate) {
+      isCandidatePhase = now >= creationDate && now <= candidateEndDate;
+    }
+
+    if (candidateEndDate && endDate) {
+      isVotingPhase = now > candidateEndDate && now <= endDate;
+    }
+
+    if (endDate) {
+      isGroupExpired = now > endDate;
+    }
   }
-
-  if (candidateEndDate && endDate) {
-    isVotingPhase = now > candidateEndDate && now <= endDate;
-  }
-
-  if (endDate) {
-    isGroupExpired = now > endDate;
-  }
-}
   if (groupLoading || !group) {
     return <div className="loading-wrap">טוען נתוני קבוצה…</div>;
   }
@@ -326,10 +326,10 @@ if (group) {
   const pieData = candidates
     .filter((c) => c.votesCount > 0)
     .map((c) => ({ name: c.name, value: c.votesCount || 0 }));
-const barData = (sortedCandidates || []).map((c) => ({
-  name: c.name ? (c.name.length > 12 ? c.name.substring(0, 12) + '...' : c.name) : 'לא ידוע',
-  votesCount: c.votesCount || 0,
-}));
+  const barData = (sortedCandidates || []).map((c) => ({
+    name: c.name ? (c.name.length > 12 ? c.name.substring(0, 12) + '...' : c.name) : 'לא ידוע',
+    votesCount: c.votesCount || 0,
+  }));
 
 
 
@@ -382,7 +382,7 @@ const barData = (sortedCandidates || []).map((c) => ({
           </div>
         </div>
 
-        {isVotingPhase  && (
+        {isVotingPhase && (
           <button
             className="vote-btn"
             onClick={() => {
@@ -423,8 +423,8 @@ const barData = (sortedCandidates || []).map((c) => ({
                       key={c._id}
                       className={`candidate-card ${isWinner ? 'winner' : ''}`}
                     >
-                 
-                      {isGroupExpired  && isWinner && (
+
+                      {isGroupExpired && isWinner && (
                         <div className="current-leader">
                           {getWinnerLabel(winners.findIndex(w => w._id === c._id))}
                         </div>
@@ -446,7 +446,7 @@ const barData = (sortedCandidates || []).map((c) => ({
                         </div>
                       </div>
 
-                      {isGroupExpired  && (
+                      {isGroupExpired && (
                         <div className="votes-count">{c.votesCount || 0} קולות</div>
                       )}
                     </div>
@@ -473,33 +473,16 @@ const barData = (sortedCandidates || []).map((c) => ({
           style={{ width: `${100 - leftWidth}%` }}
         >
 
+          {isCandidatePhase && (
+            <div className="candidate-form-card">
+              {isCandidatePhase && (
+                <CandidateApplyForm groupId={group._id} />
+              )}
 
-      <div className="phase-message">
-        {isCandidatePhase && (
-          <p>📝 אפשר להגיש מועמדות כעת</p>
-        )}
-        {isVotingPhase && (
-          <p>🗳️ הגשת מועמדות הסתיימה — אפשר להצביע עכשיו</p>
-        )}
-        {isGroupExpired && (
-          <p>⏰ זמן הבחירות הסתיים</p>
-        )}
-      </div>
- {isCandidatePhase && (
-    <div className="candidate-form-card">
-      <h2>הגש מועמדות</h2>
-      {/* <form onSubmit={handleSubmitCandidate}>
-     
-      </form> */}
+            </div>
+          )}
 
-      {isCandidatePhase && (
-  <CandidateApplyForm groupId={group._id} />
-)}
-
-    </div>
-  )}
-
-          {isVotingPhase  && (
+          {isVotingPhase && (
             <div className="group-details-card">
 
 
@@ -536,7 +519,7 @@ const barData = (sortedCandidates || []).map((c) => ({
             </div>
           )}
 
-          {isGroupExpired  && totalVotes > 0 && (
+          {isGroupExpired && totalVotes > 0 && (
             <div className="charts">
               <div className="pie-chart-container">
                 <h3>אחוזי הצבעה</h3>
@@ -583,7 +566,7 @@ const barData = (sortedCandidates || []).map((c) => ({
             </div>
           )}
 
-          {isGroupExpired  && totalVotes === 0 && (
+          {isGroupExpired && totalVotes === 0 && (
             <div className="no-votes-message">🕐 אין הצבעות — לא ניתן להציג גרפים</div>
           )}
         </div>

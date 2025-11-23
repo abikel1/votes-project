@@ -382,3 +382,7 @@ initialState: {
 
 export const { logout, loginSuccess, clearError, clearMessage } = authSlice.actions;
 export default authSlice.reducer;
+// src/slices/authSlice.js
+
+export const selectUser = (state) => state.auth.user;
+export const selectUserId = (state) => state.auth.userId;
