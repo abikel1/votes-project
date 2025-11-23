@@ -9,7 +9,7 @@ const {
   getCandidateById,
   getCandidatesByGroup,
   incrementVotes,
-
+rejectCandidate,
    applyCandidate,
   approveCandidate,
   addCandidateByEmail,
@@ -29,7 +29,9 @@ router.post('/:id/votes', incrementVotes);           // להוסיף הצבעו�
 router.post('/:id/applyCandidate',auth, applyCandidate);
 
 // 2️⃣ מנהל מאשר / דוחה (כרגע רק approve)
-router.post('/groups/:id/candidates/approve/:requestId',auth,  approveCandidate);
+router.post('/:id/approveCandidates/:requestId',auth,  approveCandidate);
+
+router.post('/:id/rejectCandidates/:requestId', auth, rejectCandidate);
 
 // 3️⃣ מנהל מוסיף לפי מייל
 router.post('/groups/:id/candidates/add-by-email',auth,  addCandidateByEmail);

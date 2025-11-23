@@ -10,6 +10,7 @@ const {
 const {
   applyCandidateService,
   approveCandidateRequestService,
+  rejectCandidateRequestService ,
   addCandidateByEmailService,
   getCandidateCampaignService
 } = require('../services/group_service');
@@ -85,7 +86,6 @@ async function incrementVotes(req, res) {
   }
 }
 
-
 // 1️⃣ משתמש מגיש בקשת מועמדות
 async function applyCandidate(req, res) {
   try {
@@ -97,8 +97,29 @@ async function applyCandidate(req, res) {
     res.status(400).json({ message: err.message });
   }
 }
+// 1️⃣ מנהל מאשר דוחה  בקשת מועמדות
 
-// 2️⃣ מנהל מאשר
+async function rejectCandidate(req, res) {
+    console.log("req.params", req.params)
+
+  try {
+    await rejectCandidateRequestService(
+      req.params.id,
+      req.user._id,
+      req.params.requestId
+    );
+
+    res.json({
+      ok: true,
+      requestId: req.params.requestId,
+      groupId: req.params.id
+    });
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+}
+
+
 async function approveCandidate(req, res) {
   try {
     const c = await approveCandidateRequestService(
@@ -106,11 +127,18 @@ async function approveCandidate(req, res) {
       req.user._id,
       req.params.requestId
     );
-    res.json({ ok: true, candidate: c });
+
+    res.json({
+      ok: true,
+      candidate: c,
+      requestId: req.params.requestId,
+      groupId: req.params.id
+    });
   } catch (err) {
     res.status(400).json({ message: err.message });
   }
 }
+
 
 // 3️⃣ הוספה לפי מייל
 async function addCandidateByEmail(req, res) {
@@ -137,5 +165,6 @@ module.exports = {
   incrementVotes,
     applyCandidate,
   approveCandidate,
+  rejectCandidate,
   addCandidateByEmail,
 };

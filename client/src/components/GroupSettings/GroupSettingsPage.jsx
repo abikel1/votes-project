@@ -218,6 +218,8 @@ const requestsError = null; // או selector מתאים
     if (!groupId) return;
     dispatch(fetchGroupWithMembers(groupId));
     dispatch(fetchCandidatesByGroup(groupId));
+      // dispatch(fetchCandidateRequests(groupId)); 
+
     dispatch(fetchVotersByGroup(groupId));
   }, [dispatch, groupId]);
 

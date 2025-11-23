@@ -295,6 +295,26 @@ async function approveCandidateRequestService(groupId, ownerId, requestId) {
   return candidate;
 }
 
+async function rejectCandidateRequestService(groupId, adminId, requestId) {
+  const group = await Group.findById(groupId);
+  if (!group) throw new Error("Group not found");
+
+  // בדיקת הרשאות
+  if (group.createdById.toString() !== adminId.toString()) {
+    throw new Error("Not authorized");
+  }
+
+  const request = group.candidateRequests.id(requestId);
+  if (!request) throw new Error("Request not found");
+
+  // מחיקה מהרשימה במקום שינוי סטטוס
+  request.deleteOne();
+  await group.save();
+
+  return { requestId, groupId };  // חובה להחזיר requestId כדי שה-Redux יסיר אותו
+};
+
+
 async function addCandidateByEmailService(groupId, ownerId, email, data = {}) {
   const g = await Group.findById(groupId);
   if (!g) throw new Error('Group not found');
@@ -336,4 +356,5 @@ module.exports = {
   applyCandidateService,
   approveCandidateRequestService,
   addCandidateByEmailService,
+  rejectCandidateRequestService,
 };
