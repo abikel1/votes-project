@@ -163,7 +163,8 @@
 .groups-card:hover {
   border-color: #999;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
-  transform: scale(1.02);   /* 👈 מגדיל קצת את הכרטיס */
+  transform: scale(1.02);
+  /* 👈 מגדיל קצת את הכרטיס */
 }
 
 .groups-card-disabled {
@@ -446,15 +447,18 @@
   width: 10px;
   height: 10px;
   border-radius: 50%;
-  border: 1px solid #fff; /* קו מסביב כדי שיהיה ברור על הרקע */
+  border: 1px solid #fff;
+  /* קו מסביב כדי שיהיה ברור על הרקע */
 }
 
 .groups-lock-status.member {
-  background-color: #27ae60; /* ירוק */
+  background-color: #27ae60;
+  /* ירוק */
 }
 
 .groups-lock-status.not-member {
-  background-color: #c0392b; /* אדום */
+  background-color: #c0392b;
+  /* אדום */
 }
 
 .groups-pagination {
@@ -516,7 +520,8 @@
 
 .groups-fab:hover {
   background: #000;
-  transform: scale(1.12);  /* 👈 מגדיל את הכפתור */
+  transform: scale(1.12);
+  /* 👈 מגדיל את הכפתור */
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.35);
 }
 
@@ -530,4 +535,22 @@
   }
 }
 
+.groups-card-owner {
+  display: flex;
+  justify-content:first baseline;
+  /* מעביר את כל השורה לצד ימין */
+  gap: 6px;
+  margin-bottom: 10px;
+  font-size: 14px;
+  color: #333;
+}
 
+.groups-card-owner-label {
+  /* font-weight: 600; */
+  color: #555;
+}
+
+.groups-card-owner-value {
+  font-weight: 500;
+  color: #222;
+}
