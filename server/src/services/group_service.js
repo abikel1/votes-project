@@ -217,6 +217,11 @@ async function applyCandidateService(groupId, user, data) {
   const g = await Group.findById(groupId);
   if (!g) throw new Error('Group not found');
 
+    const now = new Date();
+  if (g.candidateEndDate && now > g.candidateEndDate) {
+    throw new Error('Candidate submission period has ended');
+  }
+
   // האם כבר חבר?
   const alreadyCandidate = await Candidate.findOne({
     groupId,
