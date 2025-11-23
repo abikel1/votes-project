@@ -191,7 +191,7 @@ export default function GroupDetailPage() {
   const isMember =
     !!joinedIdsSet && typeof joinedIdsSet.has === 'function' && joinedIdsSet.has(gidStr);
 
-  const canChat = isOwner || isMember;
+  const canChat = !isLocked || isOwner || isMember;
 
   const isExpired = group?.endDate ? new Date(group.endDate) < new Date() : false;
 
