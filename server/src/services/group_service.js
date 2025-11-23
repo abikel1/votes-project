@@ -340,6 +340,12 @@ async function addCandidateByEmailService(groupId, ownerId, email, data = {}) {
   return candidate;
 }
 
+async function getCandidateRequestsService(groupId) {
+  const group = await Group.findById(groupId);
+  if (!group) throw new Error('Group not found');
+  return group.candidateRequests || [];
+}
+
 module.exports = {
   createGroupService,
   updateGroupService,
@@ -357,4 +363,5 @@ module.exports = {
   approveCandidateRequestService,
   addCandidateByEmailService,
   rejectCandidateRequestService,
+  getCandidateRequestsService
 };

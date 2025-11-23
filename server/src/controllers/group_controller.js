@@ -11,6 +11,7 @@ const {
   getMyJoinStatusesService,
   isMemberOfGroupService,
   removeGroupMemberService,
+  getCandidateRequestsService ,
 } = require('../services/group_service');
 const Group = require('../models/group_model');
 
@@ -151,6 +152,16 @@ async function removeMember(req, res) {
   }
 }
 
+async function getCandidateRequests(req, res) {
+  try {
+    const requests = await getCandidateRequestsService(req.params.groupId);
+    res.json(requests);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+}
+
+
 module.exports = {
   createGroup,
   updateGroup,
@@ -166,4 +177,5 @@ module.exports = {
   getMyJoinStatuses,
   getMyMembership,
   removeMember,
+  getCandidateRequests,
 };

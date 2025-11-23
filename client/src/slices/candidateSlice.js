@@ -60,9 +60,9 @@ export const applyCandidate = createAsyncThunk(
   async ({ groupId, name, description, symbol, photoUrl }, { rejectWithValue }) => {
     try {
       const { data } = await http.post
-      (`/candidates/${groupId}/applyCandidate`, {
-        name, description, symbol, photoUrl
-      });
+        (`/candidates/${groupId}/applyCandidate`, {
+          name, description, symbol, photoUrl
+        });
       return { groupId, candidate: data };
     } catch (err) {
       return rejectWithValue(err?.response?.data?.message || 'Failed to apply candidate');
@@ -111,6 +111,18 @@ export const rejectCandidateRequest = createAsyncThunk(
   }
 );
 
+// src/slices/candidateSlice.js
+export const fetchCandidateRequestsByGroup = createAsyncThunk(
+  'candidates/fetchRequestsByGroup',
+  async (groupId, { rejectWithValue }) => {
+    try {
+      const { data } = await http.get(`/groups/${groupId}/requests`);
+      return { groupId, requests: data };
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.message || err.message);
+    }
+  }
+);
 
 const candidateSlice = createSlice({
   name: 'candidates',
@@ -224,28 +236,23 @@ const candidateSlice = createSlice({
         state.applying = false;
         state.applyError = action.payload;
       })
-
+    .addCase(fetchCandidateRequestsByGroup.fulfilled, (state, action) => {
+      const { groupId, requests } = action.payload;
+      state.candidateRequestsByGroup[groupId] = requests;
+    })
       .addCase(approveCandidateRequest.pending, (state) => {
         state.loadingRequests = true;
         state.requestsError = null;
       })
-      .addCase(approveCandidateRequest.fulfilled, (state, action) => {
-        console.log(state.candidateRequestsByGroup[groupId], requestId);
-
-        const { requestId, groupId, candidate } = action.payload;
-
-        // להסיר את הבקשה
-     state.candidateRequestsByGroup[groupId] =
-  state.candidateRequestsByGroup[groupId]?.filter(r => r._id !== requestId) || [];
-
-
-        // להוסיף את המועמד החדש לרשימת המועמדים
-        if (!Array.isArray(state.listByGroup[groupId]))
-          state.listByGroup[groupId] = [];
-
-        state.listByGroup[groupId].push(candidate);
-      })
-
+       .addCase(approveCandidateRequest.fulfilled, (state, action) => {
+      const { requestId, groupId, candidate } = action.payload;
+      // להסיר את הבקשה
+      state.candidateRequestsByGroup[groupId] =
+        state.candidateRequestsByGroup[groupId]?.filter(r => r._id !== requestId) || [];
+      // להוסיף את המועמד המאושר לרשימת המועמדים
+      if (!Array.isArray(state.listByGroup[groupId])) state.listByGroup[groupId] = [];
+      state.listByGroup[groupId].push(candidate);
+    })
       .addCase(approveCandidateRequest.rejected, (state, action) => {
         state.loadingRequests = false;
         state.requestsError = action.payload;
@@ -256,13 +263,11 @@ const candidateSlice = createSlice({
         state.loadingRequests = true;
         state.requestsError = null;
       })
-      .addCase(rejectCandidateRequest.fulfilled, (state, action) => {
-        const { requestId, groupId } = action.payload;
-
+       .addCase(rejectCandidateRequest.fulfilled, (state, action) => {
+      const { requestId, groupId } = action.payload;
       state.candidateRequestsByGroup[groupId] =
-  state.candidateRequestsByGroup[groupId]?.filter(r => r._id !== requestId) || [];
-
-      })
+        state.candidateRequestsByGroup[groupId]?.filter(r => r._id !== requestId) || [];
+    })
       .addCase(rejectCandidateRequest.rejected, (state, action) => {
         state.loadingRequests = false;
         state.requestsError = action.payload;
