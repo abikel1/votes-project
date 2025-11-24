@@ -46,6 +46,8 @@ async function createGroupService(data, user) {
 
 
 async function updateGroupService(groupId, updateData) {
+  console.log("BODY UPDATE:", updateData);
+
   if (updateData && Object.prototype.hasOwnProperty.call(updateData, 'isLocked')) {
     const v = toBoolStrict(updateData.isLocked);
     if (v !== null) updateData.isLocked = v;

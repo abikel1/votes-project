@@ -41,7 +41,6 @@ async function deleteGroup(req, res) {
     }
 
     await deleteGroupService(req.params.id);
-    // אפשר בעתיד להוסיף ניקוי ישויות תלויות במידלוואר.
     res.json({ ok: true, message: 'Group deleted successfully', deletedId: String(req.params.id) });
   } catch (err) {
     res.status(500).json({ message: 'Error deleting group', error: err.message });
