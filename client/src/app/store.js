@@ -6,6 +6,8 @@ import votesReducer from '../slices/votesSlice';
 import candidatesReducer from '../slices/candidateSlice';
 import joinReqReducer from '../slices/joinRequestsSlice';
 import mailReducer from '../slices/mailSlice';
+import campaignReducer from '../slices/campaignSlice';
+
 
 const store = configureStore({
     reducer: {
@@ -16,6 +18,8 @@ const store = configureStore({
         votes: votesReducer,
         joinReq: joinReqReducer,
         mail: mailReducer,
+            campaign: campaignReducer,
+
     },
     devTools: true,
 });
