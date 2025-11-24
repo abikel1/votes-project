@@ -488,7 +488,8 @@ export default function GroupDetailPage() {
               />
             </div>
           )}
-          {!isVotingPhase && (
+
+          {isVotingPhase && (
             <div className="group-details-card">
               <div className="group-info-grid">
                 <div className="info-card">
