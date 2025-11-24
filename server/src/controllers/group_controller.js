@@ -28,7 +28,7 @@ async function updateGroup(req, res) {
     const group = await updateGroupService(req.params.id, req.body);
     if (!group) return res.status(404).json({ message: 'Group not found' });
     res.json(group);
-  } catch (err) { res.status(500).json({ message: 'Error updating group', error: err.message }); }
+  } catch (err) { res.status(500).json({ message: 'שגיאה בעדכון הקבוצה', error: err.message }); }
 }
 
 async function deleteGroup(req, res) {
