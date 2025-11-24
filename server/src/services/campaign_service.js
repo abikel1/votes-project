@@ -2,7 +2,20 @@
 const Campaign = require('../models/campaign_model');
 
 async function getCampaignByCandidate(candidateId) {
-  return Campaign.findOne({ candidate: candidateId });
+  let campaign = await Campaign.findOne({ candidateId });
+
+  // אם אין קמפיין — ניצור חדש
+  if (!campaign) {
+campaign = await Campaign.create({
+  candidate: candidateId,
+  description: "",
+  posts: [],
+  polls: []
+});
+
+  }
+
+  return campaign;
 }
 
 async function createCampaign(candidateId, data) {
