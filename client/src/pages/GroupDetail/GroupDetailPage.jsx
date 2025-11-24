@@ -73,6 +73,7 @@ export default function GroupDetailPage() {
 
   const joinedIdsSet = useSelector(selectMyJoinedIds);
 
+const [candidateRequests, setCandidateRequests] = useState([]);
 
 
   const getWinnerLabel = (index) => ` ${index + 1}`;
@@ -158,6 +159,21 @@ export default function GroupDetailPage() {
       document.removeEventListener('mouseup', handleMouseUp);
     };
   }, [isDragging]);
+
+  useEffect(() => {
+  if (!groupId) return;
+
+  const fetchRequests = async () => {
+    try {
+      const res = await http.get(`/groups/${groupId}/requests`);
+      setCandidateRequests(res.data); // מערך בקשות הצטרפות
+    } catch (err) {
+      console.error('failed to fetch join requests', err);
+    }
+  };
+
+  fetchRequests();
+}, [groupId]);
 
   if (groupError) {
     return (
@@ -473,14 +489,15 @@ export default function GroupDetailPage() {
           style={{ width: `${100 - leftWidth}%` }}
         >
 
-          {isCandidatePhase && (
-            <div className="candidate-form-card">
-              {isCandidatePhase && (
-                <CandidateApplyForm groupId={group._id} />
-              )}
+       {isCandidatePhase && (
+  <div className="candidate-form-card">
+    <CandidateApplyForm 
+      groupId={group._id} 
+      candidateRequests={candidateRequests} // <-- עכשיו באמת שולח את הבקשות
+    />
+  </div>
+)}
 
-            </div>
-          )}
 
           {isVotingPhase && (
             <div className="group-details-card">
