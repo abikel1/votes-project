@@ -11,7 +11,8 @@ const {
   getMyJoinStatusesService,
   isMemberOfGroupService,
   removeGroupMemberService,
-  getCandidateRequestsService ,
+  getCandidateRequestsService,
+  generateGroupDescriptionService,
 } = require('../services/group_service');
 const Group = require('../models/group_model');
 
@@ -159,6 +160,22 @@ async function getCandidateRequests(req, res) {
     res.status(500).json({ message: err.message });
   }
 }
+async function generateGroupDescription(req, res) {
+  try {
+    const { name, hint } = req.body || {};
+
+    if (!name || !String(name).trim()) {
+      return res.status(400).json({ message: 'שם קבוצה חובה ליצירת תיאור' });
+    }
+
+    const description = await generateGroupDescriptionService(name, hint || '');
+
+    res.json({ description });
+  } catch (err) {
+    console.error('AI description error:', err);
+    res.status(500).json({ message: err.message || 'AI description error' });
+  }
+}
 
 
 module.exports = {
@@ -177,4 +194,5 @@ module.exports = {
   getMyMembership,
   removeMember,
   getCandidateRequests,
+  generateGroupDescription,
 };
