@@ -420,30 +420,36 @@ export default function GroupSettingsPage() {
     }));
   };
 
-  const onSaveGroup = async (e) => {
-    e.preventDefault();
+const onSaveGroup = async (e) => {
+  e.preventDefault();
+
+  const groupEnd = form.endDate ? new Date(form.endDate) : null;
+  const candEnd = form.candidateEndDate ? new Date(form.candidateEndDate) : null;
+
+  if (groupEnd && candEnd && candEnd > groupEnd) {
+    toast.error("תאריך סיום הגשת מועמדות לא יכול להיות אחרי תאריך סיום הקבוצה");
+    return; // מונע שליחת הבקשה לשרת
+  }
+
   const patch = {
-  name: form.name.trim(),
-  description: form.description.trim(),
-  symbol: (form.symbol || '').trim(),
-  maxWinners: Number(form.maxWinners) || 1,
-  isLocked: !!form.isLocked,
+    name: form.name.trim(),
+    description: form.description.trim(),
+    symbol: (form.symbol || '').trim(),
+    maxWinners: Number(form.maxWinners) || 1,
+    isLocked: !!form.isLocked,
+    ...(form.endDate ? { endDate: new Date(form.endDate).toISOString() } : {}),
+    ...(form.candidateEndDate ? { candidateEndDate: new Date(form.candidateEndDate).toISOString() } : {}),
+  };
 
-  ...(form.endDate
-    ? { endDate: new Date(form.endDate).toISOString() }
-    : {}),
-
-  ...(form.candidateEndDate
-    ? { candidateEndDate: new Date(form.candidateEndDate).toISOString() }
-    : {}),
+  await dispatch(updateGroup({ groupId, patch })).unwrap();
+  setEditMode(false);
+  if (patch.isLocked) dispatch(fetchJoinRequests(groupId));
+  dispatch(fetchGroupWithMembers(groupId));
+  dispatch(fetchVotersByGroup(groupId));
 };
 
-    await dispatch(updateGroup({ groupId, patch })).unwrap();
-    setEditMode(false);
-    if (patch.isLocked) dispatch(fetchJoinRequests(groupId));
-    dispatch(fetchGroupWithMembers(groupId));
-    dispatch(fetchVotersByGroup(groupId));
-  };
+
+
 
   const onCancelEdit = () => {
     setEditMode(false);
