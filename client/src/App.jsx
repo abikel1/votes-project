@@ -25,6 +25,7 @@ import ToastDemo from './components/a.jsx';
 import Footer from './components/Footer/Footer';
 import ContactPage from './pages/ContactForm/ContactForm.jsx';
 import ScrollToTop from './components/ScrollToTop.jsx';
+import CampaignPage from './pages/Campaign/CampaignPage';
 
 // 👇 ה־Guard
 import RequireAuth from './components/RequireAuth/RequireAuth.jsx';
@@ -119,6 +120,9 @@ export default function App() {
             path="/groups/:groupSlug/candidates"
             element={<VotingPage />}
           />
+
+          <Route path="/campaign/:candidateId" element={<CampaignPage />} />
+
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/tools/send-email" element={<SendEmailPage />} />
         </Route>

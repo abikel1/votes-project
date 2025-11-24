@@ -74,18 +74,19 @@ export default function CandidateApplyForm({ groupId, candidateRequests = [] }) 
           ✅ בקשת מועמדות שלך התקבלה
         </div>
       );
-    } else if (userRequest.status === 'rejected') {
-      return (
-        <div className="alert alert-warning">
-          ⚠️ בקשתך נדחתה – ניתן להגיש בקשה שוב
-        </div>
-      );
     }
+
   }
 
-  // אם אין בקשה או נדחתה, מציגים את הטופס
+
   return (
     <div className="auth-card register-card">
+ {userRequest?.status === 'rejected' && (
+      <div className="alert alert-warning">
+        ⚠️ בקשתך נדחתה – ניתן להגיש בקשה שוב
+      </div>
+    )}
+
       <div className="auth-header">
         <h1>הגש מועמדות</h1>
         <p>מלאי את הפרטים למועמדות לקבוצה</p>

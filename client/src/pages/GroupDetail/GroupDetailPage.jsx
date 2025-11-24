@@ -40,6 +40,8 @@ import {
 
 import http from '../../api/http';
 import CandidateApplyForm from '../../components/CandidateApplyForm'
+import { FiStar } from 'react-icons/fi'; // Feather Icons – כוכב
+
 // צבעים לגרפים
 const COLORS = [
   '#003366',
@@ -417,47 +419,40 @@ export default function GroupDetailPage() {
 
             {!loadingCandidates && candidates.length > 0 && (
               <div className="candidates-grid">
-                {sortedCandidates.map((c) => {
-                  const isWinner = winners.some((w) => w._id === c._id);
+              {sortedCandidates.map((c) => {
+  const isWinner = winners.some((w) => w._id === c._id);
 
-                  return (
-                    <div
-                      key={c._id}
-                      className={`candidate-card ${isWinner ? 'winner' : ''}`}
-                    >
+  return (
+    <div key={c._id} className={`candidate-card ${isWinner ? 'winner' : ''}`}>
+      
+      {c.photoUrl && (
+        <img
+          src={c.photoUrl}
+          alt={c.name || 'תמונת מועמד'}
+          className="candidate-avatar"
+        />
+      )}
+      <div className="candidate-text">
+        <h4>{c.name}</h4>
+        {c.description && <p>{c.description}</p>}
+      </div>
 
-                      {
-                        isGroupExpired && isWinner && (
+      {/* כפתור לדף קמפיין */}
+<button
+  className="campaign-btn"
+  onClick={() => navigate(`/campaign/${c._id}`)}
+  title="קמפיין שלי"
+>
+  <FiStar size={20} />
+</button>
 
-                          <div className="current-leader">
-                            {getWinnerLabel(winners.findIndex(w => w._id === c._id))}
-                          </div>
-                        )
-                      }
 
 
-                      <div className="candidate-header">
-                        {c.photoUrl && (
-                          <img
-                            src={c.photoUrl}
-                            alt={c.name || 'תמונת מועמד'}
-                            className="candidate-avatar"
-                          />
-                        )}
-                        <div className="candidate-text">
-                          <h4>{c.name}</h4>
-                          {c.description && <p>{c.description}</p>}
-                        </div>
-                      </div>
+      {isGroupExpired && <div className="votes-count">{c.votesCount || 0} קולות</div>}
+    </div>
+  );
+})}
 
-                      {
-                        isGroupExpired && (
-                          <div className="votes-count">{c.votesCount || 0} קולות</div>
-                        )
-                      }
-                    </div >
-                  );
-                })}
               </div >
             )}
 
@@ -488,7 +483,8 @@ export default function GroupDetailPage() {
               />
             </div>
           )}
-          {!isVotingPhase && (
+
+          {isVotingPhase && (
             <div className="group-details-card">
               <div className="group-info-grid">
                 <div className="info-card">

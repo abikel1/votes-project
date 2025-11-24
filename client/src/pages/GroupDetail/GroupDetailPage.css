@@ -1056,6 +1056,7 @@
   transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
+
 .chat-fab:hover {
   transform: scale(1.08);              /* גדילה קלה */
   box-shadow: 0 10px 26px rgba(15,23,42,0.35);
@@ -1079,3 +1080,22 @@
   display: flex;
   flex-direction: column;
 }
+.campaign-btn {
+  background: #ffffff;  
+  color: #003366;
+  border: none;
+  border-radius: 6px;
+  /* padding: 6px; */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  transition: all 0.2s ease;
+}
+
+.campaign-btn:hover {
+  /* background: #2563eb; */
+  transform: scale(1.1);

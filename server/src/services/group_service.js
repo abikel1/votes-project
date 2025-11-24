@@ -242,11 +242,45 @@ async function removeGroupMemberService(groupId, ownerId, { memberId, email }) {
 
 
 //=============================================================================
+// async function applyCandidateService(groupId, user, data) {
+//   const g = await Group.findById(groupId);
+//   if (!g) throw new Error('Group not found');
+
+//     const now = new Date();
+//   if (g.candidateEndDate && now > g.candidateEndDate) {
+//     throw new Error('Candidate submission period has ended');
+//   }
+
+//   // האם כבר חבר?
+//   const alreadyCandidate = await Candidate.findOne({
+//     groupId,
+//     userId: user._id
+//   }).lean();
+//   if (alreadyCandidate) throw new Error('Already a candidate');
+
+//   // האם כבר הגיש בקשה?
+//   const exists = g.candidateRequests?.find(r =>
+//     String(r.userId) === String(user._id) && r.status === 'pending'
+//   );
+//   if (exists) return g;
+
+//   g.candidateRequests.push({
+//     userId: user._id,
+//     email: (user.email || '').trim().toLowerCase(),
+//     name: data.name || user.name,
+//     description: data.description || '',
+//     status: 'pending'
+//   });
+
+//   await g.save();
+//   return g;
+// }
+
 async function applyCandidateService(groupId, user, data) {
   const g = await Group.findById(groupId);
   if (!g) throw new Error('Group not found');
 
-    const now = new Date();
+  const now = new Date();
   if (g.candidateEndDate && now > g.candidateEndDate) {
     throw new Error('Candidate submission period has ended');
   }
@@ -258,23 +292,35 @@ async function applyCandidateService(groupId, user, data) {
   }).lean();
   if (alreadyCandidate) throw new Error('Already a candidate');
 
-  // האם כבר הגיש בקשה?
-  const exists = g.candidateRequests?.find(r =>
-    String(r.userId) === String(user._id) && r.status === 'pending'
-  );
-  if (exists) return g;
+  // בדיקה אם כבר קיימת בקשה כלשהי של המשתמש
+  const existingRequests = g.candidateRequests.filter(r => String(r.userId) === String(user._id));
 
-  g.candidateRequests.push({
+  if (existingRequests.length) {
+    // עדכון כל הרשומות הקיימות ל-pending עם הפרטים החדשים
+    existingRequests.forEach(r => {
+      r.name = data.name || user.name;
+      r.description = data.description || '';
+      r.status = 'pending';
+    });
+    await g.save();
+    return existingRequests[0]; // מחזירים את הרשומה הראשונה (ניתן להתאים)
+  }
+
+  // אם אין בקשה בכלל – יוצרים חדשה
+  const newReq = {
     userId: user._id,
     email: (user.email || '').trim().toLowerCase(),
     name: data.name || user.name,
     description: data.description || '',
     status: 'pending'
-  });
-
+  };
+  g.candidateRequests.push(newReq);
   await g.save();
-  return g;
+
+  return newReq;
 }
+
+
 async function approveCandidateRequestService(groupId, ownerId, requestId) {
   const g = await Group.findById(groupId);
   if (!g) throw new Error('Group not found');
@@ -295,8 +341,8 @@ async function approveCandidateRequestService(groupId, ownerId, requestId) {
     groupId: groupId
   });
 
-  // מחיקה מהרשימה
-  req.deleteOne();
+  // // מחיקה מהרשימה
+  // req.deleteOne();
   await g.save();
 
   return candidate;
@@ -314,12 +360,13 @@ async function rejectCandidateRequestService(groupId, adminId, requestId) {
   const request = group.candidateRequests.id(requestId);
   if (!request) throw new Error("Request not found");
 
-  // מחיקה מהרשימה במקום שינוי סטטוס
-  request.deleteOne();
+  // עדכון סטטוס לדחוי במקום מחיקה
+  request.status = 'rejected';
   await group.save();
 
-  return { requestId, groupId };  // חובה להחזיר requestId כדי שה-Redux יסיר אותו
-};
+  return request; // מחזירים את הבקשה המעודכנת כדי שה-Redux יעדכן את הסטור
+}
+
 
 
 async function addCandidateByEmailService(groupId, ownerId, email, data = {}) {
