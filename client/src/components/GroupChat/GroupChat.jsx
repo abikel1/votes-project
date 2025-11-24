@@ -1,9 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
-import { FiMoreVertical, FiSmile, FiSend } from 'react-icons/fi'; // 👈 במקום FiChevronLeft
+import { FiMoreVertical, FiSmile, FiSend } from 'react-icons/fi';
 import http from '../../api/http';
 import EmojiPicker from 'emoji-picker-react';
 import './GroupChat.css';
-
 
 const AVATAR_COLORS = [
     '#4f46e5',
@@ -28,7 +27,7 @@ function getColorForUser(key) {
     return AVATAR_COLORS[index];
 }
 
-export default function GroupChat({ groupId, canChat, currentUserId }) {
+export default function GroupChat({ groupId, canChat, currentUserId, isOwner }) {
     const [messages, setMessages] = useState([]);
     const [text, setText] = useState('');
     const [loading, setLoading] = useState(false);
@@ -37,6 +36,9 @@ export default function GroupChat({ groupId, canChat, currentUserId }) {
     const [menuOpenFor, setMenuOpenFor] = useState(null);
     const [editingId, setEditingId] = useState(null);
     const messagesEndRef = useRef(null);
+
+    // האם המשתמש בתחתית הצ'אט כרגע
+    const [isAtBottom, setIsAtBottom] = useState(true);
 
     // סיכום שיחה
     const [summaryLoading, setSummaryLoading] = useState(false);
@@ -47,11 +49,12 @@ export default function GroupChat({ groupId, canChat, currentUserId }) {
     const [showEmojiPicker, setShowEmojiPicker] = useState(false);
     const inputRef = useRef(null);
 
+    // גלילה למטה רק אם המשתמש בתחתית
     useEffect(() => {
-        if (messagesEndRef.current) {
+        if (isAtBottom && messagesEndRef.current) {
             messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
         }
-    }, [messages]);
+    }, [messages, isAtBottom]);
 
     useEffect(() => {
         if (!groupId) return;
@@ -131,6 +134,8 @@ export default function GroupChat({ groupId, canChat, currentUserId }) {
             }
 
             setText('');
+            // אחרי שליחת הודעה בד"כ נמצאים בתחתית, נחזיר דגל
+            setIsAtBottom(true);
         } catch (err) {
             console.error('failed to send chat message', err);
             setError('שגיאה בשליחת ההודעה');
@@ -209,6 +214,7 @@ export default function GroupChat({ groupId, canChat, currentUserId }) {
                 setMessages(data.messages);
             }
 
+            // אחרי סיכום נרצה להגיע לסוף
             setTimeout(() => {
                 if (messagesEndRef.current) {
                     messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
@@ -267,7 +273,15 @@ export default function GroupChat({ groupId, canChat, currentUserId }) {
                     </div>
                 )}
 
-                <div className="group-chat-messages">
+                <div
+                    className="group-chat-messages"
+                    onScroll={(e) => {
+                        const el = e.target;
+                        const isBottom =
+                            el.scrollHeight - el.scrollTop - el.clientHeight < 50;
+                        setIsAtBottom(isBottom);
+                    }}
+                >
                     {messages.map((msg) => {
                         const id = msg._id || msg.id;
 
@@ -278,11 +292,15 @@ export default function GroupChat({ groupId, canChat, currentUserId }) {
                             msg.senderName === 'AI' ||
                             msg.senderName === 'בינה מלאכותית';
 
-                        const isMine =
+                        // האם זו הודעה של המשתמש הנוכחי (לא כולל AI)
+                        const isMineBase =
                             !isAi &&
                             currentUserId &&
                             (msg.userId === currentUserId ||
                                 String(msg.userId) === String(currentUserId));
+
+                        // האם מותר למשתמש לנהל את ההודעה (עריכה/מחיקה)
+                        const canManageMessage = isOwner || isMineBase;
 
                         const isDeleted = !!msg.deleted;
 
@@ -297,7 +315,10 @@ export default function GroupChat({ groupId, canChat, currentUserId }) {
                                 (msg.sender.avatar || msg.sender.avatarUrl)) ||
                             null;
 
-                        const textToShow = isDeleted ? 'הודעה נמחקה' : msg.text || '';
+                        const textToShow = isDeleted
+                            ? (msg.text || 'הודעה נמחקה')
+                            : (msg.text || '');
+
                         const initial = displayName ? displayName.trim().charAt(0) : '?';
 
                         const colorKey =
@@ -312,11 +333,11 @@ export default function GroupChat({ groupId, canChat, currentUserId }) {
                         return (
                             <div
                                 key={id}
-                                className={`group-chat-message-row ${isMine ? 'mine' : 'theirs'
+                                className={`group-chat-message-row ${isMineBase ? 'mine' : 'theirs'
                                     } ${isAi ? 'ai' : ''}`}
                             >
                                 <div
-                                    className={`group-chat-message ${isMine ? 'mine' : 'theirs'
+                                    className={`group-chat-message ${isMineBase ? 'mine' : 'theirs'
                                         } ${isDeleted ? 'deleted' : ''} ${isAi ? 'ai' : ''}`}
                                 >
                                     <div className="group-chat-message-header">
@@ -327,7 +348,7 @@ export default function GroupChat({ groupId, canChat, currentUserId }) {
                                                 {formatTime(msg.createdAt)}
                                             </span>
 
-                                            {isMine && !isDeleted && (
+                                            {canManageMessage && !isDeleted && (
                                                 <div className="group-chat-menu-wrapper">
                                                     <button
                                                         type="button"
@@ -344,12 +365,16 @@ export default function GroupChat({ groupId, canChat, currentUserId }) {
 
                                                     {menuOpenFor === id && (
                                                         <div className="group-chat-menu">
-                                                            <button
-                                                                type="button"
-                                                                onClick={() => handleStartEdit(msg)}
-                                                            >
-                                                                עריכה
-                                                            </button>
+                                                            {/* עריכה – רק על הודעה שלי ולא AI */}
+                                                            {!isAi && isMineBase && (
+                                                                <button
+                                                                    type="button"
+                                                                    onClick={() => handleStartEdit(msg)}
+                                                                >
+                                                                    עריכה
+                                                                </button>
+                                                            )}
+                                                            {/* מחיקה – גם שלי וגם של אחרים אם אני מנהל/ת */}
                                                             <button
                                                                 type="button"
                                                                 onClick={() => handleDelete(id)}
@@ -366,7 +391,7 @@ export default function GroupChat({ groupId, canChat, currentUserId }) {
                                     <div className="group-chat-text">{textToShow}</div>
                                 </div>
 
-                                {!isMine && (
+                                {!isMineBase && (
                                     <div className="group-chat-avatar">
                                         {isAi ? (
                                             <div className="group-chat-avatar-ai">AI</div>
