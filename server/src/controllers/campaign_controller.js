@@ -34,8 +34,21 @@ async function updateCampaign(req, res) {
   }
 }
 
+async function addPost(req, res) {
+  const { campaignId } = req.params;
+  const postData = req.body;
+
+  try {
+    const campaign = await campaignService.addPostToCampaign(campaignId, postData);
+    res.json(campaign);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+}
+
 module.exports = {
   getCampaign,
   createCampaign,
   updateCampaign,
+  addPost,
 };

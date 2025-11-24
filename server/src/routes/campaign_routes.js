@@ -18,4 +18,7 @@ router.post('/candidate/:candidateId', createCampaign);
 // עדכון קמפיין
 router.put('/:campaignId', updateCampaign);
 
+router.put('/:campaignId/posts', campaignController.addPost);
+
+
 module.exports = router;

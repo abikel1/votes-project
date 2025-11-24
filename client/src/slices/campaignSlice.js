@@ -6,7 +6,7 @@ export const fetchCampaign = createAsyncThunk(
   'campaign/fetchCampaign',
   async (candidateId, thunkAPI) => {
     try {
-      const { data } = await http.get(`/campaigns/candidate/${candidateId}`);
+      const { data } = await http.get(`/campaign/candidate/${candidateId}`);
       return data;
     } catch (err) {
       return thunkAPI.rejectWithValue(err.response?.data?.message || 'שגיאה');
