@@ -7,6 +7,7 @@ import toast from 'react-hot-toast';
 import { FiSettings, FiMessageSquare, FiX } from 'react-icons/fi';
 import { BiArrowBack } from 'react-icons/bi';
 
+import CountdownTimer from '../../components/CountdownTimer/CountdownTimer';
 import GroupChat from '../../components/GroupChat/GroupChat';
 
 import {
@@ -38,7 +39,7 @@ import {
 } from 'recharts';
 
 import http from '../../api/http';
-
+import CandidateApplyForm from '../../components/CandidateApplyForm'
 // צבעים לגרפים
 const COLORS = [
   '#003366',
@@ -50,7 +51,6 @@ const COLORS = [
   '#6366f1',
   '#84cc16',
 ];
-
 const makeSlug = (name = '') =>
   encodeURIComponent(
     String(name)
@@ -77,6 +77,8 @@ export default function GroupDetailPage() {
 
   const joinedIdsSet = useSelector(selectMyJoinedIds);
 
+  const [candidateRequests, setCandidateRequests] = useState([]);
+
   const getWinnerLabel = (index) => ` ${index + 1}`;
 
   const { userEmail: authEmail, userId: authId } = useSelector((s) => s.auth);
@@ -86,7 +88,6 @@ export default function GroupDetailPage() {
   const [isDragging, setIsDragging] = useState(false);
   const containerRef = useRef(null);
 
-  // צ'אט פתוח/סגור (חלון קטן בצד)
   const [isChatOpen, setIsChatOpen] = useState(false);
 
   // אם נכנסו עם /groups/:groupSlug בלי state – נטען id מהשרת לפי slug
@@ -108,7 +109,7 @@ export default function GroupDetailPage() {
     })();
   }, [navGroupId, groupSlug]);
 
-  // טוען נתוני קבוצה ומועמדים + הקבוצות שלי
+
   useEffect(() => {
     if (groupId) {
       dispatch(fetchGroupWithMembers(groupId));
@@ -139,6 +140,21 @@ export default function GroupDetailPage() {
     };
   }, [isDragging]);
 
+  useEffect(() => {
+    if (!groupId) return;
+
+    const fetchRequests = async () => {
+      try {
+        const res = await http.get(`/groups/${groupId}/requests`);
+        setCandidateRequests(res.data); // מערך בקשות הצטרפות
+      } catch (err) {
+        console.error('failed to fetch join requests', err);
+      }
+    };
+
+    fetchRequests();
+  }, [groupId]);
+
   if (groupError) {
     return (
       <div className="group-detail-error">
@@ -157,9 +173,40 @@ export default function GroupDetailPage() {
     return <div className="loading-wrap">טוען נתוני קבוצה…</div>;
   }
 
+  // if (groupLoading || !group) {
+  //   return <div className="loading-wrap">טוען נתוני קבוצה…</div>;
+  // }
+
+  const now = new Date();
+  let creationDate, candidateEndDate, endDate;
+
+  let isCandidatePhase = false;
+  let isVotingPhase = false;
+  let isGroupExpired = false;
+
+  if (group) {
+    creationDate = group.creationDate ? new Date(group.creationDate) : null;
+    candidateEndDate = group.candidateEndDate ? new Date(group.candidateEndDate) : null;
+    endDate = group.endDate ? new Date(group.endDate) : null;
+
+    if (creationDate && candidateEndDate) {
+      isCandidatePhase = now >= creationDate && now <= candidateEndDate;
+    }
+
+    if (candidateEndDate && endDate) {
+      isVotingPhase = now > candidateEndDate && now <= endDate;
+    }
+
+    if (endDate) {
+      isGroupExpired = now > endDate;
+    }
+  }
   if (groupLoading || !group) {
     return <div className="loading-wrap">טוען נתוני קבוצה…</div>;
   }
+
+  // עכשיו בטוח להשתמש ב-group._id
+
 
   // ---- חישובי הרשאות אחרי שיש group ----
   const gidStr = String(group._id);
@@ -191,9 +238,22 @@ export default function GroupDetailPage() {
   const isMember =
     !!joinedIdsSet && typeof joinedIdsSet.has === 'function' && joinedIdsSet.has(gidStr);
 
+
   const canChat = !isLocked || isOwner || isMember;
 
-  const isExpired = group?.endDate ? new Date(group.endDate) < new Date() : false;
+  // סוף יום ההצבעה – 23:59:59 של אותו יום
+  let endAt = group?.endDate ? new Date(group.endDate) : null;
+
+  if (endAt) {
+    endAt = new Date(
+      endAt.getFullYear(),
+      endAt.getMonth(),
+      endAt.getDate(),
+      23, 59, 59, 999
+    );
+  }
+
+  const isExpired = endAt ? endAt < new Date() : false;
 
   // 🔒 קבוצה נעולה + לא מחובר כלל
   if (isLocked && !isAuthed) {
@@ -277,16 +337,18 @@ export default function GroupDetailPage() {
   const pieData = candidates
     .filter((c) => c.votesCount > 0)
     .map((c) => ({ name: c.name, value: c.votesCount || 0 }));
-
-  const barData = sortedCandidates.map((c) => ({
-    name: c.name.length > 12 ? c.name.substring(0, 12) + '...' : c.name,
+  const barData = (sortedCandidates || []).map((c) => ({
+    name: c.name ? (c.name.length > 12 ? c.name.substring(0, 12) + '...' : c.name) : 'לא ידוע',
     votesCount: c.votesCount || 0,
   }));
+
+
 
   const winners = sortedCandidates.slice(0, group.maxWinners);
 
   return (
     <div className="page-wrap dashboard">
+
       <div className="page-header clean-header">
         {/* כותרת מרכזית */}
         <div className="header-title">
@@ -304,7 +366,7 @@ export default function GroupDetailPage() {
         <button className="icon-btn" onClick={() => navigate('/groups')} title="חזרה לקבוצות">
           <BiArrowBack size={20} />
         </button>
-      </div>
+      </div >
 
       <div className="meta-and-button">
         <div className="group-meta">
@@ -322,7 +384,7 @@ export default function GroupDetailPage() {
           </div>
         </div>
 
-        {!isExpired && (
+        {isVotingPhase && (
           <button
             className="vote-btn"
             onClick={() => {
@@ -340,6 +402,8 @@ export default function GroupDetailPage() {
           </button>
         )}
       </div>
+
+
 
       {errorCandidates && <p className="err">❌ שגיאה: {errorCandidates}</p>}
 
@@ -361,11 +425,16 @@ export default function GroupDetailPage() {
                       key={c._id}
                       className={`candidate-card ${isWinner ? 'winner' : ''}`}
                     >
-                      {isExpired && isWinner && (
-                        <div className="current-leader">
-                          {getWinnerLabel(winners.findIndex(w => w._id === c._id))}
-                        </div>
-                      )}
+
+                      {
+                        isGroupExpired && isWinner && (
+
+                          <div className="current-leader">
+                            {getWinnerLabel(winners.findIndex(w => w._id === c._id))}
+                          </div>
+                        )
+                      }
+
 
                       <div className="candidate-header">
                         {c.photoUrl && (
@@ -381,48 +450,54 @@ export default function GroupDetailPage() {
                         </div>
                       </div>
 
-                      {isExpired && (
-                        <div className="votes-count">{c.votesCount || 0} קולות</div>
-                      )}
-                    </div>
+                      {
+                        isGroupExpired && (
+                          <div className="votes-count">{c.votesCount || 0} קולות</div>
+                        )
+                      }
+                    </div >
                   );
                 })}
-              </div>
+              </div >
             )}
 
             {!loadingCandidates && candidates.length === 0 && <p>אין מועמדים</p>}
-          </div>
-        </div>
+          </div >
+        </div >
 
         {/* פס גרירה */}
-        <div
+        < div
           className="resize-handle"
           onMouseDown={() => setIsDragging(true)}
         >
           <div className="resize-line" />
-        </div>
+        </div >
 
         {/* צד ימין – מידע / גרפים */}
-        <div
+        < div
           className="right-section"
           style={{ width: `${100 - leftWidth}%` }}
         >
-          {!isExpired && (
+
+
+          {isCandidatePhase && (
+            <div className="candidate-form-card">
+              <CandidateApplyForm
+                groupId={group._id}
+                candidateRequests={candidateRequests} // <-- עכשיו באמת שולח את הבקשות
+              />
+            </div>
+          )}
+          {!isVotingPhase && (
             <div className="group-details-card">
               <div className="group-info-grid">
                 <div className="info-card">
                   <HiClock size={28} color="#1e3a8a" />
                   <p>זמן עד סיום</p>
-                  <h4>
-                    {Math.max(
-                      Math.floor(
-                        (new Date(group.endDate) - new Date()) / (1000 * 60 * 60 * 24),
-                      ),
-                      0,
-                    )}{' '}
-                    ימים
-                  </h4>
+                  <CountdownTimer endDate={group.endDate} />
                 </div>
+
+
                 <div className="info-card">
                   <HiUserGroup size={28} color="#1e3a8a" />
                   <p>סך הצבעות</p>
@@ -442,7 +517,7 @@ export default function GroupDetailPage() {
             </div>
           )}
 
-          {isExpired && totalVotes > 0 && (
+          {isGroupExpired && totalVotes > 0 && (
             <div className="charts">
               <div className="pie-chart-container">
                 <h3>אחוזי הצבעה</h3>
@@ -489,11 +564,11 @@ export default function GroupDetailPage() {
             </div>
           )}
 
-          {isExpired && totalVotes === 0 && (
+          {isGroupExpired && totalVotes === 0 && (
             <div className="no-votes-message">🕐 אין הצבעות — לא ניתן להציג גרפים</div>
           )}
         </div>
-      </div>
+      </div >
 
       {/* כפתור צ'אט צף בצד ימין למטה */}
       <>
@@ -508,17 +583,16 @@ export default function GroupDetailPage() {
         {isChatOpen && (
           <div className="chat-panel">
             <div className="chat-panel-header"></div>
-
-
-            <GroupChat
-              groupId={groupId}
-              canChat={canChat}     // כאן עדיין אפשר להשתמש בהרשאות
-              currentUserId={myId}
-            />
-          </div>
-        )}
+              <GroupChat
+                groupId={groupId}
+                canChat={canChat}     // כאן עדיין אפשר להשתמש בהרשאות
+                currentUserId={myId}
+              />
+            </div>
+          )
+        }
       </>
 
-    </div>
+    </div >
   );
 }
