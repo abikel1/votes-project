@@ -1045,3 +1045,23 @@
   justify-content: center;
 }
 
+.campaign-btn {
+  background: #ffffff;  
+  color: #003366;
+  border: none;
+  border-radius: 6px;
+  /* padding: 6px; */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  transition: all 0.2s ease;
+}
+
+.campaign-btn:hover {
+  /* background: #2563eb; */
+  transform: scale(1.1);
+}
