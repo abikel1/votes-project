@@ -1,3 +1,4 @@
+// server/src/routes/group_routes.js
 const express = require('express');
 const router = express.Router();
 
@@ -8,6 +9,14 @@ const {
   getGroupMembers, getUserGroups, getMyJoinStatuses, getMyMembership,
   removeMember,getCandidateRequests,
 } = require('../controllers/group_controller');
+
+const {
+  getGroupChat,
+  sendChatMessage,
+  deleteChatMessage,
+  updateChatMessage,   // ✅ חדש – עריכת הודעת צ׳אט
+} = require('../controllers/chat_controller');
+
 const handleGroupDependencies = require('../middlewares/group_middleware');
 
 const Group = require('../models/group_model');
@@ -27,10 +36,10 @@ function makeSlug(name = '') {
   return String(name)
     .trim()
     .toLowerCase()
-    .replace(/\s+/g, '-');   // רווחים → מקפים
+    .replace(/\s+/g, '-');
 }
 
-// קבלת קבוצה לפי slug (שם בקישור) – למשל /api/groups/slug/אילה-סגורה
+// קבלת קבוצה לפי slug
 router.get('/slug/:slug', async (req, res) => {
   try {
     const rawSlug = req.params.slug || '';
@@ -40,7 +49,6 @@ router.get('/slug/:slug', async (req, res) => {
       return res.status(400).json({ message: 'Missing slug' });
     }
 
-    // אותה פונקציית slug כמו בצד הקליינט
     const makeSlug = (name = '') =>
       String(name)
         .trim()
@@ -49,12 +57,10 @@ router.get('/slug/:slug', async (req, res) => {
 
     let group = null;
 
-    // אם מה שהגיע "נראה כמו" ObjectId – תנסי קודם לפי id (תאימות לאחור)
     if (/^[0-9a-fA-F]{24}$/.test(slug)) {
       group = await Group.findById(slug);
     }
 
-    // אם לא נמצא לפי id – מחפשים לפי שם -> slug
     if (!group) {
       const all = await Group.find().lean();
       group = all.find((g) => makeSlug(g.name) === slug) || null;
@@ -71,7 +77,6 @@ router.get('/slug/:slug', async (req, res) => {
   }
 });
 
-
 router.get('/:id', getGroupById);
 router.get('/:id/members', getGroupMembers);
 router.get('/', getAllGroups);
@@ -80,5 +85,11 @@ router.post('/:id/join', auth, requestJoinGroup);
 router.get('/:id/requests', auth, listJoinRequests);
 router.patch('/:id/requests/:reqId/approve', auth, approveJoinRequest);
 router.patch('/:id/requests/:reqId/reject', auth, rejectJoinRequest);
+
+// צ'אט קבוצה
+router.get('/:id/chat', auth, getGroupChat);
+router.post('/:id/chat', auth, sendChatMessage);
+router.patch('/:id/chat/:msgId', auth, updateChatMessage);  // עריכת הודעה
+router.delete('/:id/chat/:msgId', auth, deleteChatMessage);
 
 module.exports = router;

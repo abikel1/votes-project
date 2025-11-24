@@ -4,8 +4,12 @@ import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { HiClock, HiUserGroup, HiUser, HiOutlineBadgeCheck } from 'react-icons/hi';
 import toast from 'react-hot-toast';
-import { FiSettings } from 'react-icons/fi';
-import { BiArrowBack } from 'react-icons/bi'
+import { FiSettings, FiMessageSquare, FiX } from 'react-icons/fi';
+import { BiArrowBack } from 'react-icons/bi';
+
+import CountdownTimer from '../../components/CountdownTimer/CountdownTimer';
+import GroupChat from '../../components/GroupChat/GroupChat';
+
 import {
   fetchMyGroups,
   fetchGroupWithMembers,
@@ -73,21 +77,18 @@ export default function GroupDetailPage() {
 
   const joinedIdsSet = useSelector(selectMyJoinedIds);
 
-const [candidateRequests, setCandidateRequests] = useState([]);
-
+  const [candidateRequests, setCandidateRequests] = useState([]);
 
   const getWinnerLabel = (index) => ` ${index + 1}`;
 
   const { userEmail: authEmail, userId: authId } = useSelector((s) => s.auth);
   const isAuthed = !!authId || !!authEmail || !!localStorage.getItem('authToken');
-  const iconColor = "#1e3a8a"; // צבע אחיד לכל האייקונים
-
-  const myJoinedIdsSet = useSelector(selectMyJoinedIds);
 
   const [leftWidth, setLeftWidth] = useState(35);
   const [isDragging, setIsDragging] = useState(false);
   const containerRef = useRef(null);
 
+  const [isChatOpen, setIsChatOpen] = useState(false);
 
   // אם נכנסו עם /groups/:groupSlug בלי state – נטען id מהשרת לפי slug
   useEffect(() => {
@@ -108,28 +109,7 @@ const [candidateRequests, setCandidateRequests] = useState([]);
     })();
   }, [navGroupId, groupSlug]);
 
-  // <<<<<<< HEAD
-  //   // טוען נתוני קבוצה ומועמדים
-  // =======
-  //   const { selectedGroup: group, loading: groupLoading } = useSelector(s => s.groups);
 
-  //   const candidates = useSelector(selectCandidatesForGroup(groupId || '')) || [];
-  //   const loadingCandidates = useSelector(selectCandidatesLoadingForGroup(groupId || ''));
-  //   const errorCandidates = useSelector(selectCandidatesErrorForGroup(groupId || ''));
-  // const getWinnerLabel = (index) => ` ${index + 1}`;
-
-  //   const { userEmail: authEmail, userId: authId } = useSelector((s) => s.auth);
-  //   const isAuthed = !!authId || !!authEmail || !!localStorage.getItem('authToken');
-  //   const iconColor = "#1e3a8a"; // צבע אחיד לכל האייקונים
-
-  //   const myJoinedIdsSet = useSelector(selectMyJoinedIds);
-
-  //   const [leftWidth, setLeftWidth] = useState(35);
-  //   const [isDragging, setIsDragging] = useState(false);
-  //   const containerRef = useRef(null);
-
-  //   // טוען נתונים
-  // >>>>>>> fd09d35ac375e1d72d983305dcc67a256b38f216
   useEffect(() => {
     if (groupId) {
       dispatch(fetchGroupWithMembers(groupId));
@@ -161,19 +141,19 @@ const [candidateRequests, setCandidateRequests] = useState([]);
   }, [isDragging]);
 
   useEffect(() => {
-  if (!groupId) return;
+    if (!groupId) return;
 
-  const fetchRequests = async () => {
-    try {
-      const res = await http.get(`/groups/${groupId}/requests`);
-      setCandidateRequests(res.data); // מערך בקשות הצטרפות
-    } catch (err) {
-      console.error('failed to fetch join requests', err);
-    }
-  };
+    const fetchRequests = async () => {
+      try {
+        const res = await http.get(`/groups/${groupId}/requests`);
+        setCandidateRequests(res.data); // מערך בקשות הצטרפות
+      } catch (err) {
+        console.error('failed to fetch join requests', err);
+      }
+    };
 
-  fetchRequests();
-}, [groupId]);
+    fetchRequests();
+  }, [groupId]);
 
   if (groupError) {
     return (
@@ -258,7 +238,22 @@ const [candidateRequests, setCandidateRequests] = useState([]);
   const isMember =
     !!joinedIdsSet && typeof joinedIdsSet.has === 'function' && joinedIdsSet.has(gidStr);
 
-  // const isExpired = group?.endDate ? new Date(group.endDate) < new Date() : false;
+
+  const canChat = !isLocked || isOwner || isMember;
+
+  // סוף יום ההצבעה – 23:59:59 של אותו יום
+  let endAt = group?.endDate ? new Date(group.endDate) : null;
+
+  if (endAt) {
+    endAt = new Date(
+      endAt.getFullYear(),
+      endAt.getMonth(),
+      endAt.getDate(),
+      23, 59, 59, 999
+    );
+  }
+
+  const isExpired = endAt ? endAt < new Date() : false;
 
   // 🔒 קבוצה נעולה + לא מחובר כלל
   if (isLocked && !isAuthed) {
@@ -350,18 +345,11 @@ const [candidateRequests, setCandidateRequests] = useState([]);
 
 
   const winners = sortedCandidates.slice(0, group.maxWinners);
-  const maxVotes = Math.max(...candidates.map((c) => c.votesCount || 0));
 
   return (
     <div className="page-wrap dashboard">
 
-
-
-
-
       <div className="page-header clean-header">
-
-
         {/* כותרת מרכזית */}
         <div className="header-title">
           <h2>{group.name}</h2>
@@ -378,9 +366,7 @@ const [candidateRequests, setCandidateRequests] = useState([]);
         <button className="icon-btn" onClick={() => navigate('/groups')} title="חזרה לקבוצות">
           <BiArrowBack size={20} />
         </button>
-
-
-      </div>
+      </div >
 
       <div className="meta-and-button">
         <div className="group-meta">
@@ -440,12 +426,14 @@ const [candidateRequests, setCandidateRequests] = useState([]);
                       className={`candidate-card ${isWinner ? 'winner' : ''}`}
                     >
 
-                      {isGroupExpired && isWinner && (
-                        <div className="current-leader">
-                          {getWinnerLabel(winners.findIndex(w => w._id === c._id))}
-                        </div>
-                      )}
+                      {
+                        isGroupExpired && isWinner && (
 
+                          <div className="current-leader">
+                            {getWinnerLabel(winners.findIndex(w => w._id === c._id))}
+                          </div>
+                        )
+                      }
 
 
                       <div className="candidate-header">
@@ -462,61 +450,54 @@ const [candidateRequests, setCandidateRequests] = useState([]);
                         </div>
                       </div>
 
-                      {isGroupExpired && (
-                        <div className="votes-count">{c.votesCount || 0} קולות</div>
-                      )}
-                    </div>
+                      {
+                        isGroupExpired && (
+                          <div className="votes-count">{c.votesCount || 0} קולות</div>
+                        )
+                      }
+                    </div >
                   );
                 })}
-              </div>
+              </div >
             )}
 
             {!loadingCandidates && candidates.length === 0 && <p>אין מועמדים</p>}
-          </div>
-        </div>
+          </div >
+        </div >
 
         {/* פס גרירה */}
-        <div
+        < div
           className="resize-handle"
           onMouseDown={() => setIsDragging(true)}
         >
           <div className="resize-line" />
-        </div>
+        </div >
 
         {/* צד ימין – מידע / גרפים */}
-        <div
+        < div
           className="right-section"
           style={{ width: `${100 - leftWidth}%` }}
         >
 
-       {isCandidatePhase && (
-  <div className="candidate-form-card">
-    <CandidateApplyForm 
-      groupId={group._id} 
-      candidateRequests={candidateRequests} // <-- עכשיו באמת שולח את הבקשות
-    />
-  </div>
-)}
 
-
-          {isVotingPhase && (
+          {isCandidatePhase && (
+            <div className="candidate-form-card">
+              <CandidateApplyForm
+                groupId={group._id}
+                candidateRequests={candidateRequests} // <-- עכשיו באמת שולח את הבקשות
+              />
+            </div>
+          )}
+          {!isVotingPhase && (
             <div className="group-details-card">
-
-
               <div className="group-info-grid">
                 <div className="info-card">
                   <HiClock size={28} color="#1e3a8a" />
                   <p>זמן עד סיום</p>
-                  <h4>
-                    {Math.max(
-                      Math.floor(
-                        (new Date(group.endDate) - new Date()) / (1000 * 60 * 60 * 24),
-                      ),
-                      0,
-                    )}{' '}
-                    ימים
-                  </h4>
+                  <CountdownTimer endDate={group.endDate} />
                 </div>
+
+
                 <div className="info-card">
                   <HiUserGroup size={28} color="#1e3a8a" />
                   <p>סך הצבעות</p>
@@ -587,7 +568,42 @@ const [candidateRequests, setCandidateRequests] = useState([]);
             <div className="no-votes-message">🕐 אין הצבעות — לא ניתן להציג גרפים</div>
           )}
         </div>
-      </div>
-    </div>
+      </div >
+
+      {/* כפתור צ'אט צף בצד ימין למטה */}
+      <>
+        <button
+          type="button"
+          className="chat-fab"
+          onClick={() => setIsChatOpen(prev => !prev)}
+        >
+          {isChatOpen ? <FiX size={20} /> : <FiMessageSquare size={20} />}
+        </button>
+
+        {
+          isChatOpen && (
+            <div className="chat-panel">
+              <div className="chat-panel-header">
+                <span>צ'אט הקבוצה</span>
+                <button
+                  type="button"
+                  className="chat-panel-close"
+                  onClick={() => setIsChatOpen(false)}
+                >
+                  <FiX size={16} />
+                </button>
+              </div>
+
+              <GroupChat
+                groupId={groupId}
+                canChat={canChat}     // כאן עדיין אפשר להשתמש בהרשאות
+                currentUserId={myId}
+              />
+            </div>
+          )
+        }
+      </>
+
+    </div >
   );
 }
