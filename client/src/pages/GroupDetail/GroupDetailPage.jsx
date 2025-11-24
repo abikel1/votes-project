@@ -579,18 +579,18 @@ export default function GroupDetailPage() {
         >
           {isChatOpen ? <FiX size={20} /> : <FiMessageSquare size={20} />}
         </button>
-
         {isChatOpen && (
           <div className="chat-panel">
             <div className="chat-panel-header"></div>
-              <GroupChat
-                groupId={groupId}
-                canChat={canChat}     // כאן עדיין אפשר להשתמש בהרשאות
-                currentUserId={myId}
-              />
-            </div>
-          )
-        }
+            <GroupChat
+              groupId={groupId}
+              canChat={canChat}
+              currentUserId={myId}
+              isOwner={isOwner}   // <-- חדש: מעבירים האם המשתמש מנהל הקבוצה
+            />
+          </div>
+        )}
+
       </>
 
     </div >

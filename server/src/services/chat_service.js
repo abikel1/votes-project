@@ -41,7 +41,8 @@ async function deleteChatMessageService(groupId, messageId, user) {
     const msg = await ChatMessage.findOne({ _id: messageId, groupId });
     if (!msg) throw new Error('Message not found');
 
-    const isOwner = group.createdById && String(group.createdById) === String(user._id);
+    const isOwner =
+        group.createdById && String(group.createdById) === String(user._id);
     const isSender = String(msg.userId) === String(user._id);
 
     if (!isOwner && !isSender) {
@@ -50,13 +51,19 @@ async function deleteChatMessageService(groupId, messageId, user) {
         throw err;
     }
 
+    const deletedByOwner = isOwner && !isSender;
+
     msg.deleted = true;
-    msg.text = 'הודעה נמחקה';
+    msg.text = deletedByOwner
+        ? 'ההודעה נמחקה על ידי המנהל'
+        : 'הודעה נמחקה';
+
     await msg.save();
 
     const messages = await ChatMessage.find({ groupId })
         .sort({ createdAt: 1 })
         .lean();
+
     return messages;
 }
 
