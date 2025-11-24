@@ -576,20 +576,9 @@ export default function GroupDetailPage() {
           {isChatOpen ? <FiX size={20} /> : <FiMessageSquare size={20} />}
         </button>
 
-        {
-          isChatOpen && (
-            <div className="chat-panel">
-              <div className="chat-panel-header">
-                <span>צ'אט הקבוצה</span>
-                <button
-                  type="button"
-                  className="chat-panel-close"
-                  onClick={() => setIsChatOpen(false)}
-                >
-                  <FiX size={16} />
-                </button>
-              </div>
-
+        {isChatOpen && (
+          <div className="chat-panel">
+            <div className="chat-panel-header"></div>
               <GroupChat
                 groupId={groupId}
                 canChat={canChat}     // כאן עדיין אפשר להשתמש בהרשאות

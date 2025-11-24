@@ -1036,15 +1036,50 @@
   font-weight: 600;
 }
 
-.chat-panel-close {
+.chat-fab {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  width: 48px;
+  height: 48px;
+  border-radius: 999px;
   border: none;
-  background: transparent;
-  cursor: pointer;
+  background-color: #1e3a8a;
+  color: #ffffff;
   display: flex;
   align-items: center;
   justify-content: center;
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.25);
+  cursor: pointer;
+  z-index: 1000;
+  /* אנימציה חלקה על גודל וצל */
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
+
+.chat-fab:hover {
+  transform: scale(1.08);              /* גדילה קלה */
+  box-shadow: 0 10px 26px rgba(15,23,42,0.35);
+}
+
+.chat-fab:active {
+  transform: scale(0.96);              /* קליק – טיפה מצטמצם */
+}
+
+.chat-panel {
+  position: fixed;
+  bottom: 110px;     /* היה 88px – עכשיו גבוה יותר */
+  right: 24px;
+  width: 380px;
+  max-height: 70vh;
+  background-color: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.3);
+  padding: 0.75rem;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+}
 .campaign-btn {
   background: #ffffff;  
   color: #003366;
@@ -1064,4 +1099,3 @@
 .campaign-btn:hover {
   /* background: #2563eb; */
   transform: scale(1.1);
-}
