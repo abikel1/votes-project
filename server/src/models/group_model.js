@@ -1,5 +1,7 @@
 const mongoose = require('mongoose');
 
+
+
 // סכמת בקשת הצטרפות
 const joinRequestSchema = new mongoose.Schema({
   userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
@@ -15,6 +17,7 @@ const groupSchema = new mongoose.Schema({
   createdBy: { type: String, required: true }, // אימייל היוצר
   createdById: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   creationDate: { type: Date, default: Date.now },
+  candidateEndDate: { type: Date, required: true },
   endDate: { type: Date, required: true },
   candidates: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Candidate' }],
   maxWinners: { type: Number, default: 1 },
@@ -26,6 +29,17 @@ const groupSchema = new mongoose.Schema({
   isLocked: { type: Boolean, default: false },
   members: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
   joinRequests: [joinRequestSchema],
+
+
+
+  candidateRequests: [{
+    userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+    email: String,
+    name: String,
+    description: String,
+    status: { type: String, default: 'pending' }, // pending / approved / rejected
+  }]
+
 });
 
 module.exports = mongoose.model('Group', groupSchema);

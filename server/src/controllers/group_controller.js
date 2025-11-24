@@ -11,6 +11,7 @@ const {
   getMyJoinStatusesService,
   isMemberOfGroupService,
   removeGroupMemberService,
+  getCandidateRequestsService ,
 } = require('../services/group_service');
 const Group = require('../models/group_model');
 
@@ -27,7 +28,7 @@ async function updateGroup(req, res) {
     const group = await updateGroupService(req.params.id, req.body);
     if (!group) return res.status(404).json({ message: 'Group not found' });
     res.json(group);
-  } catch (err) { res.status(500).json({ message: 'Error updating group', error: err.message }); }
+  } catch (err) { res.status(500).json({ message: 'שגיאה בעדכון הקבוצה', error: err.message }); }
 }
 
 async function deleteGroup(req, res) {
@@ -40,7 +41,6 @@ async function deleteGroup(req, res) {
     }
 
     await deleteGroupService(req.params.id);
-    // אפשר בעתיד להוסיף ניקוי ישויות תלויות במידלוואר.
     res.json({ ok: true, message: 'Group deleted successfully', deletedId: String(req.params.id) });
   } catch (err) {
     res.status(500).json({ message: 'Error deleting group', error: err.message });
@@ -151,6 +151,16 @@ async function removeMember(req, res) {
   }
 }
 
+async function getCandidateRequests(req, res) {
+  try {
+    const requests = await getCandidateRequestsService(req.params.groupId);
+    res.json(requests);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+}
+
+
 module.exports = {
   createGroup,
   updateGroup,
@@ -166,4 +176,5 @@ module.exports = {
   getMyJoinStatuses,
   getMyMembership,
   removeMember,
+  getCandidateRequests,
 };

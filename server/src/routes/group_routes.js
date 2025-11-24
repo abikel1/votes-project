@@ -7,7 +7,7 @@ const {
   createGroup, updateGroup, deleteGroup, getGroupById, getAllGroups,
   requestJoinGroup, listJoinRequests, approveJoinRequest, rejectJoinRequest,
   getGroupMembers, getUserGroups, getMyJoinStatuses, getMyMembership,
-  removeMember,
+  removeMember,getCandidateRequests,
 } = require('../controllers/group_controller');
 
 const {
@@ -24,6 +24,7 @@ const Group = require('../models/group_model');
 router.post('/create', auth, createGroup);
 router.put('/:id', auth, updateGroup);
 router.delete('/:id', auth, handleGroupDependencies, deleteGroup);
+router.get('/:groupId/requests', auth, getCandidateRequests);
 
 router.get('/my', auth, getUserGroups);
 router.get('/my-join-status', auth, getMyJoinStatuses);

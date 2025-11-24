@@ -55,15 +55,87 @@ export const deleteCandidate = createAsyncThunk(
   }
 );
 
+export const applyCandidate = createAsyncThunk(
+  'candidates/apply',
+  async ({ groupId, name, description, symbol, photoUrl }, { rejectWithValue }) => {
+    try {
+      const { data } = await http.post
+        (`/candidates/${groupId}/applyCandidate`, {
+          name, description, symbol, photoUrl
+        });
+      return { groupId, candidate: data };
+    } catch (err) {
+      return rejectWithValue(err?.response?.data?.message || 'Failed to apply candidate');
+    }
+  }
+);
+
+
+// אישור בקשת מועמד
+export const approveCandidateRequest = createAsyncThunk(
+  'candidates/approveCandidateRequest',
+  async ({ groupId, requestId }, { rejectWithValue }) => {
+    try {
+      const { data } = await http.post(
+        `/candidates/${groupId}/approveCandidates/${requestId}`
+      );
+
+      return {
+        requestId: data.requestId,
+        groupId: data.groupId,
+        candidate: data.candidate
+      };
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.message || err.message);
+    }
+  }
+);
+
+
+// דחיית בקשת מועמד
+export const rejectCandidateRequest = createAsyncThunk(
+  'candidates/rejectCandidateRequest',
+  async ({ groupId, requestId }, { rejectWithValue }) => {
+    try {
+      const { data } = await http.post(
+        `/candidates/${groupId}/rejectCandidates/${requestId}`
+      );
+
+      return {
+        requestId: data.requestId,
+        groupId: data.groupId
+      };
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.message || err.message);
+    }
+  }
+);
+
+// src/slices/candidateSlice.js
+export const fetchCandidateRequestsByGroup = createAsyncThunk(
+  'candidates/fetchRequestsByGroup',
+  async (groupId, { rejectWithValue }) => {
+    try {
+      const { data } = await http.get(`/groups/${groupId}/requests`);
+      return { groupId, requests: data };
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.message || err.message);
+    }
+  }
+);
+
 const candidateSlice = createSlice({
   name: 'candidates',
   initialState: {
     listByGroup: {},       // { [groupId]: Candidate[] }
     loadingByGroup: {},    // { [groupId]: boolean }
-    errorByGroup: {},      // { [groupId]: string|null }
+    errorByGroup: {},
+    candidateRequestsByGroup: {}, // { [groupId]: [] }
+    // { [groupId]: string|null }
     creating: false,
     createError: null,
-
+    applying: false,
+    applyError: null,
     updatingById: {},      // { [candidateId]: boolean }
     updateErrorById: {},   // { [candidateId]: string|null }
   },
@@ -149,6 +221,56 @@ const candidateSlice = createSlice({
         // נקה שגיאות/סטטוסים ישנים
         delete s.updatingById[candidateId];
         delete s.updateErrorById[candidateId];
+      })
+      .addCase(applyCandidate.pending, (state, action) => {
+        state.applying = true;
+        state.applyError = null;
+      })
+      .addCase(applyCandidate.fulfilled, (state, action) => {
+        state.applying = false;
+        const { groupId, candidate } = action.payload;
+        if (!Array.isArray(state.listByGroup[groupId])) state.listByGroup[groupId] = [];
+        state.listByGroup[groupId].unshift(candidate); // מוסיף את המועמד לראש הרשימה
+      })
+      .addCase(applyCandidate.rejected, (state, action) => {
+        state.applying = false;
+        state.applyError = action.payload;
+      })
+    .addCase(fetchCandidateRequestsByGroup.fulfilled, (state, action) => {
+      const { groupId, requests } = action.payload;
+      state.candidateRequestsByGroup[groupId] = requests;
+    })
+      .addCase(approveCandidateRequest.pending, (state) => {
+        state.loadingRequests = true;
+        state.requestsError = null;
+      })
+       .addCase(approveCandidateRequest.fulfilled, (state, action) => {
+      const { requestId, groupId, candidate } = action.payload;
+      // להסיר את הבקשה
+      state.candidateRequestsByGroup[groupId] =
+        state.candidateRequestsByGroup[groupId]?.filter(r => r._id !== requestId) || [];
+      // להוסיף את המועמד המאושר לרשימת המועמדים
+      if (!Array.isArray(state.listByGroup[groupId])) state.listByGroup[groupId] = [];
+      state.listByGroup[groupId].push(candidate);
+    })
+      .addCase(approveCandidateRequest.rejected, (state, action) => {
+        state.loadingRequests = false;
+        state.requestsError = action.payload;
+      })
+
+      // דחיית בקשה
+      .addCase(rejectCandidateRequest.pending, (state) => {
+        state.loadingRequests = true;
+        state.requestsError = null;
+      })
+       .addCase(rejectCandidateRequest.fulfilled, (state, action) => {
+      const { requestId, groupId } = action.payload;
+      state.candidateRequestsByGroup[groupId] =
+        state.candidateRequestsByGroup[groupId]?.filter(r => r._id !== requestId) || [];
+    })
+      .addCase(rejectCandidateRequest.rejected, (state, action) => {
+        state.loadingRequests = false;
+        state.requestsError = action.payload;
       });
   },
 });
@@ -168,3 +290,9 @@ export const selectCandidateUpdating = (candidateId) => (state) =>
   !!state.candidates.updatingById[candidateId];
 export const selectCandidateUpdateError = (candidateId) => (state) =>
   state.candidates.updateErrorById[candidateId] || null;
+// selectors
+export const selectApplyingCandidate = (state) => state.candidates.applying;
+export const selectApplyCandidateError = (state) => state.candidates.applyError;
+
+export const selectCandidateRequestsForGroup = (state, groupId) =>
+  state.candidates.candidateRequestsByGroup[groupId] || [];

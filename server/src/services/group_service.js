@@ -1,6 +1,8 @@
 // server/src/services/group_service.js
 const mongoose = require('mongoose');
 const Group = require('../models/group_model');
+const Candidate = require('../models/candidate_model');
+const User = require('../models/user_model');
 
 function toBoolStrict(v) {
   if (typeof v === 'boolean') return v;
@@ -14,8 +16,18 @@ function toBoolStrict(v) {
 
 async function createGroupService(data, user) {
   if (!user || !user.email) throw new Error('Missing user.email');
+
   const parsedIsLocked = toBoolStrict(data.isLocked);
-  if (parsedIsLocked === null) { const err = new Error('MISSING_IS_LOCKED'); err.code = 'MISSING_IS_LOCKED'; throw err; }
+  if (parsedIsLocked === null) {
+    const err = new Error('MISSING_IS_LOCKED');
+    err.code = 'MISSING_IS_LOCKED';
+    throw err;
+  }
+
+  // בדיקה: תאריך סיום הגשת מועמדות לא יכול להיות אחרי תאריך הסיום של הקבוצה
+  if (new Date(data.candidateEndDate) > new Date(data.endDate)) {
+    throw new Error('Candidate end date cannot be after group end date');
+  }
 
   const group = await Group.create({
     name: data.name,
@@ -23,20 +35,34 @@ async function createGroupService(data, user) {
     createdBy: (user.email || '').trim().toLowerCase(),
     createdById: user._id,
     endDate: data.endDate,
+    candidateEndDate: data.candidateEndDate, // <-- חדש
     maxWinners: data.maxWinners ?? 1,
     shareLink: data.shareLink || undefined,
     isLocked: parsedIsLocked,
   });
+
   return group;
 }
 
+
 async function updateGroupService(groupId, updateData) {
+  console.log("BODY UPDATE:", updateData);
+
   if (updateData && Object.prototype.hasOwnProperty.call(updateData, 'isLocked')) {
     const v = toBoolStrict(updateData.isLocked);
     if (v !== null) updateData.isLocked = v;
   }
+
+  // אם מגיע candidateEndDate לבדוק שזה לפני endDate
+  if (updateData.candidateEndDate && updateData.endDate) {
+    if (new Date(updateData.candidateEndDate) > new Date(updateData.endDate)) {
+      throw new Error('Candidate end date cannot be after group end date');
+    }
+  }
+
   return Group.findByIdAndUpdate(groupId, updateData, { new: true, runValidators: true });
 }
+
 
 async function deleteGroupService(groupId) {
   return Group.findByIdAndDelete(groupId);
@@ -214,6 +240,119 @@ async function removeGroupMemberService(groupId, ownerId, { memberId, email }) {
   return updated;
 }
 
+
+//=============================================================================
+async function applyCandidateService(groupId, user, data) {
+  const g = await Group.findById(groupId);
+  if (!g) throw new Error('Group not found');
+
+    const now = new Date();
+  if (g.candidateEndDate && now > g.candidateEndDate) {
+    throw new Error('Candidate submission period has ended');
+  }
+
+  // האם כבר חבר?
+  const alreadyCandidate = await Candidate.findOne({
+    groupId,
+    userId: user._id
+  }).lean();
+  if (alreadyCandidate) throw new Error('Already a candidate');
+
+  // האם כבר הגיש בקשה?
+  const exists = g.candidateRequests?.find(r =>
+    String(r.userId) === String(user._id) && r.status === 'pending'
+  );
+  if (exists) return g;
+
+  g.candidateRequests.push({
+    userId: user._id,
+    email: (user.email || '').trim().toLowerCase(),
+    name: data.name || user.name,
+    description: data.description || '',
+    status: 'pending'
+  });
+
+  await g.save();
+  return g;
+}
+async function approveCandidateRequestService(groupId, ownerId, requestId) {
+  const g = await Group.findById(groupId);
+  if (!g) throw new Error('Group not found');
+  if (String(g.createdById) !== String(ownerId)) throw new Error('Not owner');
+
+  const req = g.candidateRequests.id(requestId);
+  if (!req) throw new Error('Request not found');
+
+  req.status = 'approved';
+
+  // יצירת מועמד
+  const candidate = await Candidate.create({
+    userId: req.userId,
+    name: req.name,
+    description: req.description,
+    photoUrl: '',
+    symbol: '',
+    groupId: groupId
+  });
+
+  // מחיקה מהרשימה
+  req.deleteOne();
+  await g.save();
+
+  return candidate;
+}
+
+async function rejectCandidateRequestService(groupId, adminId, requestId) {
+  const group = await Group.findById(groupId);
+  if (!group) throw new Error("Group not found");
+
+  // בדיקת הרשאות
+  if (group.createdById.toString() !== adminId.toString()) {
+    throw new Error("Not authorized");
+  }
+
+  const request = group.candidateRequests.id(requestId);
+  if (!request) throw new Error("Request not found");
+
+  // מחיקה מהרשימה במקום שינוי סטטוס
+  request.deleteOne();
+  await group.save();
+
+  return { requestId, groupId };  // חובה להחזיר requestId כדי שה-Redux יסיר אותו
+};
+
+
+async function addCandidateByEmailService(groupId, ownerId, email, data = {}) {
+  const g = await Group.findById(groupId);
+  if (!g) throw new Error('Group not found');
+  if (String(g.createdById) !== String(ownerId)) throw new Error('Not owner');
+
+  const norm = email.trim().toLowerCase();
+  const user = await User.findOne({ email: norm });
+  if (!user) throw new Error('User not found');
+
+  // לבדוק שלא קיים כבר
+  const exists = await Candidate.findOne({ groupId, userId: user._id });
+  if (exists) throw new Error('Candidate already exists');
+
+  const candidate = await Candidate.create({
+    userId: user._id,
+    name: data.name || user.name,
+    description: data.description || '',
+    photoUrl: data.photoUrl || '',
+    symbol: data.symbol || '',
+    groupId
+  });
+
+  return candidate;
+}
+
+async function getCandidateRequestsService(groupId) {
+  const group = await Group.findById(groupId);
+  if (!group) throw new Error('Group not found');
+  return group.candidateRequests || [];
+}
+
 module.exports = {
   createGroupService,
   updateGroupService,
@@ -226,5 +365,10 @@ module.exports = {
   getUserGroupsService,
   getMyJoinStatusesService,
   isMemberOfGroupService,
-  removeGroupMemberService, // ✅ export תקין
+  removeGroupMemberService, 
+  applyCandidateService,
+  approveCandidateRequestService,
+  addCandidateByEmailService,
+  rejectCandidateRequestService,
+  getCandidateRequestsService
 };
