@@ -1,8 +1,6 @@
-/* src/components/GroupChat/GroupChat.css */
-
 .group-chat {
     box-sizing: border-box;
-    margin-top: 1.5rem;
+    margin-top: 0;
     border-radius: 0.75rem;
     padding: 0.75rem 1rem 0;
     background-color: #ffffff;
@@ -12,17 +10,21 @@
     width: 100%;
 }
 
-/* כותרת */
-.group-chat-header {
+/* כותרת עליונה */
+.group-chat-header-row {
     display: flex;
+    align-items: center;
     justify-content: space-between;
-    align-items: baseline;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.25rem;
 }
 
-.group-chat-header h3 {
-    margin: 0;
-    font-size: 1.1rem;
+.group-chat-top-title {
+    font-size: 0.8rem;
+    color: #64748b;
+    text-align: right;
+    margin-bottom: 0;
+    padding-right: 4px;
+    line-height: 1;
 }
 
 .group-chat-note {
@@ -38,7 +40,7 @@
     min-height: 150px;
 }
 
-/* מצב ריק / טעינה / שגיאה */
+/* מצבים */
 .group-chat-status,
 .group-chat-error {
     text-align: center;
@@ -67,17 +69,15 @@
     max-width: 100%;
 }
 
-/* הודעה שלי */
 .group-chat-message-row.mine {
     justify-content: flex-start;
 }
 
-/* הודעה של אחרים */
 .group-chat-message-row.theirs {
     justify-content: flex-end;
 }
 
-/* הבלון */
+/* בלון הודעה */
 .group-chat-message {
     max-width: calc(100% - 48px);
     padding: 0.5rem 0.7rem;
@@ -87,19 +87,17 @@
     box-sizing: border-box;
 }
 
-/* בלון שלי */
 .group-chat-message.mine {
     background-color: #e0ecff;
     border-top-left-radius: 0.25rem;
 }
 
-/* בלון של אחרים */
 .group-chat-message.theirs {
     background-color: #f3f4f6;
     border-top-right-radius: 0.25rem;
 }
 
-/* כותרת ההודעה */
+/* כותרת הודעה */
 .group-chat-message-header {
     display: flex;
     justify-content: space-between;
@@ -147,7 +145,6 @@
     opacity: 1;
 }
 
-/* תפריט */
 .group-chat-menu {
     position: absolute;
     top: 120%;
@@ -208,42 +205,76 @@
     text-decoration: underline;
 }
 
-/* שורת קלט */
+/* ===== שורת קלט חדשה ===== */
+
 .group-chat-input-row {
     display: flex;
+    align-items: center;
     gap: 0.5rem;
     margin-top: 0.25rem;
-}
-
-.group-chat-input-row input {
-    flex: 1;
+    padding: 0.35rem 0.5rem;
     border-radius: 999px;
-    border: 1px solid #d1d5db;
-    padding: 0.5rem 0.85rem;
-    font-size: 0.9rem;
+    background-color: #eef4ff;
+    /* רקע תכלת כמו בצ'אטים */
 }
 
-.group-chat-input-row input:disabled {
-    background-color: #f9fafb;
+/* כפתור שליחה (חץ) */
+.chat-send-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 0.9rem;
+    border: none;
+    background-color: #e5e7eb;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    flex-shrink: 0;
+    color: #4b5563;
+    transition: background-color 0.15s ease, transform 0.1s ease,
+        box-shadow 0.1s ease;
+}
+
+.chat-send-btn:hover:not(:disabled) {
+    background-color: #d1d5db;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.2);
+    transform: translateY(-1px);
+}
+
+.chat-send-btn:disabled {
+    opacity: 0.5;
+    cursor: default;
+    box-shadow: none;
+}
+
+/* קפסולה לבנה – אימוג׳י + אינפוט */
+.chat-input-shell {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    background: #fff;
+    border-radius: 999px;
+    padding: 0 10px;
+    min-width: 0;
+    /* חשוב! */
+}
+
+
+/* האינפוט בפנים – בלי מסגרת משלו */
+.chat-input-shell input {
+    flex: 1;
+    border: none;
+    outline: none;
+    font-size: 0.9rem;
+    padding: 0.4rem 0.3rem;
+    background: transparent;
+}
+
+.chat-input-shell input:disabled {
     color: #9ca3af;
 }
 
-.group-chat-input-row button {
-    border-radius: 999px;
-    border: none;
-    padding: 0.5rem 1rem;
-    font-size: 0.9rem;
-    cursor: pointer;
-    background-color: #1e3a8a;
-    color: #ffffff;
-}
-
-.group-chat-input-row button:disabled {
-    opacity: 0.5;
-    cursor: default;
-}
-
-/* אווטאר */
+/* אווטארים */
 .group-chat-avatar {
     width: 32px;
     height: 32px;
@@ -262,7 +293,6 @@
     object-fit: cover;
 }
 
-/* fallback */
 .group-chat-avatar-fallback {
     width: 100%;
     height: 100%;
@@ -272,35 +302,166 @@
     font-size: 0.8rem;
     font-weight: 600;
     color: #ffffff;
-    background-color: #4f46e5;
 }
 
-.group-chat-avatar-fallback {
-    width: 100%;
-    height: 100%;
+/* ===== עיצוב מיוחד להודעת AI ===== */
+
+.group-chat-message-row.ai {
+    justify-content: center;
+}
+
+.group-chat-message.ai {
+    background: #eef2ff;
+    border: 1px solid #c7d2fe;
+    border-radius: 0.9rem;
+    box-shadow: 0 4px 10px rgba(15, 23, 42, 0.08);
+}
+
+.group-chat-message.ai .group-chat-sender {
+    color: #4f46e5;
+    font-weight: 700;
+}
+
+.group-chat-message.ai .group-chat-time {
+    color: #6b7280;
+}
+
+/* אווטאר AI */
+.group-chat-avatar-ai {
+    width: 32px;
+    height: 32px;
+    border-radius: 999px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 0.8rem;
-    font-weight: 600;
+    font-size: 0.7rem;
+    font-weight: 700;
     color: #ffffff;
-    /* background-color: #4f46e5;  <-- להסיר/להגיב, הצבע בא מג'אווהסקריפט */
+    background: linear-gradient(135deg, #4f46e5, #7c3aed);
+    box-shadow: 0 2px 6px rgba(79, 70, 229, 0.4);
 }
 
-.group-chat {
-    margin-top: 0;
-    /* במקום 1.5rem */
-    padding-top: 0.25rem;
-    /* קטן ועדין */
+/* ===== פלוס – פתיחה לצד שמאל ===== */
+
+.chat-more-wrapper {
+    position: relative;
+    flex-shrink: 0;
 }
 
-.group-chat-top-title {
+.chat-more-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 999px;
+    border: none;
+    background-color: #bfdbfe;
+    /* כחול בהיר */
+    display: flex;
+    align-items: center;
+    justify-content: center;
     font-size: 1.4rem;
-    color: #64748b;
-    text-align: right;
-    /* מיושר לימין */
-    margin-bottom: 0.25rem;
-    padding-right: 4px;
-    /* טיפה רווח מהקצה */
     line-height: 1;
+    cursor: pointer;
+    padding: 0;
+    color: #0f172a;
+    box-shadow: 0 2px 6px rgba(37, 99, 235, 0.25);
+    transition: background-color 0.15s ease, transform 0.1s ease,
+        box-shadow 0.1s ease;
+}
+
+.chat-more-btn:hover:not(:disabled) {
+    background-color: #93c5fd;
+    transform: translateY(-1px);
+    box-shadow: 0 3px 8px rgba(37, 99, 235, 0.35);
+}
+
+.chat-more-btn:disabled {
+    opacity: 0.5;
+    cursor: default;
+    box-shadow: none;
+}
+
+/* תפריט הפלוס */
+.chat-more-menu {
+    position: absolute;
+    top: 50%;
+    right: 110%;
+    transform: translateY(-50%);
+    background: #ffffff;
+    border-radius: 0.75rem;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 10px 25px rgba(15, 23, 42, 0.18);
+    padding: 0.25rem 0;
+    min-width: 140px;
+    z-index: 20;
+}
+
+.chat-more-menu button {
+    width: 100%;
+    text-align: right;
+    padding: 0.45rem 0.9rem;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-size: 0.85rem;
+    color: #000000;
+}
+
+.chat-more-menu button:hover:not(:disabled) {
+    background-color: #f3f4f6;
+}
+
+.chat-more-menu button:disabled {
+    opacity: 0.6;
+    cursor: default;
+}
+
+/* ===== אימוג׳י ===== */
+
+.chat-emoji-wrapper {
+    position: relative;
+    flex-shrink: 0;
+    margin-left: 8px;
+    /* דוחף אותו ימינה עוד קצת */
+}
+
+
+.chat-emoji-btn {
+    width: 28px;
+    height: 28px;
+    border-radius: 999px;
+    border: none;
+    background-color: transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: -11px;
+    cursor: pointer;
+    padding: 0;
+    color: #111827;
+}
+
+
+.chat-emoji-btn svg {
+    color: #111827;
+}
+
+.chat-emoji-btn:hover:not(:disabled) {
+    background-color: #f3f4ff;
+}
+
+.chat-emoji-btn:disabled {
+    opacity: 0.5;
+    cursor: default;
+}
+
+/* חלונית האימוג'ים של הספרייה */
+.emoji-picker-popover {
+    position: absolute;
+    bottom: 110%;
+    right: 0;
+    z-index: 30;
+    box-shadow: 0 10px 25px rgba(15, 23, 42, 0.18);
+    border-radius: 0.75rem;
+    overflow: hidden;
+    background: #fff;
 }

@@ -4,9 +4,19 @@ const router = express.Router();
 
 const auth = require('../middlewares/auth_middleware');
 const {
-  createGroup, updateGroup, deleteGroup, getGroupById, getAllGroups,
-  requestJoinGroup, listJoinRequests, approveJoinRequest, rejectJoinRequest,
-  getGroupMembers, getUserGroups, getMyJoinStatuses, getMyMembership,
+  createGroup,
+  updateGroup,
+  deleteGroup,
+  getGroupById,
+  getAllGroups,
+  requestJoinGroup,
+  listJoinRequests,
+  approveJoinRequest,
+  rejectJoinRequest,
+  getGroupMembers,
+  getUserGroups,
+  getMyJoinStatuses,
+  getMyMembership,
   removeMember,
 } = require('../controllers/group_controller');
 
@@ -14,11 +24,11 @@ const {
   getGroupChat,
   sendChatMessage,
   deleteChatMessage,
-  updateChatMessage,   // ✅ חדש – עריכת הודעת צ׳אט
+  updateChatMessage,
+  getGroupChatSummary,
 } = require('../controllers/chat_controller');
 
 const handleGroupDependencies = require('../middlewares/group_middleware');
-
 const Group = require('../models/group_model');
 
 router.post('/create', auth, createGroup);
@@ -31,14 +41,7 @@ router.get('/:id/my-membership', auth, getMyMembership);
 
 router.patch('/:id/members/remove', auth, removeMember);
 
-function makeSlug(name = '') {
-  return String(name)
-    .trim()
-    .toLowerCase()
-    .replace(/\s+/g, '-');
-}
-
-// קבלת קבוצה לפי slug
+// ---------- slug ----------
 router.get('/slug/:slug', async (req, res) => {
   try {
     const rawSlug = req.params.slug || '';
@@ -48,7 +51,7 @@ router.get('/slug/:slug', async (req, res) => {
       return res.status(400).json({ message: 'Missing slug' });
     }
 
-    const makeSlug = (name = '') =>
+    const makeSlugInner = (name = '') =>
       String(name)
         .trim()
         .toLowerCase()
@@ -62,7 +65,7 @@ router.get('/slug/:slug', async (req, res) => {
 
     if (!group) {
       const all = await Group.find().lean();
-      group = all.find((g) => makeSlug(g.name) === slug) || null;
+      group = all.find((g) => makeSlugInner(g.name) === slug) || null;
     }
 
     if (!group) {
@@ -76,19 +79,21 @@ router.get('/slug/:slug', async (req, res) => {
   }
 });
 
-router.get('/:id', getGroupById);
+// ---------- צ׳אט – חשוב לפני /:id ----------
+router.get('/:id/chat', auth, getGroupChat);
+router.get('/:id/chat/summary', auth, getGroupChatSummary);
+router.post('/:id/chat', auth, sendChatMessage);
+router.patch('/:id/chat/:msgId', auth, updateChatMessage);
+router.delete('/:id/chat/:msgId', auth, deleteChatMessage);
+
+// ---------- שאר הראוטים ----------
 router.get('/:id/members', getGroupMembers);
+router.get('/:id', getGroupById);
 router.get('/', getAllGroups);
 
 router.post('/:id/join', auth, requestJoinGroup);
 router.get('/:id/requests', auth, listJoinRequests);
 router.patch('/:id/requests/:reqId/approve', auth, approveJoinRequest);
 router.patch('/:id/requests/:reqId/reject', auth, rejectJoinRequest);
-
-// צ'אט קבוצה
-router.get('/:id/chat', auth, getGroupChat);
-router.post('/:id/chat', auth, sendChatMessage);
-router.patch('/:id/chat/:msgId', auth, updateChatMessage);  // עריכת הודעה
-router.delete('/:id/chat/:msgId', auth, deleteChatMessage);
 
 module.exports = router;
