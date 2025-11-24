@@ -43,6 +43,16 @@ export default function GeneralTab({
             <small>מקס׳ זוכים</small>
             <b>{group.maxWinners ?? 1}</b>
           </div>
+
+             <div>
+            <small>תאריך סיום הגשת מעומדות</small>
+            <b>
+              {group.candidateEndDate
+                ? new Date(group.candidateEndDate).toLocaleDateString('he-IL')
+                : '-'}
+            </b>
+          </div>
+
           <div>
             <small>תאריך סיום</small>
             <b>
@@ -151,6 +161,17 @@ export default function GeneralTab({
                 min={1}
                 value={form.maxWinners}
                 onChange={onGroupChange}
+              />
+            </div>
+               <div>
+              <label>תאריך סיום הגשת מועמדות</label>
+              <input
+                className="input"
+                name="candidateEndDate"
+                type="date"
+                value={form.candidateEndDate}
+                onChange={onGroupChange}
+                // min={todayStr}   // 🔹 כאן ההגבלה שלא ניתן לבחור תאריך עבר
               />
             </div>
             <div>

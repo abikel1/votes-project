@@ -53,6 +53,10 @@ import MembersTab from './MembersTab';
 import DangerTab from './DangerTab';
 import EditCandidateModal from './EditCandidateModal';
 import DeleteGroupModal from './DeleteGroupModal';
+import CandidateRequestsTab from './CandidateRequestsTab';
+import { approveCandidateRequest, rejectCandidateRequest, selectCandidateRequestsForGroup } from '../../slices/candidateSlice';
+
+
 
 import './GroupSettingsPage.css';
 
@@ -134,6 +138,7 @@ export default function GroupSettingsPage() {
     photoUrl: '',
     maxWinners: 1,
     endDate: '',
+    candidateEndDate: '',
     isLocked: false,
   });
   const [editMode, setEditMode] = useState(false);
@@ -176,6 +181,12 @@ export default function GroupSettingsPage() {
   const newFileInputRef = useRef(null);
   const editFileInputRef = useRef(null);
 
+
+
+  const candidateRequests = group?.candidateRequests || [];
+  const requestsLoading = false; // או selector מתאים
+  const requestsError = null; // או selector מתאים
+
   // שיתוף
   const [copied, setCopied] = useState(false);
 
@@ -208,6 +219,8 @@ export default function GroupSettingsPage() {
     if (!groupId) return;
     dispatch(fetchGroupWithMembers(groupId));
     dispatch(fetchCandidatesByGroup(groupId));
+    // dispatch(fetchCandidateRequests(groupId)); 
+
     dispatch(fetchVotersByGroup(groupId));
   }, [dispatch, groupId]);
 
@@ -232,6 +245,7 @@ export default function GroupSettingsPage() {
         photoUrl: group.photoUrl || '',
         maxWinners: group.maxWinners ?? 1,
         endDate: toLocalDateInputValue(group.endDate),
+        candidateEndDate: toLocalDateInputValue(group.candidateEndDate),
         isLocked: !!group.isLocked,
       });
     }
@@ -245,7 +259,7 @@ export default function GroupSettingsPage() {
       group?.createdBy &&
       userEmail &&
       String(group.createdBy).trim().toLowerCase() ===
-        String(userEmail).trim().toLowerCase();
+      String(userEmail).trim().toLowerCase();
 
     const byId =
       group?.createdById &&
@@ -258,7 +272,7 @@ export default function GroupSettingsPage() {
       lastName &&
       !String(group.createdBy).includes('@') &&
       String(group.createdBy).trim().toLowerCase() ===
-        `${firstName} ${lastName}`.trim().toLowerCase();
+      `${firstName} ${lastName}`.trim().toLowerCase();
 
     return !!(byEmail || byId || byFullName);
   }, [group, userEmail, userId, firstName, lastName]);
@@ -381,6 +395,17 @@ export default function GroupSettingsPage() {
   }
 
   // ---------- handlers ----------
+  const handleApprove = (req) => {
+    dispatch(approveCandidateRequest({ groupId, requestId: req._id }))
+      .unwrap()
+      .then(() => dispatch(fetchCandidatesByGroup(groupId)));
+  };
+
+  const handleReject = (req) => {
+    dispatch(rejectCandidateRequest({ groupId, requestId: req._id }))
+      .unwrap()
+      .then(() => dispatch(fetchCandidatesByGroup(groupId)));
+  };
 
   const onGroupChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -390,29 +415,41 @@ export default function GroupSettingsPage() {
         name === 'maxWinners'
           ? Number(value)
           : type === 'checkbox'
-          ? checked
-          : value,
+            ? checked
+            : value,
     }));
   };
 
-  const onSaveGroup = async (e) => {
-    e.preventDefault();
-    const patch = {
-      name: form.name.trim(),
-      description: form.description.trim(),
-      symbol: (form.symbol || '').trim(),
-      maxWinners: Number(form.maxWinners) || 1,
-      isLocked: !!form.isLocked,
-      ...(form.endDate
-        ? { endDate: new Date(form.endDate).toISOString() }
-        : {}),
-    };
-    await dispatch(updateGroup({ groupId, patch })).unwrap();
-    setEditMode(false);
-    if (patch.isLocked) dispatch(fetchJoinRequests(groupId));
-    dispatch(fetchGroupWithMembers(groupId));
-    dispatch(fetchVotersByGroup(groupId));
+const onSaveGroup = async (e) => {
+  e.preventDefault();
+
+  const groupEnd = form.endDate ? new Date(form.endDate) : null;
+  const candEnd = form.candidateEndDate ? new Date(form.candidateEndDate) : null;
+
+  if (groupEnd && candEnd && candEnd > groupEnd) {
+    toast.error("תאריך סיום הגשת מועמדות לא יכול להיות אחרי תאריך סיום הקבוצה");
+    return; // מונע שליחת הבקשה לשרת
+  }
+
+  const patch = {
+    name: form.name.trim(),
+    description: form.description.trim(),
+    symbol: (form.symbol || '').trim(),
+    maxWinners: Number(form.maxWinners) || 1,
+    isLocked: !!form.isLocked,
+    ...(form.endDate ? { endDate: new Date(form.endDate).toISOString() } : {}),
+    ...(form.candidateEndDate ? { candidateEndDate: new Date(form.candidateEndDate).toISOString() } : {}),
   };
+
+  await dispatch(updateGroup({ groupId, patch })).unwrap();
+  setEditMode(false);
+  if (patch.isLocked) dispatch(fetchJoinRequests(groupId));
+  dispatch(fetchGroupWithMembers(groupId));
+  dispatch(fetchVotersByGroup(groupId));
+};
+
+
+
 
   const onCancelEdit = () => {
     setEditMode(false);
@@ -424,6 +461,8 @@ export default function GroupSettingsPage() {
         photoUrl: group.photoUrl || '',
         maxWinners: group.maxWinners ?? 1,
         endDate: toLocalDateInputValue(group.endDate),
+        candidateEndDate: toLocalDateInputValue(group.candidateEndDate),
+
         isLocked: !!group.isLocked,
       });
     }
@@ -641,7 +680,7 @@ export default function GroupSettingsPage() {
 
   return (
     <div className="gs-wrap">
-      
+
       {/* <div className="gs-header">
         <h2>הגדרות קבוצה</h2>
         <div className="gs-actions">
@@ -663,39 +702,39 @@ export default function GroupSettingsPage() {
       </div> */}
 
       <div className="gs-header clean-header">
- 
-
-  {/* כותרת מרכזית */}
-  <div className="header-title">
-    <h2>{group.name}</h2>
-    <p>{group.description}</p>
-  </div>
-
-  {/* כפתור פרטי הקבוצה */}
-  <button
-    className="icon-btn"
-    onClick={() =>
-      navigate(`/groups/${slug}`, {
-        state: { groupId },
-      })
-    }
-    title="פרטי הקבוצה"
-  >
-    <FaInfoCircle size={24} />
-  </button>
-
-   {/* כפתור חזרה */}
-  <button
-    className="icon-btn"
-    onClick={() => navigate('/groups')}
-    title="חזרה לקבוצות"
-  >
-    <BiArrowBack size={24} />
-  </button>
-</div>
 
 
-      
+        {/* כותרת מרכזית */}
+        <div className="header-title">
+          <h2>{group.name}</h2>
+          <p>{group.description}</p>
+        </div>
+
+        {/* כפתור פרטי הקבוצה */}
+        <button
+          className="icon-btn"
+          onClick={() =>
+            navigate(`/groups/${slug}`, {
+              state: { groupId },
+            })
+          }
+          title="פרטי הקבוצה"
+        >
+          <FaInfoCircle size={24} />
+        </button>
+
+        {/* כפתור חזרה */}
+        <button
+          className="icon-btn"
+          onClick={() => navigate('/groups')}
+          title="חזרה לקבוצות"
+        >
+          <BiArrowBack size={24} />
+        </button>
+      </div>
+
+
+
 
       {/* layout: תוכן משמאל + סיידבר מימין */}
       <div className="gs-main-layout">
@@ -739,6 +778,18 @@ export default function GroupSettingsPage() {
             />
           )}
 
+          {activeTab === 'candidates' && (
+            <CandidateRequestsTab
+              groupId={groupId}
+              requests={candidateRequests}
+              loading={groupLoading} // או false אם אין טעינה נפרדת
+              error={groupError}    // או null אם אין שגיאה נפרדת
+              onApprove={handleApprove}
+              onReject={handleReject}
+            />
+          )}
+
+
           {activeTab === 'voters' && (
             <VotersTab
               voters={voters}
@@ -779,43 +830,43 @@ export default function GroupSettingsPage() {
         </div>
 
         {/* סיידבר הניווט מימין */}
-      
-<aside className="gs-sidebar-tabs">
-  <button
-    className={`side-tab ${activeTab === 'general' ? 'active' : ''}`}
-    onClick={() => setActiveTab('general')}
-  >
-    <FaInfoCircle style={{ marginInlineEnd: 6 }} />
-    פרטי קבוצה
-  </button>
 
-  <button
-    className={`side-tab ${activeTab === 'candidates' ? 'active' : ''}`}
-    onClick={() => setActiveTab('candidates')}
-  >
-    <FaUserPlus style={{ marginInlineEnd: 6 }} />
-    מועמדים
-  </button>
+        <aside className="gs-sidebar-tabs">
+          <button
+            className={`side-tab ${activeTab === 'general' ? 'active' : ''}`}
+            onClick={() => setActiveTab('general')}
+          >
+            <FaInfoCircle style={{ marginInlineEnd: 6 }} />
+            פרטי קבוצה
+          </button>
 
-  <button
-    className={`side-tab ${activeTab === 'voters' ? 'active' : ''}`}
-    onClick={() => setActiveTab('voters')}
-  >
-    <FaUserCheck style={{ marginInlineEnd: 6 }} />
-    מצביעים
-  </button>
+          <button
+            className={`side-tab ${activeTab === 'candidates' ? 'active' : ''}`}
+            onClick={() => setActiveTab('candidates')}
+          >
+            <FaUserPlus style={{ marginInlineEnd: 6 }} />
+            מועמדים
+          </button>
 
-  {group.isLocked && (
-    <>
-      <button
-        className={`side-tab ${activeTab === 'join' ? 'active' : ''}`}
-        onClick={() => setActiveTab('join')}
-      >
-        <FaUserPlus style={{ marginInlineEnd: 6 }} />
-        בקשות הצטרפות
-      </button>
+          <button
+            className={`side-tab ${activeTab === 'voters' ? 'active' : ''}`}
+            onClick={() => setActiveTab('voters')}
+          >
+            <FaUserCheck style={{ marginInlineEnd: 6 }} />
+            מצביעים
+          </button>
 
-{/* <<<<<<< HEAD
+          {group.isLocked && (
+            <>
+              <button
+                className={`side-tab ${activeTab === 'join' ? 'active' : ''}`}
+                onClick={() => setActiveTab('join')}
+              >
+                <FaUserPlus style={{ marginInlineEnd: 6 }} />
+                בקשות הצטרפות
+              </button>
+
+              {/* <<<<<<< HEAD
               <button
                 className={`side-tab ${
                   activeTab === 'members' ? 'active' : ''
@@ -837,25 +888,25 @@ export default function GroupSettingsPage() {
           </button>
         </aside>
 ======= */}
-      <button
-        className={`side-tab ${activeTab === 'members' ? 'active' : ''}`}
-        onClick={() => setActiveTab('members')}
-      >
-        <FaUsers style={{ marginInlineEnd: 6 }} />
-        משתתפי הקבוצה
-      </button>
-    </>
-  )}
+              <button
+                className={`side-tab ${activeTab === 'members' ? 'active' : ''}`}
+                onClick={() => setActiveTab('members')}
+              >
+                <FaUsers style={{ marginInlineEnd: 6 }} />
+                משתתפי הקבוצה
+              </button>
+            </>
+          )}
 
-  <button
-    className={`side-tab danger ${activeTab === 'danger' ? 'active' : ''}`}
-    onClick={() => setActiveTab('danger')}
-  >
-    <FaExclamationTriangle style={{ marginInlineEnd: 6 }} />
-    מחיקה
-  </button>
-</aside>
-{/* >>>>>>> fd09d35ac375e1d72d983305dcc67a256b38f216 */}
+          <button
+            className={`side-tab danger ${activeTab === 'danger' ? 'active' : ''}`}
+            onClick={() => setActiveTab('danger')}
+          >
+            <FaExclamationTriangle style={{ marginInlineEnd: 6 }} />
+            מחיקה
+          </button>
+        </aside>
+        {/* >>>>>>> fd09d35ac375e1d72d983305dcc67a256b38f216 */}
       </div>
 
       {/* מודאל מחיקת קבוצה */}
@@ -888,11 +939,10 @@ export default function GroupSettingsPage() {
         open={showConfirm}
         message={
           selectedMember
-            ? `להסיר את ${
-                selectedMember.member.name ||
-                selectedMember.member.email ||
-                selectedMember.memberId
-              } מהקבוצה?`
+            ? `להסיר את ${selectedMember.member.name ||
+            selectedMember.member.email ||
+            selectedMember.memberId
+            } מהקבוצה?`
             : ''
         }
         onConfirm={confirmDelete}

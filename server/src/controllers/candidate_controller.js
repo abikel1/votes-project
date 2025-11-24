@@ -7,6 +7,15 @@ const {
   incrementVotesService
 } = require('../services/candidate_service');
 
+const {
+  applyCandidateService,
+  approveCandidateRequestService,
+  rejectCandidateRequestService ,
+  addCandidateByEmailService,
+  getCandidateCampaignService
+} = require('../services/group_service');
+
+
 // יצירת מועמד
 async function createCandidate(req, res) {
   try {
@@ -77,11 +86,85 @@ async function incrementVotes(req, res) {
   }
 }
 
+// 1️⃣ משתמש מגיש בקשת מועמדות
+async function applyCandidate(req, res) {
+  try {
+    const out = await applyCandidateService(req.params.id, req.user, req.body);
+    res.json({ ok: true, group: out });
+    console.log('req.user = ', req.user);
+
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+}
+// 1️⃣ מנהל מאשר דוחה  בקשת מועמדות
+
+async function rejectCandidate(req, res) {
+    console.log("req.params", req.params)
+
+  try {
+    await rejectCandidateRequestService(
+      req.params.id,
+      req.user._id,
+      req.params.requestId
+    );
+
+    res.json({
+      ok: true,
+      requestId: req.params.requestId,
+      groupId: req.params.id
+    });
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+}
+
+
+async function approveCandidate(req, res) {
+  try {
+    const c = await approveCandidateRequestService(
+      req.params.id,
+      req.user._id,
+      req.params.requestId
+    );
+
+    res.json({
+      ok: true,
+      candidate: c,
+      requestId: req.params.requestId,
+      groupId: req.params.id
+    });
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+}
+
+
+// 3️⃣ הוספה לפי מייל
+async function addCandidateByEmail(req, res) {
+  try {
+    const c = await addCandidateByEmailService(
+      req.params.id,
+      req.user._id,
+      req.body.email,
+      req.body
+    );
+    res.json({ ok: true, candidate: c });
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+}
+
+
 module.exports = {
   createCandidate,
   updateCandidate,
   deleteCandidate,
   getCandidateById,
   getCandidatesByGroup,
-  incrementVotes
+  incrementVotes,
+    applyCandidate,
+  approveCandidate,
+  rejectCandidate,
+  addCandidateByEmail,
 };
