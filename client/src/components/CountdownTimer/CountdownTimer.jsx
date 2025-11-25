@@ -1,7 +1,10 @@
 import { useState, useEffect } from "react";
 import "./CountdownTimer.css";
+import { useTranslation } from "react-i18next";
 
 export default function CountdownTimer({ endDate }) {
+  const { t } = useTranslation();
+
   const [timeLeft, setTimeLeft] = useState({
     days: "00",
     hours: "00",
@@ -15,8 +18,8 @@ export default function CountdownTimer({ endDate }) {
 
       const now = new Date();
 
-      // כאן השינוי: יוצרים תאריך "סוף היום" 23:59:59 של תאריך הסיום
-      const endBase = new Date(endDate); // מה שמגיע מה־DB
+      // סוף היום – 23:59:59
+      const endBase = new Date(endDate);
       const endOfDay = new Date(
         endBase.getFullYear(),
         endBase.getMonth(),
@@ -55,31 +58,37 @@ export default function CountdownTimer({ endDate }) {
 
   return (
     <div className="countdown-row">
+      
+      {/* שניות */}
       <div className="countdown-item">
         <span className="count-number">{timeLeft.seconds}</span>
-        <span className="count-label">שניות</span>
+        <span className="count-label">{t("timer.seconds")}</span>
       </div>
 
       <span className="count-sep">:</span>
 
+      {/* דקות */}
       <div className="countdown-item">
         <span className="count-number">{timeLeft.minutes}</span>
-        <span className="count-label">דקות</span>
+        <span className="count-label">{t("timer.minutes")}</span>
       </div>
 
       <span className="count-sep">:</span>
 
+      {/* שעות */}
       <div className="countdown-item">
         <span className="count-number">{timeLeft.hours}</span>
-        <span className="count-label">שעות</span>
+        <span className="count-label">{t("timer.hours")}</span>
       </div>
 
       <span className="count-sep">:</span>
 
+      {/* ימים */}
       <div className="countdown-item">
         <span className="count-number">{timeLeft.days}</span>
-        <span className="count-label">ימים</span>
+        <span className="count-label">{t("timer.days")}</span>
       </div>
+
     </div>
   );
 }
