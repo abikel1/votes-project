@@ -2,9 +2,10 @@
 import axios from 'axios';
 
 const http = axios.create({
-    baseURL: '/api',          // ב־Vite יש proxy ל־/api → השרת
+    baseURL: 'https://votes-project.onrender.com/api',
     withCredentials: true,
 });
+
 
 // =============================
 //   בדיקת תפוגת טוקן בצד לקוח
