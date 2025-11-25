@@ -17,33 +17,33 @@ const app = express();
 
 // 1. CORS – חייבים שיהיה לפני כל ה־routes
 const allowedOrigins = [
-    'http://localhost:5173',              // client בזמן פיתוח
-    'https://votes-project.onrender.com', // השרת עצמו / בעתיד גם פרונט בענן
+    'http://localhost:5173',                    // client בזמן פיתוח
+    'https://votes-client-qoux.onrender.com',  // ✅ הפרונט ברנדר
 ];
 
 app.use(
     cors({
         origin(origin, callback) {
-            // בקשות בלי Origin (Postman וכד') – נאפשר
+            // בקשות בלי Origin (Postman, health checks וכו') – נאפשר
             if (!origin) return callback(null, true);
 
             if (allowedOrigins.includes(origin)) {
                 return callback(null, true);
             }
+
             return callback(new Error('Not allowed by CORS'));
         },
-        credentials: true, // כי ב־axios יש withCredentials: true
+        credentials: true, // כי ב־axios מוגדר withCredentials: true
     })
 );
 
 // אופציונלי – לטובת preflight כללי (OPTIONS)
 // app.options('*', cors());
 
-
-// 2. Static files for images (אפשר להשאיר כבוי אם לא בשימוש עכשיו)
+// 2. Static files for images (אם תרצי)
 // app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-// 3. Upload route — MUST come before express.json()
+// 3. Upload route — חשוב לפני express.json()
 app.use('/api/upload', uploadRoutes);
 
 // 4. JSON parser
