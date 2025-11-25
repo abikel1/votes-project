@@ -1,9 +1,9 @@
-// server/src/controllers/chat_controller.js
 const {
     getGroupChatService,
     addChatMessageService,
     deleteChatMessageService,
     updateChatMessageService,
+    summarizeGroupChatService,
 } = require('../services/chat_service');
 
 async function getGroupChat(req, res) {
@@ -68,9 +68,25 @@ async function updateChatMessage(req, res) {
     }
 }
 
+// סיכום צ׳אט – יוצר הודעת AI ושולח חזרה את כל ההודעות
+async function getGroupChatSummary(req, res) {
+    try {
+        const { id } = req.params;
+
+        const { summary, messages } = await summarizeGroupChatService(id);
+
+        res.json({ summary, messages });
+    } catch (err) {
+        console.error('getGroupChatSummary error:', err);
+        const code = err.message === 'Group not found' ? 404 : 400;
+        res.status(code).json({ message: err.message || 'Chat summary error' });
+    }
+}
+
 module.exports = {
     getGroupChat,
     sendChatMessage,
     deleteChatMessage,
     updateChatMessage,
+    getGroupChatSummary,
 };

@@ -1,12 +1,13 @@
-// server/src/services/chat_service.js
 const ChatMessage = require('../models/chat_message_model');
 const Group = require('../models/group_model');
+const { GoogleGenerativeAI } = require('@google/generative-ai');
+
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 async function getGroupChatService(groupId) {
     const group = await Group.findById(groupId).lean();
     if (!group) throw new Error('Group not found');
 
-    // מחזיר גם הודעות שנמחקו (deleted=true)
     return ChatMessage.find({ groupId })
         .sort({ createdAt: 1 })
         .lean();
@@ -37,11 +38,11 @@ async function deleteChatMessageService(groupId, messageId, user) {
     const group = await Group.findById(groupId).lean();
     if (!group) throw new Error('Group not found');
 
-    // לוודא שאכן ההודעה שייכת לקבוצה הזו
     const msg = await ChatMessage.findOne({ _id: messageId, groupId });
     if (!msg) throw new Error('Message not found');
 
-    const isOwner = group.createdById && String(group.createdById) === String(user._id);
+    const isOwner =
+        group.createdById && String(group.createdById) === String(user._id);
     const isSender = String(msg.userId) === String(user._id);
 
     if (!isOwner && !isSender) {
@@ -50,14 +51,19 @@ async function deleteChatMessageService(groupId, messageId, user) {
         throw err;
     }
 
-    // ⭐ לא מוחקים מהדאטהבייס – רק מסמנים
+    const deletedByOwner = isOwner && !isSender;
+
     msg.deleted = true;
-    msg.text = 'הודעה נמחקה';
+    msg.text = deletedByOwner
+        ? 'ההודעה נמחקה על ידי המנהל'
+        : 'הודעה נמחקה';
+
     await msg.save();
 
     const messages = await ChatMessage.find({ groupId })
         .sort({ createdAt: 1 })
         .lean();
+
     return messages;
 }
 
@@ -68,11 +74,9 @@ async function updateChatMessageService(groupId, messageId, user, text) {
     const group = await Group.findById(groupId).lean();
     if (!group) throw new Error('Group not found');
 
-    // גם כאן לפי groupId + _id
     const msg = await ChatMessage.findOne({ _id: messageId, groupId });
     if (!msg) throw new Error('Message not found');
 
-    // רק מי שכתב את ההודעה יכול לערוך
     if (String(msg.userId) !== String(user._id)) {
         const err = new Error('Forbidden');
         err.code = 'FORBIDDEN';
@@ -80,7 +84,7 @@ async function updateChatMessageService(groupId, messageId, user, text) {
     }
 
     msg.text = text.trim();
-    msg.deleted = false;          // אם ערכו אחרי שמחקו – אפשר להחזיר למצב רגיל
+    msg.deleted = false;
     msg.updatedAt = new Date();
     await msg.save();
 
@@ -90,9 +94,160 @@ async function updateChatMessageService(groupId, messageId, user, text) {
     return messages;
 }
 
+// ------ Gemini summarizer ------
+async function summarizeWithAI(groupName, messages) {
+    if (!process.env.GEMINI_API_KEY) {
+        return null;
+    }
+
+    // ניקח את 50 ההודעות האחרונות
+    const lastMessages = messages.slice(-50);
+
+    const chatText = lastMessages
+        .map((m) => {
+            const name = m.senderName || m.senderEmail || 'משתתף';
+            const text = (m.text || '').replace(/\s+/g, ' ').trim();
+            if (!text) return null;
+            return `${name}: ${text}`;
+        })
+        .filter(Boolean)
+        .join('\n');
+
+    if (!chatText) {
+        return 'אין עדיין תוכן לסיכום.';
+    }
+
+    const prompt = `
+זהו צ'אט של קבוצה בשם "${groupName}".
+
+הודעות אחרונות:
+${chatText}
+
+הוראות:
+1. כתבי סיכום קצר של השיחה בעברית, עד 2–3 משפטים בלבד.
+2. אל תשתמשי בנקודות תבליט, כותרות או מספרים כלל.
+3. אל תכתבי בשום אופן שמות של אנשים (החליפי ל"המשתתפים" או "הקבוצה").
+4. תתמקדי בנושא הכללי של השיחה ומה פחות או יותר דיברו שם, בלי להיכנס לפרטים מיותרים.
+5. אל תמציאי מידע שלא מופיע בהודעות.
+`.trim();
+
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
+
+    const result = await model.generateContent(prompt);
+    const response = result.response;
+    const text = (response.text() || '').trim();
+
+    if (!text) return null;
+
+    // חיתוך נוסף ליתר ביטחון – לוקחים רק עד 3 שורות לא ריקות
+    const lines = text
+        .split('\n')
+        .map((line) => line.trim())
+        .filter(Boolean);
+
+    const shortLines = lines.slice(0, 3);
+
+    return shortLines.join('\n').trim() || null;
+}
+
+// ------ שירות סיכום צ'אט ושמירת הודעת AI ------
+async function summarizeGroupChatService(groupId) {
+    const group = await Group.findById(groupId).lean();
+    if (!group) throw new Error('Group not found');
+
+    const messages = await ChatMessage.find({ groupId, deleted: false })
+        .sort({ createdAt: 1 })
+        .lean();
+
+    if (!messages.length) {
+        // גם פה נשמור כהודעת AI אם תרצי, אבל כרגע נחזיר בלי ליצור הודעה
+        return {
+            summary: 'אין עדיין פעילות בצ׳אט.',
+            messages: await ChatMessage.find({ groupId }).sort({ createdAt: 1 }).lean(),
+        };
+    }
+
+    // קודם ננסה עם AI
+    let finalSummary = null;
+    try {
+        const aiSummary = await summarizeWithAI(group.name || 'הקבוצה', messages);
+        if (aiSummary) {
+            finalSummary = aiSummary;
+        }
+    } catch (err) {
+        console.error('AI chat summary error:', err);
+    }
+
+    // FALLBACK ידני אם ה-AI נפל
+    if (!finalSummary) {
+        const lastMessages = messages.slice(-30);
+        const texts = lastMessages.map((m) => m.text || '').filter(Boolean);
+
+        const senders = new Set(
+            lastMessages.map((m) => m.senderName || m.senderEmail || '').filter(Boolean)
+        );
+
+        const total = messages.length;
+        const participants = senders.size || 1;
+
+        const allLower = texts.join(' ').toLowerCase();
+        let topic = 'דיון כללי בקבוצה';
+
+        if (
+            allLower.includes('בחיר') ||
+            allLower.includes('הצבע') ||
+            allLower.includes('קלפי') ||
+            allLower.includes('קולות') ||
+            allLower.includes('מועמד')
+        ) {
+            topic = 'שיחה סביב הבחירות וההצבעות בקבוצה';
+        } else if (
+            allLower.includes('היי') ||
+            allLower.includes('מה קורה') ||
+            allLower.includes('מה נשמע')
+        ) {
+            topic = 'שיחת היכרות / שיחה קלילה בין המשתתפים';
+        }
+
+        const last = lastMessages[lastMessages.length - 1];
+        let lastPreview = (last.text || '').trim();
+        if (lastPreview.length > 60) {
+            lastPreview = lastPreview.slice(0, 57) + '...';
+        }
+
+        finalSummary =
+            `יש בצ׳אט ${total} הודעות מ־${participants} משתתפים. ` +
+            `עיקר השיחה: ${topic}. ` +
+            (lastPreview ? `ההודעה האחרונה: "${lastPreview}".` : '');
+    }
+
+    // כאן שומרים את הסיכום כהודעת AI בדאטהבייס
+    await ChatMessage.create({
+        groupId,
+        // אפשר להשתמש ב-id של הקבוצה כ-userId "פיקטיבי"
+        userId: group._id,
+        senderName: 'AI',
+        senderEmail: 'ai@chat',
+        text: finalSummary,
+        deleted: false,
+        isAi: true,
+    });
+
+    // מחזירים את כל ההודעות המעודכנות
+    const allMessages = await ChatMessage.find({ groupId })
+        .sort({ createdAt: 1 })
+        .lean();
+
+    return {
+        summary: finalSummary,
+        messages: allMessages,
+    };
+}
+
 module.exports = {
     getGroupChatService,
     addChatMessageService,
     deleteChatMessageService,
     updateChatMessageService,
+    summarizeGroupChatService,
 };

@@ -22,10 +22,16 @@ const chatMessageSchema = new mongoose.Schema(
         },
         deleted: {
             type: Boolean,
-            default: false,   // ⭐ שדה שמסמן שההודעה נמחקה לוגית
+            default: false,
+        },
+        // ⭐ חדש: האם ההודעה נשלחה ע"י ה-AI
+        isAi: {
+            type: Boolean,
+            default: false,
         },
     },
-    { timestamps: true }  // יוצר createdAt + updatedAt
+    { timestamps: true }
 );
+
 
 module.exports = mongoose.model('ChatMessage', chatMessageSchema);

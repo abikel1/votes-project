@@ -3,6 +3,11 @@ const mongoose = require('mongoose');
 const Group = require('../models/group_model');
 const Candidate = require('../models/candidate_model');
 const User = require('../models/user_model');
+const { GoogleGenerativeAI } = require('@google/generative-ai');
+
+const genAI = process.env.GEMINI_API_KEY
+  ? new GoogleGenerativeAI(process.env.GEMINI_API_KEY)
+  : null;
 
 function toBoolStrict(v) {
   if (typeof v === 'boolean') return v;
@@ -242,11 +247,45 @@ async function removeGroupMemberService(groupId, ownerId, { memberId, email }) {
 
 
 //=============================================================================
+// async function applyCandidateService(groupId, user, data) {
+//   const g = await Group.findById(groupId);
+//   if (!g) throw new Error('Group not found');
+
+//     const now = new Date();
+//   if (g.candidateEndDate && now > g.candidateEndDate) {
+//     throw new Error('Candidate submission period has ended');
+//   }
+
+//   // האם כבר חבר?
+//   const alreadyCandidate = await Candidate.findOne({
+//     groupId,
+//     userId: user._id
+//   }).lean();
+//   if (alreadyCandidate) throw new Error('Already a candidate');
+
+//   // האם כבר הגיש בקשה?
+//   const exists = g.candidateRequests?.find(r =>
+//     String(r.userId) === String(user._id) && r.status === 'pending'
+//   );
+//   if (exists) return g;
+
+//   g.candidateRequests.push({
+//     userId: user._id,
+//     email: (user.email || '').trim().toLowerCase(),
+//     name: data.name || user.name,
+//     description: data.description || '',
+//     status: 'pending'
+//   });
+
+//   await g.save();
+//   return g;
+// }
+
 async function applyCandidateService(groupId, user, data) {
   const g = await Group.findById(groupId);
   if (!g) throw new Error('Group not found');
 
-    const now = new Date();
+  const now = new Date();
   if (g.candidateEndDate && now > g.candidateEndDate) {
     throw new Error('Candidate submission period has ended');
   }
@@ -258,23 +297,35 @@ async function applyCandidateService(groupId, user, data) {
   }).lean();
   if (alreadyCandidate) throw new Error('Already a candidate');
 
-  // האם כבר הגיש בקשה?
-  const exists = g.candidateRequests?.find(r =>
-    String(r.userId) === String(user._id) && r.status === 'pending'
-  );
-  if (exists) return g;
+  // בדיקה אם כבר קיימת בקשה כלשהי של המשתמש
+  const existingRequests = g.candidateRequests.filter(r => String(r.userId) === String(user._id));
 
-  g.candidateRequests.push({
+  if (existingRequests.length) {
+    // עדכון כל הרשומות הקיימות ל-pending עם הפרטים החדשים
+    existingRequests.forEach(r => {
+      r.name = data.name || user.name;
+      r.description = data.description || '';
+      r.status = 'pending';
+    });
+    await g.save();
+    return existingRequests[0]; // מחזירים את הרשומה הראשונה (ניתן להתאים)
+  }
+
+  // אם אין בקשה בכלל – יוצרים חדשה
+  const newReq = {
     userId: user._id,
     email: (user.email || '').trim().toLowerCase(),
     name: data.name || user.name,
     description: data.description || '',
     status: 'pending'
-  });
-
+  };
+  g.candidateRequests.push(newReq);
   await g.save();
-  return g;
+
+  return newReq;
 }
+
+
 async function approveCandidateRequestService(groupId, ownerId, requestId) {
   const g = await Group.findById(groupId);
   if (!g) throw new Error('Group not found');
@@ -295,8 +346,8 @@ async function approveCandidateRequestService(groupId, ownerId, requestId) {
     groupId: groupId
   });
 
-  // מחיקה מהרשימה
-  req.deleteOne();
+  // // מחיקה מהרשימה
+  // req.deleteOne();
   await g.save();
 
   return candidate;
@@ -314,12 +365,13 @@ async function rejectCandidateRequestService(groupId, adminId, requestId) {
   const request = group.candidateRequests.id(requestId);
   if (!request) throw new Error("Request not found");
 
-  // מחיקה מהרשימה במקום שינוי סטטוס
-  request.deleteOne();
+  // עדכון סטטוס לדחוי במקום מחיקה
+  request.status = 'rejected';
   await group.save();
 
-  return { requestId, groupId };  // חובה להחזיר requestId כדי שה-Redux יסיר אותו
-};
+  return request; // מחזירים את הבקשה המעודכנת כדי שה-Redux יעדכן את הסטור
+}
+
 
 
 async function addCandidateByEmailService(groupId, ownerId, email, data = {}) {
@@ -353,6 +405,51 @@ async function getCandidateRequestsService(groupId) {
   return group.candidateRequests || [];
 }
 
+async function generateGroupDescriptionService(name, hint = '') {
+  // fallback אם אין מפתח
+  if (!genAI || !process.env.GEMINI_API_KEY) {
+    return 'קבוצה חדשה באתר ההצבעות. תיאור יתווסף בהמשך.';
+  }
+
+  const safeName = String(name || '').trim();
+  const safeHint = String(hint || '').trim();
+
+  const prompt = `
+את/ה מסייע/ת ביצירת תיאור קצר לקבוצת הצבעה.
+
+שם הקבוצה: "${safeName || 'ללא שם'}"
+
+הנחיות מיוצר הקבוצה (לא חובה):
+"${safeHint || 'ללא'}"
+
+הוראות:
+1. כתוב/י תיאור בעברית בין 2 ל-4 שורות.
+2. התיאור צריך להתאים לעמוד קבוצה באתר הצבעות: ברור, מזמין, בלי סלנג קיצוני.
+3. אין להשתמש באימוג׳ים, כוכביות, כותרות או רשימות – רק טקסט רגיל.
+4. אל תוסיף/י פרטים שלא משתמעים מהשם או מההנחיות.
+`.trim();
+
+  const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
+
+  const result = await model.generateContent(prompt);
+  const response = result.response;
+  let text = (response.text() || '').trim();
+
+  if (!text) {
+    return 'קבוצה חדשה באתר ההצבעות.';
+  }
+
+  // לוודא עד 4 שורות ולא ריקות
+  const lines = text
+    .split('\n')
+    .map(l => l.trim())
+    .filter(Boolean)
+    .slice(0, 4);
+
+  return lines.join('\n') || 'קבוצה חדשה באתר ההצבעות.';
+}
+
+
 module.exports = {
   createGroupService,
   updateGroupService,
@@ -365,10 +462,11 @@ module.exports = {
   getUserGroupsService,
   getMyJoinStatusesService,
   isMemberOfGroupService,
-  removeGroupMemberService, 
+  removeGroupMemberService,
   applyCandidateService,
   approveCandidateRequestService,
   addCandidateByEmailService,
   rejectCandidateRequestService,
-  getCandidateRequestsService
+  getCandidateRequestsService,
+  generateGroupDescriptionService,
 };

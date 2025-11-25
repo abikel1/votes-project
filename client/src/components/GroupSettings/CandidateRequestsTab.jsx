@@ -26,20 +26,24 @@ export default function CandidateRequestsTab({ groupId, onApprove, onReject }) {
             <div className="muted">אין בקשות כרגע.</div>
           ) : (
             <ul className="list">
-              {requests.map(r => (
-                <li key={r._id} className="row">
-                  <div className="row-main">
-                    <div className="title">{r.name || r.email}</div>
-                    <div className="sub">{r.email} · סטטוס: {r.status}</div>
-                    {r.description && <div className="sub">{r.description}</div>}
-                  </div>
-                  <div className="row-actions">
-                    <button className="small" onClick={() => onApprove(r)}>אשר/י</button>
-                    <button className="small danger" onClick={() => onReject(r)}>דחה/י</button>
-                  </div>
-                </li>
-              ))}
+              {requests
+                .filter(r => r.status === 'pending') // רק בקשות ממתינות
+                .map(r => (
+                  <li key={r._id} className="row">
+                    <div className="row-main">
+                      <div className="title">{r.name || r.email}</div>
+                      <div className="sub">{r.email} · סטטוס: {r.status}</div>
+                      {r.description && <div className="sub">{r.description}</div>}
+                    </div>
+                    <div className="row-actions">
+                      <button className="small" onClick={() => onApprove(r)}>אשר/י</button>
+                      <button className="small danger" onClick={() => onReject(r)}>דחה/י</button>
+                    </div>
+                  </li>
+                ))
+              }
             </ul>
+
           )}
         </div>
       </details>
