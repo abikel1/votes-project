@@ -15,47 +15,40 @@ const uploadRoutes = require('./src/routes/upload_routes');
 
 const app = express();
 
-// 1. CORS – חייבים שיהיה לפני כל ה־routes
+// 1. CORS – חייב להיות לפני כל ה־routes
 const allowedOrigins = [
-    'http://localhost:5173',
-    'https://votes-client-quox.onrender.com', // ← הפרונט החדש
-    'https://votes-project.onrender.com',     // השרת עצמו
+  'http://localhost:5173',                 // פיתוח
+  'https://votes-client-qoux.onrender.com', // ← כתובת ה־Client הנכונה!
+  'https://votes-project.onrender.com',     // השרת עצמו
 ];
 
-
 app.use(
-    cors({
-        origin(origin, callback) {
-            // בקשות בלי Origin (Postman, health checks וכו') – נאפשר
-            if (!origin) return callback(null, true);
+  cors({
+    origin(origin, callback) {
+      // בקשות בלי Origin (Postman, Render health checks וכו') – נאפשר
+      if (!origin) return callback(null, true);
 
-            if (allowedOrigins.includes(origin)) {
-                return callback(null, true);
-            }
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
 
-            return callback(new Error('Not allowed by CORS'));
-        },
-        credentials: true, // כי ב־axios מוגדר withCredentials: true
-    })
+      return callback(new Error(`Not allowed by CORS: ${origin}`));
+    },
+    credentials: true,
+  })
 );
 
-// אופציונלי – לטובת preflight כללי (OPTIONS)
-// app.options('*', cors());
-
-// 2. Static files for images (אם תרצי)
-// app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
-
-// 3. Upload route — חשוב לפני express.json()
+// 2. Upload route (לפני JSON)
 app.use('/api/upload', uploadRoutes);
 
-// 4. JSON parser
+// 3. JSON parser
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-// 5. Google auth
+// 4. Google OAuth
 app.use(passport.initialize());
 
-// 6. Other routes
+// 5. All routes
 app.use('/api/users', userRoutes);
 app.use('/api/candidates', candidateRoutes);
 app.use('/api/groups', groupRoutes);
