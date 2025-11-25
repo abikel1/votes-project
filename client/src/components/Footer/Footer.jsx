@@ -1,4 +1,3 @@
-// src/components/layout/Footer.jsx
 import { FaInstagram, FaWhatsapp, FaTelegramPlane } from 'react-icons/fa';
 import './Footer.css';
 import { useTranslation } from 'react-i18next';
@@ -41,6 +40,7 @@ export default function Footer() {
                     <h4>{t('footer.followUs')}</h4>
 
                     <div className="footer-social-icons">
+                        <h4>*** FOOTER TEST ***</h4>
                         <a href="https://wa.me/972500000000" target="_blank" rel="noreferrer"><FaWhatsapp /></a>
                         <a href="https://www.instagram.com/your_page" target="_blank" rel="noreferrer"><FaInstagram /></a>
                         <a href="https://t.me/your_channel" target="_blank" rel="noreferrer"><FaTelegramPlane /></a>
