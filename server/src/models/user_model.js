@@ -32,6 +32,11 @@ const userSchema = new mongoose.Schema({
     default: 'local',
   },
 
+    isAdmin: {
+    type: Boolean,
+    default: false,
+  },
+  
   joinedGroups:  [{ type: String }],
   createdGroups: [{ type: String }],
   voteHistory:   [{ type: String }],

@@ -13,6 +13,7 @@ function generateToken(user) {
       email: user.email,
       firstName: user.firstName,
       lastName: user.lastName,
+      isAdmin: !!user.isAdmin,
     },
     JWT_SECRET,
     { expiresIn: JWT_EXPIRES }

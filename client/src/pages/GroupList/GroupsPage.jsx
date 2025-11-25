@@ -52,7 +52,15 @@ export default function GroupsPage() {
   const { t } = useTranslation();
 
   const { loading, error: err, list: groups } = useSelector((s) => s.groups);
-  const { userEmail: authEmail, userId: authId } = useSelector((s) => s.auth);
+  const { userEmail: authEmail, userId: authId, isAdmin } = useSelector((s) => s.auth);
+  // const { userEmail: authEmail, userId: authId } = useSelector((s) => s.auth);
+  useEffect(() => {
+    console.log('Auth in GroupsPage:', {
+      authEmail,
+      authId,
+      isAdmin,
+    });
+  }, [authEmail, authId, isAdmin]);
 
   const joinedIdsSet = useSelector(selectMyJoinedIds);
   const pendingIdsSet = useSelector(selectMyPendingSet);
@@ -373,6 +381,7 @@ export default function GroupsPage() {
               : String(g.createdById ?? '');
 
           const isOwner =
+            isAdmin ||
             !!g.isOwner ||
             (!!myEmail && !!createdByEmail && myEmail === createdByEmail) ||
             (!!myId && !!createdById && myId === createdById);
@@ -409,6 +418,14 @@ export default function GroupsPage() {
           };
 
           const onCardClick = async () => {
+            // 👑 אדמין – תמיד נכנס, גם לקבוצות נעולות
+            if (isAdmin) {
+              navigate(`/groups/${slug}`, {
+                state: { groupId: gid },
+              });
+              return;
+            }
+
             // קבוצה פתוחה – תמיד נכנסים
             if (!isLocked) {
               navigate(`/groups/${slug}`, {
@@ -459,6 +476,7 @@ export default function GroupsPage() {
           };
 
           const cardDisabled =
+            !isAdmin &&            // 👈 רק מי שלא אדמין יכול להיות "מנוטרל"
             !isOwner &&
             isLocked &&
             ((isPending && !isMember) || (!isPending && !isMember));

@@ -82,13 +82,13 @@ export default function GroupDetailPage() {
 
   const joinedIdsSet = useSelector(selectMyJoinedIds);
 
-  const [candidateRequests, setCandidateRequests] = useState([]);
+  // const [candidateRequests, setCandidateRequests] = useState([]);
 
   const { userEmail: authEmail, userId: authId } = useSelector((s) => s.auth);
   const isAuthed =
     !!authId ||
     !!authEmail ||
-    !!localStorage.getItem('token');
+    !!localStorage.getItem('authToken');
 
   const [leftWidth, setLeftWidth] = useState(35);
   const [isDragging, setIsDragging] = useState(false);
@@ -181,30 +181,21 @@ export default function GroupDetailPage() {
     };
   }, [isDragging]);
 
-  // ===== הבאת בקשות הצטרפות – רק למשתמש מחובר שהוא מנהל הקבוצה =====
-  useEffect(() => {
-    if (!groupId) return;
+  // useEffect(() => {
+  //   if (!groupId) return;
 
-    // אורח → לא מביאים בקשות הצטרפות, כדי לא לקבל 401
-    if (!isAuthed) return;
+  //   const fetchRequests = async () => {
+  //     try {
+  //       const res = await http.get(`/groups/${groupId}/requests`);
+  //       setCandidateRequests(res.data); // מערך בקשות הצטרפות
+  //     } catch (err) {
+  //       console.error('failed to fetch join requests', err);
+  //     }
+  //   };
 
-    // רק בעלת הקבוצה רואה את רשימת ה-requests
-    if (!isOwner) return;
+  //   fetchRequests();
+  // }, [groupId]);
 
-    const fetchRequests = async () => {
-      try {
-        const res = await http.get(`/groups/${groupId}/requests`);
-        setCandidateRequests(res.data);
-      } catch (err) {
-        // אם בטעות יש 401 / בעיה אחרת – לא מפיל את כל הדף
-        if (err?.response?.status !== 401) {
-          console.error('failed to fetch join requests', err);
-        }
-      }
-    };
-
-    fetchRequests();
-  }, [groupId, isAuthed, isOwner]);
 
   // ===== טיפול בשגיאות / מצבי טעינה =====
   if (groupError) {
@@ -253,6 +244,9 @@ export default function GroupDetailPage() {
   if (groupLoading || !group) {
     return <div className="loading-wrap">טוען נתוני קבוצה…</div>;
   }
+
+  // עכשיו בטוח להשתמש ב-group._id
+  const candidateRequests = group.candidateRequests || [];
 
   // סוף יום ההצבעה – 23:59:59 של אותו יום
   let endAt = group?.endDate ? new Date(group.endDate) : null;
@@ -487,6 +481,7 @@ export default function GroupDetailPage() {
             <div className="candidate-form-card">
               <CandidateApplyForm
                 groupId={group._id}
+
                 candidateRequests={candidateRequests}
               />
             </div>
