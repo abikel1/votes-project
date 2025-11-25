@@ -17,9 +17,11 @@ const app = express();
 
 // 1. CORS – חייבים שיהיה לפני כל ה־routes
 const allowedOrigins = [
-    'http://localhost:5173',                    // client בזמן פיתוח
-    'https://votes-client-qoux.onrender.com',  // ✅ הפרונט ברנדר
+    'http://localhost:5173',
+    'https://votes-client-quox.onrender.com', // ← הפרונט החדש
+    'https://votes-project.onrender.com',     // השרת עצמו
 ];
+
 
 app.use(
     cors({
