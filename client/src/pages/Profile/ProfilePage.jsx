@@ -12,6 +12,7 @@ import { useNavigate } from 'react-router-dom';
 import CityStreetAuto from '../../components/CityStreetAuto';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
+import http from '../../api/http';
 
 export default function ProfilePage() {
   const dispatch = useDispatch();
@@ -57,14 +58,19 @@ export default function ProfilePage() {
     }
   }, [user, token, dispatch]);
 
-  useEffect(() => {
-    if (user && token) {
-      fetch('/api/groups/my', { headers: { Authorization: `Bearer ${token}` } })
-        .then((res) => res.json())
-        .then((data) => setUserGroups(data))
-        .catch((err) => console.error('Error fetching user groups:', err));
-    }
-  }, [user, token]);
+useEffect(() => {
+  if (!user || !token) return;
+
+  http
+    .get('/groups/my')  // שם הראוט בצד שרת: /api/groups/my
+    .then((res) => {
+      setUserGroups(res.data);
+    })
+    .catch((err) => {
+      console.error('Error fetching user groups:', err);
+    });
+}, [user, token]);
+
 
   // 💡 ולידציה "חיה" לאימות סיסמה
   useEffect(() => {
