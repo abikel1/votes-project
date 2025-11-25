@@ -65,9 +65,14 @@ async function deletePost(campaignId, postId) {
   const campaign = await Campaign.findById(campaignId);
   if (!campaign) throw new Error("קמפיין לא נמצא");
 
-  campaign.posts.id(postId).remove();
-  await campaign.save();
-  return campaign;
+  console.log("Posts in campaign:", campaign.posts.map(p => p._id.toString()));
+  const post = campaign.posts.id(postId);
+  if (!post) throw new Error("פוסט לא נמצא בקמפיין");
+
+ campaign.posts = campaign.posts.filter(p => p._id.toString() !== postId);
+await campaign.save();
+return campaign;
+
 }
 
 // ===== גלריית תמונות =====

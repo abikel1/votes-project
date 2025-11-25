@@ -1,5 +1,7 @@
 import { useParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
+import { useMemo } from 'react';
+
 import { useDispatch, useSelector } from 'react-redux';
 import {
 fetchCampaign,
@@ -49,8 +51,10 @@ setNewPost({ title: '', content: '' });
 };
 
 const handleDeletePost = (postId) => {
-dispatch(deletePost({ campaignId: campaign._id, postId }));
+  console.log("Deleting postId:", postId, "campaignId:", campaign._id);
+  dispatch(deletePost({ campaignId: campaign._id, postId }));
 };
+
 
 const handleAddImage = () => {
 if (!newImageUrl) return;
@@ -59,8 +63,19 @@ setNewImageUrl('');
 };
 
 const handleDeleteImage = (url) => {
-dispatch(deleteImage({ campaignId: campaign._id, imageUrl: url }));
+  // אם backend לא תומך בשדות מספריים, צריך להמיר את המפתח או להשתמש ב־API חדש
+  dispatch(deleteImage({ campaignId: campaign._id, imageUrl: url }));
 };
+
+
+// const images = useMemo(() => {
+//   return campaign
+//     ? Object.keys(campaign)
+//         .filter((key) => !isNaN(key))
+//         .map((key) => campaign[key])
+//     : [];
+// }, [campaign]);
+
 
 if (loading) return <div>טוען קמפיין…</div>;
 if (error) return <div>שגיאה: {error}</div>;
@@ -118,18 +133,22 @@ className="back-btn"
   </div>
 
   <h3>גלריית תמונות</h3>
-  {campaign.images?.length ? (
-    <div className="campaign-gallery">
-      {campaign.images.map((img, idx) => (
+{campaign.gallery?.filter(url => url && url.startsWith('http')).length ? (
+  <div className="campaign-gallery">
+    {campaign.gallery
+      .filter(url => url && url.startsWith('http'))
+      .map((img, idx) => (
         <div key={idx} className="gallery-item">
           <img src={img} alt={`Gallery ${idx}`} />
           <button onClick={() => handleDeleteImage(img)}>מחק</button>
         </div>
       ))}
-    </div>
-  ) : (
-    <p>אין תמונות בגלריה.</p>
-  )}
+  </div>
+) : (
+  <p>אין תמונות בגלריה.</p>
+)}
+
+
   <div className="new-image">
     <input
       type="text"
