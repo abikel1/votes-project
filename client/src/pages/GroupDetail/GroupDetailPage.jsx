@@ -4,7 +4,7 @@ import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { HiClock, HiUserGroup, HiUser, HiOutlineBadgeCheck } from 'react-icons/hi';
 import toast from 'react-hot-toast';
-import { FiSettings, FiMessageSquare, FiX } from 'react-icons/fi';
+import { FiSettings, FiMessageSquare, FiX, FiStar } from 'react-icons/fi';
 import { BiArrowBack } from 'react-icons/bi';
 
 import CountdownTimer from '../../components/CountdownTimer/CountdownTimer';
@@ -39,8 +39,7 @@ import {
 } from 'recharts';
 
 import http from '../../api/http';
-import CandidateApplyForm from '../../components/CandidateApplyForm'
-import { FiStar } from 'react-icons/fi'; // Feather Icons – כוכב
+import CandidateApplyForm from '../../components/CandidateApplyForm';
 
 // צבעים לגרפים
 const COLORS = [
@@ -53,6 +52,7 @@ const COLORS = [
   '#6366f1',
   '#84cc16',
 ];
+
 const makeSlug = (name = '') =>
   encodeURIComponent(
     String(name)
@@ -70,9 +70,12 @@ export default function GroupDetailPage() {
   const navGroupId = location.state?.groupId || null;
   const [groupId, setGroupId] = useState(navGroupId);
 
-  const { selectedGroup: group, loading: groupLoading, error: groupError } = useSelector(
-    (s) => s.groups,
-  );
+  const {
+    selectedGroup: group,
+    loading: groupLoading,
+    error: groupError,
+  } = useSelector((s) => s.groups);
+
   const candidates = useSelector(selectCandidatesForGroup(groupId || '')) || [];
   const loadingCandidates = useSelector(selectCandidatesLoadingForGroup(groupId || ''));
   const errorCandidates = useSelector(selectCandidatesErrorForGroup(groupId || ''));
@@ -81,10 +84,11 @@ export default function GroupDetailPage() {
 
   const [candidateRequests, setCandidateRequests] = useState([]);
 
-  const getWinnerLabel = (index) => ` ${index + 1}`;
-
   const { userEmail: authEmail, userId: authId } = useSelector((s) => s.auth);
-  const isAuthed = !!authId || !!authEmail || !!localStorage.getItem('authToken');
+  const isAuthed =
+    !!authId ||
+    !!authEmail ||
+    !!localStorage.getItem('token');
 
   const [leftWidth, setLeftWidth] = useState(35);
   const [isDragging, setIsDragging] = useState(false);
@@ -92,7 +96,42 @@ export default function GroupDetailPage() {
 
   const [isChatOpen, setIsChatOpen] = useState(false);
 
-  // אם נכנסו עם /groups/:groupSlug בלי state – נטען id מהשרת לפי slug
+  // ===== קריאת מזהי משתמש/מייל והרשאות בסיס =====
+  const gidStr = group?._id ? String(group._id) : '';
+  const slug = makeSlug(group?.name || groupSlug || gidStr || '');
+  const isLocked = !!group?.isLocked;
+
+  const myEmail = (authEmail || localStorage.getItem('userEmail') || '')
+    .trim()
+    .toLowerCase();
+  const myId = String(authId ?? localStorage.getItem('userId') ?? '');
+
+  const createdByEmail = (
+    group?.createdBy ??
+    group?.created_by ??
+    group?.createdByEmail ??
+    group?.ownerEmail ??
+    group?.owner ??
+    ''
+  )
+    .trim()
+    .toLowerCase();
+  const createdById = String(group?.createdById ?? '');
+
+  const isOwner =
+    !!group?.isOwner ||
+    (!!myEmail && !!createdByEmail && myEmail === createdByEmail) ||
+    (!!myId && !!createdById && myId === createdById);
+
+  const isMember =
+    !!joinedIdsSet &&
+    typeof joinedIdsSet.has === 'function' &&
+    !!gidStr &&
+    joinedIdsSet.has(gidStr);
+
+  const canChat = !isLocked || isOwner || isMember;
+
+  // ===== פתרון groupId לפי slug (אם נכנסו ישירות לכתובת) =====
   useEffect(() => {
     if (navGroupId) {
       setGroupId(navGroupId);
@@ -111,7 +150,7 @@ export default function GroupDetailPage() {
     })();
   }, [navGroupId, groupSlug]);
 
-
+  // ===== טעינת נתוני קבוצה, מועמדים, הקבוצות שלי =====
   useEffect(() => {
     if (groupId) {
       dispatch(fetchGroupWithMembers(groupId));
@@ -122,7 +161,7 @@ export default function GroupDetailPage() {
     }
   }, [dispatch, groupId, isAuthed]);
 
-  // Resize bar
+  // ===== Resize bar =====
   useEffect(() => {
     const handleMouseMove = (e) => {
       if (!isDragging || !containerRef.current) return;
@@ -142,21 +181,32 @@ export default function GroupDetailPage() {
     };
   }, [isDragging]);
 
+  // ===== הבאת בקשות הצטרפות – רק למשתמש מחובר שהוא מנהל הקבוצה =====
   useEffect(() => {
     if (!groupId) return;
+
+    // אורח → לא מביאים בקשות הצטרפות, כדי לא לקבל 401
+    if (!isAuthed) return;
+
+    // רק בעלת הקבוצה רואה את רשימת ה-requests
+    if (!isOwner) return;
 
     const fetchRequests = async () => {
       try {
         const res = await http.get(`/groups/${groupId}/requests`);
-        setCandidateRequests(res.data); // מערך בקשות הצטרפות
+        setCandidateRequests(res.data);
       } catch (err) {
-        console.error('failed to fetch join requests', err);
+        // אם בטעות יש 401 / בעיה אחרת – לא מפיל את כל הדף
+        if (err?.response?.status !== 401) {
+          console.error('failed to fetch join requests', err);
+        }
       }
     };
 
     fetchRequests();
-  }, [groupId]);
+  }, [groupId, isAuthed, isOwner]);
 
+  // ===== טיפול בשגיאות / מצבי טעינה =====
   if (groupError) {
     return (
       <div className="group-detail-error">
@@ -174,10 +224,6 @@ export default function GroupDetailPage() {
   if (!groupId) {
     return <div className="loading-wrap">טוען נתוני קבוצה…</div>;
   }
-
-  // if (groupLoading || !group) {
-  //   return <div className="loading-wrap">טוען נתוני קבוצה…</div>;
-  // }
 
   const now = new Date();
   let creationDate, candidateEndDate, endDate;
@@ -203,45 +249,10 @@ export default function GroupDetailPage() {
       isGroupExpired = now > endDate;
     }
   }
+
   if (groupLoading || !group) {
     return <div className="loading-wrap">טוען נתוני קבוצה…</div>;
   }
-
-  // עכשיו בטוח להשתמש ב-group._id
-
-
-  // ---- חישובי הרשאות אחרי שיש group ----
-  const gidStr = String(group._id);
-  const slug = makeSlug(group.name || groupSlug || gidStr);
-  const isLocked = !!group.isLocked;
-
-  const myEmail = (authEmail || localStorage.getItem('userEmail') || '')
-    .trim()
-    .toLowerCase();
-  const myId = String(authId ?? localStorage.getItem('userId') ?? '');
-
-  const createdByEmail = (
-    group.createdBy ??
-    group.created_by ??
-    group.createdByEmail ??
-    group.ownerEmail ??
-    group.owner ??
-    ''
-  )
-    .trim()
-    .toLowerCase();
-  const createdById = String(group.createdById ?? '');
-
-  const isOwner =
-    !!group.isOwner ||
-    (!!myEmail && !!createdByEmail && myEmail === createdByEmail) ||
-    (!!myId && !!createdById && myId === createdById);
-
-  const isMember =
-    !!joinedIdsSet && typeof joinedIdsSet.has === 'function' && joinedIdsSet.has(gidStr);
-
-
-  const canChat = !isLocked || isOwner || isMember;
 
   // סוף יום ההצבעה – 23:59:59 של אותו יום
   let endAt = group?.endDate ? new Date(group.endDate) : null;
@@ -339,18 +350,16 @@ export default function GroupDetailPage() {
   const pieData = candidates
     .filter((c) => c.votesCount > 0)
     .map((c) => ({ name: c.name, value: c.votesCount || 0 }));
+
   const barData = (sortedCandidates || []).map((c) => ({
     name: c.name ? (c.name.length > 12 ? c.name.substring(0, 12) + '...' : c.name) : 'לא ידוע',
     votesCount: c.votesCount || 0,
   }));
 
-
-
   const winners = sortedCandidates.slice(0, group.maxWinners);
 
   return (
     <div className="page-wrap dashboard">
-
       <div className="page-header clean-header">
         {/* כותרת מרכזית */}
         <div className="header-title">
@@ -365,10 +374,14 @@ export default function GroupDetailPage() {
         )}
 
         {/* כפתור חזרה ימין */}
-        <button className="icon-btn" onClick={() => navigate('/groups')} title="חזרה לקבוצות">
+        <button
+          className="icon-btn"
+          onClick={() => navigate('/groups')}
+          title="חזרה לקבוצות"
+        >
           <BiArrowBack size={20} />
         </button>
-      </div >
+      </div>
 
       <div className="meta-and-button">
         <div className="group-meta">
@@ -405,8 +418,6 @@ export default function GroupDetailPage() {
         )}
       </div>
 
-
-
       {errorCandidates && <p className="err">❌ שגיאה: {errorCandidates}</p>}
 
       <div className="main-content-resizable" ref={containerRef}>
@@ -419,67 +430,64 @@ export default function GroupDetailPage() {
 
             {!loadingCandidates && candidates.length > 0 && (
               <div className="candidates-grid">
-              {sortedCandidates.map((c) => {
-  const isWinner = winners.some((w) => w._id === c._id);
+                {sortedCandidates.map((c) => {
+                  const isWinner = winners.some((w) => w._id === c._id);
 
-  return (
-    <div key={c._id} className={`candidate-card ${isWinner ? 'winner' : ''}`}>
-      
-      {c.photoUrl && (
-        <img
-          src={c.photoUrl}
-          alt={c.name || 'תמונת מועמד'}
-          className="candidate-avatar"
-        />
-      )}
-      <div className="candidate-text">
-        <h4>{c.name}</h4>
-        {c.description && <p>{c.description}</p>}
-      </div>
+                  return (
+                    <div key={c._id} className={`candidate-card ${isWinner ? 'winner' : ''}`}>
+                      {c.photoUrl && (
+                        <img
+                          src={c.photoUrl}
+                          alt={c.name || 'תמונת מועמד'}
+                          className="candidate-avatar"
+                        />
+                      )}
 
-      {/* כפתור לדף קמפיין */}
-<button
-  className="campaign-btn"
-  onClick={() => navigate(`/campaign/${c._id}`)}
-  title="קמפיין שלי"
->
-  <FiStar size={20} />
-</button>
+                      <div className="candidate-text">
+                        <h4>{c.name}</h4>
+                        {c.description && <p>{c.description}</p>}
+                      </div>
 
+                      {/* כפתור לדף קמפיין */}
+                      <button
+                        className="campaign-btn"
+                        onClick={() => navigate(`/campaign/${c._id}`)}
+                        title="קמפיין שלי"
+                      >
+                        <FiStar size={20} />
+                      </button>
 
-
-      {isGroupExpired && <div className="votes-count">{c.votesCount || 0} קולות</div>}
-    </div>
-  );
-})}
-
-              </div >
+                      {isGroupExpired && (
+                        <div className="votes-count">{c.votesCount || 0} קולות</div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
             )}
 
             {!loadingCandidates && candidates.length === 0 && <p>אין מועמדים</p>}
-          </div >
-        </div >
+          </div>
+        </div>
 
         {/* פס גרירה */}
-        < div
+        <div
           className="resize-handle"
           onMouseDown={() => setIsDragging(true)}
         >
           <div className="resize-line" />
-        </div >
+        </div>
 
-        {/* צד ימין – מידע / גרפים */}
-        < div
+        {/* צד ימין – מידע / גרפים / טפסים */}
+        <div
           className="right-section"
           style={{ width: `${100 - leftWidth}%` }}
         >
-
-
           {isCandidatePhase && (
             <div className="candidate-form-card">
               <CandidateApplyForm
                 groupId={group._id}
-                candidateRequests={candidateRequests} // <-- עכשיו באמת שולח את הבקשות
+                candidateRequests={candidateRequests}
               />
             </div>
           )}
@@ -492,7 +500,6 @@ export default function GroupDetailPage() {
                   <p>זמן עד סיום</p>
                   <CountdownTimer endDate={group.endDate} />
                 </div>
-
 
                 <div className="info-card">
                   <HiUserGroup size={28} color="#1e3a8a" />
@@ -561,34 +568,38 @@ export default function GroupDetailPage() {
           )}
 
           {isGroupExpired && totalVotes === 0 && (
-            <div className="no-votes-message">🕐 אין הצבעות — לא ניתן להציג גרפים</div>
+            <div className="no-votes-message">
+              🕐 אין הצבעות — לא ניתן להציג גרפים
+            </div>
           )}
         </div>
-      </div >
+      </div>
 
       {/* כפתור צ'אט צף בצד ימין למטה */}
-      <>
-        <button
-          type="button"
-          className="chat-fab"
-          onClick={() => setIsChatOpen(prev => !prev)}
-        >
-          {isChatOpen ? <FiX size={20} /> : <FiMessageSquare size={20} />}
-        </button>
-        {isChatOpen && (
-          <div className="chat-panel">
-            <div className="chat-panel-header"></div>
-            <GroupChat
-              groupId={groupId}
-              canChat={canChat}
-              currentUserId={myId}
-              isOwner={isOwner}   // <-- חדש: מעבירים האם המשתמש מנהל הקבוצה
-            />
-          </div>
-        )}
+      {/* כפתור צ'אט צף בצד ימין למטה – יוצג רק אם המשתמש מחובר */}
+      {isAuthed && (
+        <>
+          <button
+            type="button"
+            className="chat-fab"
+            onClick={() => setIsChatOpen((prev) => !prev)}
+          >
+            {isChatOpen ? <FiX size={20} /> : <FiMessageSquare size={20} />}
+          </button>
+          {isChatOpen && (
+            <div className="chat-panel">
+              <div className="chat-panel-header" />
+              <GroupChat
+                groupId={groupId}
+                canChat={canChat}
+                currentUserId={myId}
+                isOwner={isOwner}
+              />
+            </div>
+          )}
+        </>
+      )}
 
-      </>
-
-    </div >
+    </div>
   );
 }
