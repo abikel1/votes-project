@@ -1,4 +1,3 @@
-// src/components/layout/Footer.jsx
 import { FaInstagram, FaWhatsapp, FaTelegramPlane } from 'react-icons/fa';
 import './Footer.css';
 import { useTranslation } from 'react-i18next';

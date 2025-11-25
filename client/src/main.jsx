@@ -7,6 +7,7 @@ import App from './App.jsx';
 import './index.css';
 import './i18n';
 import DirectionWrapper from './DirectionWrapper.jsx';
+import './components/Footer/Footer.css'
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
