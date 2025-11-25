@@ -1,8 +1,7 @@
-
-
 // src/slices/votesSlice.js
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import http from '../api/http';
+import i18n from '../i18n';
 
 /**
  * הצבעה למועמד/ת
@@ -13,12 +12,17 @@ export const voteForCandidate = createAsyncThunk(
   async ({ groupId, candidateId }, { getState, rejectWithValue }) => {
     try {
       const userId = getState().auth?.userId;
-      if (!userId) return rejectWithValue('User not logged in');
+      if (!userId) {
+        // לא מחובר – הודעה מתורגמת
+        return rejectWithValue(i18n.t('votes.errors.notLoggedIn'));
+      }
 
       const { data } = await http.post('/votes/create', { userId, groupId, candidateId });
       return { groupId, candidateId, data };
     } catch (e) {
-      return rejectWithValue(e?.response?.data?.message || 'Vote failed');
+      return rejectWithValue(
+        e?.response?.data?.message || i18n.t('votes.errors.voteFailed')
+      );
     }
   }
 );
@@ -37,7 +41,8 @@ export const fetchVotersByGroup = createAsyncThunk(
     } catch (e) {
       return rejectWithValue({
         groupId,
-        message: e?.response?.data?.message || 'Failed to fetch voters',
+        message:
+          e?.response?.data?.message || i18n.t('votes.errors.fetchVotersFailed'),
       });
     }
   }
@@ -101,7 +106,7 @@ const votesSlice = createSlice({
     });
     b.addCase(voteForCandidate.rejected, (s, a) => {
       s.status = 'failed';
-      s.error = a.payload;
+      s.error = a.payload || i18n.t('votes.errors.voteFailed');
     });
 
     // בדיקת "כבר הצבעתי"
@@ -131,7 +136,8 @@ const votesSlice = createSlice({
     b.addCase(fetchVotersByGroup.rejected, (s, a) => {
       const gid = String(a.payload?.groupId ?? a.meta.arg);
       s.votersLoadingByGroup[gid] = false;
-      s.votersErrorByGroup[gid] = a.payload?.message || 'Failed to fetch voters';
+      s.votersErrorByGroup[gid] =
+        a.payload?.message || i18n.t('votes.errors.fetchVotersFailed');
     });
   },
 });

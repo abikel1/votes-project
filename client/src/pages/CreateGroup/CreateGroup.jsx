@@ -4,6 +4,7 @@ import { createGroup, clearCreateState } from '../../slices/groupsSlice';
 import { useNavigate } from 'react-router-dom';
 import './CreateGroup.css';
 import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
 
 const makeSlug = (name = '') =>
   encodeURIComponent(
@@ -13,10 +14,10 @@ const makeSlug = (name = '') =>
       .replace(/\s+/g, '-')
   );
 
-
 export default function CreateGroupPage() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const { createLoading, createError, justCreated, selectedGroup } = useSelector((s) => s.groups);
 
@@ -24,8 +25,7 @@ export default function CreateGroupPage() {
     name: '',
     description: '',
     endDate: '',
-      candidateEndDate: '', // <-- חדש
-
+    candidateEndDate: '', // <-- חדש
     maxWinners: 1,
     isLocked: false, // false = פתוחה, true = נעולה
   });
@@ -48,54 +48,56 @@ export default function CreateGroupPage() {
   };
 
   const toggleLock = () => {
-    setForm(prev => ({ ...prev, isLocked: !prev.isLocked }));
+    setForm((prev) => ({ ...prev, isLocked: !prev.isLocked }));
   };
-
 
   const onSubmit = (e) => {
     e.preventDefault();
 
     if (!form.name.trim()) {
-      toast.error('שם קבוצה חובה');
+      toast.error(t('groups.create.errors.nameRequired'));
       return;
     }
 
     if (!form.description.trim()) {
-      toast.error('תיאור חובה');
+      toast.error(t('groups.create.errors.descriptionRequired'));
       return;
     }
 
     if (!form.endDate) {
-      toast.error('תאריך סיום חובה');
+      toast.error(t('groups.create.errors.endDateRequired'));
+      return;
+    }
+
+    if (!form.candidateEndDate) {
+      toast.error(t('groups.create.errors.candidateEndDateRequired'));
       return;
     }
 
     if (new Date(form.candidateEndDate) > new Date(form.endDate)) {
-  toast.error('תאריך סיום הגשת מועמדות לא יכול להיות אחרי תאריך סיום הקבוצה');
-  return;
-}
+      toast.error(t('groups.create.errors.candidateAfterGroup'));
+      return;
+    }
 
-
-   const payload = {
-  name: form.name.trim(),
-  description: form.description.trim(),
-  maxWinners: Number(form.maxWinners) || 1,
-  isLocked: !!form.isLocked,
-  endDate: new Date(form.endDate).toISOString(),
-  candidateEndDate: new Date(form.candidateEndDate).toISOString(), // <-- חדש
-};
-
+    const payload = {
+      name: form.name.trim(),
+      description: form.description.trim(),
+      maxWinners: Number(form.maxWinners) || 1,
+      isLocked: !!form.isLocked,
+      endDate: new Date(form.endDate).toISOString(),
+      candidateEndDate: new Date(form.candidateEndDate).toISOString(), // <-- חדש
+    };
 
     dispatch(createGroup(payload));
-    toast.success('הקבוצה נוצרה בהצלחה!');
+    toast.success(t('groups.create.toast.created'));
   };
 
   const copy = async (text) => {
     try {
       await navigator.clipboard.writeText(text);
-      toast.success('הקישור הועתק');
+      toast.success(t('groups.create.toast.linkCopied'));
     } catch {
-      // אפשר להוסיף toast.error אם רוצים להתריע במקרה של שגיאה
+      // אפשר להוסיף toast.error אם רוצים
     }
   };
 
@@ -112,24 +114,19 @@ export default function CreateGroupPage() {
       : `/groups/${slug}`)   // 🌐 קבוצה פתוחה – גם כן בשם
     : '';
 
-
   const shareUrl = sharePath ? `${origin}${sharePath}` : '';
+  const prettyShareUrl = shareUrl ? decodeURI(shareUrl) : '';
 
-  const prettyShareUrl = shareUrl ? decodeURI(shareUrl) : ''; // 👈 מה שמציגים בעין
-
-  const copyShareUrl = async () => {                         // 👈 במקום copy הישן
+  const copyShareUrl = async () => {
     if (!shareUrl) return;
     try {
       await navigator.clipboard.writeText(prettyShareUrl);
       setCopied(true);
       setTimeout(() => setCopied(false), 1500);
     } catch {
-      // אפשר להשאיר ריק או לשים fallback עם input זמני אם תרצי
+      // אפשר לשים fallback אם תרצי
     }
   };
-
-
-
 
   const finishToGroup = () => {
     setShowModal(false);
@@ -145,19 +142,24 @@ export default function CreateGroupPage() {
     }
   };
 
-
   return (
     <div className="cg-wrap">
-      <h2 className="cg-title">יצירת קבוצה חדשה</h2>
+      <h2 className="cg-title">{t('groups.create.title')}</h2>
 
       <form className="cg-form" onSubmit={onSubmit}>
         <label className="cg-label">
-          שם קבוצה *
-          <input className="cg-input" name="name" value={form.name} onChange={onChange} required />
+          {t('groups.create.labels.name')} *
+          <input
+            className="cg-input"
+            name="name"
+            value={form.name}
+            onChange={onChange}
+            required
+          />
         </label>
 
         <label className="cg-label">
-          תיאור *
+          {t('groups.create.labels.description')} *
           <textarea
             className="cg-input"
             rows={3}
@@ -169,26 +171,33 @@ export default function CreateGroupPage() {
         </label>
 
         <label className="cg-label">
-          תאריך סיום *
-          <input min={todayStr} className="cg-input" type="date" name="endDate" value={form.endDate} onChange={onChange} required />
+          {t('groups.create.labels.endDate')} *
+          <input
+            min={todayStr}
+            className="cg-input"
+            type="date"
+            name="endDate"
+            value={form.endDate}
+            onChange={onChange}
+            required
+          />
         </label>
 
         <label className="cg-label">
-  תאריך סיום הגשת מועמדות *
-  <input
-    min={todayStr}
-    className="cg-input"
-    type="date"
-    name="candidateEndDate"
-    value={form.candidateEndDate}
-    onChange={onChange}
-    required
-  />
-</label>
-
+          {t('groups.create.labels.candidateEndDate')} *
+          <input
+            min={todayStr}
+            className="cg-input"
+            type="date"
+            name="candidateEndDate"
+            value={form.candidateEndDate}
+            onChange={onChange}
+            required
+          />
+        </label>
 
         <label className="cg-label">
-          מקסימום זוכים
+          {t('groups.create.labels.maxWinners')}
           <input
             className="cg-input"
             type="number"
@@ -201,14 +210,18 @@ export default function CreateGroupPage() {
         </label>
 
         <div className="cg-label">
-          מצב קבוצה *
+          {t('groups.create.labels.status')} *
           <div className="switch-container">
-            <span>נעולה</span>
+            <span>{t('groups.create.status.locked')}</span>
             <label className="switch">
-              <input type="checkbox" checked={form.isLocked} onChange={toggleLock} />
+              <input
+                type="checkbox"
+                checked={form.isLocked}
+                onChange={toggleLock}
+              />
               <span className="slider round"></span>
             </label>
-            <span>פתוחה </span>
+            <span>{t('groups.create.status.open')}</span>
           </div>
         </div>
 
@@ -216,10 +229,16 @@ export default function CreateGroupPage() {
 
         <div className="cg-actions">
           <button className="cg-btn" type="submit" disabled={createLoading}>
-            {createLoading ? 'שומר…' : 'צור קבוצה'}
+            {createLoading
+              ? t('groups.create.buttons.saving')
+              : t('groups.create.buttons.create')}
           </button>
-          <button className="cg-btn-outline" type="button" onClick={() => navigate('/groups')}>
-            ביטול
+          <button
+            className="cg-btn-outline"
+            type="button"
+            onClick={() => navigate('/groups')}
+          >
+            {t('groups.create.buttons.cancel')}
           </button>
         </div>
       </form>
@@ -227,16 +246,18 @@ export default function CreateGroupPage() {
       {showModal && selectedGroup?._id && (
         <div className="modal-backdrop" onClick={() => setShowModal(false)}>
           <div className="modal" onClick={(e) => e.stopPropagation()}>
-            <h3 style={{ marginBottom: 8 }}>הקבוצה נוצרה ✔</h3>
+            <h3 style={{ marginBottom: 8 }}>
+              {t('groups.create.modal.title')}
+            </h3>
 
             {selectedGroup.isLocked && (
               <div className="muted" style={{ marginBottom: 8 }}>
-                כדי לבקש להצטרף לקבוצה נעולה יש להתחבר — לאחר התחברות נשלחת בקשת הצטרפות אוטומטית.
+                {t('groups.create.modal.lockedInfo')}
               </div>
             )}
 
             <div style={{ marginBottom: 12 }}>
-              <div>קישור לשיתוף:</div>
+              <div>{t('groups.create.modal.shareLinkLabel')}</div>
               <div style={{ display: 'flex', gap: 8, marginTop: 6 }}>
                 <input
                   className="cg-input"
@@ -251,14 +272,25 @@ export default function CreateGroupPage() {
                   type="button"
                   onClick={copyShareUrl}
                 >
-                  {copied ? 'הועתק ✓' : 'העתק'}
+                  {copied
+                    ? t('groups.create.modal.shareCopied')
+                    : t('groups.create.modal.shareCopy')}
                 </button>
-
               </div>
             </div>
 
-            <div className="actions-row" style={{ marginTop: 12, display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
-              <button className="gs-btn" type="button" onClick={finishToGroup}>סיום</button>
+            <div
+              className="actions-row"
+              style={{
+                marginTop: 12,
+                display: 'flex',
+                gap: 8,
+                justifyContent: 'flex-end',
+              }}
+            >
+              <button className="gs-btn" type="button" onClick={finishToGroup}>
+                {t('groups.create.modal.finish')}
+              </button>
             </div>
           </div>
         </div>

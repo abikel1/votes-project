@@ -3,6 +3,7 @@ import { useEffect, useState, useCallback, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
 import http from '../../api/http';
+import { useTranslation } from 'react-i18next';
 
 const lc = (s) => (s || '').trim().toLowerCase();
 
@@ -10,6 +11,7 @@ export default function JoinGroupPage() {
   // בקישור יש שם קבוצה (slug), לא id
   const { slug } = useParams();
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   // מזהה/ת התחברות גם לפי userEmail (למשל אחרי OAuth)
   const { userId, userEmail } = useSelector((s) => s.auth || {});
@@ -39,7 +41,7 @@ export default function JoinGroupPage() {
     if (!slug) {
       setGroup(null);
       setGroupName('');
-      setError('קבוצה לא נמצאה');
+      setError(t('join.errors.groupNotFound'));
       return null;
     }
 
@@ -52,56 +54,61 @@ export default function JoinGroupPage() {
       setError('');
       return data;
     } catch (e) {
-      const msg = e?.response?.data?.message || 'קבוצה לא נמצאה';
+      const msg =
+        e?.response?.data?.message || t('join.errors.groupNotFound');
       setGroup(null);
       setGroupName('');
       setError(msg);
       return null;
     }
-  }, [slug]);
+  }, [slug, t]);
 
   // שולח בקשת הצטרפות (למחוברים) – לפי groupId אמיתי מהשרת
-  const sendJoinRequest = useCallback(async (groupIdFromServer) => {
-    if (!groupIdFromServer) return;
+  const sendJoinRequest = useCallback(
+    async (groupIdFromServer) => {
+      if (!groupIdFromServer) return;
 
-    if (postedOnceRef.current) return; // אל תשגר פעמיים
-    postedOnceRef.current = true;
+      if (postedOnceRef.current) return; // אל תשגר פעמיים
+      postedOnceRef.current = true;
 
-    setLoading(true);
-    setError('');
-    setHint('');
+      setLoading(true);
+      setError('');
+      setHint('');
 
-    try {
-      const { data } = await http.post(`/groups/${groupIdFromServer}/join`);
-      // הצלחה רגילה
-      setShowSuccess(true);
-      if (data?.message && typeof data.message === 'string') {
-        setHint(data.message);
+      try {
+        const { data } = await http.post(`/groups/${groupIdFromServer}/join`);
+        // הצלחה רגילה
+        setShowSuccess(true);
+        if (data?.message && typeof data.message === 'string') {
+          setHint(data.message);
+        }
+      } catch (e) {
+        const msg = String(
+          e?.response?.data?.message ||
+            t('join.errors.sendRequestFailed')
+        );
+
+        // טיפול במקרים נפוצים – מציגים כהצלחה “רכה”
+        if (/pending|already.*pending|exists/i.test(msg)) {
+          setHint(t('join.hints.alreadyPending'));
+          setShowSuccess(true);
+        } else if (/already.*member|כבר.*חבר/i.test(msg)) {
+          setHint(t('join.hints.alreadyMember'));
+          setShowSuccess(true);
+        } else if (/not locked|Group is not locked|קבוצה.*פתוחה/i.test(msg)) {
+          setHint(t('join.hints.groupOpen'));
+          setShowSuccess(true);
+        } else {
+          // שגיאה אמיתית
+          setError(msg);
+          postedOnceRef.current = false; // אפשר לנסות שוב אם תרצי
+        }
+      } finally {
+        setLoading(false);
       }
-    } catch (e) {
-      const msg = String(
-        e?.response?.data?.message || 'שליחת בקשת ההצטרפות נכשלה'
-      );
-
-      // טיפול במקרים נפוצים – מציגים כהצלחה “רכה”
-      if (/pending|already.*pending|exists/i.test(msg)) {
-        setHint('כבר קיימת בקשת הצטרפות ממתינה לאישור.');
-        setShowSuccess(true);
-      } else if (/already.*member|כבר.*חבר/i.test(msg)) {
-        setHint('את/ה כבר חבר/ה בקבוצה.');
-        setShowSuccess(true);
-      } else if (/not locked|Group is not locked|קבוצה.*פתוחה/i.test(msg)) {
-        setHint('הקבוצה פתוחה — אין צורך בבקשת הצטרפות.');
-        setShowSuccess(true);
-      } else {
-        // שגיאה אמיתית
-        setError(msg);
-        postedOnceRef.current = false; // אפשר לנסות שוב אם תרצי
-      }
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+    },
+    [t]
+  );
 
   // זרימה ראשית
   useEffect(() => {
@@ -183,42 +190,48 @@ export default function JoinGroupPage() {
     setShowSuccess(false);
     navigate('/groups');
   };
+
   const cancelAndBack = () => {
     setShowLoginPrompt(false);
-    // בקבוצה נעולה, משתמש לא מחובר לא אמור לראות את הדף שלה
-    // לכן נחזור לרשימת הקבוצות
     navigate('/groups');
   };
 
-
   return (
     <div style={{ padding: 24 }}>
-      {loading ? 'טוען…' : null}
-      {error ? <div style={{ color: 'red', marginTop: 8 }}>{error}</div> : null}
+      {loading ? t('join.loading') : null}
+      {error ? (
+        <div style={{ color: 'red', marginTop: 8 }}>{error}</div>
+      ) : null}
 
       {/* מודאל: דרושה התחברות לפני בקשה */}
       {showLoginPrompt && (
         <div className="modal-backdrop" onClick={cancelAndBack}>
           <div className="modal" onClick={(e) => e.stopPropagation()}>
             <h3 style={{ marginBottom: 8 }}>
-              בקשת הצטרפות לקבוצה {groupName ? `“${groupName}”` : '(קבוצה נעולה)'}
+              {t('join.loginModal.title', {
+                groupName: groupName || undefined,
+              })}
             </h3>
             <div className="muted" style={{ marginBottom: 12 }}>
-              כדי לבקש להצטרף לקבוצה נעולה יש להתחבר לחשבון.
+              {t('join.loginModal.text')}
             </div>
             <div
               className="actions-row"
-              style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}
+              style={{
+                display: 'flex',
+                gap: 8,
+                justifyContent: 'flex-end',
+              }}
             >
               <button
                 className="gs-btn-outline"
                 type="button"
                 onClick={cancelAndBack}
               >
-                ביטול
+                {t('common.cancel')}
               </button>
               <button className="gs-btn" type="button" onClick={goLogin}>
-                התחברות
+                {t('auth.login')}
               </button>
             </div>
           </div>
@@ -229,16 +242,26 @@ export default function JoinGroupPage() {
       {showSuccess && (
         <div className="modal-backdrop" onClick={closeSuccess}>
           <div className="modal" onClick={(e) => e.stopPropagation()}>
-            <h3 style={{ marginBottom: 8 }}>הפניה בוצעה ✔</h3>
+            <h3 style={{ marginBottom: 8 }}>
+              {t('join.successModal.title')}
+            </h3>
             <div className="muted" style={{ marginBottom: 12 }}>
-              {hint || 'הבקשה נשלחה וממתינה לאישור מנהל/ת הקבוצה.'}
+              {hint || t('join.successModal.defaultHint')}
             </div>
             <div
               className="actions-row"
-              style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}
+              style={{
+                display: 'flex',
+                gap: 8,
+                justifyContent: 'flex-end',
+              }}
             >
-              <button className="gs-btn" type="button" onClick={closeSuccess}>
-                סגור
+              <button
+                className="gs-btn"
+                type="button"
+                onClick={closeSuccess}
+              >
+                {t('common.close')}
               </button>
             </div>
           </div>

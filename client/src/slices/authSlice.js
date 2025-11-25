@@ -1,6 +1,7 @@
 // src/slices/authSlice.js
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import http from '../api/http';
+import i18n from '../i18n';
 
 /** ===== עזר: פענוח JWT ללא אימות חתימה ===== */
 function decodeJwtNoVerify(token) {
@@ -76,8 +77,9 @@ export const register = createAsyncThunk(
       const { data } = await http.post('/users/register', form);
       return data;
     } catch (err) {
-      return thunkAPI.rejectWithValue(
-        err?.response?.data?.errors || { form: 'אירעה שגיאה ברישום' }
+      return thunkAPI.rejectWithValue( {
+          form: i18n.t('auth.register.genericError'),
+        }
       );
     }
   }
@@ -93,7 +95,7 @@ export const fetchProfile = createAsyncThunk(
       const { data } = await http.get('/users/me');
       return data; // { _id, name, email, ... }
     } catch (err) {
-      return rejectWithValue(err.response?.data?.message || err.message);
+      return rejectWithValue( i18n.t('auth.profile.loadFailed'));
     }
   }
 );
@@ -110,7 +112,7 @@ export const updateProfile = createAsyncThunk(
       if (serverErrors) {
         return rejectWithValue(serverErrors);
       }
-      const msg = err?.response?.data?.message || 'Update profile failed';
+      const msg =  i18n.t('auth.profile.updateFailed');
       return rejectWithValue({ form: msg });
     }
   }
@@ -121,7 +123,7 @@ export const login = createAsyncThunk('auth/login', async (formData, { rejectWit
     const { data } = await http.post('/users/login', formData);
     return data;
   } catch (err) {
-    return rejectWithValue(err?.response?.data?.errors || { form: 'שגיאה בשרת' });
+    return rejectWithValue( { form: i18n.t('auth.serverError') });
   }
 });
 
@@ -130,7 +132,7 @@ export const fetchMe = createAsyncThunk('auth/me', async (_, { rejectWithValue }
     const { data } = await http.get('/users/me');
     return data;
   } catch (err) {
-    return rejectWithValue(err?.response?.data?.message || 'Load profile failed');
+    return rejectWithValue( i18n.t('auth.profile.loadFailed'));
   }
 });
 
@@ -141,9 +143,9 @@ export const requestPasswordReset = createAsyncThunk(
   async (email, { rejectWithValue }) => {
     try {
       const { data } = await http.post('/auth/password/forgot', { email });
-      return data?.message || 'אם המייל קיים, נשלחו הוראות לאיפוס.';
+      return i18n.t('auth.forgot.genericSuccess');
     } catch (e) {
-      return rejectWithValue(e?.response?.data?.message || 'Request failed');
+      return rejectWithValue( i18n.t('auth.forgot.genericError'));
     }
   }
 );
@@ -154,9 +156,10 @@ export const resetPassword = createAsyncThunk(
   async ({ token, password }, { rejectWithValue }) => {
     try {
       const { data } = await http.post('/auth/password/reset', { token, password });
-      return data?.message || 'הסיסמה עודכנה בהצלחה.';
+      return i18n.t('auth.reset.genericSuccess');
     } catch (e) {
-      return rejectWithValue(e?.response?.data?.message || 'Reset failed');
+      return rejectWithValue( i18n.t('auth.reset.genericError')
+      );
     }
   }
 );
@@ -169,11 +172,11 @@ export const changePassword = createAsyncThunk(
         currentPassword,
         newPassword,
       });
-      return data.message || 'הסיסמה עודכנה בהצלחה';
+      return  i18n.t('auth.changePassword.genericSuccess');
     } catch (err) {
       const serverErrors = err?.response?.data?.errors;
       if (serverErrors) return rejectWithValue(serverErrors);
-      const msg = err?.response?.data?.message || 'Change password failed';
+      const msg =  i18n.t('auth.changePassword.genericError');
       return rejectWithValue({ form: msg });
     }
   }
@@ -182,7 +185,7 @@ export const changePassword = createAsyncThunk(
 /** ===== Slice ===== */
 const authSlice = createSlice({
   name: 'auth',
-initialState: {
+  initialState: {
     token: initialToken,
     firstName: initialFirstName,
     lastName: initialLastName,
@@ -202,7 +205,7 @@ initialState: {
       state.message = null;
     },
 
-     logout(state) {
+    logout(state) {
       state.token = null;
       state.firstName = null;
       state.lastName = null;
@@ -332,7 +335,7 @@ initialState: {
       })
       .addCase(updateProfile.rejected, (s, a) => {
         s.loading = false;
-        s.updateErrors = a.payload || { form: 'Update profile failed' };
+        s.updateErrors = { form: i18n.t('auth.profile.updateFailed') };
       })
 
       /** password reset request */
@@ -375,7 +378,7 @@ initialState: {
         s.message = a.payload;
       })
       .addCase(changePassword.rejected, (s, a) => {
-        s.updateErrors = a.payload || { form: 'Change password failed' };
+        s.updateErrors = { form: i18n.t('auth.changePassword.genericError') };
       });
   }
 });

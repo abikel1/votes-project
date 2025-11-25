@@ -34,3 +34,15 @@ html, body, #root {
   overflow: visible !important;
 }
 
+/* עברית */
+.rtl {
+  direction: rtl;
+  text-align: right;
+}
+
+/* אנגלית */
+.ltr {
+  direction: ltr;
+  text-align: left;
+}
+
