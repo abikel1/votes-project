@@ -2,10 +2,14 @@ import { useParams } from 'react-router-dom';
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchCampaign, selectCampaign, selectCampaignLoading, selectCampaignError } from '../../slices/campaignSlice';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 export default function CampaignPage() {
   const { candidateId } = useParams();
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const groupId = location.state?.groupId || null; // ← מקבלת את ה-ID שהעברנו
 
   const campaign = useSelector(selectCampaign);
   const loading = useSelector(selectCampaignLoading);
@@ -20,7 +24,49 @@ export default function CampaignPage() {
   if (!campaign) return <div>אין קמפיין למועמד</div>;
 
   return (
+
+
+
+
     <div className="campaign-page">
+
+      <button
+        onClick={() => {
+          if (groupId) {
+            navigate(`/groups/${groupId}`);
+          } else {
+            navigate('/groups');
+          }
+        }}
+        className="back-btn"
+      >
+        חזרה לקבוצה
+      </button>
+
+<div className="candidate-info">
+  <h1>{campaign.candidate?.name}</h1>
+
+  {campaign.candidate?.photoUrl && (
+    <img 
+      src={campaign.candidate.photoUrl} 
+      alt={campaign.candidate.name} 
+      className="candidate-photo"
+    />
+  )}
+
+  {campaign.candidate?.symbol && (
+    <div className="candidate-symbol">
+      {campaign.candidate.symbol}
+    </div>
+  )}
+
+  {campaign.candidate?.description && (
+    <p>{campaign.candidate.description}</p>
+  )}
+</div>
+
+
+
       <h2>{campaign.title}</h2>
       <p>{campaign.description}</p>
 

@@ -7,6 +7,7 @@ const {
   getCampaign,
   createCampaign,
   updateCampaign,
+  addPost
 } = require('../controllers/campaign_controller');
 
 // קמפיין של מועמד
@@ -18,7 +19,7 @@ router.post('/candidate/:candidateId', createCampaign);
 // עדכון קמפיין
 router.put('/:campaignId', updateCampaign);
 
-router.put('/:campaignId/posts', campaignController.addPost);
+router.put('/:campaignId/posts', addPost);
 
 
 module.exports = router;

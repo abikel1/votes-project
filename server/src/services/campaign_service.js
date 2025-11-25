@@ -1,22 +1,29 @@
 // src/services/campaignService.js
 const Campaign = require('../models/campaign_model');
+const Candidate = require('../models/candidate_model');
 
 async function getCampaignByCandidate(candidateId) {
-  let campaign = await Campaign.findOne({ candidateId });
+  let campaign = await Campaign.findOne({ candidate: candidateId })
+    .populate("candidate") // ← מחזיר את פרטי המועמד
+    .lean();
 
-  // אם אין קמפיין — ניצור חדש
   if (!campaign) {
-campaign = await Campaign.create({
-  candidate: candidateId,
-  description: "",
-  posts: [],
-  polls: []
-});
+    const newCampaign = await Campaign.create({
+      candidate: candidateId,
+      description: "",
+      posts: [],
+      polls: []
+    });
 
+    campaign = await Campaign.findById(newCampaign._id)
+      .populate("candidate")
+      .lean();
   }
 
   return campaign;
 }
+
+
 
 async function createCampaign(candidateId, data) {
   const campaign = new Campaign({ candidate: candidateId, ...data });

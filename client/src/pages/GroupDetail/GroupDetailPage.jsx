@@ -440,11 +440,16 @@ export default function GroupDetailPage() {
       {/* כפתור לדף קמפיין */}
 <button
   className="campaign-btn"
-  onClick={() => navigate(`/campaign/${c._id}`)}
+  onClick={() =>
+    navigate(`/campaign/${c._id}`, {
+      state: { groupId }   // ← שולחת את מזהה הקבוצה
+    })
+  }
   title="קמפיין שלי"
 >
   <FiStar size={20} />
 </button>
+
 
 
 
