@@ -1,14 +1,25 @@
+// src/pages/Home/HomePage.jsx
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { fetchGroups, selectGroupsWithOwnership } from '../../slices/groupsSlice';
-import { HiClock, HiUserGroup, HiCheckCircle, HiXCircle, HiPlus, HiChartBar, HiUser, HiOutlineBadgeCheck } from 'react-icons/hi';
+import {
+  HiClock,
+  HiUserGroup,
+  HiCheckCircle,
+  HiPlus,
+  HiChartBar,
+  HiUser,
+} from 'react-icons/hi';
 import './HomePage.css';
 import { toast } from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
 
 const HomePage = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { t } = useTranslation();
+
   const groups = useSelector(selectGroupsWithOwnership);
   const loading = useSelector((s) => s.groups.loading);
   const error = useSelector((s) => s.groups.error);
@@ -37,7 +48,9 @@ const HomePage = () => {
       if (isOpenToAll && (!endDate || endDate > now)) {
         active.push(group);
       } else if (isOpenToAll && endDate && endDate <= now) {
-        const daysSinceClosed = Math.floor((now - endDate) / (1000 * 60 * 60 * 24));
+        const daysSinceClosed = Math.floor(
+          (now - endDate) / (1000 * 60 * 60 * 24)
+        );
         if (daysSinceClosed <= 30) {
           recentlyClosed.push(group);
         }
@@ -57,21 +70,25 @@ const HomePage = () => {
   }, [groups]);
 
   const getTimeRemaining = (endDate) => {
-    if (!endDate) return 'ללא מועד סיום';
+    if (!endDate) return t('home.time.noEndDate');
 
     const now = new Date();
     const end = new Date(endDate);
     const diff = end - now;
 
-    if (diff <= 0) return 'הסתיים';
+    if (diff <= 0) return t('home.time.ended');
 
     const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+    const hours = Math.floor(
+      (diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
+    );
+    const minutes = Math.floor(
+      (diff % (1000 * 60 * 60)) / (1000 * 60)
+    );
 
-    if (days > 0) return `${days} ימים`;
-    if (hours > 0) return `${hours} שעות`;
-    return `${minutes} דקות`;
+    if (days > 0) return `${days} ${t('home.time.days')}`;
+    if (hours > 0) return `${hours} ${t('home.time.hours')}`;
+    return `${minutes} ${t('home.time.minutes')}`;
   };
 
   const makeSlug = (name = '', id = '') =>
@@ -86,8 +103,7 @@ const HomePage = () => {
 
   const onCreateGroupClick = () => {
     if (!isAuthed) {
-      toast.error('כדי ליצור קבוצה יש להתחבר תחילה.');
-
+      toast.error(t('home.toasts.loginToCreate'));
       return;
     }
     navigate('/groups/create');
@@ -104,7 +120,7 @@ const HomePage = () => {
       <div className="home-page">
         <div className="home-loading">
           <div className="spinner"></div>
-          <p>טוען קבוצות...</p>
+          <p>{t('home.loading')}</p>
         </div>
       </div>
     );
@@ -114,10 +130,13 @@ const HomePage = () => {
     return (
       <div className="home-page">
         <div className="home-error">
-          <h2>⚠️ שגיאה</h2>
+          <h2>⚠️ {t('home.error.title')}</h2>
           <p>{error}</p>
-          <button onClick={() => dispatch(fetchGroups())} className="retry-btn">
-            נסה שוב
+          <button
+            onClick={() => dispatch(fetchGroups())}
+            className="retry-btn"
+          >
+            {t('home.error.retry')}
           </button>
         </div>
       </div>
@@ -130,14 +149,15 @@ const HomePage = () => {
       <section className="hero-section">
         <div className="hero-overlay"></div>
         <div className="hero-content">
-          <h1 className="hero-title">מערכת הצבעה דיגיטלית</h1>
-          <p className="hero-subtitle">קולך נשמע • ההחלטה שלנו</p>
+          <h1 className="hero-title">{t('home.hero.title')}</h1>
+          <p className="hero-subtitle">{t('home.hero.subtitle')}</p>
           <button className="hero-cta" onClick={onCreateGroupClick}>
             <HiPlus className="btn-icon" />
-            יצירת חדר הצבעות חדש          </button>
+            {t('home.hero.cta')}
+          </button>
         </div>
         <div className="scroll-indicator">
-          <span>גלול למטה</span>
+          <span>{t('home.hero.scrollDown')}</span>
           <div className="scroll-arrow"></div>
         </div>
       </section>
@@ -145,15 +165,16 @@ const HomePage = () => {
       {/* Main Content */}
       <div className="main-content">
         <div className="content-wrapper">
-
           {/* Active Groups - Right Column */}
           <section className="groups-column active-column">
             <div className="column-header">
               <div className="header-title">
                 <HiCheckCircle className="header-icon active" />
-                <h2>הצבעות פעילות</h2>
+                <h2>{t('home.active.title')}</h2>
               </div>
-              <span className="badge-count active-badge">{activeGroups.length}</span>
+              <span className="badge-count active-badge">
+                {activeGroups.length}
+              </span>
             </div>
 
             {activeGroups.length > 0 ? (
@@ -165,31 +186,31 @@ const HomePage = () => {
                     onClick={() => handleGroupClick(group)}
                   >
                     <div className="card-content">
-                      <h3 className="card-title">{group.name || 'ללא שם'}</h3>
+                      <h3 className="card-title">
+                        {group.name || t('home.common.noName')}
+                      </h3>
                       {group.description && (
-                        <p className="card-description">{group.description}</p>
+                        <p className="card-description">
+                          {group.description}
+                        </p>
                       )}
 
                       <div className="card-meta">
-                        {/* <div className="meta-item">
-                          <HiUserGroup className="meta-icon" />
-                          <span>
-                          {group.votes?.length || 0}
-
-                          </span>
-                        </div> */}
-
+                        {/* אפשר להחזיר בעתיד את כמות המצביעים */}
                         <div className="meta-item time-meta">
                           <HiClock className="meta-icon" />
-                          <span className="time-text">{getTimeRemaining(group.endDate)}</span>
+                          <span className="time-text">
+                            {getTimeRemaining(group.endDate)}
+                          </span>
                         </div>
                       </div>
 
+                      {/* כפתור הצבעה אפשרי בעתיד */}
                       {/* <button
                         className="card-action-btn active-btn"
                         onClick={(e) => handleVoteClick(group, e)}
                       >
-                        הצבע עכשיו
+                        {t('home.active.voteNow')}
                         <span className="btn-arrow">←</span>
                       </button> */}
                     </div>
@@ -198,7 +219,7 @@ const HomePage = () => {
               </div>
             ) : (
               <div className="empty-column">
-                <p>אין הצבעות פעילות כרגע</p>
+                <p>{t('home.active.empty')}</p>
               </div>
             )}
           </section>
@@ -208,9 +229,11 @@ const HomePage = () => {
             <div className="column-header">
               <div className="header-title">
                 <HiChartBar className="header-icon closed" />
-                <h2>תוצאות אחרונות</h2>
+                <h2>{t('home.closed.title')}</h2>
               </div>
-              <span className="badge-count closed-badge">{recentlyClosedGroups.length}</span>
+              <span className="badge-count closed-badge">
+                {recentlyClosedGroups.length}
+              </span>
             </div>
 
             {recentlyClosedGroups.length > 0 ? (
@@ -222,29 +245,21 @@ const HomePage = () => {
                     onClick={() => handleGroupClick(group)}
                   >
                     <div className="card-content">
-                      <h3 className="card-title">{group.name || 'ללא שם'}</h3>
+                      <h3 className="card-title">
+                        {group.name || t('home.common.noName')}
+                      </h3>
                       {group.description && (
-                        <p className="card-description">{group.description}</p>
+                        <p className="card-description">
+                          {group.description}
+                        </p>
                       )}
 
                       <div className="card-meta">
-                        {/* <div className="meta-item">
-                          <HiUserGroup className="meta-icon" />
-                          <span>
-                         {group.votes?.length || 0}
-
-                          </span>
-                        </div> */}
-
-
-                        {/* <div className="meta-item">
-                          <HiXCircle className="meta-icon closed-icon" />
-                          <span>הסתיים</span>
-                        </div> */}
+                        {/* אפשר להחזיר בעתיד נתונים נוספים */}
                       </div>
 
                       <button className="card-action-btn closed-btn">
-                        צפה בתוצאות
+                        {t('home.closed.viewResults')}
                         <span className="btn-arrow">←</span>
                       </button>
                     </div>
@@ -253,46 +268,51 @@ const HomePage = () => {
               </div>
             ) : (
               <div className="empty-column">
-                <p>אין תוצאות אחרונות</p>
+                <p>{t('home.closed.empty')}</p>
               </div>
             )}
           </section>
-
         </div>
 
         {/* Empty State - when no groups at all */}
         {activeGroups.length === 0 && recentlyClosedGroups.length === 0 && (
           <div className="empty-state-full">
             <div className="empty-icon">🗳️</div>
-            <h2>אין קבוצות זמינות כרגע</h2>
-            <p>כשיהיו הצבעות פעילות, הן יופיעו כאן</p>
+            <h2>{t('home.emptyState.title')}</h2>
+            <p>{t('home.emptyState.subtitle')}</p>
             <button className="create-btn" onClick={onCreateGroupClick}>
               <HiPlus className="btn-icon" />
-              צור קבוצה חדשה
+              {t('home.emptyState.create')}
             </button>
           </div>
         )}
-
-
       </div>
 
       {/* Quick Actions Footer */}
       <section className="quick-actions">
-        <button className="action-btn" onClick={() => navigate('/groups')}>
-          <HiUserGroup className="btn-icon" /> כל חדרי ההצבעה
+        <button
+          className="action-btn"
+          onClick={() => navigate('/groups')}
+        >
+          <HiUserGroup className="btn-icon" /> {t('home.actions.allGroups')}
         </button>
 
         {isAuthed && (
-          <button className="action-btn" onClick={() => navigate('/profile')}>
-            <HiUser className="btn-icon" /> הפרופיל שלי
+          <button
+            className="action-btn"
+            onClick={() => navigate('/profile')}
+          >
+            <HiUser className="btn-icon" /> {t('home.actions.myProfile')}
           </button>
         )}
 
-        <button className="action-btn primary-action" onClick={onCreateGroupClick}>
-          <HiPlus className="btn-icon" /> יצירת קבוצה
+        <button
+          className="action-btn primary-action"
+          onClick={onCreateGroupClick}
+        >
+          <HiPlus className="btn-icon" /> {t('home.actions.createGroup')}
         </button>
       </section>
-
     </div>
   );
 };

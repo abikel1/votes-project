@@ -3,11 +3,15 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { logout } from '../../slices/authSlice';
 import './NavBar.css';
+import LanguageSwitcher from '../LanguageSwitcher.jsx';
+import { useTranslation } from 'react-i18next';
+// import logo from '../../assets/logo.png';
 
 const NavBar = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const location = useLocation(); // <-- כאן מקבלים את הנתיב הנוכחי
+  const location = useLocation();
+  const { t } = useTranslation();          // 👈 מוסיפים
 
   const { token, firstName, lastName } = useSelector((s) => s.auth);
   const isAuthed = Boolean(token);
@@ -21,10 +25,10 @@ const NavBar = () => {
   const initial = fullName ? fullName[0] : '';
 
   const links = [
-    { name: 'בית', path: '/' },
-    { name: 'קבוצות', path: '/groups' },
-    { name: 'אודות', path: '/about' },
-    { name: 'מדריך למשתמש', path: '/user-guide' },
+    { name: t('nav.home'), path: '/' },
+    { name: t('nav.groups'), path: '/groups' },
+    { name: t('nav.about'), path: '/about' },
+    { name: t('nav.guide'), path: '/user-guide' },
   ];
 
   return (
@@ -48,24 +52,26 @@ const NavBar = () => {
 
         {isAuthed ? (
           <button type="button" className="logout-btn" onClick={onLogout}>
-            יציאה
+            {t('nav.logout')}
           </button>
         ) : (
           <Link
             to="/login"
             className={location.pathname === '/login' ? 'active-link' : ''}
           >
-            התחברות
+            {t('nav.login')}
           </Link>
         )}
       </div>
+
+      <LanguageSwitcher />
 
       <div
         className="site-name"
         onClick={() => navigate('/')}
         style={{ cursor: 'pointer' }}
       >
-        בחירות
+        {t('app.title')}
       </div>
     </nav>
   );

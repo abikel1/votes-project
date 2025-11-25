@@ -1,9 +1,11 @@
+// src/pages/Register/RegisterPage.jsx
 import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { register } from '../../slices/authSlice';
 import CityStreetAuto from '../../components/CityStreetAuto';
 import './RegisterPage.css';
+import { useTranslation } from 'react-i18next';
 
 const InputField = ({ label, type = 'text', placeholder, value, onChange, onFocus, error }) => (
   <div className="form-group">
@@ -20,10 +22,9 @@ const InputField = ({ label, type = 'text', placeholder, value, onChange, onFocu
   </div>
 );
 
-
-
 const PasswordField = ({ label, placeholder, value, onChange, onFocus, error }) => {
   const [show, setShow] = useState(false);
+  const { t } = useTranslation();
 
   return (
     <div className="form-group">
@@ -41,7 +42,7 @@ const PasswordField = ({ label, placeholder, value, onChange, onFocus, error }) 
           type="button"
           className="toggle-password"
           onClick={() => setShow(s => !s)}
-          aria-label={show ? 'הסתר סיסמה' : 'הצג סיסמה'}
+          aria-label={show ? t('auth.reset.hidePassword') : t('auth.reset.showPassword')}
         >
           {show ? (
             // 👁️ עין פתוחה — סיסמה מוצגת
@@ -57,7 +58,6 @@ const PasswordField = ({ label, placeholder, value, onChange, onFocus, error }) 
             </svg>
           )}
         </button>
-
       </div>
       {error && <span className="error-text">{error}</span>}
     </div>
@@ -69,6 +69,7 @@ export default function RegisterPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const { loading, registeredOk } = useSelector(s => s.auth);
+  const { t } = useTranslation();
 
   const [form, setForm] = useState({
     firstName: '',
@@ -97,30 +98,30 @@ export default function RegisterPage() {
 
   useEffect(() => {
     if (form.confirmPassword && form.password && form.confirmPassword !== form.password) {
-      setErrors(e => ({ ...e, confirmPassword: 'הסיסמאות אינן תואמות' }));
+      setErrors(e => ({ ...e, confirmPassword: t('auth.register.errors.passwordsMismatch') }));
     } else {
       setErrors(e => ({ ...e, confirmPassword: undefined }));
     }
-  }, [form.password, form.confirmPassword]);
+  }, [form.password, form.confirmPassword, t]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     const newErrors = {};
 
     if (form.firstName.trim().length < 2)
-      newErrors.firstName = 'שם פרטי חייב לפחות 2 תווים';
+      newErrors.firstName = t('auth.register.errors.firstNameTooShort');
     if (form.lastName.trim().length < 2)
-      newErrors.lastName = 'שם משפחה חייב לפחות 2 תווים';
+      newErrors.lastName = t('auth.register.errors.lastNameTooShort');
     if (!/^\S+@\S+\.\S+$/.test(form.email))
-      newErrors.email = 'אימייל לא תקין';
+      newErrors.email = t('auth.register.errors.invalidEmail');
     if (form.password.length < 6)
-      newErrors.password = 'סיסמה חייבת לפחות 6 תווים';
+      newErrors.password = t('auth.register.errors.passwordTooShort');
     if (form.phone && !/^[\d+\-\s()]{6,20}$/.test(form.phone))
-      newErrors.phone = 'טלפון לא תקין';
-    if (!form.city) newErrors.city = 'עיר חובה';
-    if (!form.address) newErrors.address = 'כתובת חובה';
+      newErrors.phone = t('auth.register.errors.invalidPhone');
+    if (!form.city) newErrors.city = t('auth.register.errors.cityRequired');
+    if (!form.address) newErrors.address = t('auth.register.errors.addressRequired');
     if (form.confirmPassword !== form.password)
-      newErrors.confirmPassword = 'הסיסמאות אינן תואמות';
+      newErrors.confirmPassword = t('auth.register.errors.passwordsMismatch');
 
     if (Object.keys(newErrors).length) {
       setErrors(newErrors);
@@ -144,7 +145,7 @@ export default function RegisterPage() {
       } else if (err?.message) {
         apiErrors.form = err.message;
       } else {
-        apiErrors.email = 'מייל זה קיים במערכת';
+        apiErrors.email = t('auth.register.errors.emailExists');
       }
       setErrors(apiErrors);
     }
@@ -152,12 +153,12 @@ export default function RegisterPage() {
 
   useEffect(() => {
     if (registeredOk) {
-      const t = setTimeout(() => {
+      const tmr = setTimeout(() => {
         const params = new URLSearchParams(location.search);
         const after = params.get('redirect');
         navigate(after ? decodeURIComponent(after) : '/login');
       }, 1500);
-      return () => clearTimeout(t);
+      return () => clearTimeout(tmr);
     }
   }, [registeredOk, navigate, location.search]);
 
@@ -165,12 +166,14 @@ export default function RegisterPage() {
     <div className="auth-container">
       <div className="auth-card register-card">
         <div className="auth-header">
-          <h1>הרשמה</h1>
-          <p>צור חשבון חדש והצטרף אלינו</p>
+          <h1>{t('auth.register.title')}</h1>
+          <p>{t('auth.register.subtitle')}</p>
         </div>
 
         {registeredOk && (
-          <div className="alert alert-success">נרשמת בהצלחה! מעביר אותך...</div>
+          <div className="alert alert-success">
+            {t('auth.register.successRedirect')}
+          </div>
         )}
 
         {errors.form && (
@@ -180,8 +183,8 @@ export default function RegisterPage() {
         <form onSubmit={handleSubmit} className="auth-form">
           <div className="form-row">
             <InputField
-              label="שם פרטי*"
-              placeholder="הכנס שם פרטי"
+              label={t('auth.register.firstNameLabel')}
+              placeholder={t('auth.register.firstNamePlaceholder')}
               value={form.firstName}
               onChange={val => setForm(f => ({ ...f, firstName: val }))}
               onFocus={() => setErrors(e => ({ ...e, firstName: undefined }))}
@@ -189,8 +192,8 @@ export default function RegisterPage() {
             />
 
             <InputField
-              label="שם משפחה*"
-              placeholder="הכנס שם משפחה"
+              label={t('auth.register.lastNameLabel')}
+              placeholder={t('auth.register.lastNamePlaceholder')}
               value={form.lastName}
               onChange={val => setForm(f => ({ ...f, lastName: val }))}
               onFocus={() => setErrors(e => ({ ...e, lastName: undefined }))}
@@ -199,9 +202,9 @@ export default function RegisterPage() {
           </div>
 
           <InputField
-            label="אימייל*"
+            label={t('auth.register.emailLabel')}
             type="email"
-            placeholder="example@email.com"
+            placeholder={t('auth.register.emailPlaceholder')}
             value={form.email}
             onChange={val => setForm(f => ({ ...f, email: val }))}
             onFocus={() => setErrors(e => ({ ...e, email: undefined }))}
@@ -209,8 +212,8 @@ export default function RegisterPage() {
           />
 
           <InputField
-            label="טלפון*"
-            placeholder="050-1234567"
+            label={t('auth.register.phoneLabel')}
+            placeholder={t('auth.register.phonePlaceholder')}
             value={form.phone}
             onChange={val => setForm(f => ({ ...f, phone: val }))}
             onFocus={() => setErrors(e => ({ ...e, phone: undefined }))}
@@ -218,9 +221,9 @@ export default function RegisterPage() {
           />
 
           <div className="form-row">
-            {/* עמודה 1 – עיר */}
+            {/* עיר */}
             <div className="form-group">
-              <label>עיר*</label>
+              <label>{t('auth.register.cityLabel')}</label>
               <CityStreetAuto
                 idPrefix="reg-city"
                 className="citystreet--modern"
@@ -229,25 +232,25 @@ export default function RegisterPage() {
                   setForm((f) => ({ ...f, city: val }));
                   setErrors((e) => ({ ...e, city: undefined }));
                 }}
-                cityInputProps={{ placeholder: 'עיר' }}
+                cityInputProps={{ placeholder: t('auth.register.cityPlaceholder') }}
                 onlyCity
               />
               {errors.city && <span className="error-text">{errors.city}</span>}
             </div>
 
-            {/* עמודה 2 – רחוב */}
+            {/* רחוב */}
             <div className="form-group">
-              <label>רחוב*</label>
+              <label>{t('auth.register.streetLabel')}</label>
               <CityStreetAuto
                 idPrefix="reg-street"
                 className="citystreet--modern"
-                city={form.city}          // כדי שידע לפי איזו עיר להביא רחובות
+                city={form.city}
                 address={form.address}
                 onAddressChange={(val) => {
                   setForm((f) => ({ ...f, address: val }));
                   setErrors((e) => ({ ...e, address: undefined }));
                 }}
-                streetInputProps={{ placeholder: 'רחוב' }}
+                streetInputProps={{ placeholder: t('auth.register.streetPlaceholder') }}
                 onlyStreet
               />
               {errors.address && (
@@ -256,10 +259,9 @@ export default function RegisterPage() {
             </div>
           </div>
 
-
           <PasswordField
-            label="סיסמה*"
-            placeholder="לפחות 6 תווים"
+            label={t('auth.register.passwordLabel')}
+            placeholder={t('auth.register.passwordPlaceholder')}
             value={form.password}
             onChange={val => setForm(f => ({ ...f, password: val }))}
             onFocus={() => setErrors(e => ({ ...e, password: undefined }))}
@@ -267,8 +269,8 @@ export default function RegisterPage() {
           />
 
           <PasswordField
-            label="אימות סיסמה*"
-            placeholder="הכנס את הסיסמה שוב"
+            label={t('auth.register.confirmPasswordLabel')}
+            placeholder={t('auth.register.confirmPasswordPlaceholder')}
             value={form.confirmPassword}
             onChange={val => setForm(f => ({ ...f, confirmPassword: val }))}
             onFocus={() => setErrors(e => ({ ...e, confirmPassword: undefined }))}
@@ -279,32 +281,31 @@ export default function RegisterPage() {
             <div className="password-strength">
               <div className="strength-indicator">
                 <div
-                  className={`strength-bar ${form.password.length < 6 ? 'weak' :
+                  className={`strength-bar ${
+                    form.password.length < 6 ? 'weak' :
                     form.password.length < 10 ? 'medium' : 'strong'
-                    }`}
+                  }`}
                   style={{
                     width: form.password.length < 6 ? '33%' :
                       form.password.length < 10 ? '66%' : '100%'
                   }}
                 />
               </div>
-
             </div>
           )}
-
 
           <button
             type="submit"
             className="btn btn-primary"
             disabled={loading || form.confirmPassword !== form.password}
           >
-            {loading ? 'יוצר חשבון...' : 'צור חשבון'}
+            {loading ? t('auth.register.submitting') : t('auth.register.submit')}
           </button>
         </form>
 
         <div className="auth-footer">
-          <span>כבר יש לך חשבון? </span>
-          <Link to="/login">התחבר</Link>
+          <span>{t('auth.register.alreadyHaveAccount')}</span>
+          <Link to="/login">{t('auth.register.loginLink')}</Link>
         </div>
       </div>
     </div>
