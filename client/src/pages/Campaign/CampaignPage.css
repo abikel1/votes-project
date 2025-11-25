@@ -1,0 +1,80 @@
+.campaign-page {
+max-width: 800px;
+margin: 20px auto;
+padding: 15px;
+font-family: Arial, sans-serif;
+background: #f9f9f9;
+border-radius: 6px;
+box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+.back-btn {
+margin-bottom: 15px;
+padding: 6px 12px;
+background: #1976d2;
+color: white;
+border: none;
+border-radius: 4px;
+cursor: pointer;
+}
+
+.back-btn:hover {
+background: #1565c0;
+}
+
+.candidate-info {
+margin-bottom: 20px;
+text-align: center;
+}
+
+.candidate-photo {
+max-width: 150px;
+border-radius: 50%;
+margin: 10px 0;
+}
+
+.candidate-symbol {
+font-size: 30px;
+margin: 10px 0;
+}
+
+textarea, input[type="text"] {
+width: 100%;
+margin: 5px 0 10px;
+padding: 6px;
+border: 1px solid #ccc;
+border-radius: 4px;
+font-family: inherit;
+}
+
+button {
+padding: 6px 12px;
+margin: 5px 0;
+border: none;
+border-radius: 4px;
+background: #1976d2;
+color: white;
+cursor: pointer;
+}
+
+button:hover {
+background: #1565c0;
+}
+
+.campaign-post, .gallery-item {
+border: 1px solid #ddd;
+padding: 10px;
+border-radius: 4px;
+margin-bottom: 10px;
+background: white;
+}
+
+.gallery-item img {
+max-width: 100%;
+display: block;
+margin-bottom: 5px;
+}
+
+.new-post, .new-image {
+margin-top: 10px;
+}

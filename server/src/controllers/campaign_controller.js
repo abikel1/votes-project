@@ -1,11 +1,8 @@
-// src/controllers/campaignController.js
 const campaignService = require('../services/campaign_service');
 
 async function getCampaign(req, res) {
-  const { candidateId } = req.params;
   try {
-    const campaign = await campaignService.getCampaignByCandidate(candidateId);
-    if (!campaign) return res.status(404).json({ message: 'קמפיין לא נמצא' });
+    const campaign = await campaignService.getCampaignByCandidate(req.params.candidateId);
     res.json(campaign);
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -13,10 +10,8 @@ async function getCampaign(req, res) {
 }
 
 async function createCampaign(req, res) {
-  const { candidateId } = req.params;
-  const data = req.body;
   try {
-    const campaign = await campaignService.createCampaign(candidateId, data);
+    const campaign = await campaignService.createCampaign(req.params.candidateId, req.body);
     res.status(201).json(campaign);
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -24,22 +19,55 @@ async function createCampaign(req, res) {
 }
 
 async function updateCampaign(req, res) {
-  const { campaignId } = req.params;
-  const data = req.body;
   try {
-    const campaign = await campaignService.updateCampaign(campaignId, data);
+    const campaign = await campaignService.updateCampaign(req.params.campaignId, req.body);
     res.json(campaign);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 }
 
+// ===== פוסטים =====
 async function addPost(req, res) {
-  const { campaignId } = req.params;
-  const postData = req.body;
-
   try {
-    const campaign = await campaignService.addPostToCampaign(campaignId, postData);
+    const campaign = await campaignService.addPostToCampaign(req.params.campaignId, req.body);
+    res.json(campaign);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+}
+
+async function updatePost(req, res) {
+  try {
+    const campaign = await campaignService.updatePost(req.params.campaignId, req.params.postId, req.body);
+    res.json(campaign);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+}
+
+async function deletePost(req, res) {
+  try {
+    const campaign = await campaignService.deletePost(req.params.campaignId, req.params.postId);
+    res.json(campaign);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+}
+
+// ===== גלריית תמונות =====
+async function addImage(req, res) {
+  try {
+    const campaign = await campaignService.addImageToGallery(req.params.campaignId, req.body.imageUrl);
+    res.json(campaign);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+}
+
+async function deleteImage(req, res) {
+  try {
+    const campaign = await campaignService.deleteImageFromGallery(req.params.campaignId, req.body.imageUrl);
     res.json(campaign);
   } catch (err) {
     res.status(400).json({ message: err.message });
@@ -51,4 +79,8 @@ module.exports = {
   createCampaign,
   updateCampaign,
   addPost,
+  updatePost,
+  deletePost,
+  addImage,
+  deleteImage
 };
