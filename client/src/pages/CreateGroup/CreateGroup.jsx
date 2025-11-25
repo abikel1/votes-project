@@ -147,6 +147,7 @@ export default function CreateGroupPage() {
     } catch {
       // אפשר לשים fallback אם תרצי
     }
+  };
 
 
     const finishToGroup = () => {
@@ -358,5 +359,5 @@ export default function CreateGroupPage() {
       </div >
     );
   }
-}
+
 
