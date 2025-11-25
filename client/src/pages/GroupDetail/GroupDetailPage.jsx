@@ -79,7 +79,7 @@ export default function GroupDetailPage() {
 
   const joinedIdsSet = useSelector(selectMyJoinedIds);
 
-  const [candidateRequests, setCandidateRequests] = useState([]);
+  // const [candidateRequests, setCandidateRequests] = useState([]);
 
   const getWinnerLabel = (index) => ` ${index + 1}`;
 
@@ -142,20 +142,20 @@ export default function GroupDetailPage() {
     };
   }, [isDragging]);
 
-  useEffect(() => {
-    if (!groupId) return;
+  // useEffect(() => {
+  //   if (!groupId) return;
 
-    const fetchRequests = async () => {
-      try {
-        const res = await http.get(`/groups/${groupId}/requests`);
-        setCandidateRequests(res.data); // מערך בקשות הצטרפות
-      } catch (err) {
-        console.error('failed to fetch join requests', err);
-      }
-    };
+  //   const fetchRequests = async () => {
+  //     try {
+  //       const res = await http.get(`/groups/${groupId}/requests`);
+  //       setCandidateRequests(res.data); // מערך בקשות הצטרפות
+  //     } catch (err) {
+  //       console.error('failed to fetch join requests', err);
+  //     }
+  //   };
 
-    fetchRequests();
-  }, [groupId]);
+  //   fetchRequests();
+  // }, [groupId]);
 
   if (groupError) {
     return (
@@ -208,6 +208,7 @@ export default function GroupDetailPage() {
   }
 
   // עכשיו בטוח להשתמש ב-group._id
+  const candidateRequests = group.candidateRequests || [];
 
 
   // ---- חישובי הרשאות אחרי שיש group ----
@@ -479,7 +480,7 @@ export default function GroupDetailPage() {
             <div className="candidate-form-card">
               <CandidateApplyForm
                 groupId={group._id}
-                candidateRequests={candidateRequests} // <-- עכשיו באמת שולח את הבקשות
+                // candidateRequests={candidateRequests} // <-- עכשיו באמת שולח את הבקשות
               />
             </div>
           )}
