@@ -3,6 +3,11 @@ const mongoose = require('mongoose');
 const Group = require('../models/group_model');
 const Candidate = require('../models/candidate_model');
 const User = require('../models/user_model');
+const { GoogleGenerativeAI } = require('@google/generative-ai');
+
+const genAI = process.env.GEMINI_API_KEY
+  ? new GoogleGenerativeAI(process.env.GEMINI_API_KEY)
+  : null;
 
 function toBoolStrict(v) {
   if (typeof v === 'boolean') return v;
@@ -400,6 +405,51 @@ async function getCandidateRequestsService(groupId) {
   return group.candidateRequests || [];
 }
 
+async function generateGroupDescriptionService(name, hint = '') {
+  // fallback אם אין מפתח
+  if (!genAI || !process.env.GEMINI_API_KEY) {
+    return 'קבוצה חדשה באתר ההצבעות. תיאור יתווסף בהמשך.';
+  }
+
+  const safeName = String(name || '').trim();
+  const safeHint = String(hint || '').trim();
+
+  const prompt = `
+את/ה מסייע/ת ביצירת תיאור קצר לקבוצת הצבעה.
+
+שם הקבוצה: "${safeName || 'ללא שם'}"
+
+הנחיות מיוצר הקבוצה (לא חובה):
+"${safeHint || 'ללא'}"
+
+הוראות:
+1. כתוב/י תיאור בעברית בין 2 ל-4 שורות.
+2. התיאור צריך להתאים לעמוד קבוצה באתר הצבעות: ברור, מזמין, בלי סלנג קיצוני.
+3. אין להשתמש באימוג׳ים, כוכביות, כותרות או רשימות – רק טקסט רגיל.
+4. אל תוסיף/י פרטים שלא משתמעים מהשם או מההנחיות.
+`.trim();
+
+  const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
+
+  const result = await model.generateContent(prompt);
+  const response = result.response;
+  let text = (response.text() || '').trim();
+
+  if (!text) {
+    return 'קבוצה חדשה באתר ההצבעות.';
+  }
+
+  // לוודא עד 4 שורות ולא ריקות
+  const lines = text
+    .split('\n')
+    .map(l => l.trim())
+    .filter(Boolean)
+    .slice(0, 4);
+
+  return lines.join('\n') || 'קבוצה חדשה באתר ההצבעות.';
+}
+
+
 module.exports = {
   createGroupService,
   updateGroupService,
@@ -412,10 +462,11 @@ module.exports = {
   getUserGroupsService,
   getMyJoinStatusesService,
   isMemberOfGroupService,
-  removeGroupMemberService, 
+  removeGroupMemberService,
   applyCandidateService,
   approveCandidateRequestService,
   addCandidateByEmailService,
   rejectCandidateRequestService,
-  getCandidateRequestsService
+  getCandidateRequestsService,
+  generateGroupDescriptionService,
 };

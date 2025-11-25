@@ -1,0 +1,57 @@
+/* רק למחלקות הקשורות ל-AI modal */
+
+.ai-modal {
+    max-width: 520px;
+}
+
+.ai-modal-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 6px;
+}
+
+.ai-modal-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    background: #f3f6ff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 8px rgba(0, 51, 102, 0.15);
+}
+
+.ai-icon-emoji {
+    font-size: 22px;
+    line-height: 1;
+}
+
+.ai-modal-subtitle {
+    margin-top: 4px;
+    font-size: 13px;
+    color: #5c6b7a;
+}
+
+.ai-generate-btn {
+    margin-top: 10px;
+}
+
+.ai-preview-block {
+    margin-top: 12px;
+}
+
+.cg-ai-preview-label {
+    margin-bottom: 4px;
+    font-size: 13px;
+    color: #003366;
+    font-weight: 600;
+}
+
+.cg-ai-preview {
+    white-space: pre-line;
+}
+
+.ai-actions-row {
+    margin-top: 14px;
+}
