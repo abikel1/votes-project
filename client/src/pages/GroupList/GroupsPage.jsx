@@ -236,7 +236,7 @@ export default function GroupsPage() {
               }}
               title={t('groups.list.filters.title')}
             >
-              <img src="/src/assets/icons/filter.png" alt={t('groups.list.filters.alt')} />
+              <img src="/icons/filter.png" alt={t('groups.list.filters.alt')} />
             </button>
             {showFilters && (
               <div className="groups-dropdown">
@@ -311,7 +311,7 @@ export default function GroupsPage() {
               }}
               title={t('groups.list.sort.title')}
             >
-              <img src="/src/assets/icons/sort.png" alt={t('groups.list.sort.alt')} />
+              <img src="/icons/sort.png" alt={t('groups.list.sort.alt')} />
             </button>
             {showSort && (
               <div className="groups-dropdown">
@@ -482,7 +482,7 @@ export default function GroupsPage() {
                       }}
                     >
                       <img
-                        src="/src/assets/icons/padlock.png"
+                        src="/icons/padlock.png"
                         alt={t('groups.list.card.lockedAlt')}
                         className="groups-badge-locked"
                         title={t('groups.list.card.lockedTitle')}
@@ -504,7 +504,7 @@ export default function GroupsPage() {
                       onClick={goSettings}
                       title={t('groups.list.card.settingsTitle')}
                     >
-                      <img src="/src/assets/icons/settings.png" alt={t('groups.list.card.settingsAlt')} />
+                      <img src="/icons/settings.png" alt={t('groups.list.card.settingsAlt')} />
                     </button>
                   )}
                 </div>
