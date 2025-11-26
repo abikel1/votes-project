@@ -1,5 +1,6 @@
+// src/components/CandidateApplyForm.jsx
 import { useDispatch, useSelector } from 'react-redux';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import toast from 'react-hot-toast';
 
 import {
@@ -9,6 +10,9 @@ import {
 } from '../slices/candidateSlice';
 
 import { selectUserId } from '../slices/authSlice';
+import CandidateForm from './GroupSettings/CandidateForm';
+import { uploadImage } from './GroupSettings/uploadImage';
+
 import '../pages/Register/RegisterPage.css';
 
 export default function CandidateApplyForm({ groupId, candidateRequests = [] }) {
@@ -30,6 +34,10 @@ export default function CandidateApplyForm({ groupId, candidateRequests = [] }) 
     photoUrl: '',
   });
 
+  const [errors, setErrors] = useState({});
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef(null);
+
   const [userRequest, setUserRequest] = useState(null);
 
   useEffect(() => {
@@ -47,9 +55,29 @@ export default function CandidateApplyForm({ groupId, candidateRequests = [] }) 
     setUserRequest(req || null);
   }, [candidateRequests, userId, userEmail]);
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
+  const handleFieldChange = (name, value) => {
     setForm((prev) => ({ ...prev, [name]: value }));
+    setErrors((prev) => ({ ...prev, [name]: undefined }));
+  };
+
+  const clearPhoto = () => {
+    setForm((prev) => ({ ...prev, photoUrl: '' }));
+  };
+
+  const handleUpload = async (file) => {
+    if (!file) return;
+
+    try {
+      setUploading(true);
+      const url = await uploadImage(file, form.photoUrl || '');
+      if (!url) return;
+      setForm((prev) => ({ ...prev, photoUrl: url }));
+    } catch (err) {
+      console.error('Upload error:', err);
+      toast.error('שגיאה בהעלאת התמונה');
+    } finally {
+      setUploading(false);
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -61,6 +89,7 @@ export default function CandidateApplyForm({ groupId, candidateRequests = [] }) 
     }
 
     if (!form.name.trim()) {
+      setErrors((prev) => ({ ...prev, name: 'שם מלא חובה' }));
       toast.error('שם מלא חובה');
       return;
     }
@@ -73,7 +102,7 @@ export default function CandidateApplyForm({ groupId, candidateRequests = [] }) 
           description: form.description.trim(),
           symbol: form.symbol.trim(),
           photoUrl: form.photoUrl.trim(),
-        })
+        }),
       ).unwrap();
 
       if (out?.request) {
@@ -82,6 +111,8 @@ export default function CandidateApplyForm({ groupId, candidateRequests = [] }) 
 
       toast.success('בקשת המועמדות הוגשה למנהל/ת הקבוצה!');
       setForm({ name: '', description: '', symbol: '', photoUrl: '' });
+      setErrors({});
+      clearPhoto();
     } catch (err) {
       const message = err?.message || 'שגיאה בלתי צפויה';
       toast.error(message);
@@ -100,7 +131,7 @@ export default function CandidateApplyForm({ groupId, candidateRequests = [] }) 
     );
   }
 
-  // 🔒 סטטוסים שחוסמים את הצגת הטופס
+  // סטטוסים שחוסמים את הצגת הטופס
   if (userRequest) {
     if (userRequest.status === 'pending') {
       return (
@@ -121,14 +152,14 @@ export default function CandidateApplyForm({ groupId, candidateRequests = [] }) 
 
   return (
     <div className="auth-card register-card">
-      {/* ❌ נדחה */}
+      {/* נדחה */}
       {userRequest?.status === 'rejected' && (
         <div className="alert alert-warning">
           ⚠️ בקשת המועמדות שלך נדחתה – ניתן להגיש בקשה חדשה
         </div>
       )}
 
-      {/* 🗑️ נמחק */}
+      {/* נמחק */}
       {userRequest?.status === 'removed' && (
         <div className="alert alert-warning">
           ⚠️ המועמדות הקודמת שלך נמחקה ע&quot;י המנהל/ת – ניתן להגיש בקשה חדשה
@@ -140,57 +171,20 @@ export default function CandidateApplyForm({ groupId, candidateRequests = [] }) 
         <p>מלא/י את הפרטים למועמדות בקבוצה</p>
       </div>
 
-      <form className="auth-form" onSubmit={handleSubmit}>
-        <div className="form-group">
-          <label>שם מלא</label>
-          <input
-            type="text"
-            name="name"
-            placeholder="שם מלא"
-            value={form.name}
-            onChange={handleChange}
-            required
-          />
-        </div>
+      <CandidateForm
+        form={form}
+        errors={errors}
+        onChange={handleFieldChange}
+        onSubmit={handleSubmit}
+        uploading={uploading}
+        onUploadFile={handleUpload}
+        fileInputRef={fileInputRef}
+        clearPhoto={clearPhoto}
+        submitLabel={loading ? 'טוען...' : 'הגש מועמדות'}
+        submitDisabled={loading || uploading}
+      />
 
-        <div className="form-group">
-          <label>סימול</label>
-          <input
-            type="text"
-            name="symbol"
-            placeholder="סימול (אופציונלי)"
-            value={form.symbol}
-            onChange={handleChange}
-          />
-        </div>
-
-        <div className="form-group">
-          <label>תיאור קצר</label>
-          <textarea
-            name="description"
-            placeholder="תיאור קצר עליך"
-            value={form.description}
-            onChange={handleChange}
-          />
-        </div>
-
-        <div className="form-group">
-          <label>קישור לתמונה</label>
-          <input
-            type="text"
-            name="photoUrl"
-            placeholder="https://..."
-            value={form.photoUrl}
-            onChange={handleChange}
-          />
-        </div>
-
-        <button type="submit" className="btn btn-primary" disabled={loading}>
-          {loading ? 'טוען...' : 'הגש מועמדות'}
-        </button>
-
-        {error && <p className="error-text">❌ {error}</p>}
-      </form>
+      {error && <p className="error-text">❌ {error}</p>}
     </div>
   );
 }

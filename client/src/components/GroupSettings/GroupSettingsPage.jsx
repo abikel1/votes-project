@@ -54,7 +54,11 @@ import DangerTab from './DangerTab';
 import EditCandidateModal from './EditCandidateModal';
 import DeleteGroupModal from './DeleteGroupModal';
 import CandidateRequestsTab from './CandidateRequestsTab';
-import { approveCandidateRequest, rejectCandidateRequest, selectCandidateRequestsForGroup } from '../../slices/candidateSlice';
+import {
+  approveCandidateRequest,
+  rejectCandidateRequest,
+  fetchCandidateRequestsByGroup,
+} from '../../slices/candidateSlice';
 
 
 
@@ -182,12 +186,6 @@ export default function GroupSettingsPage() {
   const newFileInputRef = useRef(null);
   const editFileInputRef = useRef(null);
 
-
-
-  const candidateRequests = group?.candidateRequests || [];
-  const requestsLoading = false; // או selector מתאים
-  const requestsError = null; // או selector מתאים
-
   // שיתוף
   const [copied, setCopied] = useState(false);
 
@@ -220,10 +218,10 @@ export default function GroupSettingsPage() {
     if (!groupId) return;
     dispatch(fetchGroupWithMembers(groupId));
     dispatch(fetchCandidatesByGroup(groupId));
-    // dispatch(fetchCandidateRequests(groupId)); 
-
+    dispatch(fetchCandidateRequestsByGroup(groupId));
     dispatch(fetchVotersByGroup(groupId));
   }, [dispatch, groupId]);
+
 
   useEffect(() => {
     if (!groupId || !group?.isLocked) return;
@@ -401,14 +399,21 @@ export default function GroupSettingsPage() {
   const handleApprove = (req) => {
     dispatch(approveCandidateRequest({ groupId, requestId: req._id }))
       .unwrap()
-      .then(() => dispatch(fetchCandidatesByGroup(groupId)));
+      .then(() => {
+        dispatch(fetchCandidatesByGroup(groupId));
+        dispatch(fetchCandidateRequestsByGroup(groupId));
+      });
   };
 
   const handleReject = (req) => {
     dispatch(rejectCandidateRequest({ groupId, requestId: req._id }))
       .unwrap()
-      .then(() => dispatch(fetchCandidatesByGroup(groupId)));
+      .then(() => {
+        dispatch(fetchCandidatesByGroup(groupId));
+        dispatch(fetchCandidateRequestsByGroup(groupId));
+      });
   };
+
 
   const onGroupChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -501,7 +506,9 @@ export default function GroupSettingsPage() {
   };
 
   const onDeleteCandidate = (cid) =>
-    dispatch(deleteCandidate({ candidateId: cid, groupId }));
+    dispatch(deleteCandidate({ candidateId: cid, groupId }))
+      .unwrap()
+      .then(() => dispatch(fetchCandidatesByGroup(groupId)));
 
   const doDeleteGroup = async () => {
     try {
@@ -773,13 +780,11 @@ export default function GroupSettingsPage() {
           {activeTab === 'candidates' && (
             <CandidateRequestsTab
               groupId={groupId}
-              requests={candidateRequests}
-              loading={groupLoading} // או false אם אין טעינה נפרדת
-              error={groupError}    // או null אם אין שגיאה נפרדת
               onApprove={handleApprove}
               onReject={handleReject}
             />
           )}
+
 
 
           {activeTab === 'voters' && (
