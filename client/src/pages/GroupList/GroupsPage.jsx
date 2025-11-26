@@ -21,6 +21,7 @@ import {
 } from '../../slices/joinRequestsSlice';
 import http from '../../api/http';
 import './GroupsPage.css';
+import { useTranslation } from 'react-i18next';
 
 function formatDate(d) {
   if (!d) return '-';
@@ -48,9 +49,18 @@ const makeSlug = (name = '') =>
 export default function GroupsPage() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const { loading, error: err, list: groups } = useSelector((s) => s.groups);
-  const { userEmail: authEmail, userId: authId } = useSelector((s) => s.auth);
+  const { userEmail: authEmail, userId: authId, isAdmin } = useSelector((s) => s.auth);
+  // const { userEmail: authEmail, userId: authId } = useSelector((s) => s.auth);
+  useEffect(() => {
+    console.log('Auth in GroupsPage:', {
+      authEmail,
+      authId,
+      isAdmin,
+    });
+  }, [authEmail, authId, isAdmin]);
 
   const joinedIdsSet = useSelector(selectMyJoinedIds);
   const pendingIdsSet = useSelector(selectMyPendingSet);
@@ -70,32 +80,15 @@ export default function GroupsPage() {
 
   const isAuthed = !!authId || !!authEmail;
 
-  // const onCreateGroupClick = () => {
-  //   if (!isAuthed) {
-  //     toast.error('כדי ליצור קבוצה יש להתחבר תחילה.');
-  //     return;
-  //   }
-  //   navigate('/groups/create');
-  // };
-
-  // <<<<<<< HEAD
-  //   useEffect(() => {
-  //     dispatch(hydratePendingFromLocalStorage());
-  //   }, [dispatch]);
-  // =======
-
   const onCreateGroupClick = () => {
     if (!isAuthed) {
-      toast.error('כדי ליצור קבוצה יש להתחבר תחילה.');
-
+      toast.error(t('groups.list.toasts.loginToCreate'));
       return;
     }
     navigate('/groups/create');
   };
 
   useEffect(() => { dispatch(hydratePendingFromLocalStorage()); }, [dispatch]);
-
-  // >>>>>>> fd09d35ac375e1d72d983305dcc67a256b38f216
 
   useEffect(() => {
     dispatch(fetchGroups());
@@ -107,11 +100,11 @@ export default function GroupsPage() {
 
   useEffect(() => {
     if (!isAuthed) return;
-    const t = setInterval(() => {
+    const tmr = setInterval(() => {
       dispatch(fetchMyGroups());
       dispatch(fetchMyJoinStatuses());
     }, 5000);
-    return () => clearInterval(t);
+    return () => clearInterval(tmr);
   }, [dispatch, isAuthed]);
 
   useEffect(() => {
@@ -163,23 +156,23 @@ export default function GroupsPage() {
     setCurrentPage(1);
   }, [searchTerm, filter, sortBy, groups?.length]);
 
-  if (loading) return <div className="groups-loading">טוען קבוצות...</div>;
+  if (loading) return <div className="groups-loading">{t('groups.list.loading')}</div>;
   if (err) return <div className="groups-error">{err}</div>;
 
   if (!groups?.length)
     return (
       <div className="groups-empty">
-        <p>אין קבוצות עדיין.</p>
+        <p>{t('groups.list.empty.noGroups')}</p>
         {isAuthed ? (
           <button
             className="groups-create-btn"
             onClick={onCreateGroupClick}
           >
-            + יצירת קבוצה חדשה
+            {t('groups.list.empty.createButton')}
           </button>
         ) : (
           <p className="groups-empty-hint">
-            כדי ליצור קבוצה יש להתחבר תחילה.
+            {t('groups.list.empty.loginHint')}
           </p>
         )}
       </div>
@@ -236,7 +229,7 @@ export default function GroupsPage() {
         <div className="groups-toolbar-right">
           <input
             type="text"
-            placeholder="חיפוש קבוצות..."
+            placeholder={t('groups.list.searchPlaceholder')}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="groups-search"
@@ -249,9 +242,9 @@ export default function GroupsPage() {
                 setShowFilters((v) => !v);
                 setShowSort(false);
               }}
-              title="סינון"
+              title={t('groups.list.filters.title')}
             >
-              <img src="/src/assets/icons/filter.png" alt="סינון" />
+              <img src="/icons/filter.png" alt={t('groups.list.filters.alt')} />
             </button>
             {showFilters && (
               <div className="groups-dropdown">
@@ -263,10 +256,9 @@ export default function GroupsPage() {
                     checked={filter === 'all'}
                     onChange={(e) => setFilter(e.target.value)}
                   />
-                  כל הקבוצות
+                  {t('groups.list.filters.all')}
                 </label>
                 <label>
-                  {/* <<<<<<< HEAD
                   <input
                     type="radio"
                     name="filter"
@@ -274,7 +266,7 @@ export default function GroupsPage() {
                     checked={filter === 'open'}
                     onChange={(e) => setFilter(e.target.value)}
                   />
-                  פתוחות
+                  {t('groups.list.filters.open')}
                 </label>
                 <label>
                   <input
@@ -284,7 +276,7 @@ export default function GroupsPage() {
                     checked={filter === 'locked'}
                     onChange={(e) => setFilter(e.target.value)}
                   />
-                  נעולות
+                  {t('groups.list.filters.locked')}
                 </label>
                 <label>
                   <input
@@ -294,7 +286,7 @@ export default function GroupsPage() {
                     checked={filter === 'joined'}
                     onChange={(e) => setFilter(e.target.value)}
                   />
-                  קבוצות שאני מחוברת אליהן
+                  {t('groups.list.filters.joined')}
                 </label>
                 <label>
                   <input
@@ -304,23 +296,7 @@ export default function GroupsPage() {
                     checked={filter === 'owned'}
                     onChange={(e) => setFilter(e.target.value)}
                   />
-                  קבוצות שאני מנהלת
-======= */}
-                  <input type="radio" name="filter" value="open" checked={filter === 'open'} onChange={(e) => setFilter(e.target.value)} />
-                  קבוצות פתוחות
-                </label>
-                <label>
-                  <input type="radio" name="filter" value="locked" checked={filter === 'locked'} onChange={(e) => setFilter(e.target.value)} />
-                  קבוצות נעולות
-                </label>
-                <label>
-                  <input type="radio" name="filter" value="joined" checked={filter === 'joined'} onChange={(e) => setFilter(e.target.value)} />
-                  קבוצות שאני מחובר/ת
-                </label>
-                <label>
-                  <input type="radio" name="filter" value="owned" checked={filter === 'owned'} onChange={(e) => setFilter(e.target.value)} />
-                  קבוצות שאני מנהל/ת
-                  {/* >>>>>>> fd09d35ac375e1d72d983305dcc67a256b38f216 */}
+                  {t('groups.list.filters.owned')}
                 </label>
                 <label>
                   <input
@@ -330,7 +306,7 @@ export default function GroupsPage() {
                     checked={filter === 'expired'}
                     onChange={(e) => setFilter(e.target.value)}
                   />
-                  קבוצות שהסתיימו
+                  {t('groups.list.filters.expired')}
                 </label>
               </div>
             )}
@@ -341,9 +317,9 @@ export default function GroupsPage() {
                 setShowSort((v) => !v);
                 setShowFilters(false);
               }}
-              title="מיון"
+              title={t('groups.list.sort.title')}
             >
-              <img src="/src/assets/icons/sort.png" alt="מיון" />
+              <img src="/icons/sort.png" alt={t('groups.list.sort.alt')} />
             </button>
             {showSort && (
               <div className="groups-dropdown">
@@ -355,7 +331,7 @@ export default function GroupsPage() {
                     checked={sortBy === 'creationDate'}
                     onChange={(e) => setSortBy(e.target.value)}
                   />
-                  תאריך יצירה (חדש קודם)
+                  {t('groups.list.sort.creationDate')}
                 </label>
                 <label>
                   <input
@@ -365,7 +341,7 @@ export default function GroupsPage() {
                     checked={sortBy === 'endDate'}
                     onChange={(e) => setSortBy(e.target.value)}
                   />
-                  תאריך סיום (מוקדם קודם)
+                  {t('groups.list.sort.endDate')}
                 </label>
                 <label>
                   <input
@@ -375,7 +351,7 @@ export default function GroupsPage() {
                     checked={sortBy === 'name'}
                     onChange={(e) => setSortBy(e.target.value)}
                   />
-                  שם קבוצה (א-ת)
+                  {t('groups.list.sort.name')}
                 </label>
               </div>
             )}
@@ -396,16 +372,16 @@ export default function GroupsPage() {
             g.createdByEmail ??
             g.ownerEmail ??
             g.owner ??
-            (g.createdById && g.createdById.email) // אם הגיע מהשרת
+            (g.createdById && g.createdById.email)
           );
 
-          // לתמוך גם במצב שהשרת מחזיר ObjectId וגם במצב של אובייקט מאוכלס
           const createdById =
             g.createdById && typeof g.createdById === 'object'
               ? String(g.createdById._id)
               : String(g.createdById ?? '');
 
           const isOwner =
+            isAdmin ||
             !!g.isOwner ||
             (!!myEmail && !!createdByEmail && myEmail === createdByEmail) ||
             (!!myId && !!createdById && myId === createdById);
@@ -417,12 +393,11 @@ export default function GroupsPage() {
 
           const endDate = new Date(g.endDate);
           const isExpired = endDate < new Date();
-          // שם המנהל/ת – מורכב משם פרטי ושם משפחה אם קיימים
+
           const ownerName =
             g.createdById && typeof g.createdById === 'object'
               ? `${g.createdById.firstName || ''} ${g.createdById.lastName || ''}`.trim()
               : '';
-
 
           const goSettings = (e) => {
             e.stopPropagation();
@@ -431,35 +406,26 @@ export default function GroupsPage() {
             });
           };
 
-          // <<<<<<< HEAD
-          //           const isNewUser =
-          //             !joinedIdsSet.size && !pendingIdsSet.size && !rejectedIdsSet.size;
-
-          //           const onRequestJoin = (e) => {
-          //             e.stopPropagation();
-          //             if (isMember || isPending) return;
-          //             if (!isAuthed) {
-          //               toast.error('כדי לשלוח בקשת הצטרפות יש להתחבר תחילה.');
-          //               return;
-          //             }
-          //             dispatch(clearRemovedNotice(gid));
-          //             dispatch(requestJoinGroup(gid)).unwrap().catch(() => {});
-          // =======
           const onRequestJoin = (e) => {
             e.stopPropagation();
             if (isMember || isPending) return;
             if (!isAuthed) {
-              toast.error('כדי לשלוח בקשת הצטרפות יש להתחבר תחילה.');
-
-
+              toast.error(t('groups.list.toasts.loginToRequestJoin'));
               return;
             }
             dispatch(clearRemovedNotice(gid));
             dispatch(requestJoinGroup(gid)).unwrap().catch(() => { });
-            // >>>>>>> fd09d35ac375e1d72d983305dcc67a256b38f216
           };
 
           const onCardClick = async () => {
+            // 👑 אדמין – תמיד נכנס, גם לקבוצות נעולות
+            if (isAdmin) {
+              navigate(`/groups/${slug}`, {
+                state: { groupId: gid },
+              });
+              return;
+            }
+
             // קבוצה פתוחה – תמיד נכנסים
             if (!isLocked) {
               navigate(`/groups/${slug}`, {
@@ -471,7 +437,7 @@ export default function GroupsPage() {
             // קבוצה נעולה + pending + לא חברה
             if (!isOwner && isLocked && isPending && !isMember) {
               if (!isAuthed) {
-                toast.error('הקבוצה נעולה. כדי לבקש הצטרפות – יש להתחבר');
+                toast.error(t('groups.list.toasts.lockedLoginToJoin'));
                 return;
               }
               try {
@@ -485,43 +451,32 @@ export default function GroupsPage() {
                   });
                   return;
                 }
-                // <<<<<<< HEAD
               } catch { }
-              toast.info('עדיין אינך מחובר/ת לקבוצה. הבקשה בהמתנה לאישור מנהל/ת.');
-              // =======
-              // } catch { }
-              // toast.info('עדיין אינך מחובר/ת לקבוצה. הבקשה בהמתנה לאישור מנהל/ת.');
-              // >>>>>>> fd09d35ac375e1d72d983305dcc67a256b38f216
+              toast.info(t('groups.list.toasts.pendingStill'));
               return;
             }
 
             // קבוצה נעולה + לא חברה
             if (!isOwner && isLocked && !isMember) {
               if (!isAuthed) {
-                toast.error('הקבוצה נעולה. כדי לבקש הצטרפות – יש להתחבר');
+                toast.error(t('groups.list.toasts.lockedLoginToJoin'));
                 return;
               }
               if (isRejected) {
-                // <<<<<<< HEAD
-                //                 toast.error(
-                //                   'בקשתך נדחתה על ידי מנהלת הקבוצה. ניתן לשלוח בקשה חדשה.',
-                //                 );
-                // =======
-                toast.error('בקשתך נדחתה על ידי מנהל/ת הקבוצה. ניתן לשלוח בקשה חדשה.');
-
-                // >>>>>>> fd09d35ac375e1d72d983305dcc67a256b38f216
+                toast.error(t('groups.list.toasts.rejected'));
                 return;
               }
               return;
             }
 
-            // בעלת הקבוצה / חברה בקבוצה נעולה
+            // בעל/ת הקבוצה / חבר/ה בקבוצה נעולה
             navigate(`/groups/${slug}`, {
               state: { groupId: gid },
             });
           };
 
           const cardDisabled =
+            !isAdmin &&            // 👈 רק מי שלא אדמין יכול להיות "מנוטרל"
             !isOwner &&
             isLocked &&
             ((isPending && !isMember) || (!isPending && !isMember));
@@ -545,20 +500,18 @@ export default function GroupsPage() {
                       }}
                     >
                       <img
-                        src="/src/assets/icons/padlock.png"
-                        alt="נעול"
+                        src="/icons/padlock.png"
+                        alt={t('groups.list.card.lockedAlt')}
                         className="groups-badge-locked"
-                        title="קבוצה נעולה"
+                        title={t('groups.list.card.lockedTitle')}
                       />
                       <span
-                        // <<<<<<< HEAD
-                        //                         className={`groups-lock-status ${
-                        //                           isMember || isOwner ? 'member' : 'not-member'
-                        //                         }`}
-                        //                         title={isMember || isOwner ? 'מחוברת' : 'לא מחוברת'}
-                        // =======
                         className={`groups-lock-status ${isMember || isOwner ? 'member' : 'not-member'}`}
-                        title={isMember || isOwner ? 'מחובר/ת' : 'לא מחובר/ת'}
+                        title={
+                          isMember || isOwner
+                            ? t('groups.list.card.memberTooltip')
+                            : t('groups.list.card.notMemberTooltip')
+                        }
                       />
                     </div>
                   )}
@@ -567,9 +520,9 @@ export default function GroupsPage() {
                     <button
                       className="groups-settings-btn"
                       onClick={goSettings}
-                      title="הגדרות קבוצה"
+                      title={t('groups.list.card.settingsTitle')}
                     >
-                      <img src="/src/assets/icons/settings.png" alt="הגדרות" />
+                      <img src="/icons/settings.png" alt={t('groups.list.card.settingsAlt')} />
                     </button>
                   )}
                 </div>
@@ -580,21 +533,24 @@ export default function GroupsPage() {
               )}
 
               <div className="groups-card-owner">
-                <span className="groups-card-owner-label">מנהל/ת:</span>
+                <span className="groups-card-owner-label">
+                  {t('groups.list.card.ownerLabel')}
+                </span>
                 <span className="groups-card-owner-value">
-                  {ownerName || 'לא ידוע'}
+                  {ownerName || t('groups.list.card.ownerUnknown')}
                 </span>
               </div>
-
 
               <div className="groups-card-footer">
                 {isExpired ? (
                   <div className="groups-card-date-expired-text">
-                    תקופת ההצבעה הסתיימה — לצפייה בתוצאות
+                    {t('groups.list.card.expiredText')}
                   </div>
                 ) : (
                   <div className="groups-card-date">
-                    <span className="groups-card-date-label">תאריך סיום:</span>
+                    <span className="groups-card-date-label">
+                      {t('groups.list.card.endDateLabel')}
+                    </span>
                     <span className="groups-card-date-value">
                       {formatDate(g.endDate)}
                     </span>
@@ -606,31 +562,16 @@ export default function GroupsPage() {
               {!isOwner && isLocked && (
                 <div className="groups-card-actions">
                   {isMember ? (
-                    // <<<<<<< HEAD
-                    //                     <span className="groups-status groups-status-member">
-                    //                       מחוברת
-                    //                     </span>
-                    //                   ) : !isAuthed ? null : isRejected ? (
-                    //                     <>
-                    //                       <div className="groups-notice groups-notice-rejected">
-                    //                         בקשתך נדחתה על ידי מנהלת הקבוצה. ניתן לשלוח בקשה
-                    //                         חדשה.
-                    //                       </div>
-                    //                       <button
-                    //                         className="groups-action-btn"
-                    //                         onClick={onRequestJoin}
-                    //                       >
-                    //                         שלחי בקשה שוב
-                    // =======
-                    <span className="groups-status groups-status-member">מחובר/ת</span>
+                    <span className="groups-status groups-status-member">
+                      {t('groups.list.card.status.member')}
+                    </span>
                   ) : !isAuthed ? null : isRejected ? (
                     <>
                       <div className="groups-notice groups-notice-rejected">
-                        בקשתך נדחתה על ידי מנהל/ת הקבוצה. ניתן לשלוח בקשה חדשה.
+                        {t('groups.list.card.rejectedNotice')}
                       </div>
                       <button className="groups-action-btn" onClick={onRequestJoin}>
-                        שלח/י בקשה שוב
-                        {/* >>>>>>> fd09d35ac375e1d72d983305dcc67a256b38f216 */}
+                        {t('groups.list.card.requestAgain')}
                       </button>
                     </>
                   ) : isPending ? (
@@ -639,47 +580,25 @@ export default function GroupsPage() {
                         className="groups-action-btn groups-action-btn-pending"
                         disabled
                       >
-                        בהמתנה...
+                        {t('groups.list.card.pendingButton')}
                       </button>
-                      {/* <<<<<<< HEAD
                       <p className="groups-hint">
-                        הבקשה נשלחה וממתינה לאישור מנהלת
+                        {t('groups.list.card.pendingHint')}
                       </p>
-======= */}
-                      <p className="groups-hint">בקשתך נשלחה וממתינה לאישור מנהל/ת</p>
-                      {/* >>>>>>> fd09d35ac375e1d72d983305dcc67a256b38f216 */}
                     </>
                   ) : wasRemoved && !isMember && !isPending ? (
                     <>
                       <div className="groups-notice groups-notice-removed">
-                        {/* <<<<<<< HEAD
-                        הוסרת מהקבוצה על ידי מנהלת. ניתן לשלוח בקשת הצטרפות
-                        חדשה.
+                        {t('groups.list.card.removedNotice')}
                       </div>
-                      <button
-                        className="groups-action-btn"
-                        onClick={onRequestJoin}
-                      >
-                        שלחי בקשת הצטרפות
+                      <button className="groups-action-btn" onClick={onRequestJoin}>
+                        {t('groups.list.card.requestJoin')}
                       </button>
                     </>
                   ) : (
-                    <button
-                      className="groups-action-btn"
-                      onClick={onRequestJoin}
-                    >
-                      בקשי הצטרפות
-                    </button>
-======= */}
-                        הוסרת מהקבוצה על ידי מנהל/ת. ניתן לשלוח בקשת הצטרפות חדשה.
-                      </div>
-                      <button className="groups-action-btn" onClick={onRequestJoin}>
-                        בקשת הצטרפות                      </button>
-                    </>
-                  ) : (
                     <button className="groups-action-btn" onClick={onRequestJoin}>
-                      בקשת הצטרפות                    </button>
-                    // >>>>>>> fd09d35ac375e1d72d983305dcc67a256b38f216
+                      {t('groups.list.card.requestJoin')}
+                    </button>
                   )}
                 </div>
               )}
@@ -696,14 +615,13 @@ export default function GroupsPage() {
             disabled={safePage === 1}
             onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
           >
-            הקודם
+            {t('groups.list.pagination.prev')}
           </button>
 
           {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
             <button
               key={page}
-              className={`groups-page-btn ${page === safePage ? 'active' : ''
-                }`}
+              className={`groups-page-btn ${page === safePage ? 'active' : ''}`}
               onClick={() => setCurrentPage(page)}
             >
               {page}
@@ -717,7 +635,7 @@ export default function GroupsPage() {
               setCurrentPage((p) => Math.min(totalPages, p + 1))
             }
           >
-            הבא
+            {t('groups.list.pagination.next')}
           </button>
         </div>
       )}
@@ -725,7 +643,7 @@ export default function GroupsPage() {
       <button
         className="groups-fab"
         onClick={onCreateGroupClick}
-        title="יצירת קבוצה חדשה"
+        title={t('groups.list.fab.title')}
       >
         +
       </button>

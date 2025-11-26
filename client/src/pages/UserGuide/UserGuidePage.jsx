@@ -1,26 +1,29 @@
 // src/pages/UserGuide/UserGuidePage.jsx
 import React from 'react';
 import './UserGuidePage.css';
+import { useTranslation } from 'react-i18next';
 
 export default function UserGuidePage() {
+  const { t } = useTranslation();
+
   const steps = [
-    { title: 'הרשמה והתחברות', description: 'יצירת חשבון חדש או התחברות לחשבון קיים מאפשרת לך להשתמש בכל הפיצ\'רים של האתר.' },
-    { title: 'ניהול קבוצות', description: 'צור קבוצות, נהל חברים וקבע הצבעות בקלות וביעילות.' },
-    { title: 'הצבעות', description: 'הצבע על נושאים, עקוב אחרי תוצאות בזמן אמת, והבן את דעת הקבוצה בצורה ברורה.' },
-    { title: 'התראות ומעקב', description: 'קבל התראות על שינויים, הצבעות חדשות או בקשות להצטרפות.' },
+    { title: t('guide.steps.registerTitle'), description: t('guide.steps.registerDesc') },
+    { title: t('guide.steps.groupsTitle'), description: t('guide.steps.groupsDesc') },
+    { title: t('guide.steps.votesTitle'), description: t('guide.steps.votesDesc') },
+    { title: t('guide.steps.notificationsTitle'), description: t('guide.steps.notificationsDesc') },
   ];
 
   const tips = [
-    { title: 'קיצורי דרך', description: 'למד את הקיצורים שלנו לחיסכון בזמן ובקלות שימוש.' },
-    { title: 'שימוש בטלפון', description: 'הממשק מותאם גם למכשירים ניידים ונוח לשימוש מכל מקום.' },
-    { title: 'שמירה על פרטיות', description: 'המערכת שומרת על המידע האישי שלך והצבעותיך מאובטחות.' },
-    { title: 'תמיכה מקצועית', description: 'פנה אלינו בכל שאלה – אנחנו כאן כדי לעזור.' },
+    { title: t('guide.tips.shortcutsTitle'), description: t('guide.tips.shortcutsDesc') },
+    { title: t('guide.tips.mobileTitle'), description: t('guide.tips.mobileDesc') },
+    { title: t('guide.tips.privacyTitle'), description: t('guide.tips.privacyDesc') },
+    { title: t('guide.tips.supportTitle'), description: t('guide.tips.supportDesc') },
   ];
 
   return (
     <div className="user-guide-page">
-      <h1>מדריך למשתמש</h1>
-      <p className="guide-subtitle">כל מה שאתה צריך לדעת כדי להשתמש באתר בצורה נוחה ובטוחה</p>
+      <h1>{t('guide.title')}</h1>
+      <p className="guide-subtitle">{t('guide.subtitle')}</p>
 
       <div className="cards-container">
         {steps.map((step, index) => (
@@ -32,8 +35,8 @@ export default function UserGuidePage() {
       </div>
 
       <div className="highlight-card">
-        <h2>טיפ חשוב למשתמש</h2>
-        <p>כדי ליהנות מהמערכת בצורה מיטבית, הקפד לבדוק את כל ההגדרות של הקבוצה שלך, נהל את החברים בצורה מסודרת, ועקוב אחרי ההתראות בזמן אמת.</p>
+        <h2>{t('guide.highlightTitle')}</h2>
+        <p>{t('guide.highlightDesc')}</p>
       </div>
 
       <div className="mini-cards-container">

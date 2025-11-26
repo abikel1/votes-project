@@ -11,7 +11,8 @@ const {
   getMyJoinStatusesService,
   isMemberOfGroupService,
   removeGroupMemberService,
-  getCandidateRequestsService ,
+  getCandidateRequestsService,
+  generateGroupDescriptionService,
 } = require('../services/group_service');
 const Group = require('../models/group_model');
 
@@ -36,7 +37,7 @@ async function deleteGroup(req, res) {
     // בדיקת בעלות לפני מחיקה
     const g = await Group.findById(req.params.id).lean();
     if (!g) return res.status(404).json({ message: 'Group not found' });
-    if (String(g.createdById) !== String(req.user._id)) {
+    if (String(g.createdById) !== String(req.user._id) && !req.user.isAdmin) {
       return res.status(403).json({ message: 'Not owner' });
     }
 
@@ -74,35 +75,110 @@ async function requestJoinGroup(req, res) {
 
 async function listJoinRequests(req, res) {
   try {
-    const list = await listJoinRequestsService(req.params.id, req.user._id);
+    // אם זה אדמין – נעביר זיהוי מיוחד, אחרת ה־_id הרגיל
+    const ownerId = req.user.isAdmin ? 'ADMIN' : req.user._id;
+
+    const list = await listJoinRequestsService(req.params.id, ownerId);
     res.json(list);
   } catch (err) {
-    const code = err.message === 'Not owner' ? 403 : (err.message === 'Group not found' ? 404 : 400);
+    const code =
+      err.message === 'Not owner'
+        ? 403
+        : err.message === 'Group not found'
+          ? 404
+          : 400;
     res.status(code).json({ message: err.message });
   }
 }
 
 async function approveJoinRequest(req, res) {
   try {
-    await setJoinRequestStatusService(req.params.id, req.user._id, req.params.reqId, 'approved');
-    const list = await listJoinRequestsService(req.params.id, req.user._id);
-    res.json({ ok: true, pending: list });
+    const ownerId = req.user.isAdmin ? 'ADMIN' : req.user._id;
+
+    // קודם מאשרים
+    await setJoinRequestStatusService(
+      req.params.id,
+      ownerId,
+      req.params.reqId,
+      'approved'
+    );
+
+    // ואז מביאים רשימה מעודכנת
+    const updatedList = await listJoinRequestsService(req.params.id, ownerId);
+
+    res.json({ ok: true, pending: updatedList });
   } catch (err) {
-    const code = err.message === 'Not owner' ? 403 : (err.message === 'Group not found' ? 404 : 400);
+    const code =
+      err.message === 'Not owner'
+        ? 403
+        : err.message === 'Group not found'
+          ? 404
+          : 400;
     res.status(code).json({ message: err.message });
   }
 }
 
 async function rejectJoinRequest(req, res) {
   try {
-    await setJoinRequestStatusService(req.params.id, req.user._id, req.params.reqId, 'rejected');
-    const list = await listJoinRequestsService(req.params.id, req.user._id);
-    res.json({ ok: true, pending: list });
+    const ownerId = req.user.isAdmin ? 'ADMIN' : req.user._id;
+
+    await setJoinRequestStatusService(
+      req.params.id,
+      ownerId,
+      req.params.reqId,
+      'rejected'
+    );
+
+    const updatedList = await listJoinRequestsService(req.params.id, ownerId);
+
+    res.json({ ok: true, pending: updatedList });
   } catch (err) {
-    const code = err.message === 'Not owner' ? 403 : (err.message === 'Group not found' ? 404 : 400);
+    const code =
+      err.message === 'Not owner'
+        ? 403
+        : err.message === 'Group not found'
+          ? 404
+          : 400;
     res.status(code).json({ message: err.message });
   }
 }
+
+/** הסרת משתתף/ת */
+async function removeMember(req, res) {
+  try {
+    const { memberId, email } = req.body || {};
+    if (!memberId && !email) {
+      return res
+        .status(400)
+        .json({ message: 'memberId or email is required' });
+    }
+
+    const ownerId = req.user.isAdmin ? 'ADMIN' : req.user._id;
+
+    const g = await removeGroupMemberService(req.params.id, ownerId, {
+      memberId,
+      email,
+    });
+
+    const pending = await listJoinRequestsService(
+      req.params.id,
+      ownerId
+    ).catch(() => []);
+
+    res.json({ ok: true, group: g, pending });
+  } catch (err) {
+    const code =
+      err.message === 'Not owner'
+        ? 403
+        : err.message === 'Group not found'
+          ? 404
+          : 400;
+    res
+      .status(code)
+      .json({ message: err.message || 'Remove member failed' });
+  }
+}
+
 
 async function getGroupMembers(req, res) {
   try {
@@ -133,23 +209,7 @@ async function getMyMembership(req, res) {
   }
 }
 
-/** הסרת משתתף/ת */
-async function removeMember(req, res) {
-  try {
-    const { memberId, email } = req.body || {};
-    if (!memberId && !email) {
-      return res.status(400).json({ message: 'memberId or email is required' });
-    }
-    const g = await removeGroupMemberService(req.params.id, req.user._id, { memberId, email });
-    const pending = await listJoinRequestsService(req.params.id, req.user._id).catch(() => []);
-    res.json({ ok: true, group: g, pending });
-  } catch (err) {
-    const code = err.message === 'Not owner' ? 403
-      : err.message === 'Group not found' ? 404
-        : 400;
-    res.status(code).json({ message: err.message || 'Remove member failed' });
-  }
-}
+
 
 async function getCandidateRequests(req, res) {
   try {
@@ -157,6 +217,22 @@ async function getCandidateRequests(req, res) {
     res.json(requests);
   } catch (err) {
     res.status(500).json({ message: err.message });
+  }
+}
+async function generateGroupDescription(req, res) {
+  try {
+    const { name, hint } = req.body || {};
+
+    if (!name || !String(name).trim()) {
+      return res.status(400).json({ message: 'שם קבוצה חובה ליצירת תיאור' });
+    }
+
+    const description = await generateGroupDescriptionService(name, hint || '');
+
+    res.json({ description });
+  } catch (err) {
+    console.error('AI description error:', err);
+    res.status(500).json({ message: err.message || 'AI description error' });
   }
 }
 
@@ -177,4 +253,5 @@ module.exports = {
   getMyMembership,
   removeMember,
   getCandidateRequests,
+  generateGroupDescription,
 };

@@ -1,4 +1,3 @@
-// client/src/pages/VotingDragPage.jsx
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
@@ -24,10 +23,12 @@ import {
 import './VotingPage.css';
 import { toast } from 'react-hot-toast';
 import http from '../../api/http';
+import { useTranslation } from 'react-i18next';
 
 export default function VotingDragPage() {
   const { groupSlug } = useParams();
   const location = useLocation();
+  const { t } = useTranslation();
 
   // id שהגיע מניווט פנימי (כפתור "להצבעה בקלפי")
   const navGroupId = location.state?.groupId || null;
@@ -164,7 +165,7 @@ export default function VotingDragPage() {
       ) {
         // נתעלם, הסטייט יתעדכן מהשרת
       } else {
-        toast.error('שגיאה בהצבעה: ' + msg);
+        toast.error(t('voting.voteErrorPrefix') + msg);
       }
     } finally {
       setIsSubmitting(false);
@@ -204,8 +205,8 @@ export default function VotingDragPage() {
   if (!slugResolved && !groupId) {
     return (
       <div className="vd-wrap">
-        <h2>דף הצבעה</h2>
-        <div>טוען נתוני קבוצה...</div>
+        <h2>{t('voting.pageTitle')}</h2>
+        <div>{t('voting.loadingGroup')}</div>
       </div>
     );
   }
@@ -213,13 +214,13 @@ export default function VotingDragPage() {
   if (slugResolved && !groupId) {
     return (
       <div className="vd-wrap">
-        <h2>דף הצבעה</h2>
-        <div className="vd-error">הקבוצה לא נמצאה.</div>
+        <h2>{t('voting.pageTitle')}</h2>
+        <div className="vd-error">{t('voting.groupNotFound')}</div>
         <button
           className="vd-back-button"
           onClick={() => navigate('/groups')}
         >
-          ← חזרה לרשימת הקבוצות
+          ← {t('voting.backToGroupsList')}
         </button>
       </div>
     );
@@ -228,8 +229,8 @@ export default function VotingDragPage() {
   if (groupLoading || !group) {
     return (
       <div className="vd-wrap">
-        <h2>דף הצבעה</h2>
-        <div>טוען נתוני קבוצה...</div>
+        <h2>{t('voting.pageTitle')}</h2>
+        <div>{t('voting.loadingGroup')}</div>
       </div>
     );
   }
@@ -237,7 +238,7 @@ export default function VotingDragPage() {
   if (groupError) {
     return (
       <div className="vd-wrap">
-        <h2>דף הצבעה</h2>
+        <h2>{t('voting.pageTitle')}</h2>
         <div className="vd-error">{groupError}</div>
       </div>
     );
@@ -279,13 +280,11 @@ export default function VotingDragPage() {
   if (group.isLocked && !isMember && !isOwner) {
     return (
       <div className="vd-wrap">
-        <h2>דף הצבעה</h2>
+        <h2>{t('voting.pageTitle')}</h2>
         <div className="vd-error">
-          נראה שאינך מחובר/ת לקבוצה{' '}
-          <strong>{group.name}</strong>, ולכן לא ניתן להצביע בה.
+          {t('voting.notMemberText', { groupName: group.name })}
           <br />
-          כדי להשתתף בהצבעה יש להצטרף לקבוצה ולהמתין לאישור מנהל/ת
-          הקבוצה.
+          {t('voting.notMemberHelp')}
         </div>
         <div className="vd-actions">
           <button
@@ -294,13 +293,13 @@ export default function VotingDragPage() {
               navigate(`/groups/${groupSlug}`, { state: { groupId } })
             }
           >
-            מעבר לדף הקבוצה
+            {t('voting.goToGroupPage')}
           </button>
           <button
             className="vd-back-button"
             onClick={() => navigate('/groups')}
           >
-            לרשימת כל הקבוצות
+            {t('voting.goToAllGroups')}
           </button>
         </div>
       </div>
@@ -312,8 +311,8 @@ export default function VotingDragPage() {
   if (candLoading) {
     return (
       <div className="vd-wrap">
-        <h2>דף הצבעה</h2>
-        <div>טוען מועמדים...</div>
+        <h2>{t('voting.pageTitle')}</h2>
+        <div>{t('voting.loadingCandidates')}</div>
       </div>
     );
   }
@@ -321,7 +320,7 @@ export default function VotingDragPage() {
   if (candError) {
     return (
       <div className="vd-wrap">
-        <h2>דף הצבעה</h2>
+        <h2>{t('voting.pageTitle')}</h2>
         <div className="vd-error">{candError}</div>
       </div>
     );
@@ -330,8 +329,8 @@ export default function VotingDragPage() {
   if (!candidates?.length) {
     return (
       <div className="vd-wrap">
-        <h2>דף הצבעה</h2>
-        <div className="vd-empty">אין מועמדים בקבוצה</div>
+        <h2>{t('voting.pageTitle')}</h2>
+        <div className="vd-empty">{t('voting.noCandidates')}</div>
       </div>
     );
   }
@@ -345,10 +344,10 @@ export default function VotingDragPage() {
             navigate(`/groups/${groupSlug}`, { state: { groupId } })
           }
         >
-          ← חזור לפרטי הקבוצה
+          ← {t('voting.backToGroupDetails')}
         </button>
 
-        <h2>דף הצבעה</h2>
+        <h2>{t('voting.pageTitle')}</h2>
         {group && <div className="vd-group-name">{group.name}</div>}
       </div>
 
@@ -376,7 +375,7 @@ export default function VotingDragPage() {
                 )}
 
                 <h4 className="vd-slip-name">
-                  {c.name || 'ללא שם'}
+                  {c.name || t('voting.noName')}
                 </h4>
                 {c.symbol && (
                   <span className="vd-slip-symbol">{c.symbol}</span>
@@ -407,7 +406,9 @@ export default function VotingDragPage() {
                 </div>
               </div>
             ) : (
-              <div className="vd-envelope-label">גרור פתק לכאן</div>
+              <div className="vd-envelope-label">
+                {t('voting.dragSlipHere')}
+              </div>
             )}
           </div>
 
@@ -423,8 +424,8 @@ export default function VotingDragPage() {
             <div className="vd-ballot-slot"></div>
             <div className="vd-ballot-label">
               {hasVoted
-                ? 'הצבעתך נקלטה בהצלחה'
-                : 'גרור מעטפה לקלפי'}
+                ? t('voting.voteSuccess')
+                : t('voting.dragEnvelopeToBallot')}
             </div>
           </div>
         </div>
@@ -469,7 +470,7 @@ export default function VotingDragPage() {
                   closeModal();
                 }}
               >
-                בחר להצבעה
+                {t('voting.selectForVote')}
               </button>
 
               <div className="vd-modal-symbol">
@@ -477,7 +478,7 @@ export default function VotingDragPage() {
                   selectedCandidate.name?.substring(0, 2) ||
                   '??'}
               </div>
-              <h3>{selectedCandidate.name || 'ללא שם'}</h3>
+              <h3>{selectedCandidate.name || t('voting.noName')}</h3>
             </div>
             {selectedCandidate.description && (
               <div className="vd-modal-desc">

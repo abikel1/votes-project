@@ -12,9 +12,9 @@
   padding: 24px 20px;
   font-size: 14px;
   border-top: 1px solid #003366;
-  direction: rtl;
-      margin-top: 100px;
+  margin-top: 100px;
 }
+
 
 /* שלוש עמודות */
 .footer-inner {
@@ -127,4 +127,6 @@
   .footer-social-icons a {
     font-size: 24px;
   }
+
+
 }

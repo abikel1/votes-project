@@ -1,6 +1,8 @@
+// server/src/routes/group_routes.js
 const express = require('express');
 const router = express.Router();
 const auth = require('../middlewares/auth_middleware');
+
 const {
   createGroup,
   updateGroup,
@@ -15,7 +17,9 @@ const {
   getUserGroups,
   getMyJoinStatuses,
   getMyMembership,
-  removeMember,getCandidateRequests
+  removeMember,
+  getCandidateRequests,
+  generateGroupDescription,
 } = require('../controllers/group_controller');
 
 const {
@@ -29,9 +33,17 @@ const {
 const handleGroupDependencies = require('../middlewares/group_middleware');
 const Group = require('../models/group_model');
 
+
+// ✅ חייב להיות ממש למעלה, לפני כל "/:id" למיניהם
+router.post('/ai-description', auth, generateGroupDescription);
+
 router.post('/create', auth, createGroup);
 router.put('/:id', auth, updateGroup);
 router.delete('/:id', auth, handleGroupDependencies, deleteGroup);
+
+// ✅ בקשות הצטרפות
+router.get('/:id/requests', auth, listJoinRequests);
+// בקשות מועמדות (GET לפי groupId)
 router.get('/:groupId/requests', auth, getCandidateRequests);
 
 router.get('/my', auth, getUserGroups);

@@ -1,6 +1,8 @@
+// src/slices/groupsSlice.js
 import { createSlice, createAsyncThunk, createSelector } from '@reduxjs/toolkit';
 import http from '../api/http';
 import { fetchUsersByIds, hydrateUsersForGroup, selectUsersMap } from './usersSlice';
+import i18n from '../i18n';
 
 /* ===== Helpers ===== */
 const pickId = (m) => {
@@ -13,29 +15,54 @@ const coalesceName = (u) => {
   const parts =
     (u.firstName && u.lastName) ? `${u.firstName} ${u.lastName}` :
       (u.first_name && u.last_name) ? `${u.first_name} ${u.last_name}` : null;
-  const candidates = [u.name, u.fullName, u.full_name, u.username, u.displayName, u.display_name, parts, u.email];
+  const candidates = [
+    u.name,
+    u.fullName,
+    u.full_name,
+    u.username,
+    u.displayName,
+    u.display_name,
+    parts,
+    u.email
+  ];
   const found = candidates?.find(v => typeof v === 'string' && v.trim());
   return found || null;
 };
 const normalizeGroup = (g) => g;
 
 /* ===== Thunks ===== */
-export const fetchGroups = createAsyncThunk('groups/fetchAll', async (_, { rejectWithValue }) => {
-  try { const { data } = await http.get('/groups'); return data; }
-  catch (err) { return rejectWithValue(err?.response?.data?.message || 'Failed to load groups'); }
-});
+export const fetchGroups = createAsyncThunk(
+  'groups/fetchAll',
+  async (_, { rejectWithValue }) => {
+    try {
+      const { data } = await http.get('/groups');
+      return data;
+    } catch (err) {
+      return rejectWithValue(i18n.t('groups.errors.loadAllFailed'));
+    }
+  }
+);
 
-export const fetchGroupOnly = createAsyncThunk('groups/fetchOnly', async (groupId, { rejectWithValue }) => {
-  try { const { data } = await http.get(`/groups/${groupId}`); return data; }
-  catch (err) { return rejectWithValue(err?.response?.data?.message || 'Failed to load group'); }
-});
+export const fetchGroupOnly = createAsyncThunk(
+  'groups/fetchOnly',
+  async (groupId, { rejectWithValue }) => {
+    try {
+      const { data } = await http.get(`/groups/${groupId}`);
+      return data;
+    } catch (err) {
+      return rejectWithValue(i18n.t('groups.errors.loadOneFailed'));
+    }
+  }
+);
 
 export const fetchGroupWithMembers = createAsyncThunk(
   'groups/fetchWithMembers',
   async (groupId, { dispatch, rejectWithValue, getState }) => {
     try {
       const group = await dispatch(fetchGroupOnly(groupId)).unwrap();
-      const ids = (Array.isArray(group?.members) ? group.members : []).map(pickId).filter(Boolean);
+      const ids = (Array.isArray(group?.members) ? group.members : [])
+        .map(pickId)
+        .filter(Boolean);
 
       if (ids.length) {
         await dispatch(fetchUsersByIds(ids));
@@ -47,25 +74,34 @@ export const fetchGroupWithMembers = createAsyncThunk(
       }
       return group;
     } catch (err) {
-      return rejectWithValue(err?.message || err);
+      return rejectWithValue(i18n.t('groups.errors.loadWithMembersFailed'));
     }
   }
 );
 
-export const createGroup = createAsyncThunk('groups/create', async (payload, { rejectWithValue }) => {
-  try { const { data } = await http.post('/groups/create', payload); return data; }
-  catch (err) { return rejectWithValue(err?.response?.data?.message || 'Create group failed'); }
-});
+export const createGroup = createAsyncThunk(
+  'groups/create',
+  async (payload, { rejectWithValue }) => {
+    try {
+      const { data } = await http.post('/groups/create', payload);
+      return data;
+    } catch (err) {
+      return rejectWithValue(i18n.t('groups.errors.createFailed'));
+    }
+  }
+);
 
 export const updateGroup = createAsyncThunk(
   'groups/update',
   async ({ groupId, patch }, { rejectWithValue }) => {
     try {
-      const clean = Object.fromEntries(Object.entries(patch).filter(([_, v]) => v !== '' && v !== undefined && v !== null));
+      const clean = Object.fromEntries(
+        Object.entries(patch).filter(([_, v]) => v !== '' && v !== undefined && v !== null)
+      );
       const { data } = await http.put(`/groups/${groupId}`, clean);
       return data;
     } catch (err) {
-      return rejectWithValue(err?.response?.data?.message || 'Failed to update group');
+      return rejectWithValue(i18n.t('groups.errors.updateFailed'));
     }
   }
 );
@@ -78,7 +114,7 @@ export const fetchMyGroups = createAsyncThunk(
       const { data } = await http.get('/groups/my'); // { created: [], joined: [] }
       return data;
     } catch (err) {
-      return rejectWithValue(err?.response?.data?.message || 'Failed to load my groups');
+      return rejectWithValue(i18n.t('groups.errors.loadMyFailed'));
     }
   }
 );
@@ -94,12 +130,12 @@ export const removeGroupMember = createAsyncThunk(
       const { data } = await http.patch(`/groups/${groupId}/members/remove`, payload);
       return { groupId, data };
     } catch (err) {
-      return rejectWithValue(err?.response?.data?.message || 'Failed to remove member');
+      return rejectWithValue(i18n.t('groups.errors.removeMemberFailed'));
     }
   }
 );
 
-// ❗❗ חדש: מחיקת קבוצה
+// ❗❗ מחיקת קבוצה
 export const deleteGroupById = createAsyncThunk(
   'groups/delete',
   async (groupId, { rejectWithValue }) => {
@@ -107,14 +143,10 @@ export const deleteGroupById = createAsyncThunk(
       const { data } = await http.delete(`/groups/${groupId}`);
       return { groupId, data };
     } catch (err) {
-      return rejectWithValue(err?.response?.data?.message || 'Failed to delete group');
+      return rejectWithValue(i18n.t('groups.errors.deleteFailed'));
     }
   }
 );
-
-
-
-
 
 const groupsSlice = createSlice({
   name: 'groups',
@@ -133,32 +165,79 @@ const groupsSlice = createSlice({
     myJoinedIds: [],
   },
   reducers: {
-    clearCreateState(state) { state.createLoading = false; state.createError = null; state.justCreated = null; },
-    clearUpdateState(state) { state.updateLoading = false; state.updateError = null; state.updateSuccess = false; },
+    clearCreateState(state) {
+      state.createLoading = false;
+      state.createError = null;
+      state.justCreated = null;
+    },
+    clearUpdateState(state) {
+      state.updateLoading = false;
+      state.updateError = null;
+      state.updateSuccess = false;
+    },
   },
   extraReducers: (b) => {
     b
-      .addCase(fetchGroups.pending, (s) => { s.loading = true; s.error = null; })
-      .addCase(fetchGroups.fulfilled, (s, a) => { s.loading = false; s.list = a.payload.map(normalizeGroup); })
-      .addCase(fetchGroups.rejected, (s, a) => { s.loading = false; s.error = a.payload; })
+      .addCase(fetchGroups.pending, (s) => {
+        s.loading = true;
+        s.error = null;
+      })
+      .addCase(fetchGroups.fulfilled, (s, a) => {
+        s.loading = false;
+        s.list = a.payload.map(normalizeGroup);
+      })
+      .addCase(fetchGroups.rejected, (s, a) => {
+        s.loading = false;
+        s.error = a.payload;
+      })
 
-      .addCase(fetchGroupOnly.pending, (s) => { s.loading = true; s.error = null; s.selectedGroup = null; })
-      .addCase(fetchGroupOnly.fulfilled, (s, a) => { s.loading = false; s.selectedGroup = normalizeGroup(a.payload); })
-      .addCase(fetchGroupOnly.rejected, (s, a) => { s.loading = false; s.error = a.payload; })
+      .addCase(fetchGroupOnly.pending, (s) => {
+        s.loading = true;
+        s.error = null;
+        s.selectedGroup = null;
+      })
+      .addCase(fetchGroupOnly.fulfilled, (s, a) => {
+        s.loading = false;
+        s.selectedGroup = normalizeGroup(a.payload);
+      })
+      .addCase(fetchGroupOnly.rejected, (s, a) => {
+        s.loading = false;
+        s.error = a.payload;
+      })
 
-      .addCase(fetchGroupWithMembers.pending, (s) => { s.loading = true; s.error = null; s.selectedGroup = null; })
-      .addCase(fetchGroupWithMembers.fulfilled, (s, a) => { s.loading = false; s.selectedGroup = normalizeGroup(a.payload); })
-      .addCase(fetchGroupWithMembers.rejected, (s, a) => { s.loading = false; s.error = a.payload; })
+      .addCase(fetchGroupWithMembers.pending, (s) => {
+        s.loading = true;
+        s.error = null;
+        s.selectedGroup = null;
+      })
+      .addCase(fetchGroupWithMembers.fulfilled, (s, a) => {
+        s.loading = false;
+        s.selectedGroup = normalizeGroup(a.payload);
+      })
+      .addCase(fetchGroupWithMembers.rejected, (s, a) => {
+        s.loading = false;
+        s.error = a.payload;
+      })
 
-      .addCase(updateGroup.pending, (s) => { s.updateLoading = true; s.updateError = null; s.updateSuccess = false; })
+      .addCase(updateGroup.pending, (s) => {
+        s.updateLoading = true;
+        s.updateError = null;
+        s.updateSuccess = false;
+      })
       .addCase(updateGroup.fulfilled, (s, a) => {
-        s.updateLoading = false; s.updateSuccess = true;
+        s.updateLoading = false;
+        s.updateSuccess = true;
         const g = normalizeGroup(a.payload);
         const idx = s.list.findIndex(x => String(x._id) === String(g._id));
         if (idx >= 0) s.list[idx] = g;
-        if (s.selectedGroup && String(s.selectedGroup._id) === String(g._id)) s.selectedGroup = g;
+        if (s.selectedGroup && String(s.selectedGroup._id) === String(g._id)) {
+          s.selectedGroup = g;
+        }
       })
-      .addCase(updateGroup.rejected, (s, a) => { s.updateLoading = false; s.updateError = a.payload; })
+      .addCase(updateGroup.rejected, (s, a) => {
+        s.updateLoading = false;
+        s.updateError = a.payload;
+      })
 
       .addCase(fetchMyGroups.fulfilled, (s, a) => {
         const created = Array.isArray(a.payload?.created) ? a.payload.created : [];
@@ -171,12 +250,13 @@ const groupsSlice = createSlice({
         const { groupId, data } = a.payload || {};
         const g = data?.group;
         if (g) {
-          if (s.selectedGroup && String(s.selectedGroup._id) === String(groupId)) s.selectedGroup = g;
+          if (s.selectedGroup && String(s.selectedGroup._id) === String(groupId)) {
+            s.selectedGroup = g;
+          }
           const idx = s.list.findIndex(x => String(x._id) === String(groupId));
           if (idx >= 0) s.list[idx] = g;
         }
       })
-
 
       .addCase(createGroup.pending, (state) => {
         state.createLoading = true;
@@ -187,24 +267,20 @@ const groupsSlice = createSlice({
         state.createLoading = false;
         state.createError = action.payload;
       })
-
       .addCase(createGroup.fulfilled, (state, action) => {
         state.createLoading = false;
-        state.justCreated = true; // בשביל הניווט אחרי יצירה
+        state.justCreated = true;
         state.createError = null;
 
-        // נעדכן את הרשימה אם היא קיימת
         if (Array.isArray(state.list)) {
           state.list.push(action.payload);
         } else {
           state.list = [action.payload];
         }
 
-        // נעדכן גם selectedGroup אם תרצה
         state.selectedGroup = action.payload;
       })
 
-      // מחיקת קבוצה: מוציאים מהרשימה ומנקים selectedGroup
       .addCase(deleteGroupById.fulfilled, (s, a) => {
         const gid = a.payload?.groupId;
         s.list = (s.list || []).filter(g => String(g._id) !== String(gid));
@@ -225,7 +301,12 @@ const selectMyEmail = (s) => s.auth.userEmail || null;
 const selectMyId = (s) => s.auth.userId || null;
 
 const getCreatorEmail = (g) => {
-  const cand = g?.createdBy ?? g?.created_by ?? g?.createdByEmail ?? g?.ownerEmail ?? g?.owner;
+  const cand =
+    g?.createdBy ??
+    g?.created_by ??
+    g?.createdByEmail ??
+    g?.ownerEmail ??
+    g?.owner;
   return (typeof cand === 'string') ? cand.trim().toLowerCase() : null;
 };
 
@@ -233,7 +314,11 @@ const isOwnerByClient = (g, myEmail, myUserId) => {
   const groupEmail = getCreatorEmail(g);
   const meEmail = (myEmail || '').trim().toLowerCase();
   const emailMatch = !!(groupEmail && meEmail && groupEmail === meEmail);
-  const idMatch = !emailMatch && g?.createdById && myUserId && String(g.createdById) === String(myUserId);
+  const idMatch =
+    !emailMatch &&
+    g?.createdById &&
+    myUserId &&
+    String(g.createdById) === String(myUserId);
   return !!(emailMatch || idMatch);
 };
 
@@ -258,7 +343,7 @@ export const selectSelectedGroupMembersEnriched = createSelector(
       const id = pickId(m);
       const fromUsers = id ? usersById[String(id)] : null;
       const merged = { ...(typeof m === 'object' ? m : {}), ...(fromUsers || {}) };
-      const name = coalesceName(merged) || id || '(ללא שם)';
+      const name = coalesceName(merged) || id || i18n.t('home.common.noName');
       return { ...merged, _id: merged._id || id, name };
     });
   }

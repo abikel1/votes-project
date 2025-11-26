@@ -97,7 +97,8 @@ export default function GroupSettingsPage() {
   } = useSelector((s) => s.groups);
 
   const enrichedMembers = useSelector(selectSelectedGroupMembersEnriched);
-  const { userId, userEmail, firstName, lastName } = useSelector((s) => s.auth);
+  const { userId, userEmail, firstName, lastName, isAdmin } = useSelector((s) => s.auth);
+  // const { userId, userEmail, firstName, lastName } = useSelector((s) => s.auth);
 
   const candidates =
     useSelector(selectCandidatesForGroup(groupId || '')) || EMPTY_ARR;
@@ -277,6 +278,8 @@ export default function GroupSettingsPage() {
     return !!(byEmail || byId || byFullName);
   }, [group, userEmail, userId, firstName, lastName]);
 
+  const isOwnerOrAdmin = isOwner || isAdmin;
+
   const slug = group ? makeSlug(group.name || groupSlug || groupId) : groupSlug;
 
   const sharePath = useMemo(() => {
@@ -376,7 +379,7 @@ export default function GroupSettingsPage() {
   }
 
   // משתמש מחובר אבל לא מנהל – הודעה נעימה
-  if (!isOwner) {
+  if (!isOwnerOrAdmin) {
     return (
       <div className="gs-wrap">
         <h2>הגדרות קבוצה</h2>
@@ -814,7 +817,7 @@ const onSaveGroup = async (e) => {
             <MembersTab
               group={group}
               enrichedMembers={enrichedMembers}
-              isOwner={isOwner}
+              isOwner={isOwnerOrAdmin}
               onRemoveMember={handleRemoveMember}
             />
           )}

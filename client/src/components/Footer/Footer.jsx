@@ -1,9 +1,10 @@
-// src/components/layout/Footer.jsx
 import { FaInstagram, FaWhatsapp, FaTelegramPlane } from 'react-icons/fa';
 import './Footer.css';
+import { useTranslation } from 'react-i18next';
 
 export default function Footer() {
     const year = new Date().getFullYear();
+    const { t } = useTranslation();
 
     return (
         <footer className="site-footer">
@@ -11,34 +12,35 @@ export default function Footer() {
 
                 {/* טור טקסט על המערכת */}
                 <div className="footer-col footer-col-main">
-                    <h4>מערכת ההצבעות</h4>
+                    <h4>{t('footer.title')}</h4>
                     <p>
-                        פלטפורמה פשוטה לניהול הצבעות וקבוצות.
+                        {t('footer.description.line1')}
                         <br />
-                        יצירת קבוצות, הוספת מועמדים, שליחת קישורי הצבעה ועוד.
+                        {t('footer.description.line2')}
                     </p>
                     <p className="footer-tagline">
-                        ניהול הצבעות מסודר, מאובטח וקל לשימוש – במקום אחד.
+                        {t('footer.tagline')}
                     </p>
                 </div>
 
                 {/* טור קישורים */}
                 <div className="footer-col">
-                    <h4>קישורים שימושיים</h4>
+                    <h4>{t('footer.usefulLinksTitle')}</h4>
                     <ul className="footer-links footer-links-grid">
-                        <li><a href="/">עמוד הבית</a></li>
-                        <li><a href="/groups">הקבוצות</a></li>
-                        <li><a href="/user-guide">מדריך למשתמש</a></li>
-                        <li><a href="/about">אודות</a></li>
-                        <li><a href="/contact">צור קשר</a></li>
+                        <li><a href="/">{t('footer.link.home')}</a></li>
+                        <li><a href="/groups">{t('footer.link.groups')}</a></li>
+                        <li><a href="/user-guide">{t('footer.link.guide')}</a></li>
+                        <li><a href="/about">{t('footer.link.about')}</a></li>
+                        <li><a href="/contact">{t('footer.link.contact')}</a></li>
                     </ul>
                 </div>
 
-                {/* טור רשתות חברתיות — טור נפרד */}
+                {/* טור רשתות חברתיות */}
                 <div className="footer-col footer-col-social">
-                    <h4>עקוב אחרינו</h4>
+                    <h4>{t('footer.followUs')}</h4>
 
                     <div className="footer-social-icons">
+                        <h4>*** FOOTER TEST ***</h4>
                         <a href="https://wa.me/972500000000" target="_blank" rel="noreferrer"><FaWhatsapp /></a>
                         <a href="https://www.instagram.com/your_page" target="_blank" rel="noreferrer"><FaInstagram /></a>
                         <a href="https://t.me/your_channel" target="_blank" rel="noreferrer"><FaTelegramPlane /></a>
@@ -48,7 +50,7 @@ export default function Footer() {
             </div>
 
             <div className="footer-bottom">
-                <span>© {year} מערכת ההצבעות · כל הזכויות שמורות</span>
+                <span>© {year} {t('footer.bottomText')}</span>
             </div>
 
         </footer>

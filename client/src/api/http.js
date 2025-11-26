@@ -2,9 +2,11 @@
 import axios from 'axios';
 
 const http = axios.create({
-    baseURL: '/api',          // ב־Vite יש proxy ל־/api → השרת
+    baseURL: import.meta.env.VITE_API_BASE_URL || '/api',
     withCredentials: true,
 });
+
+
 
 // =============================
 //   בדיקת תפוגת טוקן בצד לקוח

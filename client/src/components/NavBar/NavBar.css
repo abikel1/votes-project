@@ -101,3 +101,14 @@ body {
   font-weight: bold;
   border-bottom: 2px solid #c8f4ff;
 }
+
+.site-logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.logo-img {
+  height: 44px;    /* גובה מומלץ */
+  width: auto;
+}
