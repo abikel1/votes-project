@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
 import { FaUsers, FaUserPlus, FaUserCheck, FaUserTimes, FaExclamationTriangle, FaInfoCircle } from 'react-icons/fa';
-
+import { uploadImage } from './uploadImage';
 import {
   fetchGroupWithMembers,
   updateGroup,
@@ -423,33 +423,33 @@ export default function GroupSettingsPage() {
     }));
   };
 
-const onSaveGroup = async (e) => {
-  e.preventDefault();
+  const onSaveGroup = async (e) => {
+    e.preventDefault();
 
-  const groupEnd = form.endDate ? new Date(form.endDate) : null;
-  const candEnd = form.candidateEndDate ? new Date(form.candidateEndDate) : null;
+    const groupEnd = form.endDate ? new Date(form.endDate) : null;
+    const candEnd = form.candidateEndDate ? new Date(form.candidateEndDate) : null;
 
-  if (groupEnd && candEnd && candEnd > groupEnd) {
-    toast.error("תאריך סיום הגשת מועמדות לא יכול להיות אחרי תאריך סיום הקבוצה");
-    return; // מונע שליחת הבקשה לשרת
-  }
+    if (groupEnd && candEnd && candEnd > groupEnd) {
+      toast.error("תאריך סיום הגשת מועמדות לא יכול להיות אחרי תאריך סיום הקבוצה");
+      return; // מונע שליחת הבקשה לשרת
+    }
 
-  const patch = {
-    name: form.name.trim(),
-    description: form.description.trim(),
-    symbol: (form.symbol || '').trim(),
-    maxWinners: Number(form.maxWinners) || 1,
-    isLocked: !!form.isLocked,
-    ...(form.endDate ? { endDate: new Date(form.endDate).toISOString() } : {}),
-    ...(form.candidateEndDate ? { candidateEndDate: new Date(form.candidateEndDate).toISOString() } : {}),
+    const patch = {
+      name: form.name.trim(),
+      description: form.description.trim(),
+      symbol: (form.symbol || '').trim(),
+      maxWinners: Number(form.maxWinners) || 1,
+      isLocked: !!form.isLocked,
+      ...(form.endDate ? { endDate: new Date(form.endDate).toISOString() } : {}),
+      ...(form.candidateEndDate ? { candidateEndDate: new Date(form.candidateEndDate).toISOString() } : {}),
+    };
+
+    await dispatch(updateGroup({ groupId, patch })).unwrap();
+    setEditMode(false);
+    if (patch.isLocked) dispatch(fetchJoinRequests(groupId));
+    dispatch(fetchGroupWithMembers(groupId));
+    dispatch(fetchVotersByGroup(groupId));
   };
-
-  await dispatch(updateGroup({ groupId, patch })).unwrap();
-  setEditMode(false);
-  if (patch.isLocked) dispatch(fetchJoinRequests(groupId));
-  dispatch(fetchGroupWithMembers(groupId));
-  dispatch(fetchVotersByGroup(groupId));
-};
 
 
 
@@ -585,30 +585,18 @@ const onSaveGroup = async (e) => {
       if (mode === 'new') setUploadingNew(true);
       if (mode === 'edit') setUploadingEdit(true);
 
-      const fd = new FormData();
-      fd.append('image', file);
-      if (oldUrl) fd.append('old', oldUrl);
-
-      const res = await fetch('/api/upload', {
-        method: 'POST',
-        body: fd,
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.message || 'Upload failed');
-      }
+      const url = await uploadImage(file, oldUrl);
+      if (!url) return null;
 
       if (mode === 'new') {
-        setCandForm((prev) => ({ ...prev, photoUrl: data.url }));
+        setCandForm((prev) => ({ ...prev, photoUrl: url }));
       }
 
       if (mode === 'edit') {
-        setEditCandForm((prev) => ({ ...prev, photoUrl: data.url }));
+        setEditCandForm((prev) => ({ ...prev, photoUrl: url }));
       }
 
-      return data.url;
+      return url;
     } catch (err) {
       console.error('Upload error:', err);
       alert('שגיאה בהעלאת הקובץ');
@@ -618,6 +606,7 @@ const onSaveGroup = async (e) => {
       if (mode === 'edit') setUploadingEdit(false);
     }
   }
+
 
   const clearNewPhoto = () =>
     setCandForm((prev) => ({ ...prev, photoUrl: '' }));

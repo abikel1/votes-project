@@ -69,11 +69,32 @@ export const checkHasVoted = createAsyncThunk(
   }
 );
 
+/**
+ * 🔔 מהשרת: קבוצות שהמשתמש הצביע בהן, ההצבעה הסתיימה, כולל זוכים
+ * GET /votes/my-finished
+ */
+export const fetchMyFinishedVotedGroups = createAsyncThunk(
+  'votes/fetchMyFinishedVotedGroups',
+  async (_, { rejectWithValue }) => {
+    try {
+      const { data } = await http.get('/votes/my-finished');
+      return data; // array
+    } catch (e) {
+      return rejectWithValue(i18n.t('votes.errors.fetchMyFinishedFailed'));
+    }
+  }
+);
+
 const initialState = {
   status: 'idle',
   error: null,
   lastVote: null,
   hasVoted: false,             // האם המשתמש הנוכחי הצביע בקבוצה האחרונה שנבדקה
+
+  // 🔔 קבוצות שהמשתמש הצביע בהן וההצבעה הסתיימה (מהשרת)
+  finishedVotedGroups: [],     // [{ groupId, groupName, endDate, winners: [...] }]
+  finishedStatus: 'idle',
+  finishedError: null,
 
   // מפות פר-קבוצה להצגת המצביעים
   votersByGroup: {},           // { [groupId]: Voter[] }
@@ -139,6 +160,20 @@ const votesSlice = createSlice({
       s.votersErrorByGroup[gid] =
         a.payload?.message || i18n.t('votes.errors.fetchVotersFailed');
     });
+
+    // 🔔 קבוצות שסיימו הצבעה עבור המשתמש
+    b.addCase(fetchMyFinishedVotedGroups.pending, (s) => {
+      s.finishedStatus = 'loading';
+      s.finishedError = null;
+    });
+    b.addCase(fetchMyFinishedVotedGroups.fulfilled, (s, a) => {
+      s.finishedStatus = 'succeeded';
+      s.finishedVotedGroups = Array.isArray(a.payload) ? a.payload : [];
+    });
+    b.addCase(fetchMyFinishedVotedGroups.rejected, (s, a) => {
+      s.finishedStatus = 'failed';
+      s.finishedError = a.payload || i18n.t('votes.errors.fetchMyFinishedFailed');
+    });
   },
 });
 
@@ -159,3 +194,7 @@ export const selectVotersLoadingForGroup = (groupId) => (state) =>
 
 export const selectVotersErrorForGroup = (groupId) => (state) =>
   state.votes?.votersErrorByGroup?.[String(groupId)] || null;
+
+// 🔔 סלקטור לפופ-אפ
+export const selectFinishedVotedGroups = (state) =>
+  state.votes?.finishedVotedGroups || [];

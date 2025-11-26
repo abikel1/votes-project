@@ -82,8 +82,6 @@ export default function GroupDetailPage() {
 
   const joinedIdsSet = useSelector(selectMyJoinedIds);
 
-  // const [candidateRequests, setCandidateRequests] = useState([]);
-
   const { userEmail: authEmail, userId: authId } = useSelector((s) => s.auth);
   const isAuthed =
     !!authId ||
@@ -181,22 +179,6 @@ export default function GroupDetailPage() {
     };
   }, [isDragging]);
 
-  // useEffect(() => {
-  //   if (!groupId) return;
-
-  //   const fetchRequests = async () => {
-  //     try {
-  //       const res = await http.get(`/groups/${groupId}/requests`);
-  //       setCandidateRequests(res.data); // מערך בקשות הצטרפות
-  //     } catch (err) {
-  //       console.error('failed to fetch join requests', err);
-  //     }
-  //   };
-
-  //   fetchRequests();
-  // }, [groupId]);
-
-
   // ===== טיפול בשגיאות / מצבי טעינה =====
   if (groupError) {
     return (
@@ -245,7 +227,7 @@ export default function GroupDetailPage() {
     return <div className="loading-wrap">טוען נתוני קבוצה…</div>;
   }
 
-  // עכשיו בטוח להשתמש ב-group._id
+  // candidateRequests מהשרת (מגיעים ב-getGroupById)
   const candidateRequests = group.candidateRequests || [];
 
   // סוף יום ההצבעה – 23:59:59 של אותו יום
@@ -436,6 +418,7 @@ export default function GroupDetailPage() {
                           className="candidate-avatar"
                         />
                       )}
+{/* <<<<<<< HEAD */}
 
                         {/* אם הקבוצה נגמרה והמועמד מנצח – הצג מקום */}
       {isGroupExpired && winnerIndex !== -1 && (
@@ -449,7 +432,7 @@ export default function GroupDetailPage() {
                         className="campaign-btn"
                         onClick={() =>
                           navigate(`/campaign/${c._id}`, {
-                            state: { groupId }   // ← שולחת את מזהה הקבוצה
+                            state: { groupId },
                           })
                         }
                         title="קמפיין שלי"
@@ -457,20 +440,12 @@ export default function GroupDetailPage() {
                         <FiStar size={20} />
                       </button>
 
-
                       <div className="candidate-text">
                         <h4>{c.name}</h4>
                         {c.description && <p>{c.description}</p>}
                       </div>
 
-                      {/* כפתור לדף קמפיין */}
-                      <button
-                        className="campaign-btn"
-                        onClick={() => navigate(`/campaign/${c._id}`)}
-                        title="קמפיין שלי"
-                      >
-                        <FiStar size={20} />
-                      </button>
+                 
 
                       {isGroupExpired && (
                         <div className="votes-count">{c.votesCount || 0} קולות</div>
@@ -502,7 +477,6 @@ export default function GroupDetailPage() {
             <div className="candidate-form-card">
               <CandidateApplyForm
                 groupId={group._id}
-
                 candidateRequests={candidateRequests}
               />
             </div>
@@ -591,7 +565,6 @@ export default function GroupDetailPage() {
         </div>
       </div>
 
-      {/* כפתור צ'אט צף בצד ימין למטה */}
       {/* כפתור צ'אט צף בצד ימין למטה – יוצג רק אם המשתמש מחובר */}
       {isAuthed && (
         <>
