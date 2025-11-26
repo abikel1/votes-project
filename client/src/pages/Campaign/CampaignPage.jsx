@@ -37,18 +37,19 @@ export default function CampaignPage() {
   const [editDescription, setEditDescription] = useState('');
   const [isEditingDescription, setIsEditingDescription] = useState(false);
 
+  // מצב עריכה – חדש!
+  const [isEditMode, setIsEditMode] = useState(false);
+
   //---------------------------------------------------------------------
   // 1) נטען משתמש → ואז קמפיין → ואז מציגים הכול
   //---------------------------------------------------------------------
 
-  // טוען קמפיין רק כאשר גם userId וגם candidateId זמינים
-  useEffect(() => {
-    if (!userLoading && currentUserId && candidateId) {
-      dispatch(fetchCampaign(candidateId));
-    }
-  }, [currentUserId, userLoading, candidateId, dispatch]);
+useEffect(() => {
+  if (candidateId) {
+    dispatch(fetchCampaign(candidateId));
+  }
+}, [candidateId, dispatch]);
 
-  // מעדכן תיאור כשקמפיין נטען
   useEffect(() => {
     if (campaign?.description) {
       setEditDescription(campaign.description);
@@ -84,26 +85,31 @@ export default function CampaignPage() {
   const handleUpdateCampaign = () => {
     dispatch(updateCampaign({ campaignId: campaign._id, payload: { description: editDescription } }));
     setIsEditingDescription(false);
+    setIsEditMode(false); // יציאה ממצב עריכה
   };
 
   const handleAddPost = () => {
     if (!newPost.title.trim()) return;
     dispatch(addPost({ campaignId: campaign._id, post: newPost }));
     setNewPost({ title: '', content: '' });
+    setIsEditMode(false); // יציאה ממצב עריכה
   };
 
   const handleDeletePost = (postId) => {
     dispatch(deletePost({ campaignId: campaign._id, postId }));
+    setIsEditMode(false); // יציאה ממצב עריכה
   };
 
   const handleAddImage = () => {
     if (!newImageUrl.trim()) return;
     dispatch(addImage({ campaignId: campaign._id, imageUrl: newImageUrl }));
     setNewImageUrl('');
+    setIsEditMode(false); // יציאה ממצב עריכה
   };
 
   const handleDeleteImage = (url) => {
     dispatch(deleteImage({ campaignId: campaign._id, imageUrl: url }));
+    setIsEditMode(false); // יציאה ממצב עריכה
   };
 
   //---------------------------------------------------------------------
@@ -113,7 +119,7 @@ export default function CampaignPage() {
   return (
     <div className="page-wrap dashboard">
 
-      {/* כפתור חזרה */}
+      {/* כפתור חזרה + כפתור עריכת דף */}
       <div className="page-header">
         <div className="header-title">
           <h2>{campaign.candidate?.name}</h2>
@@ -134,6 +140,17 @@ export default function CampaignPage() {
         >
           <BiArrowBack size={20} />
         </button>
+
+        {/* NEW – כפתור עריכת הדף */}
+        {isCandidateOwner && !isEditMode && (
+          <button
+            className="vote-btn"
+            onClick={() => setIsEditMode(true)}
+            style={{ marginRight: '10px' }}
+          >
+            עריכת הדף
+          </button>
+        )}
       </div>
 
       <div className="main-content-resizable">
@@ -143,8 +160,8 @@ export default function CampaignPage() {
           <div className="candidates-container">
             <h3 className="section-title">פוסטים</h3>
 
-            {/* הוספת פוסט */}
-            {isCandidateOwner && (
+            {/* הוספת פוסט (מצב עריכה בלבד) */}
+            {isCandidateOwner && isEditMode && (
               <div className="info-card" style={{ marginBottom: '16px', padding: '16px' }}>
                 <input
                   type="text"
@@ -187,7 +204,7 @@ export default function CampaignPage() {
                       {p.content}
                     </p>
 
-                    {isCandidateOwner && (
+                    {isCandidateOwner && isEditMode && (
                       <button
                         onClick={() => handleDeletePost(p._id)}
                         style={{
@@ -243,7 +260,10 @@ export default function CampaignPage() {
                     </button>
 
                     <button
-                      onClick={() => setIsEditingDescription(false)}
+                      onClick={() => {
+                        setIsEditingDescription(false);
+                        setIsEditMode(false);
+                      }}
                       className="back-btn"
                     >
                       ביטול
@@ -256,7 +276,7 @@ export default function CampaignPage() {
                     {editDescription || 'אין תיאור קמפיין עדיין'}
                   </p>
 
-                  {isCandidateOwner && (
+                  {isCandidateOwner && isEditMode && (
                     <button onClick={() => setIsEditingDescription(true)}>
                       ערוך תיאור
                     </button>
@@ -268,7 +288,8 @@ export default function CampaignPage() {
 
           <h3 className="section-title">גלריית תמונות</h3>
 
-          {isCandidateOwner && (
+          {/* הוספת תמונה – רק במצב עריכה */}
+          {isCandidateOwner && isEditMode && (
             <div className="info-card" style={{ marginBottom: '16px', padding: '16px' }}>
               <div style={{ display: 'flex', gap: '10px' }}>
                 <input
@@ -322,7 +343,7 @@ export default function CampaignPage() {
                         style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                       />
 
-                      {isCandidateOwner && (
+                      {isCandidateOwner && isEditMode && (
                         <button
                           onClick={() => handleDeleteImage(img)}
                           style={{
