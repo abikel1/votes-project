@@ -101,7 +101,7 @@ const handleAddPost = () => {
   };
 
   const handleDeleteImage = (url) => {
-    // console.log('Deleting image URL:', url);
+    // console.log('Deleting imagטe URL:', url);
     dispatch(deleteImage({ campaignId: campaign._id, imageUrl: url }));
     setIsEditMode(false);
   };
@@ -223,7 +223,19 @@ const handleAddPost = () => {
                 <div key={idx} style={{ position: 'relative', aspectRatio: '1', borderRadius: '8px', overflow: 'hidden' }}>
                   <img src={img} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                   {isCandidateOwner && isEditMode && (
-                    <button onClick={() => handleDeleteImage(img)} className="delete-btn">×</button>
+                    <button onClick={() => handleDeleteImage(img)} className="delete-btn"         style={{
+                            position: 'absolute',
+                            top: '6px',
+                            left: '6px',
+                            width: '28px',
+                            height: '28px',
+                            borderRadius: '50%',
+                            background: '#dc3545',
+                            color: 'white',
+                            border: 'none',
+                            cursor: 'pointer',
+                          }}
+                    >×</button>
                   )}
                 </div>
               ))
@@ -234,3 +246,27 @@ const handleAddPost = () => {
     </div>
   );
 }
+
+
+
+
+
+  // {isCandidateOwner && (
+  //                       <button
+  //                         onClick={() => handleDeleteImage(img)}
+                          // style={{
+                          //   position: 'absolute',
+                          //   top: '6px',
+                          //   left: '6px',
+                          //   width: '28px',
+                          //   height: '28px',
+                          //   borderRadius: '50%',
+                          //   background: '#dc3545',
+                          //   color: 'white',
+                          //   border: 'none',
+                          //   cursor: 'pointer',
+                          // }}
+  //                       >
+  //                         ×
+  //                       </button>
+  //                     )}
