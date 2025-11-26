@@ -40,7 +40,7 @@ async function createGroupService(data, user) {
     createdBy: (user.email || '').trim().toLowerCase(),
     createdById: user._id,
     endDate: data.endDate,
-    candidateEndDate: data.candidateEndDate, // <-- חדש
+    candidateEndDate: data.candidateEndDate,
     maxWinners: data.maxWinners ?? 1,
     shareLink: data.shareLink || undefined,
     isLocked: parsedIsLocked,
@@ -49,9 +49,8 @@ async function createGroupService(data, user) {
   return group;
 }
 
-
 async function updateGroupService(groupId, updateData) {
-  console.log("BODY UPDATE:", updateData);
+  console.log('BODY UPDATE:', updateData);
 
   if (updateData && Object.prototype.hasOwnProperty.call(updateData, 'isLocked')) {
     const v = toBoolStrict(updateData.isLocked);
@@ -65,9 +64,11 @@ async function updateGroupService(groupId, updateData) {
     }
   }
 
-  return Group.findByIdAndUpdate(groupId, updateData, { new: true, runValidators: true });
+  return Group.findByIdAndUpdate(groupId, updateData, {
+    new: true,
+    runValidators: true,
+  });
 }
-
 
 async function deleteGroupService(groupId) {
   return Group.findByIdAndDelete(groupId);
@@ -84,11 +85,11 @@ async function getAllGroupsService() {
     .populate('candidates')
     .populate({
       path: 'createdById',
-      select: 'firstName lastName email'
+      select: 'firstName lastName email',
     });
 }
 
-/* ===== בקשות הצטרפות ===== */
+/* ===== בקשות הצטרפות כחבר בקבוצה ===== */
 
 async function requestJoinGroupService(groupId, user) {
   const g = await Group.findById(groupId);
@@ -96,13 +97,13 @@ async function requestJoinGroupService(groupId, user) {
   if (!g.isLocked) throw new Error('Group is not locked');
 
   // כבר חבר?
-  if (g.members?.some(id => String(id) === String(user._id))) return g;
+  if (g.members?.some((id) => String(id) === String(user._id))) return g;
   const emailNorm = (user.email || '').trim().toLowerCase();
   if (Array.isArray(g.participants) && g.participants.includes(emailNorm)) return g;
 
   // קיימת בקשה ממתינה?
-  const exists = g.joinRequests?.find(r =>
-    String(r.userId) === String(user._id) && r.status === 'pending'
+  const exists = g.joinRequests?.find(
+    (r) => String(r.userId) === String(user._id) && r.status === 'pending'
   );
   if (exists) return g;
 
@@ -120,26 +121,33 @@ async function requestJoinGroupService(groupId, user) {
 async function listJoinRequestsService(groupId, ownerId) {
   const g = await Group.findById(groupId);
   if (!g) throw new Error('Group not found');
-  if (String(g.createdById) !== String(ownerId) && ownerId !== 'ADMIN') throw new Error('Not owner');
-  return (g.joinRequests || []).filter(r => r.status === 'pending');
+  if (String(g.createdById) !== String(ownerId) && ownerId !== 'ADMIN') {
+    throw new Error('Not owner');
+  }
+  return (g.joinRequests || []).filter((r) => r.status === 'pending');
 }
 
 async function setJoinRequestStatusService(groupId, ownerId, reqId, status) {
   const g = await Group.findById(groupId);
   if (!g) throw new Error('Group not found');
-  if (String(g.createdById) !== String(ownerId) && ownerId !== 'ADMIN') throw new Error('Not owner');
+  if (String(g.createdById) !== String(ownerId) && ownerId !== 'ADMIN') {
+    throw new Error('Not owner');
+  }
 
   const req = g.joinRequests.id(reqId);
   if (!req) throw new Error('Request not found');
 
   if (status === 'approved') {
     if (!g.members) g.members = [];
-    if (!g.members.some(id => String(id) === String(req.userId))) {
+    if (!g.members.some((id) => String(id) === String(req.userId))) {
       g.members.push(req.userId);
     }
     if (!Array.isArray(g.participants)) g.participants = [];
     const emailNorm = (req.email || '').trim().toLowerCase();
-    if (emailNorm && !g.participants.map(e => (e || '').trim().toLowerCase()).includes(emailNorm)) {
+    if (
+      emailNorm &&
+      !g.participants.map((e) => (e || '').trim().toLowerCase()).includes(emailNorm)
+    ) {
       g.participants.push(emailNorm);
     }
     req.deleteOne();
@@ -164,7 +172,9 @@ async function getUserGroupsService(user) {
   const joinedByParticipants = await Group.find({ participants: email }).lean();
 
   const uniq = new Map();
-  for (const g of [...joinedByMembers, ...joinedByParticipants]) uniq.set(String(g._id), g);
+  for (const g of [...joinedByMembers, ...joinedByParticipants]) {
+    uniq.set(String(g._id), g);
+  }
   const joined = Array.from(uniq.values());
 
   return { created, joined };
@@ -176,16 +186,30 @@ async function getMyJoinStatusesService(user) {
 
   const orConds = [];
   if (user._id && mongoose.isValidObjectId(user._id)) {
-    orConds.push({ joinRequests: { $elemMatch: { userId: new mongoose.Types.ObjectId(user._id), status: 'pending' } } });
+    orConds.push({
+      joinRequests: {
+        $elemMatch: {
+          userId: new mongoose.Types.ObjectId(user._id),
+          status: 'pending',
+        },
+      },
+    });
   }
   if (user.email) {
-    orConds.push({ joinRequests: { $elemMatch: { email: (user.email || '').trim().toLowerCase(), status: 'pending' } } });
+    orConds.push({
+      joinRequests: {
+        $elemMatch: {
+          email: (user.email || '').trim().toLowerCase(),
+          status: 'pending',
+        },
+      },
+    });
   }
 
   if (!orConds.length) return { pending: [] };
 
   const rows = await Group.find({ $or: orConds }, { _id: 1 }).lean();
-  return { pending: rows.map(r => String(r._id)) };
+  return { pending: rows.map((r) => String(r._id)) };
 }
 
 /** חברות בקבוצה מסוימת */
@@ -197,9 +221,11 @@ async function isMemberOfGroupService(groupId, user) {
   const uid = String(user._id || '');
   const email = (user.email || '').trim().toLowerCase();
 
-  const byMembers = Array.isArray(g.members) && g.members.some(id => String(id) === uid);
-  const byParticipants = Array.isArray(g.participants) &&
-    g.participants.map(e => (e || '').trim().toLowerCase()).includes(email);
+  const byMembers =
+    Array.isArray(g.members) && g.members.some((id) => String(id) === uid);
+  const byParticipants =
+    Array.isArray(g.participants) &&
+    g.participants.map((e) => (e || '').trim().toLowerCase()).includes(email);
 
   return { member: !!(byMembers || byParticipants) };
 }
@@ -214,72 +240,43 @@ async function removeGroupMemberService(groupId, ownerId, { memberId, email }) {
 
   const g = await Group.findById(groupId);
   if (!g) throw new Error('Group not found');
-  if (String(g.createdById) !== String(ownerId) && ownerId !== 'ADMIN') throw new Error('Not owner');
+  if (String(g.createdById) !== String(ownerId) && ownerId !== 'ADMIN') {
+    throw new Error('Not owner');
+  }
 
   const emailNorm = (email || '').trim().toLowerCase();
 
   // הסרה מ-members לפי ObjectId
   if (memberId) {
-    g.members = (g.members || []).filter(id => String(id) !== String(memberId));
+    g.members = (g.members || []).filter((id) => String(id) !== String(memberId));
   }
 
   // הסרה גם מ-participants לפי אימייל
   if (emailNorm) {
     g.participants = (g.participants || [])
-      .map(e => (e || '').trim().toLowerCase())
-      .filter(e => e !== emailNorm);
+      .map((e) => (e || '').trim().toLowerCase())
+      .filter((e) => e !== emailNorm);
   }
 
-  // מחיקת בקשות בהמתנה של אותו משתמש/אימייל (לא חובה אבל נחמד)
-  g.joinRequests = (g.joinRequests || []).filter(r => {
+  // מחיקת בקשות בהמתנה
+  g.joinRequests = (g.joinRequests || []).filter((r) => {
     const sameUser = memberId && String(r.userId) === String(memberId);
-    const sameEmail = emailNorm && (r.email || '').trim().toLowerCase() === emailNorm;
+    const sameEmail =
+      emailNorm && (r.email || '').trim().toLowerCase() === emailNorm;
     return !(sameUser || sameEmail);
   });
 
   await g.save();
 
-  const updated = await Group.findById(groupId)
-    .populate({ path: 'members', select: 'name email' });
+  const updated = await Group.findById(groupId).populate({
+    path: 'members',
+    select: 'name email',
+  });
 
   return updated;
 }
 
-
-//=============================================================================
-// async function applyCandidateService(groupId, user, data) {
-//   const g = await Group.findById(groupId);
-//   if (!g) throw new Error('Group not found');
-
-//     const now = new Date();
-//   if (g.candidateEndDate && now > g.candidateEndDate) {
-//     throw new Error('Candidate submission period has ended');
-//   }
-
-//   // האם כבר חבר?
-//   const alreadyCandidate = await Candidate.findOne({
-//     groupId,
-//     userId: user._id
-//   }).lean();
-//   if (alreadyCandidate) throw new Error('Already a candidate');
-
-//   // האם כבר הגיש בקשה?
-//   const exists = g.candidateRequests?.find(r =>
-//     String(r.userId) === String(user._id) && r.status === 'pending'
-//   );
-//   if (exists) return g;
-
-//   g.candidateRequests.push({
-//     userId: user._id,
-//     email: (user.email || '').trim().toLowerCase(),
-//     name: data.name || user.name,
-//     description: data.description || '',
-//     status: 'pending'
-//   });
-
-//   await g.save();
-//   return g;
-// }
+/* ===== בקשות מועמדות ===== */
 
 async function applyCandidateService(groupId, user, data) {
   const g = await Group.findById(groupId);
@@ -287,103 +284,122 @@ async function applyCandidateService(groupId, user, data) {
 
   const now = new Date();
   if (g.candidateEndDate && now > g.candidateEndDate) {
-    throw new Error('Candidate submission period has ended');
+    const e = new Error('Candidate submission period has ended');
+    e.code = 'CANDIDATE_PERIOD_ENDED';
+    throw e;
   }
 
-  // האם כבר חבר?
+  // כבר קיים מועמד עבור המשתמש הזה בקבוצה?
   const alreadyCandidate = await Candidate.findOne({
     groupId,
-    userId: user._id
+    userId: user._id,
   }).lean();
-  if (alreadyCandidate) throw new Error('Already a candidate');
 
-  // בדיקה אם כבר קיימת בקשה כלשהי של המשתמש
-  const existingRequests = g.candidateRequests.filter(r => String(r.userId) === String(user._id));
-
-  if (existingRequests.length) {
-    // עדכון כל הרשומות הקיימות ל-pending עם הפרטים החדשים
-    existingRequests.forEach(r => {
-      r.name = data.name || user.name;
-      r.description = data.description || '';
-      r.status = 'pending';
-    });
-    await g.save();
-    return existingRequests[0]; // מחזירים את הרשומה הראשונה (ניתן להתאים)
+  if (alreadyCandidate) {
+    const e = new Error('Already a candidate');
+    e.code = 'ALREADY_CANDIDATE';
+    throw e;
   }
 
-  // אם אין בקשה בכלל – יוצרים חדשה
-  const newReq = {
-    userId: user._id,
-    email: (user.email || '').trim().toLowerCase(),
-    name: data.name || user.name,
-    description: data.description || '',
-    status: 'pending'
-  };
-  g.candidateRequests.push(newReq);
+  // מחפשים בקשת מועמדות קיימת לאותו משתמש (לא משנה מה הסטטוס)
+  let req =
+    (g.candidateRequests || []).find(
+      (r) => String(r.userId) === String(user._id)
+    ) || null;
+
+  if (req) {
+    // מעדכנים את הפרטים הקיימים ומחזירים ל־pending
+    req.name = data.name || user.name || '';
+    req.description = data.description || '';
+    req.email = (user.email || '').trim().toLowerCase();
+    req.status = 'pending';
+  } else {
+    // יוצרים בקשה חדשה
+    const newReq = {
+      userId: user._id,
+      email: (user.email || '').trim().toLowerCase(),
+      name: data.name || user.name || '',
+      description: data.description || '',
+      status: 'pending',
+      createdAt: new Date(),
+    };
+    g.candidateRequests.push(newReq);
+    req = g.candidateRequests[g.candidateRequests.length - 1];
+  }
+
   await g.save();
 
-  return newReq;
+  return {
+    groupId: String(g._id),
+    request: req,
+  };
 }
-
 
 async function approveCandidateRequestService(groupId, ownerId, requestId) {
   const g = await Group.findById(groupId);
   if (!g) throw new Error('Group not found');
-  if (String(g.createdById) !== String(ownerId) && ownerId !== 'ADMIN') throw new Error('Not owner');
+  if (String(g.createdById) !== String(ownerId) && ownerId !== 'ADMIN') {
+    throw new Error('Not owner');
+  }
 
   const req = g.candidateRequests.id(requestId);
   if (!req) throw new Error('Request not found');
 
+  if (req.status === 'approved') {
+    throw new Error('Request already approved');
+  }
+
   req.status = 'approved';
 
-  // יצירת מועמד
   const candidate = await Candidate.create({
     userId: req.userId,
     name: req.name,
     description: req.description,
     photoUrl: '',
     symbol: '',
-    groupId: groupId
+    groupId,
   });
 
-  // // מחיקה מהרשימה
-  // req.deleteOne();
   await g.save();
 
-  return candidate;
+  return {
+    groupId: String(g._id),
+    request: req,
+    candidate,
+  };
 }
 
 async function rejectCandidateRequestService(groupId, adminId, requestId) {
   const group = await Group.findById(groupId);
-  if (!group) throw new Error("Group not found");
+  if (!group) throw new Error('Group not found');
 
-  // בדיקת הרשאות
-  if (group.createdById.toString() !== adminId.toString() && adminId !== 'ADMIN') {
-    throw new Error("Not authorized");
+  if (String(group.createdById) !== String(adminId) && adminId !== 'ADMIN') {
+    throw new Error('Not authorized');
   }
 
   const request = group.candidateRequests.id(requestId);
-  if (!request) throw new Error("Request not found");
+  if (!request) throw new Error('Request not found');
 
-  // עדכון סטטוס לדחוי במקום מחיקה
   request.status = 'rejected';
   await group.save();
 
-  return request; // מחזירים את הבקשה המעודכנת כדי שה-Redux יעדכן את הסטור
+  return {
+    groupId: String(group._id),
+    request,
+  };
 }
-
-
 
 async function addCandidateByEmailService(groupId, ownerId, email, data = {}) {
   const g = await Group.findById(groupId);
   if (!g) throw new Error('Group not found');
-  if (String(g.createdById) !== String(ownerId) && ownerId !== 'ADMIN') throw new Error('Not owner');
+  if (String(g.createdById) !== String(ownerId) && ownerId !== 'ADMIN') {
+    throw new Error('Not owner');
+  }
 
   const norm = email.trim().toLowerCase();
   const user = await User.findOne({ email: norm });
   if (!user) throw new Error('User not found');
 
-  // לבדוק שלא קיים כבר
   const exists = await Candidate.findOne({ groupId, userId: user._id });
   if (exists) throw new Error('Candidate already exists');
 
@@ -393,7 +409,7 @@ async function addCandidateByEmailService(groupId, ownerId, email, data = {}) {
     description: data.description || '',
     photoUrl: data.photoUrl || '',
     symbol: data.symbol || '',
-    groupId
+    groupId,
   });
 
   return candidate;
@@ -405,8 +421,9 @@ async function getCandidateRequestsService(groupId) {
   return group.candidateRequests || [];
 }
 
+/* ===== AI תיאור קבוצה ===== */
+
 async function generateGroupDescriptionService(name, hint = '') {
-  // fallback אם אין מפתח
   if (!genAI || !process.env.GEMINI_API_KEY) {
     return 'קבוצה חדשה באתר ההצבעות. תיאור יתווסף בהמשך.';
   }
@@ -439,16 +456,14 @@ async function generateGroupDescriptionService(name, hint = '') {
     return 'קבוצה חדשה באתר ההצבעות.';
   }
 
-  // לוודא עד 4 שורות ולא ריקות
   const lines = text
     .split('\n')
-    .map(l => l.trim())
+    .map((l) => l.trim())
     .filter(Boolean)
     .slice(0, 4);
 
   return lines.join('\n') || 'קבוצה חדשה באתר ההצבעות.';
 }
-
 
 module.exports = {
   createGroupService,
