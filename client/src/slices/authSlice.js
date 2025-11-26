@@ -223,6 +223,7 @@ const authSlice = createSlice({
     error: null,
     user: null,
     message: '',
+    updateErrors: null,
   },
   reducers: {
     clearError: (state) => {
@@ -417,8 +418,9 @@ const authSlice = createSlice({
         s.message = a.payload;
       })
       .addCase(changePassword.rejected, (s, a) => {
-        s.updateErrors = { form: i18n.t('auth.changePassword.genericError') };
+        s.updateErrors = a.payload || { form: i18n.t('auth.changePassword.genericError') };
       });
+
   }
 });
 
