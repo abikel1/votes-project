@@ -84,12 +84,21 @@ export default function CampaignPage() {
     setIsEditingDescription(false);
     setIsEditMode(false);
   };
-
   const handleAddPost = () => {
     if (!newPost.title.trim()) return;
-    dispatch(addPost({ campaignId: campaign._id, post: newPost }));
-    setNewPost({ title: '', content: '' });
+
+    dispatch(addPost({ campaignId: campaign._id, post: newPost }))
+      .unwrap()
+      .then(() => {
+        setNewPost({ title: '', content: '' });
+        setIsEditMode(false);      // 👈 נסגר רק אחרי הצלחה
+      })
+      .catch(() => {
+        // פה אפשר לשים toast לשגיאה אם תרצי
+      });
   };
+
+
 
   const handleDeletePost = (postId) => {
     dispatch(deletePost({ campaignId: campaign._id, postId }));
