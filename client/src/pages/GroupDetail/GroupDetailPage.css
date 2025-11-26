@@ -196,7 +196,23 @@
     border: 1px solid #10b981;
     /* background: #f0fdf4; */
 }
-
+.winner-badge {
+  position: absolute;
+  top: -8px;
+  left: -8px;
+  width: 28px;
+  height: 28px;
+  background-color: #f5ce0b; /* צהוב-כתום */
+  color: #fff;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* border-radius: 4px; */
+  font-size: 14px;
+  box-shadow: 0 0 4px rgba(0,0,0,0.3);
+  z-index: 2;
+}
 .candidate-photo {
     width: 60px;
     height: 60px;
@@ -1102,3 +1118,10 @@
   transform: scale(1.1);
 }
 
+/* .candidate-card {
+  position: relative;
+  padding: 12px;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+} */
