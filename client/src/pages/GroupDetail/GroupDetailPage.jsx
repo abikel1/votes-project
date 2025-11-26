@@ -406,11 +406,11 @@ export default function GroupDetailPage() {
 
             {!loadingCandidates && candidates.length > 0 && (
               <div className="candidates-grid">
-                {sortedCandidates.map((c) => {
-                  const isWinner = winners.some((w) => w._id === c._id);
+{sortedCandidates.map((c, index) => {
+  const winnerIndex = winners.findIndex((w) => w._id === c._id);
 
                   return (
-                    <div key={c._id} className={`candidate-card ${isWinner ? 'winner' : ''}`}>
+<div key={c._id} className={`candidate-card ${winnerIndex !== -1 ? 'winner' : ''}`}>
                       {c.photoUrl && (
                         <img
                           src={c.photoUrl}
@@ -418,6 +418,15 @@ export default function GroupDetailPage() {
                           className="candidate-avatar"
                         />
                       )}
+{/* <<<<<<< HEAD */}
+
+                        {/* אם הקבוצה נגמרה והמועמד מנצח – הצג מקום */}
+      {isGroupExpired && winnerIndex !== -1 && (
+        <div className="winner-badge">
+            {winnerIndex + 1}
+        </div>
+      )}
+
 
                       <button
                         className="campaign-btn"
@@ -435,6 +444,8 @@ export default function GroupDetailPage() {
                         <h4>{c.name}</h4>
                         {c.description && <p>{c.description}</p>}
                       </div>
+
+                 
 
                       {isGroupExpired && (
                         <div className="votes-count">{c.votesCount || 0} קולות</div>
