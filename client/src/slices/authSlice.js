@@ -120,14 +120,39 @@ export const updateProfile = createAsyncThunk(
   }
 );
 
-export const login = createAsyncThunk('auth/login', async (formData, { rejectWithValue }) => {
-  try {
-    const { data } = await http.post('/users/login', formData);
-    return data;
-  } catch (err) {
-    return rejectWithValue({ form: i18n.t('auth.serverError') });
+export const login = createAsyncThunk(
+  'auth/login',
+  async (formData, { rejectWithValue }) => {
+    try {
+      const { data } = await http.post('/users/login', formData);
+      return data;
+    } catch (err) {
+      const errors = err?.response?.data?.errors;
+
+      if (errors) {
+        const translated = {};
+
+        if (errors.email === 'EMAIL_NOT_FOUND') {
+          translated.email = i18n.t('auth.login.errors.emailNotFound');
+        } else if (typeof errors.email === 'string') {
+          // fallback – אם שכחנו קוד חדש
+          translated.email = errors.email;
+        }
+
+        if (errors.password === 'INVALID_PASSWORD') {
+          translated.password = i18n.t('auth.login.errors.invalidPassword');
+        } else if (typeof errors.password === 'string') {
+          translated.password = errors.password;
+        }
+
+        return rejectWithValue(translated);
+      }
+
+      return rejectWithValue({ form: i18n.t('auth.serverError') });
+    }
   }
-});
+);
+
 
 export const fetchMe = createAsyncThunk('auth/me', async (_, { rejectWithValue }) => {
   try {
