@@ -424,11 +424,11 @@ export default function GroupDetailPage() {
 
             {!loadingCandidates && candidates.length > 0 && (
               <div className="candidates-grid">
-                {sortedCandidates.map((c) => {
-                  const isWinner = winners.some((w) => w._id === c._id);
+{sortedCandidates.map((c, index) => {
+  const winnerIndex = winners.findIndex((w) => w._id === c._id);
 
                   return (
-                    <div key={c._id} className={`candidate-card ${isWinner ? 'winner' : ''}`}>
+<div key={c._id} className={`candidate-card ${winnerIndex !== -1 ? 'winner' : ''}`}>
                       {c.photoUrl && (
                         <img
                           src={c.photoUrl}
@@ -436,17 +436,26 @@ export default function GroupDetailPage() {
                           className="candidate-avatar"
                         />
                       )}
+
+                        {/* אם הקבוצה נגמרה והמועמד מנצח – הצג מקום */}
+      {isGroupExpired && winnerIndex !== -1 && (
+        <div className="winner-badge">
+            {winnerIndex + 1}
+        </div>
+      )}
+
+
                       <button
-  className="campaign-btn"
-  onClick={() =>
-    navigate(`/campaign/${c._id}`, {
-      state: { groupId }   // ← שולחת את מזהה הקבוצה
-    })
-  }
-  title="קמפיין שלי"
->
-  <FiStar size={20} />
-</button>
+                        className="campaign-btn"
+                        onClick={() =>
+                          navigate(`/campaign/${c._id}`, {
+                            state: { groupId }   // ← שולחת את מזהה הקבוצה
+                          })
+                        }
+                        title="קמפיין שלי"
+                      >
+                        <FiStar size={20} />
+                      </button>
 
 
                       <div className="candidate-text">
@@ -463,16 +472,6 @@ export default function GroupDetailPage() {
                         <FiStar size={20} />
                       </button>
 
-{/* <<<<<<< HEAD
-
-
-      {isGroupExpired && <div className="votes-count">{c.votesCount || 0} קולות</div>}
-    </div>
-  );
-})}
-
-              </div >
-======= */}
                       {isGroupExpired && (
                         <div className="votes-count">{c.votesCount || 0} קולות</div>
                       )}
@@ -480,7 +479,6 @@ export default function GroupDetailPage() {
                   );
                 })}
               </div>
-// >>>>>>> 70bc378c36c331b9f7615e0b5e57ea8ba11b06cb
             )}
 
             {!loadingCandidates && candidates.length === 0 && <p>אין מועמדים</p>}
