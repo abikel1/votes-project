@@ -15,6 +15,7 @@ const {
   getCandidateCampaignService
 } = require('../services/group_service');
 
+const Campaign = require('../models/campaign_model');
 
 // יצירת מועמד
 async function createCandidate(req, res) {
@@ -52,10 +53,16 @@ async function deleteCandidate(req, res) {
 }
 
 // קבלת מועמד לפי ID
+// קבלת מועמד לפי ID כולל הקמפיין שלו
 async function getCandidateById(req, res) {
   try {
     const candidate = await getCandidateByIdService(req.params.id);
     if (!candidate) return res.status(404).json({ message: 'Candidate not found' });
+
+    // מצרפים את הקמפיין
+    const campaign = await Campaign.findOne({ candidate: req.params.id }).lean();
+    candidate.campaign = campaign || null;
+
     res.json(candidate);
   } catch (err) {
     console.error('❌ Error getting candidate:', err);

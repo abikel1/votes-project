@@ -41,6 +41,8 @@ router.post('/create', auth, createGroup);
 router.put('/:id', auth, updateGroup);
 router.delete('/:id', auth, handleGroupDependencies, deleteGroup);
 
+// ✅ בקשות הצטרפות
+router.get('/:id/requests', auth, listJoinRequests);
 // בקשות מועמדות (GET לפי groupId)
 router.get('/:groupId/requests', auth, getCandidateRequests);
 

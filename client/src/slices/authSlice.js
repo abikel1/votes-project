@@ -26,6 +26,7 @@ function clearAuthStorage() {
   localStorage.removeItem('userId');
   localStorage.removeItem('userEmail');
   localStorage.removeItem('token_exp');
+  localStorage.removeItem('isAdmin');
 }
 
 function redirectToExpiredLogin() {
@@ -61,6 +62,7 @@ const initialUserId = localStorage.getItem('userId');
 const initialFirstName = localStorage.getItem('firstName');
 const initialLastName = localStorage.getItem('lastName');
 const initialExp = Number(localStorage.getItem('token_exp') || 0);
+const initialIsAdmin = localStorage.getItem('isAdmin') === '1';
 
 // אם יש טוקן + exp – נבדוק אם כבר פג
 if (initialToken && initialExp * 1000 <= Date.now()) {
@@ -77,9 +79,9 @@ export const register = createAsyncThunk(
       const { data } = await http.post('/users/register', form);
       return data;
     } catch (err) {
-      return thunkAPI.rejectWithValue( {
-          form: i18n.t('auth.register.genericError'),
-        }
+      return thunkAPI.rejectWithValue({
+        form: i18n.t('auth.register.genericError'),
+      }
       );
     }
   }
@@ -95,7 +97,7 @@ export const fetchProfile = createAsyncThunk(
       const { data } = await http.get('/users/me');
       return data; // { _id, name, email, ... }
     } catch (err) {
-      return rejectWithValue( i18n.t('auth.profile.loadFailed'));
+      return rejectWithValue(i18n.t('auth.profile.loadFailed'));
     }
   }
 );
@@ -112,7 +114,7 @@ export const updateProfile = createAsyncThunk(
       if (serverErrors) {
         return rejectWithValue(serverErrors);
       }
-      const msg =  i18n.t('auth.profile.updateFailed');
+      const msg = i18n.t('auth.profile.updateFailed');
       return rejectWithValue({ form: msg });
     }
   }
@@ -123,7 +125,7 @@ export const login = createAsyncThunk('auth/login', async (formData, { rejectWit
     const { data } = await http.post('/users/login', formData);
     return data;
   } catch (err) {
-    return rejectWithValue( { form: i18n.t('auth.serverError') });
+    return rejectWithValue({ form: i18n.t('auth.serverError') });
   }
 });
 
@@ -132,7 +134,7 @@ export const fetchMe = createAsyncThunk('auth/me', async (_, { rejectWithValue }
     const { data } = await http.get('/users/me');
     return data;
   } catch (err) {
-    return rejectWithValue( i18n.t('auth.profile.loadFailed'));
+    return rejectWithValue(i18n.t('auth.profile.loadFailed'));
   }
 });
 
@@ -145,7 +147,7 @@ export const requestPasswordReset = createAsyncThunk(
       const { data } = await http.post('/auth/password/forgot', { email });
       return i18n.t('auth.forgot.genericSuccess');
     } catch (e) {
-      return rejectWithValue( i18n.t('auth.forgot.genericError'));
+      return rejectWithValue(i18n.t('auth.forgot.genericError'));
     }
   }
 );
@@ -158,7 +160,7 @@ export const resetPassword = createAsyncThunk(
       const { data } = await http.post('/auth/password/reset', { token, password });
       return i18n.t('auth.reset.genericSuccess');
     } catch (e) {
-      return rejectWithValue( i18n.t('auth.reset.genericError')
+      return rejectWithValue(i18n.t('auth.reset.genericError')
       );
     }
   }
@@ -172,11 +174,11 @@ export const changePassword = createAsyncThunk(
         currentPassword,
         newPassword,
       });
-      return  i18n.t('auth.changePassword.genericSuccess');
+      return i18n.t('auth.changePassword.genericSuccess');
     } catch (err) {
       const serverErrors = err?.response?.data?.errors;
       if (serverErrors) return rejectWithValue(serverErrors);
-      const msg =  i18n.t('auth.changePassword.genericError');
+      const msg = i18n.t('auth.changePassword.genericError');
       return rejectWithValue({ form: msg });
     }
   }
@@ -191,6 +193,7 @@ const authSlice = createSlice({
     lastName: initialLastName,
     userId: initialUserId,
     userEmail: initialUserEmail,
+    isAdmin: initialIsAdmin,
     loading: false,
     error: null,
     user: null,
@@ -214,6 +217,7 @@ const authSlice = createSlice({
       state.user = null;
       state.error = null;
       state.message = '';
+      state.isAdmin = false;
 
       if (logoutTimer) clearTimeout(logoutTimer);
       clearAuthStorage();
@@ -230,12 +234,14 @@ const authSlice = createSlice({
       state.userId = user._id ?? payload.sub ?? payload.userId ?? payload.id ?? null;
       state.firstName = user.firstName ?? payload.firstName ?? state.firstName;
       state.lastName = user.lastName ?? payload.lastName ?? state.lastName;
+      state.isAdmin = !!user.isAdmin;
 
       localStorage.setItem('token', token);
       if (state.userEmail) localStorage.setItem('userEmail', state.userEmail);
       if (state.userId) localStorage.setItem('userId', state.userId);
       if (state.firstName) localStorage.setItem('firstName', state.firstName);
       if (state.lastName) localStorage.setItem('lastName', state.lastName);
+      localStorage.setItem('isAdmin', state.isAdmin ? '1' : '0');
 
       if (payload.exp) {
         localStorage.setItem('token_exp', String(payload.exp));
@@ -285,12 +291,14 @@ const authSlice = createSlice({
         s.userEmail = user.email ?? null;
         s.firstName = user.firstName ?? null;
         s.lastName = user.lastName ?? null;
+        s.isAdmin = !!user.isAdmin;
 
         localStorage.setItem('token', s.token);
         if (s.firstName) localStorage.setItem('firstName', s.firstName);
         if (s.lastName) localStorage.setItem('lastName', s.lastName);
         if (s.userId) localStorage.setItem('userId', s.userId);
         if (s.userEmail) localStorage.setItem('userEmail', s.userEmail);
+        localStorage.setItem('isAdmin', s.isAdmin ? '1' : '0');
 
         const payload = decodeJwtNoVerify(s.token);
         if (payload.exp) {
@@ -307,11 +315,13 @@ const authSlice = createSlice({
         s.lastName = a.payload.lastName ?? s.lastName;
         s.userId = a.payload._id ?? s.userId;
         s.userEmail = a.payload.email ?? s.userEmail;
+        s.isAdmin = a.payload.isAdmin ?? s.isAdmin;
 
         if (s.firstName) localStorage.setItem('firstName', s.firstName);
         if (s.lastName) localStorage.setItem('lastName', s.lastName);
         if (s.userId) localStorage.setItem('userId', s.userId);
         if (s.userEmail) localStorage.setItem('userEmail', s.userEmail);
+        localStorage.setItem('isAdmin', s.isAdmin ? '1' : '0');
       })
       .addCase(fetchMe.rejected, (s, a) => { s.loading = false; s.error = a.payload; })
 
@@ -328,10 +338,14 @@ const authSlice = createSlice({
         s.firstName = a.payload.firstName ?? s.firstName;
         s.lastName = a.payload.lastName ?? s.lastName;
         s.userEmail = a.payload.email ?? s.userEmail;
+        if (typeof a.payload.isAdmin !== 'undefined') {
+          s.isAdmin = !!a.payload.isAdmin;
+        }
 
         if (s.firstName) localStorage.setItem('firstName', s.firstName);
         if (s.lastName) localStorage.setItem('lastName', s.lastName);
         if (s.userEmail) localStorage.setItem('userEmail', s.userEmail);
+        localStorage.setItem('isAdmin', s.isAdmin ? '1' : '0');
       })
       .addCase(updateProfile.rejected, (s, a) => {
         s.loading = false;

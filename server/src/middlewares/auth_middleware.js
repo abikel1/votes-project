@@ -40,7 +40,8 @@ module.exports = async function auth(req, res, next) {
       email: user.email,
       firstName: user.firstName,
       lastName: user.lastName,
-      name: fullName, // נוח לשימוש מאוחד במקומות אחרים
+      name: fullName,
+      isAdmin: !!user.isAdmin,   // 👈 חדש – המנהל
     };
 
     next();
