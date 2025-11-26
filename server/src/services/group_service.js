@@ -406,27 +406,46 @@ async function getCandidateRequestsService(groupId) {
 }
 
 async function generateGroupDescriptionService(name, hint = '') {
-  // fallback אם אין מפתח
-  if (!genAI || !process.env.GEMINI_API_KEY) {
-    return 'קבוצה חדשה באתר ההצבעות. תיאור יתווסף בהמשך.';
-  }
-
   const safeName = String(name || '').trim();
   const safeHint = String(hint || '').trim();
 
+  // נבדוק בערך באיזה שפה השם
+  const hasHebrew = /[\u0590-\u05FF]/.test(safeName);
+  const hasEnglish = /[A-Za-z]/.test(safeName);
+
+  // בחירת שפת ברירת־מחדל לצורך fallback
+  let defaultLang = 'he';
+  if (hasEnglish && !hasHebrew) {
+    defaultLang = 'en';
+  }
+
+  // fallback אם אין מפתח / מודל
+  if (!genAI || !process.env.GEMINI_API_KEY) {
+    if (defaultLang === 'en') {
+      return 'A new voting group on the site. A description will be added later.';
+    }
+    return 'קבוצה חדשה באתר ההצבעות. תיאור יתווסף בהמשך.';
+  }
+
   const prompt = `
-את/ה מסייע/ת ביצירת תיאור קצר לקבוצת הצבעה.
+You are helping to create a short description for a voting group.
 
-שם הקבוצה: "${safeName || 'ללא שם'}"
+Group name: "${safeName || 'Unnamed group'}"
 
-הנחיות מיוצר הקבוצה (לא חובה):
-"${safeHint || 'ללא'}"
+Creator instructions (optional):
+"${safeHint || 'None'}"
 
-הוראות:
-1. כתוב/י תיאור בעברית בין 2 ל-4 שורות.
-2. התיאור צריך להתאים לעמוד קבוצה באתר הצבעות: ברור, מזמין, בלי סלנג קיצוני.
-3. אין להשתמש באימוג׳ים, כוכביות, כותרות או רשימות – רק טקסט רגיל.
-4. אל תוסיף/י פרטים שלא משתמעים מהשם או מההנחיות.
+Language rule:
+- Write the description in the **same main language** as the group name.
+- If the group name is mostly Hebrew, write in Hebrew.
+- If it is mostly English, write in English.
+- If it is in another language, write in that language.
+
+Guidelines:
+1. Length: 2–4 short sentences.
+2. Tone: clear, inviting, and suitable for a voting group page (no heavy slang).
+3. Do not use emojis, stars, headings, or bullet lists – plain text only.
+4. Do not add details that are not implied by the name or the instructions.
 `.trim();
 
   const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
@@ -436,6 +455,9 @@ async function generateGroupDescriptionService(name, hint = '') {
   let text = (response.text() || '').trim();
 
   if (!text) {
+    if (defaultLang === 'en') {
+      return 'A new voting group on the site.';
+    }
     return 'קבוצה חדשה באתר ההצבעות.';
   }
 
@@ -446,8 +468,16 @@ async function generateGroupDescriptionService(name, hint = '') {
     .filter(Boolean)
     .slice(0, 4);
 
-  return lines.join('\n') || 'קבוצה חדשה באתר ההצבעות.';
+  if (!lines.length) {
+    if (defaultLang === 'en') {
+      return 'A new voting group on the site.';
+    }
+    return 'קבוצה חדשה באתר ההצבעות.';
+  }
+
+  return lines.join('\n');
 }
+
 
 
 module.exports = {
