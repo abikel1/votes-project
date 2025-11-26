@@ -12,6 +12,7 @@ const mailRoutes = require('./src/routes/mail_routes');
 const authRoutes = require('./src/routes/auth_routes');
 
 const uploadRoutes = require('./src/routes/upload_routes');
+const campaignRoutes = require('./src/routes/campaign_routes'); // 1. ייבוא
 
 const app = express();
 
@@ -65,11 +66,9 @@ app.use('/api/groups', groupRoutes);
 app.use('/api/votes', voteRoutes);
 app.use('/api/mail', mailRoutes);
 app.use('/api/auth', authRoutes);
+app.use('/api/campaigns', campaignRoutes);
+// Root test
 
-
-// ----------------------------------------------------------------------
-// 6. Root test
-// ----------------------------------------------------------------------
 app.get('/', (req, res) => res.send('API is running...'));
 
 module.exports = app;

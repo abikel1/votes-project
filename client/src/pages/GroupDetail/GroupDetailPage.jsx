@@ -436,6 +436,18 @@ export default function GroupDetailPage() {
                           className="candidate-avatar"
                         />
                       )}
+                      <button
+  className="campaign-btn"
+  onClick={() =>
+    navigate(`/campaign/${c._id}`, {
+      state: { groupId }   // ← שולחת את מזהה הקבוצה
+    })
+  }
+  title="קמפיין שלי"
+>
+  <FiStar size={20} />
+</button>
+
 
                       <div className="candidate-text">
                         <h4>{c.name}</h4>
@@ -451,6 +463,16 @@ export default function GroupDetailPage() {
                         <FiStar size={20} />
                       </button>
 
+{/* <<<<<<< HEAD
+
+
+      {isGroupExpired && <div className="votes-count">{c.votesCount || 0} קולות</div>}
+    </div>
+  );
+})}
+
+              </div >
+======= */}
                       {isGroupExpired && (
                         <div className="votes-count">{c.votesCount || 0} קולות</div>
                       )}
@@ -458,6 +480,7 @@ export default function GroupDetailPage() {
                   );
                 })}
               </div>
+// >>>>>>> 70bc378c36c331b9f7615e0b5e57ea8ba11b06cb
             )}
 
             {!loadingCandidates && candidates.length === 0 && <p>אין מועמדים</p>}
