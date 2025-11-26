@@ -79,13 +79,12 @@ const candidate = useSelector(selectCandidate); // עכשיו זה המועמד 
     setIsEditMode(false);
   };
 
-  const handleAddPost = () => {
-    if (!newPost.title.trim()) return;
-    console.log('Adding post:', newPost);
-    dispatch(addPost({ campaignId: campaign._id, post: newPost }));
-    setNewPost({ title: '', content: '' });
-    setIsEditMode(false);
-  };
+const handleAddPost = () => {
+  if (!newPost.title.trim()) return;
+  dispatch(addPost({ campaignId: campaign._id, post: newPost }));
+  setNewPost({ title: '', content: '' });
+};
+
 
   const handleDeletePost = (postId) => {
     console.log('Deleting postId:', postId);
@@ -111,6 +110,7 @@ const candidate = useSelector(selectCandidate); // עכשיו זה המועמד 
   // 5) Render
   //---------------------------------------------------------------------
   console.log('Rendering CampaignPage. Campaign gallery:', campaign.gallery);
+console.log('Campaign gallery:', campaign?.gallery);
 
   return (
     <div className="page-wrap dashboard">

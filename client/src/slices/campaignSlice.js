@@ -127,42 +127,43 @@ extraReducers: (builder) => {
       state.loading = true;
       state.error = null;
     })
-    .addCase(fetchCampaign.fulfilled, (state, action) => {
-      state.loading = false;
-      state.data = action.payload; // ← כולל campaign + candidate בתוכו
-    })
+.addCase(fetchCampaign.fulfilled, (state, action) => {
+  state.loading = false;
+  state.data = action.payload.campaign;   // ← זה הקמפיין עצמו
+  state.candidate = action.payload.candidate; // ← המועמד
+})
+
     .addCase(fetchCampaign.rejected, (state, action) => {
       state.loading = false;
       state.error = action.payload;
     })
 
     // Update description
-    .addCase(updateCampaign.fulfilled, (state, action) => {
-      if (state.data) state.data.description = action.payload.description;
-    })
+  .addCase(updateCampaign.fulfilled, (state, action) => {
+  state.data = action.payload; // ← כולל הפוסט המעודכן
+})
 
     // Posts
     .addCase(addPost.fulfilled, (state, action) => {
-      state.data?.posts?.push(action.payload.post);
+  state.data = action.payload; // ← כולל הפוסט המעודכן
     })
     .addCase(updatePost.fulfilled, (state, action) => {
       const updatedPost = action.payload;
-      state.data.posts = state.data.posts.map(p =>
-        p._id === updatedPost._id ? updatedPost : p
-      );
+      state.data = action.payload; // ← כולל הפוסט המעודכן
+
     })
     .addCase(deletePost.fulfilled, (state, action) => {
       const postId = action.meta.arg.postId;
-      state.data.posts = state.data.posts.filter(p => p._id !== postId);
+  state.data = action.payload; // ← כולל הפוסט המעודכן
     })
 
     // Gallery
     .addCase(addImage.fulfilled, (state, action) => {
-      state.data?.gallery?.push(action.payload.imageUrl);
+  state.data = action.payload; // ← כולל הפוסט המעודכן
     })
     .addCase(deleteImage.fulfilled, (state, action) => {
       const imageUrl = action.meta.arg.imageUrl;
-      state.data.gallery = state.data.gallery.filter(url => url !== imageUrl);
+  state.data = action.payload; // ← כולל הפוסט המעודכן
     });
 },
 
@@ -170,8 +171,8 @@ extraReducers: (builder) => {
 
 export default campaignSlice.reducer;
 
-export const selectCampaign = (state) => state.campaign.data?.campaign || null;
-export const selectCandidate = (state) => state.campaign.data?.candidate || null;
+export const selectCampaign = (state) => state.campaign.data || null;
+export const selectCandidate = (state) => state.campaign.candidate || null;
 
 export const selectCampaignLoading = (state) => state.campaign.loading;
 export const selectCampaignError = (state) => state.campaign.error;
