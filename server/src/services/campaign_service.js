@@ -62,7 +62,14 @@ async function updatePost(campaignId, postId, postData) {
 }
 
 async function deletePost(campaignId, postId) {
-  const campaign = await Campaign.findById(campaignId);
+console.log("DELETE POST");
+console.log("campaignId:", campaignId);
+console.log("postId:", postId);
+
+const campaign = await Campaign.findById(campaignId);
+
+console.log("Found campaign:", !!campaign);
+console.log("Posts IDs:", campaign?.posts.map(p => p._id.toString()));
   if (!campaign) throw new Error("קמפיין לא נמצא");
 
   console.log("Posts in campaign:", campaign.posts.map(p => p._id.toString()));

@@ -2,8 +2,13 @@ const campaignService = require('../services/campaign_service');
 
 async function getCampaign(req, res) {
   try {
-    const campaign = await campaignService.getCampaignByCandidate(req.params.candidateId);
-    res.json(campaign);
+    const campaign =
+     await campaignService.getCampaignByCandidate(req.params.candidateId);
+return res.json({
+  success: true,
+  campaign,
+  candidate: campaign.candidate
+});
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -31,7 +36,7 @@ async function updateCampaign(req, res) {
 async function addPost(req, res) {
   try {
     const campaign = await campaignService.addPostToCampaign(req.params.campaignId, req.body);
-    res.json(campaign);
+res.json({ post: campaign.posts[campaign.posts.length - 1] });
   } catch (err) {
     res.status(400).json({ message: err.message });
   }
@@ -47,12 +52,8 @@ async function updatePost(req, res) {
 }
 
 async function deletePost(req, res) {
-  try {
-    const campaign = await campaignService.deletePost(req.params.campaignId, req.params.postId);
-    res.json(campaign);
-  } catch (err) {
-    res.status(400).json({ message: err.message });
-  }
+  const campaign = await campaignService.deletePost(req.params.campaignId, req.params.postId);
+  res.json(campaign); // ← מחזירים את הקמפיין המעודכן
 }
 
 // ===== גלריית תמונות =====

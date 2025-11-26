@@ -121,36 +121,58 @@ error: null,
 },
 reducers: {},
 extraReducers: (builder) => {
-builder
-// Fetch
-.addCase(fetchCampaign.pending, (state) => { state.loading = true; state.error = null; })
-.addCase(fetchCampaign.fulfilled, (state, action) => { state.loading = false; state.data = action.payload; })
-.addCase(fetchCampaign.rejected, (state, action) => { state.loading = false; state.error = action.payload; })
+  builder
+    // Fetch
+    .addCase(fetchCampaign.pending, (state) => {
+      state.loading = true;
+      state.error = null;
+    })
+.addCase(fetchCampaign.fulfilled, (state, action) => {
+  state.loading = false;
+  state.data = action.payload.campaign;   // ← זה הקמפיין עצמו
+  state.candidate = action.payload.candidate; // ← המועמד
+})
 
-  // Create
-  .addCase(createCampaign.pending, (state) => { state.loading = true; state.error = null; })
-  .addCase(createCampaign.fulfilled, (state, action) => { state.loading = false; state.data = action.payload; })
-  .addCase(createCampaign.rejected, (state, action) => { state.loading = false; state.error = action.payload; })
+    .addCase(fetchCampaign.rejected, (state, action) => {
+      state.loading = false;
+      state.error = action.payload;
+    })
 
-  // Update
-  .addCase(updateCampaign.pending, (state) => { state.loading = true; state.error = null; })
-  .addCase(updateCampaign.fulfilled, (state, action) => { state.loading = false; state.data = action.payload; })
-  .addCase(updateCampaign.rejected, (state, action) => { state.loading = false; state.error = action.payload; })
+    // Update description
+  .addCase(updateCampaign.fulfilled, (state, action) => {
+  state.data = action.payload; // ← כולל הפוסט המעודכן
+})
 
-  // פוסטים
-  .addCase(addPost.fulfilled, (state, action) => { state.data = action.payload; })
-  .addCase(updatePost.fulfilled, (state, action) => { state.data = action.payload; })
-  .addCase(deletePost.fulfilled, (state, action) => { state.data = action.payload; })
+    // Posts
+    .addCase(addPost.fulfilled, (state, action) => {
+  state.data = action.payload; // ← כולל הפוסט המעודכן
+    })
+    .addCase(updatePost.fulfilled, (state, action) => {
+      const updatedPost = action.payload;
+      state.data = action.payload; // ← כולל הפוסט המעודכן
 
-  // גלריה
-  .addCase(addImage.fulfilled, (state, action) => { state.data = action.payload; })
-  .addCase(deleteImage.fulfilled, (state, action) => { state.data = action.payload; });
+    })
+    .addCase(deletePost.fulfilled, (state, action) => {
+      const postId = action.meta.arg.postId;
+  state.data = action.payload; // ← כולל הפוסט המעודכן
+    })
 
+    // Gallery
+    .addCase(addImage.fulfilled, (state, action) => {
+  state.data = action.payload; // ← כולל הפוסט המעודכן
+    })
+    .addCase(deleteImage.fulfilled, (state, action) => {
+      const imageUrl = action.meta.arg.imageUrl;
+  state.data = action.payload; // ← כולל הפוסט המעודכן
+    });
 },
+
 });
 
 export default campaignSlice.reducer;
 
-export const selectCampaign = (state) => state.campaign.data;
+export const selectCampaign = (state) => state.campaign.data || null;
+export const selectCandidate = (state) => state.campaign.candidate || null;
+
 export const selectCampaignLoading = (state) => state.campaign.loading;
 export const selectCampaignError = (state) => state.campaign.error;

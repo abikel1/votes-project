@@ -469,8 +469,16 @@ i18n
                     'users.loading': 'טוען משתמשים...',
                     'users.error': 'שגיאה בטעינת משתמשים: {{error}}',
                     'auth.register.genericError': 'אירעה שגיאה ברישום',
-                    'auth.serverError': 'שגיאה בשרת',
+
+                    // 👇 להוסיף את שני אלה
+                    'auth.login.errors.emailNotFound': 'האימייל לא קיים במערכת',
+                    'auth.login.errors.invalidPassword': 'סיסמה לא נכונה',
+
+                    // 👇 לעדכן את זה (במקום "אימייל לא קיים במערכת")
+                    'auth.serverError': 'אירעה שגיאה בשרת. נסי שוב מאוחר יותר',
+
                     'auth.profile.loadFailed': 'טעינת הפרופיל נכשלה',
+
                     'auth.profile.updateFailed': 'עדכון הפרופיל נכשל',
 
                     'auth.forgot.genericSuccess': 'אם המייל קיים, נשלחו הוראות לאיפוס.',
@@ -508,7 +516,6 @@ i18n
                     'votes.errors.notLoggedIn': 'עליך להתחבר לפני ההצבעה',
                     'votes.errors.voteFailed': 'הצבעה נכשלה',
                     'votes.errors.fetchVotersFailed': 'טעינת רשימת המצביעים נכשלה',
-
                 },
             },
             en: {
@@ -958,8 +965,16 @@ i18n
                     'users.loading': 'Loading users...',
                     'users.error': 'Error loading users: {{error}}',
                     'auth.register.genericError': 'Registration failed, please try again.',
-                    'auth.serverError': 'Server error',
+
+                    // 👇 להוסיף
+                    'auth.login.errors.emailNotFound': 'Email does not exist in the system.',
+                    'auth.login.errors.invalidPassword': 'Incorrect password',
+
+                    // 👇 לעדכן
+                    'auth.serverError': 'A server error occurred. Please try again later.',
+
                     'auth.profile.loadFailed': 'Loading profile failed',
+
                     'auth.profile.updateFailed': 'Updating profile failed',
 
                     'auth.forgot.genericSuccess':
