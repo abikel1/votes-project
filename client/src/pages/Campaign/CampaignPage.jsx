@@ -13,8 +13,8 @@ import { BiArrowBack } from 'react-icons/bi';
 
 import '../Campaign/CampaignPage.css';
 import '../GroupDetail/GroupDetailPage.css';
-import { selectCampaign,selectCandidate } from '../../slices/campaignSlice';
-
+import { selectCampaign, selectCandidate } from '../../slices/campaignSlice';
+import { uploadImage } from '../../components/GroupSettings/uploadImage';
 export default function CampaignPage() {
   const { candidateId } = useParams();
   const dispatch = useDispatch();
@@ -23,8 +23,8 @@ export default function CampaignPage() {
   const groupId = location.state?.groupId || null;
 
   // --- Redux state ---
-const campaign = useSelector(selectCampaign); // עכשיו זה הקמפיין עצמו
-const candidate = useSelector(selectCandidate); // עכשיו זה המועמד עצמו
+  const campaign = useSelector(selectCampaign); // הקמפיין עצמו
+  const candidate = useSelector(selectCandidate); // המועמד
 
   const campaignLoading = useSelector((state) => state.campaign.loading);
   const campaignError = useSelector((state) => state.campaign.error);
@@ -38,19 +38,19 @@ const candidate = useSelector(selectCandidate); // עכשיו זה המועמד 
   const [isEditingDescription, setIsEditingDescription] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
 
+  const [uploadingImage, setUploadingImage] = useState(false); // 🌟 חדש
+
   //---------------------------------------------------------------------
   // 1) Load campaign
   //---------------------------------------------------------------------
   useEffect(() => {
     if (candidateId) {
-      // console.log('Fetching campaign for candidateId:', candidateId);
       dispatch(fetchCampaign(candidateId));
     }
   }, [candidateId, dispatch]);
 
   useEffect(() => {
     if (campaign) {
-      console.log('Campaign loaded:', campaign);
       if (campaign.description) setEditDescription(campaign.description);
     }
   }, [campaign]);
@@ -67,41 +67,65 @@ const candidate = useSelector(selectCandidate); // עכשיו זה המועמד 
   //---------------------------------------------------------------------
   const candidateUserId = candidate?.userId;
   const isCandidateOwner =
-    currentUserId && candidateUserId && currentUserId.toString() === candidateUserId.toString();
+    currentUserId &&
+    candidateUserId &&
+    currentUserId.toString() === candidateUserId.toString();
 
   //---------------------------------------------------------------------
   // 4) Handlers
   //---------------------------------------------------------------------
   const handleUpdateCampaign = () => {
-    // console.log('Updating campaign description:', editDescription);
-    dispatch(updateCampaign({ campaignId: campaign._id, payload: { description: editDescription } }));
+    dispatch(
+      updateCampaign({
+        campaignId: campaign._id,
+        payload: { description: editDescription },
+      })
+    );
     setIsEditingDescription(false);
     setIsEditMode(false);
   };
 
-const handleAddPost = () => {
-  if (!newPost.title.trim()) return;
-  dispatch(addPost({ campaignId: campaign._id, post: newPost }));
-  setNewPost({ title: '', content: '' });
-};
-
+  const handleAddPost = () => {
+    if (!newPost.title.trim()) return;
+    dispatch(addPost({ campaignId: campaign._id, post: newPost }));
+    setNewPost({ title: '', content: '' });
+  };
 
   const handleDeletePost = (postId) => {
-    // console.log('Deleting postId:', postId);
     dispatch(deletePost({ campaignId: campaign._id, postId }));
     setIsEditMode(false);
   };
 
+  // 🌟 העלאת תמונה מהמחשב לגלריית הקמפיין בעזרת uploadImage המשותפת
+  const handleUploadGalleryFile = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    try {
+      setUploadingImage(true);
+
+      const url = await uploadImage(file); // אין צורך ב-oldUrl בקמפיין
+      if (!url) return;
+
+      await dispatch(addImage({ campaignId: campaign._id, imageUrl: url }));
+      setIsEditMode(false);
+    } catch (err) {
+      console.error('שגיאה בהעלאת תמונה לגלריה:', err);
+      alert('שגיאה בהעלאת הקובץ');
+    } finally {
+      setUploadingImage(false);
+      e.target.value = ''; // מאפשר לבחור שוב את אותו קובץ
+    }
+  };
+
   const handleAddImage = () => {
     if (!newImageUrl.trim()) return;
-    console.log('Adding image URL:', newImageUrl);
     dispatch(addImage({ campaignId: campaign._id, imageUrl: newImageUrl }));
     setNewImageUrl('');
     setIsEditMode(false);
   };
 
   const handleDeleteImage = (url) => {
-    // console.log('Deleting imagטe URL:', url);
     dispatch(deleteImage({ campaignId: campaign._id, imageUrl: url }));
     setIsEditMode(false);
   };
@@ -109,8 +133,6 @@ const handleAddPost = () => {
   //---------------------------------------------------------------------
   // 5) Render
   //---------------------------------------------------------------------
-  // console.log('Rendering CampaignPage. Campaign gallery:', campaign.gallery);
-// console.log('Campaign gallery:', campaign?.gallery);
 
   return (
     <div className="page-wrap dashboard">
@@ -121,14 +143,27 @@ const handleAddPost = () => {
           {candidate?.symbol && <p>{candidate.symbol}</p>}
         </div>
 
-        {candidate?.photoUrl && <img src={candidate.photoUrl} alt={candidate.name} className="candidate-avatar" />}
+        {candidate?.photoUrl && (
+          <img
+            src={candidate.photoUrl}
+            alt={candidate.name}
+            className="candidate-avatar"
+          />
+        )}
 
-        <button className="icon-btn" onClick={() => navigate(groupId ? `/groups/${groupId}` : '/groups')}>
+        <button
+          className="icon-btn"
+          onClick={() => navigate(groupId ? `/groups/${groupId}` : '/groups')}
+        >
           <BiArrowBack size={20} />
         </button>
 
         {isCandidateOwner && !isEditMode && (
-          <button className="vote-btn" onClick={() => setIsEditMode(true)} style={{ marginRight: '10px' }}>
+          <button
+            className="vote-btn"
+            onClick={() => setIsEditMode(true)}
+            style={{ marginRight: '10px' }}
+          >
             עריכת הדף
           </button>
         )}
@@ -145,34 +180,59 @@ const handleAddPost = () => {
                 type="text"
                 placeholder="כותרת פוסט"
                 value={newPost.title}
-                onChange={(e) => setNewPost({ ...newPost, title: e.target.value })}
+                onChange={(e) =>
+                  setNewPost({ ...newPost, title: e.target.value })
+                }
               />
               <textarea
                 placeholder="תוכן פוסט"
                 value={newPost.content}
-                onChange={(e) => setNewPost({ ...newPost, content: e.target.value })}
+                onChange={(e) =>
+                  setNewPost({ ...newPost, content: e.target.value })
+                }
               />
-              <button className="vote-btn" onClick={handleAddPost}>הוסף פוסט</button>
+              <button className="vote-btn" onClick={handleAddPost}>
+                הוסף פוסט
+              </button>
             </div>
           )}
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', maxHeight: '400px', overflowY: 'auto' }}>
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '12px',
+              maxHeight: '400px',
+              overflowY: 'auto',
+            }}
+          >
             {campaign.posts?.length ? (
               campaign.posts.map((p) => (
                 <div key={p._id} className="candidate-card">
                   <h4>{p.title}</h4>
                   <p>{p.content}</p>
                   {isCandidateOwner && isEditMode && (
-                    <button onClick={() => handleDeletePost(p._id)} className="delete-btn">מחיקה</button>
+                    <button
+                      onClick={() => handleDeletePost(p._id)}
+                      className="delete-btn"
+                    >
+                      מחיקה
+                    </button>
                   )}
                 </div>
               ))
-            ) : <p style={{ textAlign: 'center', color: '#64748b' }}>אין פוסטים בקמפיין.</p>}
+            ) : (
+              <p style={{ textAlign: 'center', color: '#64748b' }}>
+                אין פוסטים בקמפיין.
+              </p>
+            )}
           </div>
         </div>
 
         {/* RESIZE HANDLE */}
-        <div className="resize-handle"><div className="resize-line" /></div>
+        <div className="resize-handle">
+          <div className="resize-line" />
+        </div>
 
         {/* RIGHT: DESCRIPTION + GALLERY */}
         <div className="right-section">
@@ -183,90 +243,155 @@ const handleAddPost = () => {
                   value={editDescription}
                   onChange={(e) => setEditDescription(e.target.value)}
                 />
-                <div style={{ display: 'flex', gap: '8px', justifyContent: 'center' }}>
-                  <button className="vote-btn" onClick={handleUpdateCampaign}>שמור</button>
-                  <button className="back-btn" onClick={() => { setIsEditingDescription(false); setIsEditMode(false); }}>ביטול</button>
+                <div
+                  style={{
+                    display: 'flex',
+                    gap: '8px',
+                    justifyContent: 'center',
+                  }}
+                >
+                  <button className="vote-btn" onClick={handleUpdateCampaign}>
+                    שמור
+                  </button>
+                  <button
+                    className="back-btn"
+                    onClick={() => {
+                      setIsEditingDescription(false);
+                      setIsEditMode(false);
+                    }}
+                  >
+                    ביטול
+                  </button>
                 </div>
               </div>
             ) : (
               <div>
                 <p>{editDescription || 'אין תיאור קמפיין עדיין'}</p>
                 {isCandidateOwner && isEditMode && (
-                  <button onClick={() => setIsEditingDescription(true)}>ערוך תיאור</button>
+                  <button onClick={() => setIsEditingDescription(true)}>
+                    ערוך תיאור
+                  </button>
                 )}
               </div>
             )}
           </div>
 
           <h3 className="section-title">גלריית תמונות</h3>
+
           {isCandidateOwner && isEditMode && (
-            <div className="info-card" style={{ display: 'flex', gap: '10px' }}>
-              <input
-                type="text"
-                placeholder="קישור תמונה"
-                value={newImageUrl}
-                onChange={(e) => setNewImageUrl(e.target.value)}
-              />
-              <button className="vote-btn" onClick={handleAddImage}>הוסף תמונה</button>
+            <div
+              className="info-card"
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '10px',
+              }}
+            >
+              {/* הוספת תמונה מקישור */}
+              <div
+                style={{
+                  display: 'flex',
+                  gap: '10px',
+                  flexWrap: 'wrap',
+                  alignItems: 'center',
+                }}
+              >
+                <input
+                  type="text"
+                  placeholder="קישור תמונה"
+                  value={newImageUrl}
+                  onChange={(e) => setNewImageUrl(e.target.value)}
+                  style={{ flex: 1, minWidth: '180px' }}
+                />
+                <button className="vote-btn" onClick={handleAddImage}>
+                  הוסף תמונה מקישור
+                </button>
+              </div>
+
+              {/* העלאה מהמחשב בעזרת uploadImage */}
+              <div
+                className="upload-row"
+                style={{
+                  display: 'flex',
+                  gap: '10px',
+                  alignItems: 'center',
+                  flexWrap: 'wrap',
+                  marginTop: '8px',
+                }}
+              >
+                <span className="muted">או העלאה מהמחשב:</span>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleUploadGalleryFile}
+                  disabled={uploadingImage}
+                />
+                {uploadingImage && (
+                  <span className="muted">מעלה…</span>
+                )}
+              </div>
             </div>
           )}
 
-          <div style={{
-            maxHeight: '400px',
-            overflowY: 'auto',
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))',
-            gap: '12px'
-          }}>
+          <div
+            style={{
+              maxHeight: '400px',
+              overflowY: 'auto',
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))',
+              gap: '12px',
+            }}
+          >
             {campaign.gallery?.length ? (
               campaign.gallery.map((img, idx) => (
-                <div key={idx} style={{ position: 'relative', aspectRatio: '1', borderRadius: '8px', overflow: 'hidden' }}>
-                  <img src={img} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                <div
+                  key={idx}
+                  style={{
+                    position: 'relative',
+                    aspectRatio: '1',
+                    borderRadius: '8px',
+                    overflow: 'hidden',
+                  }}
+                >
+                  <img
+                    src={img}
+                    alt=""
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                      objectFit: 'cover',
+                    }}
+                  />
                   {isCandidateOwner && isEditMode && (
-                    <button onClick={() => handleDeleteImage(img)} className="delete-btn"         style={{
-                            position: 'absolute',
-                            top: '6px',
-                            left: '6px',
-                            width: '28px',
-                            height: '28px',
-                            borderRadius: '50%',
-                            background: '#dc3545',
-                            color: 'white',
-                            border: 'none',
-                            cursor: 'pointer',
-                          }}
-                    >×</button>
+                    <button
+                      onClick={() => handleDeleteImage(img)}
+                      className="delete-btn"
+                      style={{
+                        position: 'absolute',
+                        top: '6px',
+                        left: '6px',
+                        width: '28px',
+                        height: '28px',
+                        borderRadius: '50%',
+                        background: '#dc3545',
+                        color: 'white',
+                        border: 'none',
+                        cursor: 'pointer',
+                      }}
+                    >
+                      ×
+                    </button>
                   )}
                 </div>
               ))
-            ) : <p style={{ textAlign: 'center', color: '#64748b' }}>אין תמונות בגלריה.</p>}
+            ) : (
+              <p style={{ textAlign: 'center', color: '#64748b' }}>
+                אין תמונות בגלריה.
+              </p>
+            )}
           </div>
         </div>
       </div>
     </div>
   );
 }
-
-
-
-
-
-  // {isCandidateOwner && (
-  //                       <button
-  //                         onClick={() => handleDeleteImage(img)}
-                          // style={{
-                          //   position: 'absolute',
-                          //   top: '6px',
-                          //   left: '6px',
-                          //   width: '28px',
-                          //   height: '28px',
-                          //   borderRadius: '50%',
-                          //   background: '#dc3545',
-                          //   color: 'white',
-                          //   border: 'none',
-                          //   cursor: 'pointer',
-                          // }}
-  //                       >
-  //                         ×
-  //                       </button>
-  //                     )}
