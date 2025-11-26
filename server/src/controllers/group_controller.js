@@ -211,14 +211,16 @@ async function getMyMembership(req, res) {
 
 
 
+// server/src/controllers/group_controller.js
 async function getCandidateRequests(req, res) {
   try {
-    const requests = await getCandidateRequestsService(req.params.groupId);
+    const requests = await getCandidateRequestsService(req.params.id); // <– כאן השינוי
     res.json(requests);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 }
+
 async function generateGroupDescription(req, res) {
   try {
     const { name, hint } = req.body || {};

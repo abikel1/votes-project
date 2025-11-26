@@ -42,7 +42,7 @@ function loadRejectedMap() {
 function saveRejectedMap(map) {
   try {
     localStorage.setItem(getRejectedKey(), JSON.stringify(map || {}));
-  } catch {}
+  } catch { }
 }
 
 // ===== LocalStorage helpers =====
@@ -64,7 +64,7 @@ function savePendingToLS(pendingSet) {
       getPendingKey(),
       JSON.stringify(Array.from(pendingSet))
     );
-  } catch {}
+  } catch { }
 }
 
 function loadRemovedMap() {
@@ -81,7 +81,7 @@ function loadRemovedMap() {
 function saveRemovedMap(map) {
   try {
     localStorage.setItem(getRemovedKey(), JSON.stringify(map || {}));
-  } catch {}
+  } catch { }
 }
 
 /* ===== Thunks ===== */
@@ -128,7 +128,7 @@ export const fetchJoinRequests = createAsyncThunk(
   'joinReq/fetchJoinRequests',
   async (groupId, { rejectWithValue }) => {
     try {
-      const { data } = await http.get(`/groups/${groupId}/requests`);
+      const { data } = await http.get(`/groups/${groupId}/join-requests`);
       return { groupId: String(groupId), requests: data };
     } catch (err) {
       return rejectWithValue(i18n.t('join.errors.loadRequestsFailed'));
@@ -142,7 +142,7 @@ export const approveJoinRequest = createAsyncThunk(
   async ({ groupId, requestId }, { rejectWithValue }) => {
     try {
       const { data } = await http.patch(
-        `/groups/${groupId}/requests/${requestId}/approve`
+        `/groups/${groupId}/join-requests/${requestId}/approve`
       );
       return { groupId: String(groupId), requestId, response: data };
     } catch (err) {
@@ -156,7 +156,7 @@ export const rejectJoinRequest = createAsyncThunk(
   async ({ groupId, requestId }, { rejectWithValue }) => {
     try {
       const { data } = await http.patch(
-        `/groups/${groupId}/requests/${requestId}/reject`
+        `/groups/${groupId}/join-requests/${requestId}/reject`
       );
       return { groupId: String(groupId), requestId, response: data };
     } catch (err) {
@@ -366,6 +366,7 @@ const joinReqSlice = createSlice({
           if (ls.has(gid)) ls.delete(gid);
           if (s.removedNotice[gid]) {
             delete s.removedNotice[gid];
+            saveRemovedMap(s.removedNotice);
           }
         }
 

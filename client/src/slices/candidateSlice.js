@@ -18,7 +18,7 @@ export const fetchCandidatesByGroup = createAsyncThunk(
   }
 );
 
-// צור מועמד בקבוצה
+// צור מועמד בקבוצה (ע"י מנהל)
 export const createCandidate = createAsyncThunk(
   'candidates/create',
   async ({ groupId, name, description, symbol, photoUrl }, { rejectWithValue }) => {
@@ -65,7 +65,7 @@ export const deleteCandidate = createAsyncThunk(
   }
 );
 
-// הגשת מועמדות ע"י משתמש
+// הגשת מועמדות ע"י משתמש – שולח בקשה, לא יוצר מועמד בפועל
 export const applyCandidate = createAsyncThunk(
   'candidates/apply',
   async ({ groupId, name, description, symbol, photoUrl }, { rejectWithValue }) => {
@@ -74,7 +74,8 @@ export const applyCandidate = createAsyncThunk(
         `/candidates/${groupId}/applyCandidate`,
         { name, description, symbol, photoUrl }
       );
-      return { groupId, candidate: data };
+      // data = { ok, groupId, request }
+      return { groupId: data.groupId, request: data.request };
     } catch (err) {
       return rejectWithValue(
         i18n.t('candidates.errors.applyFailed')
@@ -126,12 +127,12 @@ export const rejectCandidateRequest = createAsyncThunk(
   }
 );
 
-// בקשות מועמדים בקבוצה
+// בקשות מועמדים בקבוצה (עבור המנהל)
 export const fetchCandidateRequestsByGroup = createAsyncThunk(
   'candidates/fetchRequestsByGroup',
   async (groupId, { rejectWithValue }) => {
     try {
-      const { data } = await http.get(`/groups/${groupId}/requests`);
+      const { data } = await http.get(`/groups/${groupId}/candidate-requests`);
       return { groupId, requests: data };
     } catch (err) {
       return rejectWithValue(
@@ -147,7 +148,7 @@ const candidateSlice = createSlice({
     listByGroup: {},              // { [groupId]: Candidate[] }
     loadingByGroup: {},           // { [groupId]: boolean }
     errorByGroup: {},             // { [groupId]: string|null }
-    candidateRequestsByGroup: {}, // { [groupId]: [] }
+    candidateRequestsByGroup: {}, // { [groupId]: CandidateRequest[] }
     creating: false,
     createError: null,
     applying: false,
@@ -172,7 +173,7 @@ const candidateSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      // fetch
+      // ===== fetch candidates =====
       .addCase(fetchCandidatesByGroup.pending, (s, a) => {
         const gid = a.meta.arg;
         s.loadingByGroup[gid] = true;
@@ -189,7 +190,7 @@ const candidateSlice = createSlice({
         s.errorByGroup[gid] = a.payload;
       })
 
-      // create
+      // ===== create candidate (ע"י מנהל) =====
       .addCase(createCandidate.pending, (s) => {
         s.creating = true;
         s.createError = null;
@@ -205,7 +206,7 @@ const candidateSlice = createSlice({
         s.createError = a.payload;
       })
 
-      // update
+      // ===== update candidate =====
       .addCase(updateCandidate.pending, (s, a) => {
         const { candidateId } = a.meta.arg || {};
         if (candidateId) {
@@ -232,7 +233,7 @@ const candidateSlice = createSlice({
         }
       })
 
-      // delete
+      // ===== delete candidate =====
       .addCase(deleteCandidate.fulfilled, (s, a) => {
         const { groupId, candidateId } = a.payload;
         const list = s.listByGroup[groupId];
@@ -240,31 +241,46 @@ const candidateSlice = createSlice({
         s.listByGroup[groupId] = list.filter(c => String(c._id) !== String(candidateId));
         delete s.updatingById[candidateId];
         delete s.updateErrorById[candidateId];
+        // שימי לב: בקשות מועמדות מתעדכנות בצד השרת (group.candidateRequests),
+        // ויגיעו מחדש דרך fetchGroupWithMembers / fetchCandidateRequestsByGroup.
       })
 
-      // apply candidate
+      // ===== apply candidate – ניהול סטטוס בקישה =====
       .addCase(applyCandidate.pending, (state) => {
         state.applying = true;
         state.applyError = null;
       })
       .addCase(applyCandidate.fulfilled, (state, action) => {
         state.applying = false;
-        const { groupId, candidate } = action.payload;
-        if (!Array.isArray(state.listByGroup[groupId])) state.listByGroup[groupId] = [];
-        state.listByGroup[groupId].unshift(candidate);
+        const { groupId, request } = action.payload || {};
+        if (!groupId || !request) return;
+
+        if (!Array.isArray(state.candidateRequestsByGroup[groupId])) {
+          state.candidateRequestsByGroup[groupId] = [];
+        }
+
+        const idx = state.candidateRequestsByGroup[groupId].findIndex(
+          (r) => String(r._id) === String(request._id)
+        );
+
+        if (idx !== -1) {
+          state.candidateRequestsByGroup[groupId][idx] = request;
+        } else {
+          state.candidateRequestsByGroup[groupId].push(request);
+        }
       })
       .addCase(applyCandidate.rejected, (state, action) => {
         state.applying = false;
         state.applyError = action.payload;
       })
 
-      // fetch candidate requests
+      // ===== fetch candidate requests =====
       .addCase(fetchCandidateRequestsByGroup.fulfilled, (state, action) => {
         const { groupId, requests } = action.payload;
         state.candidateRequestsByGroup[groupId] = requests;
       })
 
-      // approve request
+      // ===== approve request =====
       .addCase(approveCandidateRequest.pending, (state) => {
         state.loadingRequests = true;
         state.requestsError = null;
@@ -273,10 +289,16 @@ const candidateSlice = createSlice({
         const { requestId, groupId, candidate } = action.payload;
         state.loadingRequests = false;
 
+        // מסירים את הבקשה מהטבלה
         state.candidateRequestsByGroup[groupId] =
-          state.candidateRequestsByGroup[groupId]?.filter(r => r._id !== requestId) || [];
+          state.candidateRequestsByGroup[groupId]?.filter(
+            (r) => String(r._id) !== String(requestId)
+          ) || [];
 
-        if (!Array.isArray(state.listByGroup[groupId])) state.listByGroup[groupId] = [];
+        // מוסיפים את המועמד לרשימת המועמדים הפעילים
+        if (!Array.isArray(state.listByGroup[groupId])) {
+          state.listByGroup[groupId] = [];
+        }
         state.listByGroup[groupId].push(candidate);
       })
       .addCase(approveCandidateRequest.rejected, (state, action) => {
@@ -284,7 +306,7 @@ const candidateSlice = createSlice({
         state.requestsError = action.payload;
       })
 
-      // reject request
+      // ===== reject request =====
       .addCase(rejectCandidateRequest.pending, (state) => {
         state.loadingRequests = true;
         state.requestsError = null;
@@ -293,7 +315,9 @@ const candidateSlice = createSlice({
         const { requestId, groupId } = action.payload;
         state.loadingRequests = false;
         state.candidateRequestsByGroup[groupId] =
-          state.candidates?.candidateRequestsByGroup?.[groupId]?.filter(r => r._id !== requestId) || [];
+          state.candidateRequestsByGroup[groupId]?.filter(
+            (r) => String(r._id) !== String(requestId)
+          ) || [];
       })
       .addCase(rejectCandidateRequest.rejected, (state, action) => {
         state.loadingRequests = false;

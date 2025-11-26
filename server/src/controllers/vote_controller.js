@@ -4,6 +4,7 @@ const {
   getVotesByCandidateInGroupService,
   getVotersByGroupService,
   hasUserVotedInGroup,
+  getMyFinishedVotedGroupsWithWinners, // <=== חדש
 } = require('../services/vote_service');
 
 async function createVote(req, res) {
@@ -84,10 +85,28 @@ async function hasVoted(req, res) {
   }
 }
 
+/** קבוצות שהמשתמש הצביע בהן, ההצבעה הסתיימה, יחד עם הזוכים */
+async function getMyFinishedVotedGroups(req, res) {
+  try {
+    const userId = req.user && req.user._id;
+    if (!userId) {
+      return res.status(401).json({ message: 'Unauthorized' });
+    }
+
+    const list = await getMyFinishedVotedGroupsWithWinners(userId);
+    return res.status(200).json(list);
+  } catch (err) {
+    console.error('getMyFinishedVotedGroups error:', err);
+    return res.status(500).json({ message: 'Error getting finished voted groups' });
+  }
+}
+
 module.exports = {
   createVote,
   deleteVote,
   getVotesByCandidateInGroup,
   getVotersByGroup,
   hasVoted,
+  getMyFinishedVotedGroups,   // <=== חדש
 };
+

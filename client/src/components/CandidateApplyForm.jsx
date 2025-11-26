@@ -1,95 +1,143 @@
 import { useDispatch, useSelector } from 'react-redux';
-import { applyCandidate, selectApplyingCandidate, selectApplyCandidateError } from '../slices/candidateSlice';
-import { selectUserId } from '../slices/authSlice';
 import { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
+
+import {
+  applyCandidate,
+  selectApplyingCandidate,
+  selectApplyCandidateError,
+} from '../slices/candidateSlice';
+
+import { selectUserId } from '../slices/authSlice';
 import '../pages/Register/RegisterPage.css';
 
 export default function CandidateApplyForm({ groupId, candidateRequests = [] }) {
   const dispatch = useDispatch();
+
   const loading = useSelector(selectApplyingCandidate);
   const error = useSelector(selectApplyCandidateError);
 
-  // שולף את userId מה-Redux
   const userId = useSelector(selectUserId);
-  console.log('[CandidateApplyForm] userId from Redux:', userId);
+  const userEmail =
+    useSelector((s) => s.auth.userEmail) ||
+    localStorage.getItem('userEmail') ||
+    '';
 
-  const [form, setForm] = useState({ name: '', description: '', symbol: '', photoUrl: '' });
+  const [form, setForm] = useState({
+    name: '',
+    description: '',
+    symbol: '',
+    photoUrl: '',
+  });
+
   const [userRequest, setUserRequest] = useState(null);
-  const [localRequests, setLocalRequests] = useState(candidateRequests);
 
   useEffect(() => {
-    console.log('[CandidateApplyForm] candidateRequests updated:', candidateRequests);
-    // בודק אם המשתמש כבר הגיש בקשה
-    const req = candidateRequests.find(
-      req => req.userId && String(req.userId) === String(userId)
-    );
+    const emailNorm = (userEmail || '').trim().toLowerCase();
+
+    const req = (candidateRequests || []).find((r) => {
+      const rid = r.userId && String(r.userId);
+      const remail = (r.email || '').trim().toLowerCase();
+      return (
+        (userId && rid && String(userId) === rid) ||
+        (emailNorm && remail && emailNorm === remail)
+      );
+    });
+
     setUserRequest(req || null);
-    setLocalRequests(candidateRequests);
-  }, [candidateRequests, userId]);
+  }, [candidateRequests, userId, userEmail]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setForm(prev => ({ ...prev, [name]: value }));
-    console.log('[CandidateApplyForm] form changed:', { ...form, [name]: value });
+    setForm((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('[CandidateApplyForm] submitting form:', form);
+
+    if (!groupId) {
+      toast.error('קבוצה לא תקינה');
+      return;
+    }
+
+    if (!form.name.trim()) {
+      toast.error('שם מלא חובה');
+      return;
+    }
 
     try {
-      const newRequest = await dispatch(applyCandidate({ groupId, ...form })).unwrap();
-      console.log('[CandidateApplyForm] request submitted successfully:', newRequest);
-      toast.success('בקשת מועמדות הוגשה בהצלחה!');
-      setForm({ name: '', description: '', symbol: '', photoUrl: '' });
+      const out = await dispatch(
+        applyCandidate({
+          groupId,
+          name: form.name.trim(),
+          description: form.description.trim(),
+          symbol: form.symbol.trim(),
+          photoUrl: form.photoUrl.trim(),
+        })
+      ).unwrap();
 
-      // מעדכן את הרשימה המקומית
-      setLocalRequests(prev => [...prev, newRequest]);
-      setUserRequest(newRequest);
+      if (out?.request) {
+        setUserRequest(out.request);
+      }
+
+      toast.success('בקשת המועמדות הוגשה למנהל/ת הקבוצה!');
+      setForm({ name: '', description: '', symbol: '', photoUrl: '' });
     } catch (err) {
-      console.error('[CandidateApplyForm] request failed:', err);
       const message = err?.message || 'שגיאה בלתי צפויה';
       toast.error(message);
     }
   };
 
   if (!groupId) {
-    console.warn('[CandidateApplyForm] no groupId provided!');
     return <p>❌ אין ID של קבוצה. נסי לרענן את העמוד.</p>;
   }
 
-  // --- הצגת סטטוס בקשה לפי סטטוס ---
+  if (!userId && !userEmail) {
+    return (
+      <div className="alert alert-info">
+        כדי להגיש מועמדות יש להתחבר למערכת.
+      </div>
+    );
+  }
+
+  // 🔒 סטטוסים שחוסמים את הצגת הטופס
   if (userRequest) {
-    console.log('[CandidateApplyForm] userRequest found:', userRequest);
     if (userRequest.status === 'pending') {
       return (
         <div className="alert alert-info">
-          📝 בקשת מועמדות שלך נמצאת בבדיקה אצל המנהל
-        </div>
-      );
-    } else if (userRequest.status === 'approved') {
-      return (
-        <div className="alert alert-success">
-          ✅ בקשת מועמדות שלך התקבלה
+          📝 בקשת המועמדות שלך נמצאת בבדיקה אצל המנהל/ת
         </div>
       );
     }
 
+    if (userRequest.status === 'approved') {
+      return (
+        <div className="alert alert-success">
+          ✅ בקשת המועמדות שלך אושרה. את/ה כבר מועמד/ת בקבוצה זו.
+        </div>
+      );
+    }
   }
-
 
   return (
     <div className="auth-card register-card">
- {userRequest?.status === 'rejected' && (
-      <div className="alert alert-warning">
-        ⚠️ בקשתך נדחתה – ניתן להגיש בקשה שוב
-      </div>
-    )}
+      {/* ❌ נדחה */}
+      {userRequest?.status === 'rejected' && (
+        <div className="alert alert-warning">
+          ⚠️ בקשת המועמדות שלך נדחתה – ניתן להגיש בקשה חדשה
+        </div>
+      )}
+
+      {/* 🗑️ נמחק */}
+      {userRequest?.status === 'removed' && (
+        <div className="alert alert-warning">
+          ⚠️ המועמדות הקודמת שלך נמחקה ע&quot;י המנהל/ת – ניתן להגיש בקשה חדשה
+        </div>
+      )}
 
       <div className="auth-header">
         <h1>הגש מועמדות</h1>
-        <p>מלאי את הפרטים למועמדות לקבוצה</p>
+        <p>מלא/י את הפרטים למועמדות בקבוצה</p>
       </div>
 
       <form className="auth-form" onSubmit={handleSubmit}>
@@ -143,11 +191,6 @@ export default function CandidateApplyForm({ groupId, candidateRequests = [] }) 
 
         {error && <p className="error-text">❌ {error}</p>}
       </form>
-
-      <div style={{ marginTop: '1rem' }}>
-        <strong>Local Requests Debug:</strong>
-        <pre>{JSON.stringify(localRequests, null, 2)}</pre>
-      </div>
     </div>
   );
 }

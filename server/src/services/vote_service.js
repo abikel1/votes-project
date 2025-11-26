@@ -212,6 +212,101 @@ async function getVotersByGroupService({ groupId }) {
     };
   });
 }
+async function getMyFinishedVotedGroupsWithWinners(userId) {
+  if (!userId || !mongoose.isValidObjectId(userId)) {
+    throw new Error('Invalid userId');
+  }
+
+  const now = new Date();
+
+  // כל ההצבעות של המשתמש
+  const votes = await Vote.find({ userId })
+    .populate({
+      path: 'groupId',
+      model: Group,
+      select: ['name', 'endDate', 'maxWinners']
+    })
+    .lean();
+
+  if (!votes.length) return [];
+
+  // קבוצות שההצבעה בהן כבר הסתיימה
+  const finishedGroupIds = [
+    ...new Set(
+      votes
+        .filter(v => v.groupId && v.groupId.endDate && new Date(v.groupId.endDate) < now)
+        .map(v => String(v.groupId._id))
+    )
+  ];
+
+  if (!finishedGroupIds.length) return [];
+
+  const groups = await Group.find({ _id: { $in: finishedGroupIds } })
+    .select(['name', 'endDate', 'maxWinners'])
+    .lean();
+  const groupsById = new Map(groups.map(g => [String(g._id), g]));
+
+  const candidates = await Candidate.find({ groupId: { $in: finishedGroupIds } })
+    .select(['name', 'description', 'votesCount', 'userId', 'photoUrl', 'symbol', 'groupId'])
+    .lean();
+
+  const candidatesByGroup = new Map();
+  for (const c of candidates) {
+    const gid = String(c.groupId);
+    if (!candidatesByGroup.has(gid)) candidatesByGroup.set(gid, []);
+    candidatesByGroup.get(gid).push(c);
+  }
+
+  const result = [];
+
+  for (const gid of finishedGroupIds) {
+    const g = groupsById.get(gid);
+    if (!g) continue;
+
+    const list = candidatesByGroup.get(gid) || [];
+    if (!list.length) {
+      result.push({
+        groupId: gid,
+        groupName: g.name,
+        endDate: g.endDate,
+        winners: []
+      });
+      continue;
+    }
+
+    // מיון לפי מספר הצבעות
+    const sorted = [...list].sort(
+      (a, b) => (b.votesCount || 0) - (a.votesCount || 0)
+    );
+
+    const maxWinners = g.maxWinners || 1;
+    const top = sorted.slice(0, maxWinners);
+
+    // אם יש תיקו עם המקום האחרון – נוסיף גם אותם
+    let winners = top;
+    if (sorted.length > maxWinners) {
+      const lastVotes = top[top.length - 1].votesCount || 0;
+      winners = sorted.filter(c => (c.votesCount || 0) >= lastVotes);
+    }
+
+    result.push({
+      groupId: gid,
+      groupName: g.name,
+      endDate: g.endDate,
+      winners: winners.map((c) => ({
+        _id: c._id,
+        name: c.name,
+        description: c.description,
+        votesCount: c.votesCount || 0,
+        userId: c.userId,
+        photoUrl: c.photoUrl,
+        symbol: c.symbol,
+      }))
+    });
+  }
+
+  return result;
+}
 
 module.exports = {
   createVoteService,
@@ -219,4 +314,6 @@ module.exports = {
   getVotesByCandidateInGroupService,
   getVotersByGroupService,
   hasUserVotedInGroup,
+  getMyFinishedVotedGroupsWithWinners,   // <=== חדש
 };
+
