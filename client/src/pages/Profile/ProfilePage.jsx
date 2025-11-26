@@ -58,18 +58,18 @@ export default function ProfilePage() {
     }
   }, [user, token, dispatch]);
 
-useEffect(() => {
-  if (!user || !token) return;
+  useEffect(() => {
+    if (!user || !token) return;
 
-  http
-    .get('/groups/my')  // שם הראוט בצד שרת: /api/groups/my
-    .then((res) => {
-      setUserGroups(res.data);
-    })
-    .catch((err) => {
-      console.error('Error fetching user groups:', err);
-    });
-}, [user, token]);
+    http
+      .get('/groups/my')  // שם הראוט בצד שרת: /api/groups/my
+      .then((res) => {
+        setUserGroups(res.data);
+      })
+      .catch((err) => {
+        console.error('Error fetching user groups:', err);
+      });
+  }, [user, token]);
 
 
   // 💡 ולידציה "חיה" לאימות סיסמה
@@ -177,6 +177,20 @@ useEffect(() => {
       );
     } catch (err) {
       console.log('changePassword error (client):', err);
+
+      // err זה ה־errors מהשרת (rejectWithValue)
+      if (err && typeof err === 'object') {
+        // למשל { currentPassword: 'הסיסמה שהוזנה שגויה' }
+        setPwErrors((prev) => ({
+          ...prev,
+          ...err,
+        }));
+      } else {
+        setPwErrors((prev) => ({
+          ...prev,
+          form: t('auth.changePassword.genericError', 'עדכון הסיסמה נכשל'),
+        }));
+      }
     }
   };
 
@@ -371,6 +385,9 @@ useEffect(() => {
         <div className="modal-overlay">
           <div className="modal-box">
             <h3>{t('profile.changePassword', 'שינוי סיסמה')}</h3>
+            {pwErrors.form && (
+              <div className="error">{pwErrors.form}</div>
+            )}
 
             {pwErrors.currentPassword && (
               <div className="error">{pwErrors.currentPassword}</div>
