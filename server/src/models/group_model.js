@@ -11,18 +11,22 @@ const joinRequestSchema = new mongoose.Schema({
 }, { _id: true });
 
 // סכמת בקשת מועמדות (למערכת ההצבעות)
+// סכמת בקשת מועמדות (למערכת ההצבעות)
 const candidateRequestSchema = new mongoose.Schema({
   userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   email: { type: String },
   name: { type: String },
   description: { type: String },
+  symbol: { type: String },     // ⬅️ חדש
+  photoUrl: { type: String },   // ⬅️ חדש
   status: {
     type: String,
-    enum: ['pending', 'approved', 'rejected', 'removed'], // ⬅️ הוספנו 'removed'
+    enum: ['pending', 'approved', 'rejected', 'removed'],
     default: 'pending'
   },
   createdAt: { type: Date, default: Date.now },
 }, { _id: true });
+
 
 const groupSchema = new mongoose.Schema({
   name: { type: String, required: true },
