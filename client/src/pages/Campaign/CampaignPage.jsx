@@ -43,7 +43,7 @@ const candidate = useSelector(selectCandidate); // עכשיו זה המועמד 
   //---------------------------------------------------------------------
   useEffect(() => {
     if (candidateId) {
-      console.log('Fetching campaign for candidateId:', candidateId);
+      // console.log('Fetching campaign for candidateId:', candidateId);
       dispatch(fetchCampaign(candidateId));
     }
   }, [candidateId, dispatch]);
@@ -73,7 +73,7 @@ const candidate = useSelector(selectCandidate); // עכשיו זה המועמד 
   // 4) Handlers
   //---------------------------------------------------------------------
   const handleUpdateCampaign = () => {
-    console.log('Updating campaign description:', editDescription);
+    // console.log('Updating campaign description:', editDescription);
     dispatch(updateCampaign({ campaignId: campaign._id, payload: { description: editDescription } }));
     setIsEditingDescription(false);
     setIsEditMode(false);
@@ -87,7 +87,7 @@ const handleAddPost = () => {
 
 
   const handleDeletePost = (postId) => {
-    console.log('Deleting postId:', postId);
+    // console.log('Deleting postId:', postId);
     dispatch(deletePost({ campaignId: campaign._id, postId }));
     setIsEditMode(false);
   };
@@ -101,7 +101,7 @@ const handleAddPost = () => {
   };
 
   const handleDeleteImage = (url) => {
-    console.log('Deleting image URL:', url);
+    // console.log('Deleting image URL:', url);
     dispatch(deleteImage({ campaignId: campaign._id, imageUrl: url }));
     setIsEditMode(false);
   };
@@ -109,8 +109,8 @@ const handleAddPost = () => {
   //---------------------------------------------------------------------
   // 5) Render
   //---------------------------------------------------------------------
-  console.log('Rendering CampaignPage. Campaign gallery:', campaign.gallery);
-console.log('Campaign gallery:', campaign?.gallery);
+  // console.log('Rendering CampaignPage. Campaign gallery:', campaign.gallery);
+// console.log('Campaign gallery:', campaign?.gallery);
 
   return (
     <div className="page-wrap dashboard">
