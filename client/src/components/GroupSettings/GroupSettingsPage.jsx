@@ -186,6 +186,10 @@ export default function GroupSettingsPage() {
   const newFileInputRef = useRef(null);
   const editFileInputRef = useRef(null);
 
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+const [selectedCandidate, setSelectedCandidate] = useState(null);
+
+
   // שיתוף
   const [copied, setCopied] = useState(false);
 
@@ -279,6 +283,34 @@ export default function GroupSettingsPage() {
   const isOwnerOrAdmin = isOwner || isAdmin;
 
   const slug = group ? makeSlug(group.name || groupSlug || groupId) : groupSlug;
+
+const handleDeleteCandidateClick = (candidate) => {
+  if (!candidate || !candidate._id) {
+    console.error('Candidate invalid:', candidate);
+    return;
+  }
+  setSelectedCandidate(candidate);
+  setShowDeleteConfirm(true);
+};
+
+const confirmDeleteCandidate = async () => {
+  if (!selectedCandidate || !selectedCandidate._id) {
+    toast.error('מחיקת המועמד נכשלה – מזהה לא נמצא');
+    setShowDeleteConfirm(false);
+    return;
+  }
+
+  try {
+    await onDeleteCandidate(String(selectedCandidate._id));
+    setShowDeleteConfirm(false);
+    setSelectedCandidate(null);
+  } catch (e) {
+    toast.error('מחיקת המועמד נכשלה');
+    console.error(e);
+  }
+};
+
+
 
   const sharePath = useMemo(() => {
     if (!group) return '';
@@ -476,34 +508,41 @@ export default function GroupSettingsPage() {
     }
   };
 
-  const onAddCandidate = (e) => {
-    e.preventDefault();
+const onAddCandidate = (e) => {
+  e.preventDefault();
 
-    const errors = validateCandidateFields(candForm);
+  const errors = validateCandidateFields(candForm);
 
-    if (!candForm.name.trim()) {
-      toast.error('שם מועמד/ת חובה');
-    }
+  if (!candForm.name.trim()) {
+    toast.error('שם מועמד/ת חובה');
+  }
 
-    setCandErrors(errors);
+  setCandErrors(errors);
 
-    if (Object.keys(errors).length > 0) {
-      return;
-    }
+  if (Object.keys(errors).length > 0) {
+    return;
+  }
 
-    dispatch(createCandidate({ groupId, ...candForm }))
-      .unwrap()
-      .then(() => {
-        setCandForm({
-          name: '',
-          description: '',
-          symbol: '',
-          photoUrl: '',
-        });
-        setCandErrors({});
-      })
-      .then(() => dispatch(fetchCandidatesByGroup(groupId)));
+  // ✅ כאן מוסיפים ברירת מחדל לתמונה אם לא קיימת
+  const candidateData = {
+    ...candForm,
+    photoUrl: candForm.photoUrl || '/h.jpg',
   };
+
+  dispatch(createCandidate({ groupId, ...candidateData }))
+    .unwrap()
+    .then(() => {
+      setCandForm({
+        name: '',
+        description: '',
+        symbol: '',
+        photoUrl: '',
+      });
+      setCandErrors({});
+    })
+    .then(() => dispatch(fetchCandidatesByGroup(groupId)));
+};
+
 
   const onDeleteCandidate = (cid) =>
     dispatch(deleteCandidate({ candidateId: cid, groupId }))
@@ -768,7 +807,7 @@ export default function GroupSettingsPage() {
               setCandForm={setCandForm}
               setCandErrors={setCandErrors}
               onAddCandidate={onAddCandidate}
-              onDeleteCandidate={onDeleteCandidate}
+              onDeleteCandidate={handleDeleteCandidateClick}
               onOpenEditCandidate={openEditCandidate}
               uploadingNew={uploadingNew}
               onUploadNew={(file) => handleUpload(file, 'new')}
@@ -945,6 +984,18 @@ export default function GroupSettingsPage() {
         onConfirm={confirmDelete}
         onCancel={cancelDelete}
       />
+
+      <ConfirmModal
+  open={showDeleteConfirm}
+  message={
+    selectedCandidate
+      ? `להסיר את ${selectedCandidate.name || selectedCandidate.symbol || '(ללא שם)'}?`
+      : ''
+  }
+  onConfirm={confirmDeleteCandidate}
+  onCancel={() => setShowDeleteConfirm(false)}
+/>
+
     </div>
   );
 }
