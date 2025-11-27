@@ -182,33 +182,35 @@ export default function GroupsPage() {
   const myEmail = lc(authEmail) || lc(localStorage.getItem('userEmail'));
   const myId = String(authId ?? localStorage.getItem('userId') ?? '');
 
-  const filteredGroups = groups
-    .filter((g) => {
-      const gid = String(g._id);
-      const nameMatch = g.name
-        ?.toLowerCase()
-        .includes(searchTerm.toLowerCase());
-      if (!nameMatch) return false;
+const filteredGroups = groups
+  .filter((g) => {
+    const gid = String(g._id);
+    const nameMatch = g.name?.toLowerCase().includes(searchTerm.toLowerCase());
+    if (!nameMatch) return false;
 
-      const isLocked = !!g.isLocked;
-      const isOwner = createdIdsSet.has(gid);
-      const isMember = joinedIdsSet.has(gid);
+    const isLocked = !!g.isLocked;
+    const isOwner = createdIdsSet.has(gid);
+    const isMember = joinedIdsSet.has(gid);
+    const now = new Date();
+    const candidateOpen = g.candidateEndDate && new Date(g.candidateEndDate) > now;
 
-      switch (filter) {
-        case 'open':
-          return !isLocked;
-        case 'locked':
-          return isLocked;
-        case 'joined':
-          return isMember;
-        case 'owned':
-          return isOwner;
-        case 'expired':
-          return new Date(g.endDate) < new Date();
-        default:
-          return true;
-      }
-    })
+    switch (filter) {
+      case 'open':
+        return !isLocked;
+      case 'locked':
+        return isLocked;
+      case 'joined':
+        return isMember;
+      case 'owned':
+        return isOwner;
+      case 'expired':
+        return new Date(g.endDate) < now;
+      case 'candidateOpen':  // ← הפילטר החדש
+        return candidateOpen;
+      default:
+        return true;
+    }
+  })
     .sort((a, b) => {
       if (sortBy === 'creationDate')
         return new Date(b.creationDate) - new Date(a.creationDate);
@@ -309,6 +311,17 @@ export default function GroupsPage() {
                   />
                   {t('groups.list.filters.expired')}
                 </label>
+                <label>
+  <input
+    type="radio"
+    name="filter"
+    value="candidateOpen"
+    checked={filter === 'candidateOpen'}
+    onChange={(e) => setFilter(e.target.value)}
+  />
+  {t('groups.list.filters.candidateOpen')}
+</label>
+
               </div>
             )}
 
