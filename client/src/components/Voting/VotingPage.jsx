@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState ,useRef} from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 
@@ -32,6 +32,7 @@ export default function VotingDragPage() {
 
   // id שהגיע מניווט פנימי (כפתור "להצבעה בקלפי")
   const navGroupId = location.state?.groupId || null;
+const hasShownVotedToast = useRef(false);
 
   // state פנימי ל-id
   const [groupId, setGroupId] = useState(navGroupId);
@@ -96,7 +97,13 @@ export default function VotingDragPage() {
       }
     })();
   }, [navGroupId, groupSlug]);
-
+// בדיקה אם כבר הצבעתי – תוסף טוסט
+useEffect(() => {
+  if (hasVoted && !hasShownVotedToast.current) {
+    toast(' כבר הצבעת בקבוצה זו', { icon: '🗳️' });
+    hasShownVotedToast.current = true;
+  }
+}, [hasVoted]);
   // טעינת נתוני קבוצה + מועמדים
   useEffect(() => {
     if (!groupId) return;
