@@ -1,21 +1,14 @@
-// src/components/VoteResultNotifier.jsx
 import { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+
 import {
     fetchMyFinishedVotedGroups,
     selectFinishedVotedGroups,
 } from '../../slices/votesSlice';
-import './VoteResultNotifier.css';
 
-const makeSlug = (name = '') =>
-    encodeURIComponent(
-        String(name)
-            .trim()
-            .toLowerCase()
-            .replace(/\s+/g, '-'),
-    );
+import './VoteResultNotifier.css';
 
 // מפתח ייחודי למשתמש (כדי להפריד בין משתמשים שונים באותו דפדפן)
 const makeUserKey = (userId, email) => {
@@ -24,6 +17,7 @@ const makeUserKey = (userId, email) => {
     return null;
 };
 
+// קריאת רשימת קבוצות שהמשתמש כבר ראה עבורן פופ־אפ
 function loadNotifiedGroups(userKey) {
     if (!userKey) return new Set();
     try {
@@ -36,6 +30,7 @@ function loadNotifiedGroups(userKey) {
     }
 }
 
+// כתיבת הרשימה ל־localStorage
 function saveNotifiedGroups(userKey, set) {
     if (!userKey) return;
     try {
@@ -49,13 +44,12 @@ function saveNotifiedGroups(userKey, set) {
 }
 
 /**
- * פופ-אפ גלובלי: "ההצבעה הסתיימה ויש זוכה"
- * כל משתמש רואה פעם אחת לכל קבוצה (על בסיס userId/email).
+ * פופ־אפ גלובלי: "ההצבעה הסתיימה ויש זוכה"
+ * ➤ לכל משתמש: פעם אחת לכל קבוצה שהוא הצביע בה.
  */
 export default function VoteResultNotifier() {
     const dispatch = useDispatch();
     const navigate = useNavigate();
-    const location = useLocation();
     const { t } = useTranslation();
 
     const finishedGroups = useSelector(selectFinishedVotedGroups);
@@ -68,7 +62,7 @@ export default function VoteResultNotifier() {
     const [notifiedSet, setNotifiedSet] = useState(new Set());
     const [currentGroup, setCurrentGroup] = useState(null);
 
-    // טעינת המידע מה־localStorage כשמשתמש מתחלף / נכנס
+    // טעינת סט הקבוצות שנצפו מה־localStorage כשמשתמש משתנה
     useEffect(() => {
         if (!isAuthed || !userKey) {
             setNotifiedSet(new Set());
@@ -78,46 +72,34 @@ export default function VoteResultNotifier() {
         setNotifiedSet(loadNotifiedGroups(userKey));
     }, [isAuthed, userKey]);
 
-    // טעינה ראשונית מהשרת כשיש משתמש מחובר
+    // טעינת קבוצות שהסתיימו והמשתמש הצביע בהן
     useEffect(() => {
         if (!isAuthed) return;
         dispatch(fetchMyFinishedVotedGroups());
     }, [dispatch, isAuthed]);
 
-    // לבחור קבוצה אחת שלא קיבלה עדיין פופ-אפ עבור *המשתמש הזה*
+    // בחירת קבוצה אחת שלא קיבלה עדיין פופ־אפ עבור *המשתמש הזה*
     useEffect(() => {
         if (!isAuthed) return;
         if (!finishedGroups.length) return;
 
+        // finishedGroups אמור כבר להיות "קבוצות שהמשתמש הצביע בהן והסתיימו"
         const candidate = finishedGroups.find((g) => {
             const gid = String(g.groupId);
             return !notifiedSet.has(gid);
         });
 
-        if (candidate) setCurrentGroup(candidate);
-    }, [finishedGroups, notifiedSet, isAuthed]);
-
-    // סגירה אוטומטית כשמגיעים לדף פרטי הקבוצה
-    useEffect(() => {
-        if (!currentGroup) return;
-        const gid = String(currentGroup.groupId);
-        const slug = makeSlug(currentGroup.groupName || gid);
-        const expectedPath = `/groups/${slug}`;
-
-        if (location.pathname === expectedPath) {
-            const next = new Set(notifiedSet);
-            next.add(gid);
-            setNotifiedSet(next);
-            saveNotifiedGroups(userKey, next);
+        if (candidate) {
+            setCurrentGroup(candidate);
+        } else {
             setCurrentGroup(null);
         }
-    }, [location.pathname, currentGroup, notifiedSet, userKey]);
+    }, [finishedGroups, notifiedSet, isAuthed]);
 
+    // אם אין קבוצה להציג – לא מציגים כלום
     if (!currentGroup) return null;
 
     const gid = String(currentGroup.groupId);
-    const slug = makeSlug(currentGroup.groupName || gid);
-
     const winnersNames =
         (currentGroup.winners || [])
             .map((w) => w.name)
@@ -140,6 +122,8 @@ export default function VoteResultNotifier() {
 
         setCurrentGroup(null);
 
+        // אם השרת מחזיר גם slug – אפשר להשתמש בו, אחרת נשתמש בנתיב הרגיל לפי groupId
+        const slug = currentGroup.groupSlug || gid;
         navigate(`/groups/${slug}`, {
             state: { groupId: gid },
         });
