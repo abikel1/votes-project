@@ -80,44 +80,46 @@ export default function CandidateApplyForm({ groupId, candidateRequests = [] }) 
     }
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+const handleSubmit = async (e) => {
+  e.preventDefault();
 
-    if (!groupId) {
-      toast.error('קבוצה לא תקינה');
-      return;
+  if (!groupId) {
+    toast.error('קבוצה לא תקינה');
+    return;
+  }
+
+  if (!form.name.trim()) {
+    setErrors((prev) => ({ ...prev, name: 'שם מלא חובה' }));
+    toast.error('שם מלא חובה');
+    return;
+  }
+
+  try {
+    // ✅ כאן מוסיפים ברירת מחדל אם אין תמונה
+    const candidateData = {
+      groupId,
+      name: form.name.trim(),
+      description: form.description.trim(),
+      symbol: form.symbol.trim(),
+      photoUrl: form.photoUrl.trim() || '/h.jpg', // ← ברירת מחדל
+    };
+
+    const out = await dispatch(applyCandidate(candidateData)).unwrap();
+
+    if (out?.request) {
+      setUserRequest(out.request);
     }
 
-    if (!form.name.trim()) {
-      setErrors((prev) => ({ ...prev, name: 'שם מלא חובה' }));
-      toast.error('שם מלא חובה');
-      return;
-    }
+    toast.success('בקשת המועמדות הוגשה למנהל/ת הקבוצה!');
+    setForm({ name: '', description: '', symbol: '', photoUrl: '' });
+    setErrors({});
+    clearPhoto();
+  } catch (err) {
+    const message = err?.message || 'שגיאה בלתי צפויה';
+    toast.error(message);
+  }
+};
 
-    try {
-      const out = await dispatch(
-        applyCandidate({
-          groupId,
-          name: form.name.trim(),
-          description: form.description.trim(),
-          symbol: form.symbol.trim(),
-          photoUrl: form.photoUrl.trim(),
-        }),
-      ).unwrap();
-
-      if (out?.request) {
-        setUserRequest(out.request);
-      }
-
-      toast.success('בקשת המועמדות הוגשה למנהל/ת הקבוצה!');
-      setForm({ name: '', description: '', symbol: '', photoUrl: '' });
-      setErrors({});
-      clearPhoto();
-    } catch (err) {
-      const message = err?.message || 'שגיאה בלתי צפויה';
-      toast.error(message);
-    }
-  };
 
   if (!groupId) {
     return <p>❌ אין ID של קבוצה. נסי לרענן את העמוד.</p>;
