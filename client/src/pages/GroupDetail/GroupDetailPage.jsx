@@ -6,6 +6,7 @@ import { HiClock, HiUserGroup, HiUser, HiOutlineBadgeCheck } from 'react-icons/h
 import toast from 'react-hot-toast';
 import { FiSettings, FiMessageSquare, FiX, FiStar } from 'react-icons/fi';
 import { BiArrowBack } from 'react-icons/bi';
+import { FiZap } from "react-icons/fi";
 
 import CountdownTimer from '../../components/CountdownTimer/CountdownTimer';
 import GroupChat from '../../components/GroupChat/GroupChat';
@@ -420,7 +421,6 @@ export default function GroupDetailPage() {
                           className="candidate-avatar"
                         />
                       )}
-                      {/* <<<<<<< HEAD */}
 
                       {/* אם הקבוצה נגמרה והמועמד מנצח – הצג מקום */}
                       {isGroupExpired && winnerIndex !== -1 && (
@@ -430,17 +430,17 @@ export default function GroupDetailPage() {
                       )}
 
 
-                      <button
-                        className="campaign-btn"
-                        onClick={() =>
-                          navigate(`/campaign/${c._id}`, {
-                            state: { groupId },
-                          })
-                        }
-                        title="קמפיין שלי"
-                      >
-                        <FiStar size={20} />
-                      </button>
+{c.userId && (
+  <button
+    className="campaign-btn"
+    onClick={() =>
+      navigate(`/campaign/${c._id}`, { state: { groupId } })
+    }
+    title="קמפיין שלי"
+  >
+    <FiZap size={16} />
+  </button>
+)}
 
                       <div className="candidate-text">
                         <h4>{c.name}</h4>
