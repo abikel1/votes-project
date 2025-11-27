@@ -32,18 +32,20 @@ export default function CandidateForm({
                 name="description"
                 value={form.description}
                 onChange={(e) => onChange('description', e.target.value)}
+                required
             />
             {errors.description && (
                 <div className="err small-err">{errors.description}</div>
             )}
 
-            <label>סמל (אופציונלי)</label>
+            <label>סמל</label>
             <input
                 className="input"
                 name="symbol"
                 value={form.symbol}
                 onChange={(e) => onChange('symbol', e.target.value)}
                 placeholder="למשל: א׳"
+                required
             />
             {errors.symbol && (
                 <div className="err small-err">{errors.symbol}</div>
