@@ -9,6 +9,7 @@ import {
   selectMyCreatedIds,
 } from '../../slices/groupsSlice';
 import { toast } from 'react-hot-toast';
+import { HiOutlineDocumentText } from "react-icons/hi";
 
 import {
   requestJoinGroup,
@@ -525,6 +526,15 @@ export default function GroupsPage() {
                       <img src="/icons/settings.png" alt={t('groups.list.card.settingsAlt')} />
                     </button>
                   )}
+
+                  {g.candidateEndDate && new Date() < new Date(g.candidateEndDate) && (
+    <HiOutlineDocumentText 
+        size={20} 
+        className="groups-badge-candidate"
+        title="הגשת מועמדות פתוחה"
+    />
+)}
+
                 </div>
               </div>
 
