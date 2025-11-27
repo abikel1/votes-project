@@ -9,6 +9,7 @@ import { BiArrowBack } from 'react-icons/bi';
 
 import CountdownTimer from '../../components/CountdownTimer/CountdownTimer';
 import GroupChat from '../../components/GroupChat/GroupChat';
+import { FiLightbulb } from 'react-icons/fi';
 
 import {
   fetchMyGroups,
@@ -420,7 +421,6 @@ export default function GroupDetailPage() {
                           className="candidate-avatar"
                         />
                       )}
-                      {/* <<<<<<< HEAD */}
 
                       {/* אם הקבוצה נגמרה והמועמד מנצח – הצג מקום */}
                       {isGroupExpired && winnerIndex !== -1 && (
@@ -430,17 +430,17 @@ export default function GroupDetailPage() {
                       )}
 
 
-                      <button
-                        className="campaign-btn"
-                        onClick={() =>
-                          navigate(`/campaign/${c._id}`, {
-                            state: { groupId },
-                          })
-                        }
-                        title="קמפיין שלי"
-                      >
-                        <FiStar size={20} />
-                      </button>
+{c.userId && (
+  <button
+    className="campaign-btn"
+    onClick={() =>
+      navigate(`/campaign/${c._id}`, { state: { groupId } })
+    }
+    title="קמפיין שלי"
+  >
+    <FiLightbulb size={24} />
+  </button>
+)}
 
                       <div className="candidate-text">
                         <h4>{c.name}</h4>
