@@ -80,12 +80,11 @@ async function getGroupByIdService(groupId) {
 }
 
 async function getAllGroupsService() {
-  return Group.find()
-    .populate('candidates')
-    .populate({
-      path: 'createdById',
-      select: 'firstName lastName email',
-    });
+ return Group.find()
+  .lean()
+  .populate({ path: 'candidates', select: 'name photoUrl' })
+  .populate({ path: 'createdById', select: 'firstName lastName' });
+
 }
 
 /* ===== בקשות הצטרפות כחבר בקבוצה ===== */

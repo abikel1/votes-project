@@ -216,6 +216,7 @@ i18n
                     'groups.list.filters.joined': 'קבוצות שאני מחובר/ת',
                     'groups.list.filters.owned': 'קבוצות שאני מנהל/ת',
                     'groups.list.filters.expired': 'קבוצות שהסתיימו',
+                    'groups.list.filters.candidateOpen': 'הגשת מועמדות פתוחה',
 
                     'groups.list.sort.title': 'מיון',
                     'groups.list.sort.alt': 'מיון',
@@ -712,6 +713,7 @@ i18n
                     'groups.list.filters.joined': 'Groups I joined',
                     'groups.list.filters.owned': 'Groups I manage',
                     'groups.list.filters.expired': 'Expired groups',
+                    'groups.list.filters.candidateOpen': 'Open application',
 
                     'groups.list.sort.title': 'Sort',
                     'groups.list.sort.alt': 'Sort',

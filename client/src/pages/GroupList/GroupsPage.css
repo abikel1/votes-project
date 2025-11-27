@@ -554,3 +554,9 @@
   font-weight: 500;
   color: #222;
 }
+
+
+.groups-badge-candidate {
+  margin-left: 6px;
+  color: #727880; /* אפור נחמד (Tailwind gray-400 style) */
+}
