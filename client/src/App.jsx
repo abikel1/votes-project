@@ -30,6 +30,9 @@ import CampaignPage from './pages/Campaign/CampaignPage';
 // 👇 ה־Guard
 import RequireAuth from './components/RequireAuth/RequireAuth.jsx';
 
+// 🔔 פופ-אפ תוצאות הצבעה
+import VoteResultNotifier from './components/VoteResultNotifier/VoteResultNotifier.jsx';
+
 export default function App() {
   const dispatch = useDispatch();
   const token = useSelector((s) => s.auth.token);
@@ -88,6 +91,9 @@ export default function App() {
           },
         }}
       />
+
+      {/* פופ-אפ תוצאות הצבעה גלובלי */}
+      <VoteResultNotifier />
 
       <NavBar />
       <ScrollToTop />

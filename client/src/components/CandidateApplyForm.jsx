@@ -1,153 +1,190 @@
+// src/components/CandidateApplyForm.jsx
 import { useDispatch, useSelector } from 'react-redux';
-import { applyCandidate, selectApplyingCandidate, selectApplyCandidateError } from '../slices/candidateSlice';
-import { selectUserId } from '../slices/authSlice';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import toast from 'react-hot-toast';
+
+import {
+  applyCandidate,
+  selectApplyingCandidate,
+  selectApplyCandidateError,
+} from '../slices/candidateSlice';
+
+import { selectUserId } from '../slices/authSlice';
+import CandidateForm from './GroupSettings/CandidateForm';
+import { uploadImage } from './GroupSettings/uploadImage';
+
 import '../pages/Register/RegisterPage.css';
 
 export default function CandidateApplyForm({ groupId, candidateRequests = [] }) {
   const dispatch = useDispatch();
+
   const loading = useSelector(selectApplyingCandidate);
   const error = useSelector(selectApplyCandidateError);
 
-  // שולף את userId מה-Redux
   const userId = useSelector(selectUserId);
-  console.log('[CandidateApplyForm] userId from Redux:', userId);
+  const userEmail =
+    useSelector((s) => s.auth.userEmail) ||
+    localStorage.getItem('userEmail') ||
+    '';
 
-  const [form, setForm] = useState({ name: '', description: '', symbol: '', photoUrl: '' });
+  const [form, setForm] = useState({
+    name: '',
+    description: '',
+    symbol: '',
+    photoUrl: '',
+  });
+
+  const [errors, setErrors] = useState({});
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef(null);
+
   const [userRequest, setUserRequest] = useState(null);
-  const [localRequests, setLocalRequests] = useState(candidateRequests);
 
   useEffect(() => {
-    console.log('[CandidateApplyForm] candidateRequests updated:', candidateRequests);
-    // בודק אם המשתמש כבר הגיש בקשה
-    const req = candidateRequests.find(
-      req => req.userId && String(req.userId) === String(userId)
-    );
-    setUserRequest(req || null);
-    setLocalRequests(candidateRequests);
-  }, [candidateRequests, userId]);
+    const emailNorm = (userEmail || '').trim().toLowerCase();
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setForm(prev => ({ ...prev, [name]: value }));
-    console.log('[CandidateApplyForm] form changed:', { ...form, [name]: value });
+    const req = (candidateRequests || []).find((r) => {
+      const rid = r.userId && String(r.userId);
+      const remail = (r.email || '').trim().toLowerCase();
+      return (
+        (userId && rid && String(userId) === rid) ||
+        (emailNorm && remail && emailNorm === remail)
+      );
+    });
+
+    setUserRequest(req || null);
+  }, [candidateRequests, userId, userEmail]);
+
+  const handleFieldChange = (name, value) => {
+    setForm((prev) => ({ ...prev, [name]: value }));
+    setErrors((prev) => ({ ...prev, [name]: undefined }));
+  };
+
+  const clearPhoto = () => {
+    setForm((prev) => ({ ...prev, photoUrl: '' }));
+  };
+
+  const handleUpload = async (file) => {
+    if (!file) return;
+
+    try {
+      setUploading(true);
+      const url = await uploadImage(file, form.photoUrl || '');
+      if (!url) return;
+      setForm((prev) => ({ ...prev, photoUrl: url }));
+    } catch (err) {
+      console.error('Upload error:', err);
+      toast.error('שגיאה בהעלאת התמונה');
+    } finally {
+      setUploading(false);
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('[CandidateApplyForm] submitting form:', form);
+
+    if (!groupId) {
+      toast.error('קבוצה לא תקינה');
+      return;
+    }
+
+    if (!form.name.trim()) {
+      setErrors((prev) => ({ ...prev, name: 'שם מלא חובה' }));
+      toast.error('שם מלא חובה');
+      return;
+    }
 
     try {
-      const newRequest = await dispatch(applyCandidate({ groupId, ...form })).unwrap();
-      console.log('[CandidateApplyForm] request submitted successfully:', newRequest);
-      toast.success('בקשת מועמדות הוגשה בהצלחה!');
-      setForm({ name: '', description: '', symbol: '', photoUrl: '' });
+      const out = await dispatch(
+        applyCandidate({
+          groupId,
+          name: form.name.trim(),
+          description: form.description.trim(),
+          symbol: form.symbol.trim(),
+          photoUrl: form.photoUrl.trim(),
+        }),
+      ).unwrap();
 
-      // מעדכן את הרשימה המקומית
-      setLocalRequests(prev => [...prev, newRequest]);
-      setUserRequest(newRequest);
+      if (out?.request) {
+        setUserRequest(out.request);
+      }
+
+      toast.success('בקשת המועמדות הוגשה למנהל/ת הקבוצה!');
+      setForm({ name: '', description: '', symbol: '', photoUrl: '' });
+      setErrors({});
+      clearPhoto();
     } catch (err) {
-      console.error('[CandidateApplyForm] request failed:', err);
       const message = err?.message || 'שגיאה בלתי צפויה';
       toast.error(message);
     }
   };
 
   if (!groupId) {
-    console.warn('[CandidateApplyForm] no groupId provided!');
     return <p>❌ אין ID של קבוצה. נסי לרענן את העמוד.</p>;
   }
 
-  // --- הצגת סטטוס בקשה לפי סטטוס ---
+  if (!userId && !userEmail) {
+    return (
+      <div className="alert alert-info">
+        כדי להגיש מועמדות יש להתחבר למערכת.
+      </div>
+    );
+  }
+
+  // סטטוסים שחוסמים את הצגת הטופס
   if (userRequest) {
-    console.log('[CandidateApplyForm] userRequest found:', userRequest);
     if (userRequest.status === 'pending') {
       return (
         <div className="alert alert-info">
-          📝 בקשת מועמדות שלך נמצאת בבדיקה אצל המנהל
-        </div>
-      );
-    } else if (userRequest.status === 'approved') {
-      return (
-        <div className="alert alert-success">
-          ✅ בקשת מועמדות שלך התקבלה
+          📝 בקשת המועמדות שלך נמצאת בבדיקה אצל המנהל/ת
         </div>
       );
     }
 
+    if (userRequest.status === 'approved') {
+      return (
+        <div className="alert alert-success">
+          ✅ בקשת המועמדות שלך אושרה. את/ה כבר מועמד/ת בקבוצה זו.
+        </div>
+      );
+    }
   }
-
 
   return (
     <div className="auth-card register-card">
- {userRequest?.status === 'rejected' && (
-      <div className="alert alert-warning">
-        ⚠️ בקשתך נדחתה – ניתן להגיש בקשה שוב
-      </div>
-    )}
+      {/* נדחה */}
+      {userRequest?.status === 'rejected' && (
+        <div className="alert alert-warning">
+          ⚠️ בקשת המועמדות שלך נדחתה – ניתן להגיש בקשה חדשה
+        </div>
+      )}
+
+      {/* נמחק */}
+      {userRequest?.status === 'removed' && (
+        <div className="alert alert-warning">
+          ⚠️ המועמדות הקודמת שלך נמחקה ע&quot;י המנהל/ת – ניתן להגיש בקשה חדשה
+        </div>
+      )}
 
       <div className="auth-header">
         <h1>הגש מועמדות</h1>
-        <p>מלאי את הפרטים למועמדות לקבוצה</p>
+        <p>מלא/י את הפרטים למועמדות בקבוצה</p>
       </div>
 
-      <form className="auth-form" onSubmit={handleSubmit}>
-        <div className="form-group">
-          <label>שם מלא</label>
-          <input
-            type="text"
-            name="name"
-            placeholder="שם מלא"
-            value={form.name}
-            onChange={handleChange}
-            required
-          />
-        </div>
+      <CandidateForm
+        form={form}
+        errors={errors}
+        onChange={handleFieldChange}
+        onSubmit={handleSubmit}
+        uploading={uploading}
+        onUploadFile={handleUpload}
+        fileInputRef={fileInputRef}
+        clearPhoto={clearPhoto}
+        submitLabel={loading ? 'טוען...' : 'הגש מועמדות'}
+        submitDisabled={loading || uploading}
+      />
 
-        <div className="form-group">
-          <label>סימול</label>
-          <input
-            type="text"
-            name="symbol"
-            placeholder="סימול (אופציונלי)"
-            value={form.symbol}
-            onChange={handleChange}
-          />
-        </div>
-
-        <div className="form-group">
-          <label>תיאור קצר</label>
-          <textarea
-            name="description"
-            placeholder="תיאור קצר עליך"
-            value={form.description}
-            onChange={handleChange}
-          />
-        </div>
-
-        <div className="form-group">
-          <label>קישור לתמונה</label>
-          <input
-            type="text"
-            name="photoUrl"
-            placeholder="https://..."
-            value={form.photoUrl}
-            onChange={handleChange}
-          />
-        </div>
-
-        <button type="submit" className="btn btn-primary" disabled={loading}>
-          {loading ? 'טוען...' : 'הגש מועמדות'}
-        </button>
-
-        {error && <p className="error-text">❌ {error}</p>}
-      </form>
-
-      <div style={{ marginTop: '1rem' }}>
-        <strong>Local Requests Debug:</strong>
-        <pre>{JSON.stringify(localRequests, null, 2)}</pre>
-      </div>
+      {error && <p className="error-text">❌ {error}</p>}
     </div>
   );
 }

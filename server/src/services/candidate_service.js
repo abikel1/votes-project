@@ -1,4 +1,6 @@
+// server/src/services/candidate_service.js
 const Candidate = require('../models/candidate_model');
+const Group = require('../models/group_model');
 
 // יצירת מועמד
 async function createCandidateService(candidateData) {
@@ -7,21 +9,69 @@ async function createCandidateService(candidateData) {
     description: candidateData.description,
     photoUrl: candidateData.photoUrl,
     symbol: candidateData.symbol,
-    groupId: candidateData.groupId
+    groupId: candidateData.groupId,
+    userId: candidateData.userId || null,
   });
+
   await candidate.save();
+
+  // לשמור גם במערך candidates של הקבוצה (אם יש groupId)
+  if (candidate.groupId) {
+    await Group.findByIdAndUpdate(
+      candidate.groupId,
+      { $addToSet: { candidates: candidate._id } },
+      { new: true }
+    );
+  }
+
   return candidate;
 }
 
 // עדכון מועמד
 async function updateCandidateService(candidateId, updateData) {
-  const candidate = await Candidate.findByIdAndUpdate(candidateId, updateData, { new: true });
+  const candidate = await Candidate.findByIdAndUpdate(
+    candidateId,
+    updateData,
+    { new: true }
+  );
   return candidate;
 }
 
 // מחיקת מועמד
 async function deleteCandidateService(candidateId) {
-  const candidate = await Candidate.findByIdAndDelete(candidateId);
+  // קודם נשלוף את המועמד כדי לדעת groupId ו-userId
+  const candidate = await Candidate.findById(candidateId);
+  if (!candidate) {
+    return null;
+  }
+
+  // מחיקה ממערך המועמדים של הקבוצה
+  if (candidate.groupId) {
+    await Group.findByIdAndUpdate(
+      candidate.groupId,
+      { $pull: { candidates: candidate._id } },
+      { new: true }
+    );
+  }
+
+  // מוחקים את המועמד עצמו
+  await Candidate.findByIdAndDelete(candidateId);
+
+  // מעדכנים את בקשת המועמדות בקבוצה ל־"removed"
+  if (candidate.groupId && candidate.userId) {
+    const g = await Group.findById(candidate.groupId);
+    if (g && Array.isArray(g.candidateRequests)) {
+      const req = g.candidateRequests.find(
+        (r) => String(r.userId) === String(candidate.userId)
+      );
+      if (req) {
+        req.status = 'removed';
+        await g.save();
+      }
+    }
+  }
+
+  // מחזירים את המועמד שנמחק (אם תרצי להשתמש בזה בצד קונטרולר)
   return candidate;
 }
 
@@ -53,5 +103,5 @@ module.exports = {
   deleteCandidateService,
   getCandidateByIdService,
   getCandidatesByGroupService,
-  incrementVotesService
+  incrementVotesService,
 };

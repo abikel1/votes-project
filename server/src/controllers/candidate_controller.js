@@ -12,7 +12,7 @@ const {
   approveCandidateRequestService,
   rejectCandidateRequestService ,
   addCandidateByEmailService,
-  getCandidateCampaignService
+  
 } = require('../services/group_service');
 
 const Campaign = require('../models/campaign_model');
@@ -97,54 +97,60 @@ async function incrementVotes(req, res) {
 async function applyCandidate(req, res) {
   try {
     const out = await applyCandidateService(req.params.id, req.user, req.body);
-    res.json({ ok: true, group: out });
-    console.log('req.user = ', req.user);
 
+    res.json({
+      ok: true,
+      groupId: out.groupId,
+      request: out.request,
+    });
   } catch (err) {
-    res.status(400).json({ message: err.message });
+    console.error('❌ Error applying as candidate:', err);
+    res.status(400).json({ message: err.message, code: err.code });
   }
 }
-// 1️⃣ מנהל מאשר דוחה  בקשת מועמדות
 
+
+// 2️⃣ מנהל דוחה בקשת מועמדות
 async function rejectCandidate(req, res) {
-    console.log("req.params", req.params)
-
   try {
-    await rejectCandidateRequestService(
-      req.params.id,
-      req.user._id,
-      req.params.requestId
+    const out = await rejectCandidateRequestService(
+      req.params.id,         // groupId
+      req.user._id,          // ownerId
+      req.params.requestId   // requestId
     );
 
     res.json({
       ok: true,
-      requestId: req.params.requestId,
-      groupId: req.params.id
+      groupId: out.groupId,
+      request: out.request,
     });
   } catch (err) {
+    console.error('❌ Error rejecting candidate request:', err);
     res.status(400).json({ message: err.message });
   }
 }
 
-
+// 2️⃣ מנהל מאשר בקשת מועמדות
 async function approveCandidate(req, res) {
   try {
-    const c = await approveCandidateRequestService(
-      req.params.id,
-      req.user._id,
-      req.params.requestId
+    const out = await approveCandidateRequestService(
+      req.params.id,         // groupId
+      req.user._id,          // ownerId
+      req.params.requestId   // requestId
     );
 
     res.json({
       ok: true,
-      candidate: c,
-      requestId: req.params.requestId,
-      groupId: req.params.id
+      groupId: out.groupId,
+      request: out.request,
+      candidate: out.candidate,
     });
   } catch (err) {
+    console.error('❌ Error approving candidate request:', err);
     res.status(400).json({ message: err.message });
   }
 }
+
 
 
 // 3️⃣ הוספה לפי מייל

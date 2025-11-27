@@ -82,8 +82,6 @@ export default function GroupDetailPage() {
 
   const joinedIdsSet = useSelector(selectMyJoinedIds);
 
-  // const [candidateRequests, setCandidateRequests] = useState([]);
-
   const { userEmail: authEmail, userId: authId } = useSelector((s) => s.auth);
   const isAuthed =
     !!authId ||
@@ -181,22 +179,6 @@ export default function GroupDetailPage() {
     };
   }, [isDragging]);
 
-  // useEffect(() => {
-  //   if (!groupId) return;
-
-  //   const fetchRequests = async () => {
-  //     try {
-  //       const res = await http.get(`/groups/${groupId}/requests`);
-  //       setCandidateRequests(res.data); // מערך בקשות הצטרפות
-  //     } catch (err) {
-  //       console.error('failed to fetch join requests', err);
-  //     }
-  //   };
-
-  //   fetchRequests();
-  // }, [groupId]);
-
-
   // ===== טיפול בשגיאות / מצבי טעינה =====
   if (groupError) {
     return (
@@ -245,7 +227,7 @@ export default function GroupDetailPage() {
     return <div className="loading-wrap">טוען נתוני קבוצה…</div>;
   }
 
-  // עכשיו בטוח להשתמש ב-group._id
+  // candidateRequests מהשרת (מגיעים ב-getGroupById)
   const candidateRequests = group.candidateRequests || [];
 
   // סוף יום ההצבעה – 23:59:59 של אותו יום
@@ -424,11 +406,11 @@ export default function GroupDetailPage() {
 
             {!loadingCandidates && candidates.length > 0 && (
               <div className="candidates-grid">
-                {sortedCandidates.map((c) => {
-                  const isWinner = winners.some((w) => w._id === c._id);
+{sortedCandidates.map((c, index) => {
+  const winnerIndex = winners.findIndex((w) => w._id === c._id);
 
                   return (
-                    <div key={c._id} className={`candidate-card ${isWinner ? 'winner' : ''}`}>
+<div key={c._id} className={`candidate-card ${winnerIndex !== -1 ? 'winner' : ''}`}>
                       {c.photoUrl && (
                         <img
                           src={c.photoUrl}
@@ -436,43 +418,35 @@ export default function GroupDetailPage() {
                           className="candidate-avatar"
                         />
                       )}
-                      <button
-  className="campaign-btn"
-  onClick={() =>
-    navigate(`/campaign/${c._id}`, {
-      state: { groupId }   // ← שולחת את מזהה הקבוצה
-    })
-  }
-  title="קמפיין שלי"
->
-  <FiStar size={20} />
-</button>
+{/* <<<<<<< HEAD */}
 
+                        {/* אם הקבוצה נגמרה והמועמד מנצח – הצג מקום */}
+      {isGroupExpired && winnerIndex !== -1 && (
+        <div className="winner-badge">
+            {winnerIndex + 1}
+        </div>
+      )}
+
+
+                      <button
+                        className="campaign-btn"
+                        onClick={() =>
+                          navigate(`/campaign/${c._id}`, {
+                            state: { groupId },
+                          })
+                        }
+                        title="קמפיין שלי"
+                      >
+                        <FiStar size={20} />
+                      </button>
 
                       <div className="candidate-text">
                         <h4>{c.name}</h4>
                         {c.description && <p>{c.description}</p>}
                       </div>
 
-                      {/* כפתור לדף קמפיין */}
-                      <button
-                        className="campaign-btn"
-                        onClick={() => navigate(`/campaign/${c._id}`)}
-                        title="קמפיין שלי"
-                      >
-                        <FiStar size={20} />
-                      </button>
+                 
 
-{/* <<<<<<< HEAD
-
-
-      {isGroupExpired && <div className="votes-count">{c.votesCount || 0} קולות</div>}
-    </div>
-  );
-})}
-
-              </div >
-======= */}
                       {isGroupExpired && (
                         <div className="votes-count">{c.votesCount || 0} קולות</div>
                       )}
@@ -480,7 +454,6 @@ export default function GroupDetailPage() {
                   );
                 })}
               </div>
-// >>>>>>> 70bc378c36c331b9f7615e0b5e57ea8ba11b06cb
             )}
 
             {!loadingCandidates && candidates.length === 0 && <p>אין מועמדים</p>}
@@ -504,7 +477,6 @@ export default function GroupDetailPage() {
             <div className="candidate-form-card">
               <CandidateApplyForm
                 groupId={group._id}
-
                 candidateRequests={candidateRequests}
               />
             </div>
@@ -593,7 +565,6 @@ export default function GroupDetailPage() {
         </div>
       </div>
 
-      {/* כפתור צ'אט צף בצד ימין למטה */}
       {/* כפתור צ'אט צף בצד ימין למטה – יוצג רק אם המשתמש מחובר */}
       {isAuthed && (
         <>

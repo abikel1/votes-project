@@ -1,8 +1,7 @@
+// server/src/models/group_model.js
 const mongoose = require('mongoose');
 
-
-
-// סכמת בקשת הצטרפות
+// סכמת בקשת הצטרפות כחבר בקבוצה
 const joinRequestSchema = new mongoose.Schema({
   userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   email: { type: String, required: true },
@@ -11,14 +10,34 @@ const joinRequestSchema = new mongoose.Schema({
   createdAt: { type: Date, default: Date.now }
 }, { _id: true });
 
+// סכמת בקשת מועמדות (למערכת ההצבעות)
+// סכמת בקשת מועמדות (למערכת ההצבעות)
+const candidateRequestSchema = new mongoose.Schema({
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  email: { type: String },
+  name: { type: String },
+  description: { type: String },
+  symbol: { type: String },     // ⬅️ חדש
+  photoUrl: { type: String },   // ⬅️ חדש
+  status: {
+    type: String,
+    enum: ['pending', 'approved', 'rejected', 'removed'],
+    default: 'pending'
+  },
+  createdAt: { type: Date, default: Date.now },
+}, { _id: true });
+
+
 const groupSchema = new mongoose.Schema({
   name: { type: String, required: true },
   description: { type: String },
   createdBy: { type: String, required: true }, // אימייל היוצר
   createdById: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   creationDate: { type: Date, default: Date.now },
+
   candidateEndDate: { type: Date, required: true },
   endDate: { type: Date, required: true },
+
   candidates: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Candidate' }],
   maxWinners: { type: Number, default: 1 },
   shareLink: { type: String },
@@ -30,16 +49,8 @@ const groupSchema = new mongoose.Schema({
   members: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
   joinRequests: [joinRequestSchema],
 
-
-
-  candidateRequests: [{
-    userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-    email: String,
-    name: String,
-    description: String,
-    status: { type: String, default: 'pending' }, // pending / approved / rejected
-  }]
-
+  // בקשות מועמדות
+  candidateRequests: [candidateRequestSchema],
 });
 
 module.exports = mongoose.model('Group', groupSchema);

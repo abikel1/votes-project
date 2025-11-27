@@ -33,18 +33,19 @@ const {
 const handleGroupDependencies = require('../middlewares/group_middleware');
 const Group = require('../models/group_model');
 
-
 // ✅ חייב להיות ממש למעלה, לפני כל "/:id" למיניהם
 router.post('/ai-description', auth, generateGroupDescription);
 
+// ---------- CRUD בסיסי לקבוצות ----------
 router.post('/create', auth, createGroup);
 router.put('/:id', auth, updateGroup);
 router.delete('/:id', auth, handleGroupDependencies, deleteGroup);
 
-// ✅ בקשות הצטרפות
-router.get('/:id/requests', auth, listJoinRequests);
-// בקשות מועמדות (GET לפי groupId)
-router.get('/:groupId/requests', auth, getCandidateRequests);
+// ✅ בקשות הצטרפות כחבר בקבוצה
+router.get('/:id/join-requests', auth, listJoinRequests);
+
+// ✅ בקשות מועמדות (מועמדים להצבעה בקבוצה)
+router.get('/:id/candidate-requests', auth, getCandidateRequests);
 
 router.get('/my', auth, getUserGroups);
 router.get('/my-join-status', auth, getMyJoinStatuses);
@@ -70,10 +71,12 @@ router.get('/slug/:slug', async (req, res) => {
 
     let group = null;
 
+    // אם slug הוא ObjectId חוקי – ננסה לפי id
     if (/^[0-9a-fA-F]{24}$/.test(slug)) {
       group = await Group.findById(slug);
     }
 
+    // אחרת – משווים לסלאג מהשם
     if (!group) {
       const all = await Group.find().lean();
       group = all.find((g) => makeSlugInner(g.name) === slug) || null;
@@ -103,8 +106,9 @@ router.get('/:id', getGroupById);
 router.get('/', getAllGroups);
 
 router.post('/:id/join', auth, requestJoinGroup);
-router.get('/:id/requests', auth, listJoinRequests);
-router.patch('/:id/requests/:reqId/approve', auth, approveJoinRequest);
-router.patch('/:id/requests/:reqId/reject', auth, rejectJoinRequest);
+
+// עדכון סטטוס בקשות הצטרפות (חברות בקבוצה)
+router.patch('/:id/join-requests/:reqId/approve', auth, approveJoinRequest);
+router.patch('/:id/join-requests/:reqId/reject', auth, rejectJoinRequest);
 
 module.exports = router;
