@@ -3,12 +3,12 @@ const campaignService = require('../services/campaign_service');
 async function getCampaign(req, res) {
   try {
     const campaign =
-     await campaignService.getCampaignByCandidate(req.params.candidateId);
-return res.json({
-  success: true,
-  campaign,
-  candidate: campaign.candidate
-});
+      await campaignService.getCampaignByCandidate(req.params.candidateId);
+    return res.json({
+      success: true,
+      campaign,
+      candidate: campaign.candidate
+    });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -35,12 +35,18 @@ async function updateCampaign(req, res) {
 // ===== פוסטים =====
 async function addPost(req, res) {
   try {
-    const campaign = await campaignService.addPostToCampaign(req.params.campaignId, req.body);
-res.json({ post: campaign.posts[campaign.posts.length - 1] });
+    const campaign = await campaignService.addPostToCampaign(
+      req.params.campaignId,
+      req.body
+    );
+
+    // ⚠️ חשוב – להחזיר את הקמפיין המלא, לא רק את הפוסט
+    res.json(campaign);
   } catch (err) {
     res.status(400).json({ message: err.message });
   }
 }
+
 
 async function updatePost(req, res) {
   try {
