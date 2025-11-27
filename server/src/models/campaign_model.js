@@ -1,4 +1,3 @@
-// src/models/campaign_model.js
 const mongoose = require('mongoose');
 
 const postSchema = new mongoose.Schema({
@@ -22,6 +21,9 @@ const campaignSchema = new mongoose.Schema({
 
   // גלריית תמונות של הקמפיין (לא קשור לפוסטים)
   gallery: [String], // ← מערך תמונות URL
+
+  // ספירת צפיות בקמפיין
+  viewCount: { type: Number, default: 0 },
 
   createdAt: { type: Date, default: Date.now }
 });

@@ -8,17 +8,14 @@ import {
   addImage,
   deleteImage,
   updateCampaign,
+  incrementView,
 } from '../../slices/campaignSlice';
 import { BiArrowBack } from 'react-icons/bi';
 import {
   FiEdit3,
-  FiSave,
-  FiX,
-  FiImage,
-  FiLink,
   FiEye,
   FiHeart,
-  FiShare2
+  FiShare2,
 } from 'react-icons/fi';
 
 import './CampaignPage.css';
@@ -48,20 +45,26 @@ export default function CampaignPage() {
   const [isEditMode, setIsEditMode] = useState(false);
   const [uploadingImage, setUploadingImage] = useState(false);
 
-  // תכונות חדשות
-  const [viewCount, setViewCount] = useState(0);
+  // לייקים / גלריה
   const [likeCount, setLikeCount] = useState(0);
   const [hasLiked, setHasLiked] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
 
-  // Load campaign
+  // טוענים קמפיין לפי candidateId
   useEffect(() => {
     if (candidateId) {
       dispatch(fetchCampaign(candidateId));
-      setViewCount(prev => prev + 1);
     }
   }, [candidateId, dispatch]);
 
+  // אחרי שהקמפיין נטען ויש לו _id – מעלים צפייה (פעם אחת למאונט הזה)
+  useEffect(() => {
+    if (campaign?._id) {
+      dispatch(incrementView(campaign._id));
+    }
+  }, [campaign?._id, dispatch]);
+
+  // מעדכנים state מקומי כשקמפיין משתנה
   useEffect(() => {
     if (campaign) {
       if (campaign.description) setEditDescription(campaign.description);
@@ -71,7 +74,8 @@ export default function CampaignPage() {
 
   // Loading / Error
   if (userLoading) return <div className="loading-wrap">טוען משתמש…</div>;
-  if (campaignLoading || !campaign) return <div className="loading-wrap">טוען קמפיין…</div>;
+  if (campaignLoading || !campaign)
+    return <div className="loading-wrap">טוען קמפיין…</div>;
   if (campaignError) return <div className="err">שגיאה: {campaignError}</div>;
 
   // Ownership logic
@@ -80,6 +84,9 @@ export default function CampaignPage() {
     currentUserId &&
     candidateUserId &&
     currentUserId.toString() === candidateUserId.toString();
+
+  // צפיות מהשרת
+  const viewCount = campaign.viewCount || 0;
 
   // Handlers
   const handleUpdateCampaign = () => {
@@ -92,6 +99,7 @@ export default function CampaignPage() {
     setIsEditingDescription(false);
     setIsEditMode(false);
   };
+
   const handleAddPost = () => {
     if (!newPost.title.trim()) return;
 
@@ -99,14 +107,12 @@ export default function CampaignPage() {
       .unwrap()
       .then(() => {
         setNewPost({ title: '', content: '' });
-        setIsEditMode(false);      // 👈 נסגר רק אחרי הצלחה
+        setIsEditMode(false);
       })
       .catch(() => {
-        // פה אפשר לשים toast לשגיאה אם תרצי
+        // אפשר להוסיף toast לשגיאה
       });
   };
-
-
 
   const handleDeletePost = (postId) => {
     dispatch(deletePost({ campaignId: campaign._id, postId }));
@@ -146,17 +152,19 @@ export default function CampaignPage() {
 
   const handleLike = () => {
     setHasLiked(!hasLiked);
-    setLikeCount(prev => hasLiked ? prev - 1 : prev + 1);
-    // כאן תוסיף קריאה לשרת לשמירת הלייק
+    setLikeCount((prev) => (hasLiked ? prev - 1 : prev + 1));
+    // כאן אפשר בהמשך להוסיף קריאה לשרת לשמירת הלייק
   };
 
   const handleShare = () => {
     if (navigator.share) {
-      navigator.share({
-        title: candidate?.name,
-        text: `בואו להכיר את ${candidate?.name}`,
-        url: window.location.href,
-      }).catch(console.error);
+      navigator
+        .share({
+          title: candidate?.name,
+          text: `בואו להכיר את ${candidate?.name}`,
+          url: window.location.href,
+        })
+        .catch(console.error);
     } else {
       navigator.clipboard.writeText(window.location.href);
       alert('הקישור הועתק ללוח!');
@@ -165,22 +173,22 @@ export default function CampaignPage() {
 
   return (
     <div className="page-wrap dashboard">
-      {/* HEADER - זהה לדף קבוצה */}
+      {/* HEADER - כמו דף קבוצה */}
       <div className="page-header">
-
-        {/* כל הכפתורים למעלה בשורה אחת */}
+        {/* כפתורים למעלה בשורה אחת */}
         <div className="header-actions">
-
           {/* חזרה לעמוד קבוצה */}
           <button
             className="icon-btn"
-            onClick={() => navigate(groupId ? `/groups/${groupId}` : '/groups')}
+            onClick={() =>
+              navigate(groupId ? `/groups/${groupId}` : '/groups')
+            }
             title="חזרה"
           >
             <BiArrowBack size={20} />
           </button>
 
-          {/* כפתור עריכה — רק לבעל המועמדות */}
+          {/* כפתור עריכה — רק לבעל/ת המועמדות */}
           {isCandidateOwner && (
             <button
               className="icon-btn"
@@ -190,12 +198,9 @@ export default function CampaignPage() {
               {isEditMode ? <FiX size={20} /> : <FiEdit3 size={20} />}
             </button>
           )}
-
-
-
         </div>
 
-        {/* התוכן המרכזי */}
+        {/* התוכן המרכזי של ההדר */}
         <div className="header-content">
           {candidate?.photoUrl && (
             <img
@@ -210,23 +215,8 @@ export default function CampaignPage() {
           {candidate?.symbol && (
             <span className="candidate-symbol">{candidate.symbol}</span>
           )}
-
-          {/* סטטיסטיקות */}
-          {/* <div className="stats-row">
-      <div className="stat-item">
-        <FiEye size={14} />
-        <span>{viewCount} צפיות</span>
-      </div>
-      <div className="stat-item">
-        <FiHeart size={14} />
-        <span>{likeCount} לייקים</span>
-      </div>
-    </div> */}
         </div>
-
       </div>
-
-
 
       <div className="main-content-resizable">
         {/* LEFT: POSTS */}
@@ -274,9 +264,7 @@ export default function CampaignPage() {
                   </div>
                 ))
               ) : (
-                <div className="empty-state">
-                  אין פוסטים בקמפיין
-                </div>
+                <div className="empty-state">אין פוסטים בקמפיין</div>
               )}
             </div>
           </div>
@@ -299,7 +287,13 @@ export default function CampaignPage() {
                   onChange={(e) => setEditDescription(e.target.value)}
                   placeholder="הוסף תיאור לקמפיין"
                 />
-                <div style={{ display: 'flex', gap: '8px', marginTop: '10px' }}>
+                <div
+                  style={{
+                    display: 'flex',
+                    gap: '8px',
+                    marginTop: '10px',
+                  }}
+                >
                   <button className="vote-btn" onClick={handleUpdateCampaign}>
                     שמור
                   </button>
@@ -328,38 +322,37 @@ export default function CampaignPage() {
               </div>
             )}
           </div>
+
           {/* כרטיסי סטטיסטיקות */}
           <div className="stats-cards">
-
             <div className="stat-box">
               <FiEye size={20} />
               <span>{viewCount} צפיות</span>
             </div>
 
-          <div className="stat-box clickable" onClick={handleLike}>
-  <FiHeart 
-    size={22} 
-    color={hasLiked ? 'red' : 'inherit'} 
-  />
-  <span>{likeCount} אהבו</span>
-</div>
-
-
+            <div className="stat-box clickable" onClick={handleLike}>
+              <FiHeart size={22} color={hasLiked ? 'red' : 'inherit'} />
+              <span>{likeCount} אהבו</span>
+            </div>
 
             <div className="stat-box clickable" onClick={handleShare}>
               <FiShare2 size={20} />
               <span>שתף</span>
             </div>
-
           </div>
-
 
           <h3 className="section-title">גלריית תמונות</h3>
 
           {isCandidateOwner && isEditMode && (
             <div className="info-card">
               {/* הוספת תמונה מקישור */}
-              <div style={{ display: 'flex', gap: '8px', marginBottom: '10px' }}>
+              <div
+                style={{
+                  display: 'flex',
+                  gap: '8px',
+                  marginBottom: '10px',
+                }}
+              >
                 <input
                   type="text"
                   placeholder="קישור לתמונה"
@@ -385,9 +378,7 @@ export default function CampaignPage() {
                   onChange={handleUploadGalleryFile}
                   disabled={uploadingImage}
                 />
-                {uploadingImage && (
-                  <div className="loading-spinner" />
-                )}
+                {uploadingImage && <div className="loading-spinner" />}
               </div>
             </div>
           )}
@@ -415,9 +406,7 @@ export default function CampaignPage() {
                   </div>
                 ))
               ) : (
-                <div className="empty-state">
-                  אין תמונות בגלריה
-                </div>
+                <div className="empty-state">אין תמונות בגלריה</div>
               )}
             </div>
           </div>
@@ -426,7 +415,10 @@ export default function CampaignPage() {
 
       {/* Lightbox לתמונות */}
       {selectedImage && (
-        <div className="lightbox-overlay" onClick={() => setSelectedImage(null)}>
+        <div
+          className="lightbox-overlay"
+          onClick={() => setSelectedImage(null)}
+        >
           <img
             src={selectedImage}
             alt="תמונה מוגדלת"

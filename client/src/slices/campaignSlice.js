@@ -21,7 +21,10 @@ export const createCampaign = createAsyncThunk(
   'campaign/createCampaign',
   async ({ candidateId, payload }, thunkAPI) => {
     try {
-      const { data } = await http.post(`/campaigns/candidate/${candidateId}`, payload);
+      const { data } = await http.post(
+        `/campaigns/candidate/${candidateId}`,
+        payload
+      );
       return data;
     } catch (err) {
       return thunkAPI.rejectWithValue(err.response?.data?.message || 'שגיאה');
@@ -29,7 +32,7 @@ export const createCampaign = createAsyncThunk(
   }
 );
 
-// עדכון קמפיין
+// עדכון קמפיין (תיאור וכו')
 export const updateCampaign = createAsyncThunk(
   'campaign/updateCampaign',
   async ({ campaignId, payload }, thunkAPI) => {
@@ -49,7 +52,11 @@ export const addPost = createAsyncThunk(
   'campaign/addPost',
   async ({ campaignId, post }, thunkAPI) => {
     try {
-      const { data } = await http.put(`/campaigns/${campaignId}/posts`, post);
+      const { data } = await http.put(
+        `/campaigns/${campaignId}/posts`,
+        post
+      );
+      // השרת מחזיר את הקמפיין המלא
       return data;
     } catch (err) {
       return thunkAPI.rejectWithValue(err.response?.data?.message || 'שגיאה');
@@ -62,7 +69,11 @@ export const updatePost = createAsyncThunk(
   'campaign/updatePost',
   async ({ campaignId, postId, post }, thunkAPI) => {
     try {
-      const { data } = await http.put(`/campaigns/${campaignId}/posts/${postId}`, post);
+      const { data } = await http.put(
+        `/campaigns/${campaignId}/posts/${postId}`,
+        post
+      );
+      // השרת מחזיר את הקמפיין המלא
       return data;
     } catch (err) {
       return thunkAPI.rejectWithValue(err.response?.data?.message || 'שגיאה');
@@ -75,7 +86,10 @@ export const deletePost = createAsyncThunk(
   'campaign/deletePost',
   async ({ campaignId, postId }, thunkAPI) => {
     try {
-      const { data } = await http.delete(`/campaigns/${campaignId}/posts/${postId}`);
+      const { data } = await http.delete(
+        `/campaigns/${campaignId}/posts/${postId}`
+      );
+      // השרת מחזיר את הקמפיין המלא
       return data;
     } catch (err) {
       return thunkAPI.rejectWithValue(err.response?.data?.message || 'שגיאה');
@@ -90,7 +104,10 @@ export const addImage = createAsyncThunk(
   'campaign/addImage',
   async ({ campaignId, imageUrl }, thunkAPI) => {
     try {
-      const { data } = await http.put(`/campaigns/${campaignId}/gallery`, { imageUrl });
+      const { data } = await http.put(`/campaigns/${campaignId}/gallery`, {
+        imageUrl,
+      });
+      // השרת מחזיר את הקמפיין המלא
       return data;
     } catch (err) {
       return thunkAPI.rejectWithValue(err.response?.data?.message || 'שגיאה');
@@ -103,7 +120,26 @@ export const deleteImage = createAsyncThunk(
   'campaign/deleteImage',
   async ({ campaignId, imageUrl }, thunkAPI) => {
     try {
-      const { data } = await http.delete(`/campaigns/${campaignId}/gallery`, { data: { imageUrl } });
+      const { data } = await http.delete(`/campaigns/${campaignId}/gallery`, {
+        data: { imageUrl },
+      });
+      // השרת מחזיר את הקמפיין המלא
+      return data;
+    } catch (err) {
+      return thunkAPI.rejectWithValue(err.response?.data?.message || 'שגיאה');
+    }
+  }
+);
+
+// ===== צפיות =====
+
+// הגדלת viewCount בקמפיין
+export const incrementView = createAsyncThunk(
+  'campaign/incrementView',
+  async (campaignId, thunkAPI) => {
+    try {
+      const { data } = await http.post(`/campaigns/${campaignId}/view`);
+      // השרת מחזיר את הקמפיין המלא עם viewCount מעודכן
       return data;
     } catch (err) {
       return thunkAPI.rejectWithValue(err.response?.data?.message || 'שגיאה');
@@ -116,7 +152,8 @@ const campaignSlice = createSlice({
   name: 'campaign',
   initialState: {
     loading: false,
-    data: null,
+    data: null,       // הקמפיין
+    candidate: null,  // המועמד של הקמפיין
     error: null,
   },
   reducers: {},
@@ -129,69 +166,49 @@ const campaignSlice = createSlice({
       })
       .addCase(fetchCampaign.fulfilled, (state, action) => {
         state.loading = false;
-        state.data = action.payload.campaign;   // ← זה הקמפיין עצמו
-        state.candidate = action.payload.candidate; // ← המועמד
+        state.data = action.payload.campaign;      // הקמפיין עצמו
+        state.candidate = action.payload.candidate; // המועמד
       })
-
       .addCase(fetchCampaign.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })
 
-      // Update description
+      // Update description (או עדכון כללי של קמפיין)
       .addCase(updateCampaign.fulfilled, (state, action) => {
-        state.data = action.payload; // ← כולל הפוסט המעודכן
+        state.data = action.payload;
       })
 
       // Posts
       .addCase(addPost.fulfilled, (state, action) => {
-        const payload = action.payload;
-
-        // 1) אם השרת מחזיר את כל הקמפיין (עם posts)
-        if (payload && Array.isArray(payload.posts)) {
-          state.data = {
-            ...(state.data || {}),
-            ...payload,
-          };
-          return;
-        }
-
-        // 2) אם השרת מחזיר רק { post: {...} }
-        if (payload && payload.post) {
-          if (!state.data) return;
-          if (!Array.isArray(state.data.posts)) {
-            state.data.posts = [];
-          }
-          state.data.posts.push(payload.post);
-        }
+        state.data = action.payload;
       })
-
       .addCase(updatePost.fulfilled, (state, action) => {
-        const updatedPost = action.payload;
-        state.data = action.payload; // ← כולל הפוסט המעודכן
-
+        state.data = action.payload;
       })
       .addCase(deletePost.fulfilled, (state, action) => {
-        const postId = action.meta.arg.postId;
-        state.data = action.payload; // ← כולל הפוסט המעודכן
+        state.data = action.payload;
       })
 
       // Gallery
       .addCase(addImage.fulfilled, (state, action) => {
-        state.data = action.payload; // ← כולל הפוסט המעודכן
+        state.data = action.payload;
       })
       .addCase(deleteImage.fulfilled, (state, action) => {
-        const imageUrl = action.meta.arg.imageUrl;
-        state.data = action.payload; // ← כולל הפוסט המעודכן
+        state.data = action.payload;
+      })
+
+      // Views
+      .addCase(incrementView.fulfilled, (state, action) => {
+        state.data = action.payload; // viewCount מעודכן מגיע מהשרת
       });
   },
-
 });
 
 export default campaignSlice.reducer;
 
+// Selectors
 export const selectCampaign = (state) => state.campaign.data || null;
 export const selectCandidate = (state) => state.campaign.candidate || null;
-
 export const selectCampaignLoading = (state) => state.campaign.loading;
 export const selectCampaignError = (state) => state.campaign.error;
