@@ -835,25 +835,26 @@ const onAddCandidate = (e) => {
             />
           )}
 
-          {activeTab === 'join' && group.isLocked && (
-            <JoinRequestsTab
-              groupId={groupId}
-              reqs={reqs}
-              reqsLoading={reqsLoading}
-              reqsError={reqsError}
-              onApprove={handleApproveJoin}
-              onReject={handleRejectJoin}
-            />
+          {activeTab === 'members' && group.isLocked && (
+            <>
+              <MembersTab
+                group={group}
+                enrichedMembers={enrichedMembers}
+                isOwner={isOwnerOrAdmin}
+                onRemoveMember={handleRemoveMember}
+              />
+
+              <JoinRequestsTab
+                groupId={groupId}
+                reqs={reqs}
+                reqsLoading={reqsLoading}
+                reqsError={reqsError}
+                onApprove={handleApproveJoin}
+                onReject={handleRejectJoin}
+              />
+            </>
           )}
 
-          {activeTab === 'members' && group.isLocked && (
-            <MembersTab
-              group={group}
-              enrichedMembers={enrichedMembers}
-              isOwner={isOwnerOrAdmin}
-              onRemoveMember={handleRemoveMember}
-            />
-          )}
 
           {activeTab === 'danger' && (
             <DangerTab
@@ -893,46 +894,16 @@ const onAddCandidate = (e) => {
           </button>
 
           {group.isLocked && (
-            <>
-              <button
-                className={`side-tab ${activeTab === 'join' ? 'active' : ''}`}
-                onClick={() => setActiveTab('join')}
-              >
-                <FaUserPlus style={{ marginInlineEnd: 6 }} />
-                בקשות הצטרפות
-              </button>
-
-              {/* <<<<<<< HEAD
-              <button
-                className={`side-tab ${
-                  activeTab === 'members' ? 'active' : ''
-                }`}
-                onClick={() => setActiveTab('members')}
-              >
-                משתתפי הקבוצה
-              </button>
-            </>
+            <button
+              className={`side-tab ${activeTab === 'members' ? 'active' : ''}`}
+              onClick={() => setActiveTab('members')}
+            >
+              <FaUsers style={{ marginInlineEnd: 6 }} />
+              משתתפי הקבוצה  
+            </button>
           )}
 
-          <button
-            className={`side-tab danger ${
-              activeTab === 'danger' ? 'active' : ''
-            }`}
-            onClick={() => setActiveTab('danger')}
-          >
-            מחיקה
-          </button>
-        </aside>
-======= */}
-              <button
-                className={`side-tab ${activeTab === 'members' ? 'active' : ''}`}
-                onClick={() => setActiveTab('members')}
-              >
-                <FaUsers style={{ marginInlineEnd: 6 }} />
-                משתתפי הקבוצה
-              </button>
-            </>
-          )}
+
 
           <button
             className={`side-tab danger ${activeTab === 'danger' ? 'active' : ''}`}
@@ -942,7 +913,6 @@ const onAddCandidate = (e) => {
             מחיקה
           </button>
         </aside>
-        {/* >>>>>>> fd09d35ac375e1d72d983305dcc67a256b38f216 */}
       </div>
 
       {/* מודאל מחיקת קבוצה */}
