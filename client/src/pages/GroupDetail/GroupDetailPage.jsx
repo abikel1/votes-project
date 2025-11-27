@@ -82,7 +82,7 @@ export default function GroupDetailPage() {
 
   const joinedIdsSet = useSelector(selectMyJoinedIds);
 
-  const { userEmail: authEmail, userId: authId } = useSelector((s) => s.auth);
+  const { userEmail: authEmail, userId: authId, isAdmin } = useSelector((s) => s.auth);
   const isAuthed =
     !!authId ||
     !!authEmail ||
@@ -117,9 +117,11 @@ export default function GroupDetailPage() {
   const createdById = String(group?.createdById ?? '');
 
   const isOwner =
+    isAdmin || // 👑 אדמין נחשב כמו בעל/ת הקבוצה
     !!group?.isOwner ||
     (!!myEmail && !!createdByEmail && myEmail === createdByEmail) ||
     (!!myId && !!createdById && myId === createdById);
+
 
   const isMember =
     !!joinedIdsSet &&
@@ -406,11 +408,11 @@ export default function GroupDetailPage() {
 
             {!loadingCandidates && candidates.length > 0 && (
               <div className="candidates-grid">
-{sortedCandidates.map((c, index) => {
-  const winnerIndex = winners.findIndex((w) => w._id === c._id);
+                {sortedCandidates.map((c, index) => {
+                  const winnerIndex = winners.findIndex((w) => w._id === c._id);
 
                   return (
-<div key={c._id} className={`candidate-card ${winnerIndex !== -1 ? 'winner' : ''}`}>
+                    <div key={c._id} className={`candidate-card ${winnerIndex !== -1 ? 'winner' : ''}`}>
                       {c.photoUrl && (
                         <img
                           src={c.photoUrl}
@@ -418,14 +420,14 @@ export default function GroupDetailPage() {
                           className="candidate-avatar"
                         />
                       )}
-{/* <<<<<<< HEAD */}
+                      {/* <<<<<<< HEAD */}
 
-                        {/* אם הקבוצה נגמרה והמועמד מנצח – הצג מקום */}
-      {isGroupExpired && winnerIndex !== -1 && (
-        <div className="winner-badge">
-            {winnerIndex + 1}
-        </div>
-      )}
+                      {/* אם הקבוצה נגמרה והמועמד מנצח – הצג מקום */}
+                      {isGroupExpired && winnerIndex !== -1 && (
+                        <div className="winner-badge">
+                          {winnerIndex + 1}
+                        </div>
+                      )}
 
 
                       <button
@@ -445,7 +447,7 @@ export default function GroupDetailPage() {
                         {c.description && <p>{c.description}</p>}
                       </div>
 
-                 
+
 
                       {isGroupExpired && (
                         <div className="votes-count">{c.votesCount || 0} קולות</div>
