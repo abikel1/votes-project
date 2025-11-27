@@ -9,8 +9,22 @@ const {
 
 async function createVote(req, res) {
   try {
-    const voteData = req.body; // { userId, groupId, candidateId }
-    const vote = await createVoteService(voteData);
+    const { groupId, candidateId, userId: bodyUserId } = req.body || {};
+    const isAdmin = req.user && req.user.isAdmin;
+
+    // 👇 האדמין נחשב כאילו הוא "חבר בהכל"
+    const finalUserId =
+      // אם אדמין – קודם ננסה לקחת מה־req.user, ואם אין אז מה־body
+      isAdmin
+        ? (req.user && req.user._id) || bodyUserId
+        // אם לא אדמין – קודם מה־body, ואם אין אז מה־req.user
+        : bodyUserId || (req.user && req.user._id);
+
+    if (!finalUserId) {
+      return res.status(401).json({ message: 'Unauthorized: missing userId' });
+    }
+
+    const vote = await createVoteService({ userId: finalUserId, groupId, candidateId });
     return res.status(201).json(vote);
   } catch (err) {
     const msg = String(err.message || '');
@@ -25,7 +39,6 @@ async function createVote(req, res) {
     return res.status(500).json({ message: 'Error creating vote' });
   }
 }
-
 async function deleteVote(req, res) {
   try {
     const { userId, groupId } = req.body;

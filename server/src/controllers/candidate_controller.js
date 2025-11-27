@@ -10,9 +10,9 @@ const {
 const {
   applyCandidateService,
   approveCandidateRequestService,
-  rejectCandidateRequestService ,
+  rejectCandidateRequestService,
   addCandidateByEmailService,
-  
+
 } = require('../services/group_service');
 
 const Campaign = require('../models/campaign_model');
@@ -113,9 +113,11 @@ async function applyCandidate(req, res) {
 // 2️⃣ מנהל דוחה בקשת מועמדות
 async function rejectCandidate(req, res) {
   try {
+    const ownerId = req.user.isAdmin ? 'ADMIN' : req.user._id;   // 👈 הוספה
+
     const out = await rejectCandidateRequestService(
       req.params.id,         // groupId
-      req.user._id,          // ownerId
+      ownerId,               // ownerId
       req.params.requestId   // requestId
     );
 
@@ -133,9 +135,11 @@ async function rejectCandidate(req, res) {
 // 2️⃣ מנהל מאשר בקשת מועמדות
 async function approveCandidate(req, res) {
   try {
+    const ownerId = req.user.isAdmin ? 'ADMIN' : req.user._id;   // 👈 הוספה
+
     const out = await approveCandidateRequestService(
       req.params.id,         // groupId
-      req.user._id,          // ownerId
+      ownerId,               // ownerId
       req.params.requestId   // requestId
     );
 
@@ -156,9 +160,11 @@ async function approveCandidate(req, res) {
 // 3️⃣ הוספה לפי מייל
 async function addCandidateByEmail(req, res) {
   try {
+    const ownerId = req.user.isAdmin ? 'ADMIN' : req.user._id;   // 👈 הוספה
+
     const c = await addCandidateByEmailService(
       req.params.id,
-      req.user._id,
+      ownerId,
       req.body.email,
       req.body
     );
@@ -176,7 +182,7 @@ module.exports = {
   getCandidateById,
   getCandidatesByGroup,
   incrementVotes,
-    applyCandidate,
+  applyCandidate,
   approveCandidate,
   rejectCandidate,
   addCandidateByEmail,

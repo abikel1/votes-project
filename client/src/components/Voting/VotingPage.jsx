@@ -41,9 +41,10 @@ export default function VotingDragPage() {
   const navigate = useNavigate();
 
   // נתוני משתמש
-  const { userId, userEmail, firstName, lastName } = useSelector(
+  const { userId, userEmail, firstName, lastName, isAdmin } = useSelector(
     (s) => s.auth,
   );
+
 
   // קבוצות שאני חברה בהן
   const joinedIdsSet = useSelector(selectMyJoinedIds);
@@ -272,9 +273,11 @@ export default function VotingDragPage() {
   const createdById = String(group.createdById ?? '');
 
   const isOwner =
+    isAdmin ||                                         // 👑 אדמין נחשב כמו בעל הקבוצה
     !!group.isOwner ||
     (!!myEmail && !!createdByEmail && myEmail === createdByEmail) ||
     (!!myId && !!createdById && myId === createdById);
+
 
   // קבוצה נעולה + לא חברה בקבוצה + לא מנהלת → חסימה
   if (group.isLocked && !isMember && !isOwner) {
@@ -387,9 +390,8 @@ export default function VotingDragPage() {
 
         <div className="vd-voting-area">
           <div
-            className={`vd-envelope ${
-              slipInEnvelope ? 'vd-envelope-full' : ''
-            } ${hasVoted ? 'vd-envelope-voted' : ''}`}
+            className={`vd-envelope ${slipInEnvelope ? 'vd-envelope-full' : ''
+              } ${hasVoted ? 'vd-envelope-voted' : ''}`}
             onDragOver={handleEnvelopeDragOver}
             onDrop={handleEnvelopeDrop}
             draggable={Boolean(slipInEnvelope && !hasVoted)}
@@ -415,9 +417,8 @@ export default function VotingDragPage() {
           <div className="vd-arrow">↓</div>
 
           <div
-            className={`vd-ballot ${
-              hasVoted ? 'vd-ballot-voted' : ''
-            }`}
+            className={`vd-ballot ${hasVoted ? 'vd-ballot-voted' : ''
+              }`}
             onDragOver={handleBallotDragOver}
             onDrop={handleBallotDrop}
           >
