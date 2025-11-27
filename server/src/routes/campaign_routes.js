@@ -8,7 +8,8 @@ const {
   updatePost,
   deletePost,
   addImage,
-  deleteImage
+  deleteImage,
+  incrementView,
 } = require('../controllers/campaign_controller');
 
 // קמפיין של מועמד
@@ -28,5 +29,8 @@ router.delete('/:campaignId/posts/:postId', deletePost);
 // ===== גלריית תמונות =====
 router.put('/:campaignId/gallery', addImage);
 router.delete('/:campaignId/gallery', deleteImage);
+
+// ===== צפיות =====
+router.post('/:campaignId/view', incrementView);
 
 module.exports = router;

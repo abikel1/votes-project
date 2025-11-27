@@ -46,12 +46,13 @@ export default function EditCandidateModal({
             value={editCandForm.description}
             onChange={onEditCandChange}
             disabled={disabled}
+            required
           />
           {editCandErrors.description && (
             <div className="err small-err">{editCandErrors.description}</div>
           )}
 
-          <label>סמל (אופציונלי)</label>
+          <label>סמל</label>
           <input
             className="input"
             name="symbol"
@@ -59,6 +60,7 @@ export default function EditCandidateModal({
             onChange={onEditCandChange}
             placeholder="למשל: א׳"
             disabled={disabled}
+            required
           />
           {editCandErrors.symbol && (
             <div className="err small-err">{editCandErrors.symbol}</div>

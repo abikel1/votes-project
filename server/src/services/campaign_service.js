@@ -10,7 +10,8 @@ async function getCampaignByCandidate(candidateId) {
       candidate: candidateId,
       description: "",
       posts: [],
-      gallery: []
+      gallery: [],
+      viewCount: 0,
     });
 
     campaign = await Campaign.findById(newCampaign._id)
@@ -62,24 +63,23 @@ async function updatePost(campaignId, postId, postData) {
 }
 
 async function deletePost(campaignId, postId) {
-console.log("DELETE POST");
-console.log("campaignId:", campaignId);
-console.log("postId:", postId);
+  console.log("DELETE POST");
+  console.log("campaignId:", campaignId);
+  console.log("postId:", postId);
 
-const campaign = await Campaign.findById(campaignId);
+  const campaign = await Campaign.findById(campaignId);
 
-console.log("Found campaign:", !!campaign);
-console.log("Posts IDs:", campaign?.posts.map(p => p._id.toString()));
+  console.log("Found campaign:", !!campaign);
+  console.log("Posts IDs:", campaign?.posts.map(p => p._id.toString()));
   if (!campaign) throw new Error("קמפיין לא נמצא");
 
   console.log("Posts in campaign:", campaign.posts.map(p => p._id.toString()));
   const post = campaign.posts.id(postId);
   if (!post) throw new Error("פוסט לא נמצא בקמפיין");
 
- campaign.posts = campaign.posts.filter(p => p._id.toString() !== postId);
-await campaign.save();
-return campaign;
-
+  campaign.posts = campaign.posts.filter(p => p._id.toString() !== postId);
+  await campaign.save();
+  return campaign;
 }
 
 // ===== גלריית תמונות =====
@@ -101,6 +101,19 @@ async function deleteImageFromGallery(campaignId, imageUrl) {
   return campaign;
 }
 
+// ===== צפיות =====
+async function incrementViewCount(campaignId) {
+  const campaign = await Campaign.findByIdAndUpdate(
+    campaignId,
+    { $inc: { viewCount: 1 } },
+    { new: true }
+  ).populate('candidate');
+
+  if (!campaign) throw new Error('קמפיין לא נמצא');
+
+  return campaign;
+}
+
 module.exports = {
   getCampaignByCandidate,
   createCampaign,
@@ -109,5 +122,6 @@ module.exports = {
   updatePost,
   deletePost,
   addImageToGallery,
-  deleteImageFromGallery
+  deleteImageFromGallery,
+  incrementViewCount,
 };

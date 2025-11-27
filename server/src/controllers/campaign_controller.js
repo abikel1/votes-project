@@ -40,7 +40,7 @@ async function addPost(req, res) {
       req.body
     );
 
-    // ⚠️ חשוב – להחזיר את הקמפיין המלא, לא רק את הפוסט
+    // ⚠️ מחזירים את הקמפיין המלא
     res.json(campaign);
   } catch (err) {
     res.status(400).json({ message: err.message });
@@ -58,8 +58,12 @@ async function updatePost(req, res) {
 }
 
 async function deletePost(req, res) {
-  const campaign = await campaignService.deletePost(req.params.campaignId, req.params.postId);
-  res.json(campaign); // ← מחזירים את הקמפיין המעודכן
+  try {
+    const campaign = await campaignService.deletePost(req.params.campaignId, req.params.postId);
+    res.json(campaign);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
 }
 
 // ===== גלריית תמונות =====
@@ -81,6 +85,16 @@ async function deleteImage(req, res) {
   }
 }
 
+// ===== צפיות =====
+async function incrementView(req, res) {
+  try {
+    const campaign = await campaignService.incrementViewCount(req.params.campaignId);
+    res.json(campaign);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+}
+
 module.exports = {
   getCampaign,
   createCampaign,
@@ -89,5 +103,6 @@ module.exports = {
   updatePost,
   deletePost,
   addImage,
-  deleteImage
+  deleteImage,
+  incrementView,
 };
