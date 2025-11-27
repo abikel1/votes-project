@@ -6,10 +6,10 @@ import { HiClock, HiUserGroup, HiUser, HiOutlineBadgeCheck } from 'react-icons/h
 import toast from 'react-hot-toast';
 import { FiSettings, FiMessageSquare, FiX, FiStar } from 'react-icons/fi';
 import { BiArrowBack } from 'react-icons/bi';
+import { FiZap } from "react-icons/fi";
 
 import CountdownTimer from '../../components/CountdownTimer/CountdownTimer';
 import GroupChat from '../../components/GroupChat/GroupChat';
-import { FiLightbulb } from 'react-icons/fi';
 
 import {
   fetchMyGroups,
@@ -438,7 +438,7 @@ export default function GroupDetailPage() {
     }
     title="קמפיין שלי"
   >
-    <FiLightbulb size={24} />
+    <FiZap size={16} />
   </button>
 )}
 
