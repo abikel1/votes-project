@@ -7,16 +7,14 @@ import App from './App.jsx';
 import './index.css';
 import './i18n';
 import DirectionWrapper from './DirectionWrapper.jsx';
-import './components/Footer/Footer.css'
+import './components/Footer/Footer.css';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
-  <React.StrictMode>
-    <Provider store={store}>
-      <BrowserRouter>
-        <DirectionWrapper>
-          <App />
-        </DirectionWrapper>
-      </BrowserRouter>
-    </Provider>
-  </React.StrictMode>
+  <Provider store={store}>
+    <BrowserRouter>
+      <DirectionWrapper>
+        <App />
+      </DirectionWrapper>
+    </BrowserRouter>
+  </Provider>
 );

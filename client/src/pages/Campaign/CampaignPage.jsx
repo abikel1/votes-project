@@ -1,5 +1,5 @@
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   fetchCampaign,
@@ -9,17 +9,20 @@ import {
   deleteImage,
   updateCampaign,
   incrementView,
+  selectCampaign,
+  selectCandidate,
 } from '../../slices/campaignSlice';
+
 import { BiArrowBack } from 'react-icons/bi';
 import {
   FiEdit3,
   FiEye,
   FiHeart,
   FiShare2,
+  FiX,          // 👈 הוספנו את FiX
 } from 'react-icons/fi';
 
 import './CampaignPage.css';
-import { selectCampaign, selectCandidate } from '../../slices/campaignSlice';
 import { uploadImage } from '../../components/GroupSettings/uploadImage';
 
 export default function CampaignPage() {
@@ -45,21 +48,26 @@ export default function CampaignPage() {
   const [isEditMode, setIsEditMode] = useState(false);
   const [uploadingImage, setUploadingImage] = useState(false);
 
-  // לייקים / גלריה
   const [likeCount, setLikeCount] = useState(0);
   const [hasLiked, setHasLiked] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
+
+  // כדי לא להעלות צפייה פעמיים ב-StrictMode
+  const hasIncrementedViewRef = useRef(false);
 
   // טוענים קמפיין לפי candidateId
   useEffect(() => {
     if (candidateId) {
       dispatch(fetchCampaign(candidateId));
+      // כשנכנסים לקמפיין חדש – מאפסים את הדגל
+      hasIncrementedViewRef.current = false;
     }
   }, [candidateId, dispatch]);
 
-  // אחרי שהקמפיין נטען ויש לו _id – מעלים צפייה (פעם אחת למאונט הזה)
+  // אחרי שהקמפיין נטען ויש לו _id – מעלים צפייה פעם אחת למאונט הזה
   useEffect(() => {
-    if (campaign?._id) {
+    if (campaign?._id && !hasIncrementedViewRef.current) {
+      hasIncrementedViewRef.current = true;
       dispatch(incrementView(campaign._id));
     }
   }, [campaign?._id, dispatch]);
@@ -109,9 +117,7 @@ export default function CampaignPage() {
         setNewPost({ title: '', content: '' });
         setIsEditMode(false);
       })
-      .catch(() => {
-        // אפשר להוסיף toast לשגיאה
-      });
+      .catch(() => { });
   };
 
   const handleDeletePost = (postId) => {
@@ -153,7 +159,6 @@ export default function CampaignPage() {
   const handleLike = () => {
     setHasLiked(!hasLiked);
     setLikeCount((prev) => (hasLiked ? prev - 1 : prev + 1));
-    // כאן אפשר בהמשך להוסיף קריאה לשרת לשמירת הלייק
   };
 
   const handleShare = () => {
@@ -173,11 +178,9 @@ export default function CampaignPage() {
 
   return (
     <div className="page-wrap dashboard">
-      {/* HEADER - כמו דף קבוצה */}
+      {/* HEADER */}
       <div className="page-header">
-        {/* כפתורים למעלה בשורה אחת */}
         <div className="header-actions">
-          {/* חזרה לעמוד קבוצה */}
           <button
             className="icon-btn"
             onClick={() =>
@@ -188,7 +191,6 @@ export default function CampaignPage() {
             <BiArrowBack size={20} />
           </button>
 
-          {/* כפתור עריכה — רק לבעל/ת המועמדות */}
           {isCandidateOwner && (
             <button
               className="icon-btn"
@@ -200,7 +202,6 @@ export default function CampaignPage() {
           )}
         </div>
 
-        {/* התוכן המרכזי של ההדר */}
         <div className="header-content">
           {candidate?.photoUrl && (
             <img
@@ -323,7 +324,7 @@ export default function CampaignPage() {
             )}
           </div>
 
-          {/* כרטיסי סטטיסטיקות */}
+          {/* סטטיסטיקות */}
           <div className="stats-cards">
             <div className="stat-box">
               <FiEye size={20} />
@@ -345,7 +346,6 @@ export default function CampaignPage() {
 
           {isCandidateOwner && isEditMode && (
             <div className="info-card">
-              {/* הוספת תמונה מקישור */}
               <div
                 style={{
                   display: 'flex',
@@ -369,7 +369,6 @@ export default function CampaignPage() {
                 </button>
               </div>
 
-              {/* העלאה מהמחשב */}
               <div className="upload-row">
                 <span className="muted">או העלאה מהמחשב:</span>
                 <input
