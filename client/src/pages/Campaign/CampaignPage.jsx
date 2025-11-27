@@ -10,11 +10,21 @@ import {
   updateCampaign,
 } from '../../slices/campaignSlice';
 import { BiArrowBack } from 'react-icons/bi';
+import {
+  FiEdit3,
+  FiSave,
+  FiX,
+  FiImage,
+  FiLink,
+  FiEye,
+  FiHeart,
+  FiShare2
+} from 'react-icons/fi';
 
-import '../Campaign/CampaignPage.css';
-import '../GroupDetail/GroupDetailPage.css';
+import './CampaignPage.css';
 import { selectCampaign, selectCandidate } from '../../slices/campaignSlice';
 import { uploadImage } from '../../components/GroupSettings/uploadImage';
+
 export default function CampaignPage() {
   const { candidateId } = useParams();
   const dispatch = useDispatch();
@@ -22,58 +32,56 @@ export default function CampaignPage() {
   const location = useLocation();
   const groupId = location.state?.groupId || null;
 
-  // --- Redux state ---
-  const campaign = useSelector(selectCampaign); // הקמפיין עצמו
-  const candidate = useSelector(selectCandidate); // המועמד
-
+  // Redux state
+  const campaign = useSelector(selectCampaign);
+  const candidate = useSelector(selectCandidate);
   const campaignLoading = useSelector((state) => state.campaign.loading);
   const campaignError = useSelector((state) => state.campaign.error);
   const currentUserId = useSelector((state) => state.auth.userId);
   const userLoading = useSelector((state) => state.auth.loading);
 
-  // --- Local state ---
+  // Local state
   const [newPost, setNewPost] = useState({ title: '', content: '' });
   const [newImageUrl, setNewImageUrl] = useState('');
   const [editDescription, setEditDescription] = useState('');
   const [isEditingDescription, setIsEditingDescription] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
+  const [uploadingImage, setUploadingImage] = useState(false);
 
-  const [uploadingImage, setUploadingImage] = useState(false); // 🌟 חדש
+  // תכונות חדשות
+  const [viewCount, setViewCount] = useState(0);
+  const [likeCount, setLikeCount] = useState(0);
+  const [hasLiked, setHasLiked] = useState(false);
+  const [selectedImage, setSelectedImage] = useState(null);
 
-  //---------------------------------------------------------------------
-  // 1) Load campaign
-  //---------------------------------------------------------------------
+  // Load campaign
   useEffect(() => {
     if (candidateId) {
       dispatch(fetchCampaign(candidateId));
+      setViewCount(prev => prev + 1);
     }
   }, [candidateId, dispatch]);
 
   useEffect(() => {
     if (campaign) {
       if (campaign.description) setEditDescription(campaign.description);
+      if (campaign.likeCount) setLikeCount(campaign.likeCount);
     }
   }, [campaign]);
 
-  //---------------------------------------------------------------------
-  // 2) Loading / Error
-  //---------------------------------------------------------------------
-  if (userLoading) return <div>טוען משתמש…</div>;
-  if (campaignLoading || !campaign) return <div>טוען קמפיין…</div>;
+  // Loading / Error
+  if (userLoading) return <div className="loading-wrap">טוען משתמש…</div>;
+  if (campaignLoading || !campaign) return <div className="loading-wrap">טוען קמפיין…</div>;
   if (campaignError) return <div className="err">שגיאה: {campaignError}</div>;
 
-  //---------------------------------------------------------------------
-  // 3) Ownership logic
-  //---------------------------------------------------------------------
+  // Ownership logic
   const candidateUserId = candidate?.userId;
   const isCandidateOwner =
     currentUserId &&
     candidateUserId &&
     currentUserId.toString() === candidateUserId.toString();
 
-  //---------------------------------------------------------------------
-  // 4) Handlers
-  //---------------------------------------------------------------------
+  // Handlers
   const handleUpdateCampaign = () => {
     dispatch(
       updateCampaign({
@@ -96,17 +104,14 @@ export default function CampaignPage() {
     setIsEditMode(false);
   };
 
-  // 🌟 העלאת תמונה מהמחשב לגלריית הקמפיין בעזרת uploadImage המשותפת
   const handleUploadGalleryFile = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
     try {
       setUploadingImage(true);
-
-      const url = await uploadImage(file); // אין צורך ב-oldUrl בקמפיין
+      const url = await uploadImage(file);
       if (!url) return;
-
       await dispatch(addImage({ campaignId: campaign._id, imageUrl: url }));
       setIsEditMode(false);
     } catch (err) {
@@ -114,7 +119,7 @@ export default function CampaignPage() {
       alert('שגיאה בהעלאת הקובץ');
     } finally {
       setUploadingImage(false);
-      e.target.value = ''; // מאפשר לבחור שוב את אותו קובץ
+      e.target.value = '';
     }
   };
 
@@ -130,102 +135,141 @@ export default function CampaignPage() {
     setIsEditMode(false);
   };
 
-  //---------------------------------------------------------------------
-  // 5) Render
-  //---------------------------------------------------------------------
+  const handleLike = () => {
+    setHasLiked(!hasLiked);
+    setLikeCount(prev => hasLiked ? prev - 1 : prev + 1);
+    // כאן תוסיף קריאה לשרת לשמירת הלייק
+  };
+
+  const handleShare = () => {
+    if (navigator.share) {
+      navigator.share({
+        title: candidate?.name,
+        text: `בואו להכיר את ${candidate?.name}`,
+        url: window.location.href,
+      }).catch(console.error);
+    } else {
+      navigator.clipboard.writeText(window.location.href);
+      alert('הקישור הועתק ללוח!');
+    }
+  };
 
   return (
     <div className="page-wrap dashboard">
-      {/* HEADER */}
+      {/* HEADER - זהה לדף קבוצה */}
       <div className="page-header">
-        <div className="header-title">
-          <h2>{candidate?.name}</h2>
-          {candidate?.symbol && <p>{candidate.symbol}</p>}
+
+        {/* כל הכפתורים למעלה בשורה אחת */}
+        <div className="header-actions">
+
+          {/* חזרה לעמוד קבוצה */}
+          <button
+            className="icon-btn"
+            onClick={() => navigate(groupId ? `/groups/${groupId}` : '/groups')}
+            title="חזרה"
+          >
+            <BiArrowBack size={20} />
+          </button>
+
+          {/* כפתור עריכה — רק לבעל המועמדות */}
+          {isCandidateOwner && (
+            <button
+              className="icon-btn"
+              onClick={() => setIsEditMode(!isEditMode)}
+              title={isEditMode ? 'סיום עריכה' : 'עריכת הדף'}
+            >
+              {isEditMode ? <FiX size={20} /> : <FiEdit3 size={20} />}
+            </button>
+          )}
+
+
+
         </div>
 
-        {candidate?.photoUrl && (
-          <img
-            src={candidate.photoUrl}
-            alt={candidate.name}
-            className="candidate-avatar"
-          />
-        )}
+        {/* התוכן המרכזי */}
+        <div className="header-content">
+          {candidate?.photoUrl && (
+            <img
+              src={candidate.photoUrl}
+              alt={candidate.name}
+              className="candidate-avatar"
+            />
+          )}
 
-        <button
-          className="icon-btn"
-          onClick={() => navigate(groupId ? `/groups/${groupId}` : '/groups')}
-        >
-          <BiArrowBack size={20} />
-        </button>
+          <h2>{candidate?.name}</h2>
 
-        {isCandidateOwner && !isEditMode && (
-          <button
-            className="vote-btn"
-            onClick={() => setIsEditMode(true)}
-            style={{ marginRight: '10px' }}
-          >
-            עריכת הדף
-          </button>
-        )}
+          {candidate?.symbol && (
+            <span className="candidate-symbol">{candidate.symbol}</span>
+          )}
+
+          {/* סטטיסטיקות */}
+          {/* <div className="stats-row">
+      <div className="stat-item">
+        <FiEye size={14} />
+        <span>{viewCount} צפיות</span>
       </div>
+      <div className="stat-item">
+        <FiHeart size={14} />
+        <span>{likeCount} לייקים</span>
+      </div>
+    </div> */}
+        </div>
+
+      </div>
+
+
 
       <div className="main-content-resizable">
         {/* LEFT: POSTS */}
-        <div className="left-section">
-          <h3 className="section-title">פוסטים</h3>
+        <div className="left-section" style={{ width: '35%' }}>
+          <div className="candidates-container">
+            <h3 className="section-title">פוסטים</h3>
 
-          {isCandidateOwner && isEditMode && (
-            <div className="info-card">
-              <input
-                type="text"
-                placeholder="כותרת פוסט"
-                value={newPost.title}
-                onChange={(e) =>
-                  setNewPost({ ...newPost, title: e.target.value })
-                }
-              />
-              <textarea
-                placeholder="תוכן פוסט"
-                value={newPost.content}
-                onChange={(e) =>
-                  setNewPost({ ...newPost, content: e.target.value })
-                }
-              />
-              <button className="vote-btn" onClick={handleAddPost}>
-                הוסף פוסט
-              </button>
-            </div>
-          )}
-
-          <div
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '12px',
-              maxHeight: '400px',
-              overflowY: 'auto',
-            }}
-          >
-            {campaign.posts?.length ? (
-              campaign.posts.map((p) => (
-                <div key={p._id} className="candidate-card">
-                  <h4>{p.title}</h4>
-                  <p>{p.content}</p>
-                  {isCandidateOwner && isEditMode && (
-                    <button
-                      onClick={() => handleDeletePost(p._id)}
-                      className="delete-btn"
-                    >
-                      מחיקה
-                    </button>
-                  )}
-                </div>
-              ))
-            ) : (
-              <p style={{ textAlign: 'center', color: '#64748b' }}>
-                אין פוסטים בקמפיין.
-              </p>
+            {isCandidateOwner && isEditMode && (
+              <div className="info-card">
+                <input
+                  type="text"
+                  placeholder="כותרת פוסט"
+                  value={newPost.title}
+                  onChange={(e) =>
+                    setNewPost({ ...newPost, title: e.target.value })
+                  }
+                />
+                <textarea
+                  placeholder="תוכן הפוסט"
+                  value={newPost.content}
+                  onChange={(e) =>
+                    setNewPost({ ...newPost, content: e.target.value })
+                  }
+                />
+                <button className="vote-btn" onClick={handleAddPost}>
+                  הוסף פוסט
+                </button>
+              </div>
             )}
+
+            <div className="posts-list">
+              {campaign.posts?.length ? (
+                campaign.posts.map((p) => (
+                  <div key={p._id} className="candidate-card">
+                    <h4>{p.title}</h4>
+                    <p>{p.content}</p>
+                    {isCandidateOwner && isEditMode && (
+                      <button
+                        onClick={() => handleDeletePost(p._id)}
+                        className="delete-btn"
+                      >
+                        מחיקה
+                      </button>
+                    )}
+                  </div>
+                ))
+              ) : (
+                <div className="empty-state">
+                  אין פוסטים בקמפיין
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
@@ -235,26 +279,23 @@ export default function CampaignPage() {
         </div>
 
         {/* RIGHT: DESCRIPTION + GALLERY */}
-        <div className="right-section">
+        <div className="right-section" style={{ width: '65%' }}>
+          <h3 className="section-title">אודות</h3>
+
           <div className="info-card">
             {isEditingDescription ? (
               <div>
                 <textarea
                   value={editDescription}
                   onChange={(e) => setEditDescription(e.target.value)}
+                  placeholder="הוסף תיאור לקמפיין"
                 />
-                <div
-                  style={{
-                    display: 'flex',
-                    gap: '8px',
-                    justifyContent: 'center',
-                  }}
-                >
+                <div style={{ display: 'flex', gap: '8px', marginTop: '10px' }}>
                   <button className="vote-btn" onClick={handleUpdateCampaign}>
                     שמור
                   </button>
                   <button
-                    className="back-btn"
+                    className="delete-btn"
                     onClick={() => {
                       setIsEditingDescription(false);
                       setIsEditMode(false);
@@ -268,57 +309,66 @@ export default function CampaignPage() {
               <div>
                 <p>{editDescription || 'אין תיאור קמפיין עדיין'}</p>
                 {isCandidateOwner && isEditMode && (
-                  <button onClick={() => setIsEditingDescription(true)}>
+                  <button
+                    onClick={() => setIsEditingDescription(true)}
+                    className="vote-btn"
+                  >
                     ערוך תיאור
                   </button>
                 )}
               </div>
             )}
           </div>
+          {/* כרטיסי סטטיסטיקות */}
+          <div className="stats-cards">
+
+            <div className="stat-box">
+              <FiEye size={20} />
+              <span>{viewCount} צפיות</span>
+            </div>
+
+          <div className="stat-box clickable" onClick={handleLike}>
+  <FiHeart 
+    size={22} 
+    color={hasLiked ? 'red' : 'inherit'} 
+  />
+  <span>{likeCount} אהבו</span>
+</div>
+
+
+
+            <div className="stat-box clickable" onClick={handleShare}>
+              <FiShare2 size={20} />
+              <span>שתף</span>
+            </div>
+
+          </div>
+
 
           <h3 className="section-title">גלריית תמונות</h3>
 
           {isCandidateOwner && isEditMode && (
-            <div
-              className="info-card"
-              style={{
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '10px',
-              }}
-            >
+            <div className="info-card">
               {/* הוספת תמונה מקישור */}
-              <div
-                style={{
-                  display: 'flex',
-                  gap: '10px',
-                  flexWrap: 'wrap',
-                  alignItems: 'center',
-                }}
-              >
+              <div style={{ display: 'flex', gap: '8px', marginBottom: '10px' }}>
                 <input
                   type="text"
-                  placeholder="קישור תמונה"
+                  placeholder="קישור לתמונה"
                   value={newImageUrl}
                   onChange={(e) => setNewImageUrl(e.target.value)}
-                  style={{ flex: 1, minWidth: '180px' }}
+                  style={{ flex: 1 }}
                 />
-                <button className="vote-btn" onClick={handleAddImage}>
-                  הוסף תמונה מקישור
+                <button
+                  className="vote-btn"
+                  onClick={handleAddImage}
+                  disabled={!newImageUrl.trim()}
+                >
+                  הוסף
                 </button>
               </div>
 
-              {/* העלאה מהמחשב בעזרת uploadImage */}
-              <div
-                className="upload-row"
-                style={{
-                  display: 'flex',
-                  gap: '10px',
-                  alignItems: 'center',
-                  flexWrap: 'wrap',
-                  marginTop: '8px',
-                }}
-              >
+              {/* העלאה מהמחשב */}
+              <div className="upload-row">
                 <span className="muted">או העלאה מהמחשב:</span>
                 <input
                   type="file"
@@ -327,71 +377,61 @@ export default function CampaignPage() {
                   disabled={uploadingImage}
                 />
                 {uploadingImage && (
-                  <span className="muted">מעלה…</span>
+                  <div className="loading-spinner" />
                 )}
               </div>
             </div>
           )}
 
-          <div
-            style={{
-              maxHeight: '400px',
-              overflowY: 'auto',
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))',
-              gap: '12px',
-            }}
-          >
-            {campaign.gallery?.length ? (
-              campaign.gallery.map((img, idx) => (
-                <div
-                  key={idx}
-                  style={{
-                    position: 'relative',
-                    aspectRatio: '1',
-                    borderRadius: '8px',
-                    overflow: 'hidden',
-                  }}
-                >
-                  <img
-                    src={img}
-                    alt=""
-                    style={{
-                      width: '100%',
-                      height: '100%',
-                      objectFit: 'cover',
-                    }}
-                  />
-                  {isCandidateOwner && isEditMode && (
-                    <button
-                      onClick={() => handleDeleteImage(img)}
-                      className="delete-btn"
-                      style={{
-                        position: 'absolute',
-                        top: '6px',
-                        left: '6px',
-                        width: '28px',
-                        height: '28px',
-                        borderRadius: '50%',
-                        background: '#dc3545',
-                        color: 'white',
-                        border: 'none',
-                        cursor: 'pointer',
-                      }}
-                    >
-                      ×
-                    </button>
-                  )}
+          <div className="gallery-container">
+            <div className="gallery-grid">
+              {campaign.gallery?.length ? (
+                campaign.gallery.map((img, idx) => (
+                  <div
+                    key={idx}
+                    className="gallery-item"
+                    onClick={() => setSelectedImage(img)}
+                  >
+                    <img src={img} alt={`תמונה ${idx + 1}`} />
+                    {isCandidateOwner && isEditMode && (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDeleteImage(img);
+                        }}
+                      >
+                        ×
+                      </button>
+                    )}
+                  </div>
+                ))
+              ) : (
+                <div className="empty-state">
+                  אין תמונות בגלריה
                 </div>
-              ))
-            ) : (
-              <p style={{ textAlign: 'center', color: '#64748b' }}>
-                אין תמונות בגלריה.
-              </p>
-            )}
+              )}
+            </div>
           </div>
         </div>
       </div>
+
+      {/* Lightbox לתמונות */}
+      {selectedImage && (
+        <div className="lightbox-overlay" onClick={() => setSelectedImage(null)}>
+          <img
+            src={selectedImage}
+            alt="תמונה מוגדלת"
+            className="lightbox-image"
+            onClick={(e) => e.stopPropagation()}
+          />
+          <button
+            className="lightbox-close"
+            onClick={() => setSelectedImage(null)}
+          >
+            ×
+          </button>
+        </div>
+      )}
     </div>
   );
 }
