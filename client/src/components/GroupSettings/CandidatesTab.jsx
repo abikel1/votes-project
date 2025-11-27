@@ -48,12 +48,13 @@ export default function CandidatesTab({
                     >
                       עריכה
                     </button>
-                    <button
-                      className="small danger"
-                      onClick={() => onDeleteCandidate(String(c._id))}
-                    >
-                      הסרה
-                    </button>
+                 <button
+  className="small danger"
+  onClick={() => onDeleteCandidate(c)} // c חייב להיות אובייקט עם _id
+>
+  הסרה
+</button>
+
                   </div>
                 </li>
               ))}
