@@ -508,34 +508,41 @@ const confirmDeleteCandidate = async () => {
     }
   };
 
-  const onAddCandidate = (e) => {
-    e.preventDefault();
+const onAddCandidate = (e) => {
+  e.preventDefault();
 
-    const errors = validateCandidateFields(candForm);
+  const errors = validateCandidateFields(candForm);
 
-    if (!candForm.name.trim()) {
-      toast.error('שם מועמד/ת חובה');
-    }
+  if (!candForm.name.trim()) {
+    toast.error('שם מועמד/ת חובה');
+  }
 
-    setCandErrors(errors);
+  setCandErrors(errors);
 
-    if (Object.keys(errors).length > 0) {
-      return;
-    }
+  if (Object.keys(errors).length > 0) {
+    return;
+  }
 
-    dispatch(createCandidate({ groupId, ...candForm }))
-      .unwrap()
-      .then(() => {
-        setCandForm({
-          name: '',
-          description: '',
-          symbol: '',
-          photoUrl: '',
-        });
-        setCandErrors({});
-      })
-      .then(() => dispatch(fetchCandidatesByGroup(groupId)));
+  // ✅ כאן מוסיפים ברירת מחדל לתמונה אם לא קיימת
+  const candidateData = {
+    ...candForm,
+    photoUrl: candForm.photoUrl || '/h.jpg',
   };
+
+  dispatch(createCandidate({ groupId, ...candidateData }))
+    .unwrap()
+    .then(() => {
+      setCandForm({
+        name: '',
+        description: '',
+        symbol: '',
+        photoUrl: '',
+      });
+      setCandErrors({});
+    })
+    .then(() => dispatch(fetchCandidatesByGroup(groupId)));
+};
+
 
   const onDeleteCandidate = (cid) =>
     dispatch(deleteCandidate({ candidateId: cid, groupId }))

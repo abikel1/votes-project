@@ -35,7 +35,11 @@ export default function CandidatesTab({
                   <div className="row-main">
                     <div className="title">
                       {c.photoUrl && (
-                        <img className="avatar" src={c.photoUrl} alt="" />
+<img
+  className="avatar"
+  src={c.photoUrl || '/h.jpg'}
+  alt={c.name || 'מועמד/ת'}
+/>
                       )}
                       {c.name || '(ללא שם)'} {c.symbol ? `· ${c.symbol}` : ''}
                     </div>
