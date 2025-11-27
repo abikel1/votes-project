@@ -1,4 +1,3 @@
-// server/src/services/group_service.js
 const mongoose = require('mongoose');
 const Group = require('../models/group_model');
 const Candidate = require('../models/candidate_model');
@@ -311,6 +310,8 @@ async function applyCandidateService(groupId, user, data) {
     // מעדכנים את הפרטים הקיימים ומחזירים ל־pending
     req.name = data.name || user.name || '';
     req.description = data.description || '';
+    req.symbol = data.symbol || '';
+    req.photoUrl = data.photoUrl || '';
     req.email = (user.email || '').trim().toLowerCase();
     req.status = 'pending';
   } else {
@@ -320,6 +321,8 @@ async function applyCandidateService(groupId, user, data) {
       email: (user.email || '').trim().toLowerCase(),
       name: data.name || user.name || '',
       description: data.description || '',
+      symbol: data.symbol || '',
+      photoUrl: data.photoUrl || '',
       status: 'pending',
       createdAt: new Date(),
     };
@@ -353,11 +356,11 @@ async function approveCandidateRequestService(groupId, ownerId, requestId) {
 
   const candidate = await Candidate.create({
     userId: req.userId,
+    groupId,
     name: req.name,
     description: req.description,
-    photoUrl: '',
-    symbol: '',
-    groupId,
+    symbol: req.symbol || '',
+    photoUrl: req.photoUrl || '',
   });
 
   await g.save();
