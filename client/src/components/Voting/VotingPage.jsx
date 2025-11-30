@@ -103,7 +103,7 @@ export default function VotingDragPage() {
   // בדיקה אם כבר הצבעתי – תוסף טוסט
   useEffect(() => {
     if (hasVoted && !hasShownVotedToast.current) {
-      toast(' כבר הצבעת בקבוצה זו', { icon: '🗳️' });
+      toast(' הצבעתך נקלטה במערכת ', { icon: '🗳️' });
       hasShownVotedToast.current = true;
     }
   }, [hasVoted]);
@@ -135,27 +135,30 @@ export default function VotingDragPage() {
 const handleConfirmVote = async () => {
   if (!candidateToVote) return;
 
-  // הכנס למעטפה
+  // 🔵 הכנס למעטפה
   setSlipInEnvelope(candidateToVote);
+
   setShowConfirmModal(false);
 
-  // עכשיו שולחים לקלפי
-  await handleBallotDrop({ preventDefault: () => {} });
+  // 🔵 ואז מבצעים את השליחה
+  await voteForCandidateToBallot();
 
   setCandidateToVote(null);
 };
+
 
 const handleCancelVote = () => {
   setShowConfirmModal(false);
   setCandidateToVote(null);
 };
 const attemptVote = (candidate) => {
-  if (hasVoted || isSubmitting) return;
+  if (!candidate || hasVoted || isSubmitting) return;
 
-  // שמירת המועמד שנבחר לאישור
+  // 🔵 פותחים מודל אישור
   setCandidateToVote(candidate);
   setShowConfirmModal(true);
 };
+
 
 
   const handleSlipDragStart = (e, candidate) => {
@@ -220,11 +223,13 @@ const handleBallotDrop = (e) => {
   e.preventDefault();
   if (!slipInEnvelope) return;
 
+  // 🔵 אם אין מועמד לאישור — מבקשים אישור
   if (!candidateToVote) {
     attemptVote(slipInEnvelope);
     return;
   }
 
+  // 🔵 אחרי אישור – מצביעים
   voteForCandidateToBallot();
 };
 
@@ -245,11 +250,9 @@ const voteForCandidateToBallot = async () => {
       })
     ).unwrap();
 
-    // רענון מועמדים אחרי ההצבעה
     dispatch(fetchCandidatesByGroup(groupId));
-
-    // ריסet מעטפה אחרי הצבעה
     setSlipInEnvelope(null);
+
   } catch (err) {
     const msg = String(err || '');
     if (!msg.includes('already voted') && !msg.includes('כבר הצבעת')) {
@@ -259,6 +262,7 @@ const voteForCandidateToBallot = async () => {
     setIsSubmitting(false);
   }
 };
+
 
   const handleEnvelopeDragStart = (e) => {
     if (!slipInEnvelope || hasVoted) return;
@@ -510,11 +514,13 @@ const voteForCandidateToBallot = async () => {
           </div>
 <button
   className="vd-insert-button"
-  disabled={!selectedCandidate || hasVoted || slipInEnvelope?._id === selectedCandidate._id}
-  onClick={() => attemptVote(selectedCandidate)}
+  disabled={!slipInEnvelope || hasVoted}
+  // 🔵 תמיד מצביעים עבור slipInEnvelope
+  onClick={() => attemptVote(slipInEnvelope)}
 >
   {t('voting.insertEnvelope')}
 </button>
+
 
           <div className="vd-arrow">↓</div>
 
@@ -568,13 +574,14 @@ const voteForCandidateToBallot = async () => {
               ×
             </button>
             <div className="vd-modal-header">
-              <button
-                className="vd-select-button"
-                onClick={() => {
-                  setSlipInEnvelope(selectedCandidate);
-                  closeModal();
-                }}
-              >
+           <button
+  className="vd-select-button"
+  onClick={() => {
+    setSlipInEnvelope(selectedCandidate);
+    closeModal();
+  }}
+>
+
                 {t('voting.selectForVote')}
               </button>
 
