@@ -18,7 +18,7 @@
   padding: 12px 16px;
   background: white;
   border: 1px solid #e2e8f0;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   margin-bottom: 12px;
 }
 
@@ -71,29 +71,18 @@
   align-items: center;
   gap: 6px;
 }
+
 .header-actions {
   display: flex;
   align-items: center;
   gap: 8px;
   position: absolute;
   top: 12px;
-  left: 16px; /* אם RTL - תחליפי ל-right */
+  left: 16px;
+  /* אם RTL - תחליפי ל-right */
 }
 
-/* כפתורי אינטראקציה */
-/* .action-buttons {
-  display: flex;
-  gap: 8px;
-  margin-top: 8px;
-} */
-
-.action-buttons {
-  display: flex;
-  gap: 8px;
-}
-
-
-/* ========== כפתורים - זהה לדף קבוצה ========== */
+/* כפתורים */
 .back-btn,
 .icon-btn {
   background: transparent;
@@ -224,20 +213,20 @@
   border: 1px solid #e2e8f0;
   padding: 16px;
   margin-bottom: 12px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .candidate-card {
   background: white;
   border: 1px solid #e2e8f0;
   padding: 12px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   transition: all 0.2s ease;
 }
 
 .candidate-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
   border-color: #003366;
 }
 
@@ -324,7 +313,7 @@
   padding: 12px;
   max-height: 500px;
   overflow-y: auto;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .gallery-grid {
@@ -337,13 +326,13 @@
   position: relative;
   aspect-ratio: 1;
   overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   transition: all 0.2s ease;
   cursor: pointer;
 }
 
 .gallery-item:hover {
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .gallery-item img {
@@ -436,7 +425,9 @@
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .loading-wrap {
@@ -458,7 +449,7 @@
   font-size: 13px;
 }
 
-/* ========== Lightbox ========== */
+/* ========== Lightbox (תמונות) ========== */
 .lightbox-overlay {
   position: fixed;
   top: 0;
@@ -553,11 +544,6 @@
   .stats-row {
     font-size: 12px;
     gap: 15px;
-  }
-
-  .action-buttons {
-    flex-wrap: wrap;
-    width: 100%;
   }
 
   .vote-btn {
@@ -708,7 +694,7 @@
   }
 }
 
-/* ========== תמיכה בגלילה חלקה ========== */
+/* ========== גלילה חלקה ========== */
 .candidates-container,
 .right-section,
 .posts-list,
@@ -716,8 +702,8 @@
   -webkit-overflow-scrolling: touch;
 }
 
-/* ========== שיפור ביצועים בפידינג ========== */
 @media (max-width: 768px) {
+
   .candidate-card,
   .info-card,
   .gallery-item {
@@ -725,10 +711,7 @@
   }
 }
 
-
-
-
-
+/* סטטיסטיקות */
 .stats-cards {
   display: flex;
   gap: 12px;
@@ -736,18 +719,15 @@
   flex-wrap: wrap;
 }
 
-/* ריבועים שטוחים שמתפרסים על כל הרוחב */
 .stat-box {
   background: #f7f7f7;
   padding: 16px;
   min-height: 60px;
-  flex: 1; /* מתפרס על כל השורה */
+  flex: 1;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-
-  /* box-shadow: 0 0 4px rgba(0,0,0,0.1); */
   font-size: 14px;
   text-align: center;
 }
@@ -756,7 +736,6 @@
   margin-bottom: 6px;
 }
 
-/* כפתורי לייק/שיתוף */
 .stat-box.clickable {
   cursor: pointer;
   transition: 0.2s;
@@ -764,4 +743,152 @@
 
 .stat-box.clickable:hover {
   background: #e9eefc;
+}
+
+/* ========== AI Modal (פוסט קמפיין) ========== */
+
+.ai-overlay {
+  background: rgba(148, 163, 184, 0.30);
+  backdrop-filter: blur(4px);
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 40px;
+}
+
+.ai-modal-card {
+  background: #ffffff;
+  border-radius: 8px;
+  max-width: 720px;
+  width: 100%;
+  padding: 24px 28px;
+  box-shadow: 0 20px 40px rgba(15, 23, 42, 0.25);
+  border: 1px solid #e2e8f0;
+  display: flex;
+  flex-direction: column;
+}
+
+.ai-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.ai-modal-icon {
+  font-size: 26px;
+}
+
+.ai-modal-header h3 {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.ai-modal-subtitle {
+  margin: 0 0 16px 0;
+  text-align: center;
+  font-size: 13px;
+  color: #64748b;
+}
+
+.ai-field-group {
+  margin-bottom: 12px;
+}
+
+.ai-label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: #334155;
+  margin-bottom: 4px;
+}
+
+.ai-input,
+.ai-textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 8px 10px;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  font-size: 13px;
+  font-family: inherit;
+  background: #ffffff;
+}
+
+.ai-input:focus,
+.ai-textarea:focus {
+  outline: none;
+  border-color: #003366;
+  box-shadow: 0 0 0 1px #00336622;
+}
+
+.ai-textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.ai-generate-btn {
+  width: 100%;
+  margin-top: 4px;
+}
+
+.ai-error {
+  margin-top: 8px;
+}
+
+.ai-divider {
+  margin: 16px 0 12px 0;
+  border: none;
+  border-top: 1px solid #e2e8f0;
+}
+
+.ai-section-title {
+  font-size: 14px;
+  font-weight: 700;
+  margin: 0 0 8px 0;
+  color: #0f172a;
+}
+
+.ai-actions-row {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+@media (max-width: 600px) {
+  .ai-modal-card {
+    max-width: 100%;
+    padding: 16px;
+  }
+}
+
+.ai-result-box {
+  margin-top: 4px;
+  padding: 12px 14px;
+  border-radius: 6px;
+  border: 1px solid #e2e8f0;
+  background: #f9fafb;
+  max-height: 220px;
+  overflow-y: auto;
+}
+
+.ai-result-title {
+  font-weight: 700;
+  color: #0f172a;
+  margin-bottom: 6px;
+}
+
+.ai-result-content {
+  font-size: 13px;
+  color: #475569;
+  white-space: pre-wrap;
+  line-height: 1.6;
+}
+
+.ai-result-placeholder {
+  font-size: 13px;
+  color: #9ca3af;
 }

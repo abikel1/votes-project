@@ -11,19 +11,65 @@ import {
   incrementView,
   selectCampaign,
   selectCandidate,
+  generatePostSuggestion,
+  selectAiSuggestion,
+  selectAiLoading,
+  selectAiError,
 } from '../../slices/campaignSlice';
 
 import { BiArrowBack } from 'react-icons/bi';
-import {
-  FiEdit3,
-  FiEye,
-  FiHeart,
-  FiShare2,
-  FiX,          // 👈 הוספנו את FiX
-} from 'react-icons/fi';
+import { FiEdit3, FiEye, FiHeart, FiShare2, FiX } from 'react-icons/fi';
 
 import './CampaignPage.css';
 import { uploadImage } from '../../components/GroupSettings/uploadImage';
+
+// ===== עוזר לניקוי תשובת ה-AI =====
+function normalizeAiSuggestion(suggestion, fallbackTitle = '') {
+  if (!suggestion) {
+    return { title: fallbackTitle || '', content: '' };
+  }
+
+  const rawTitle =
+    suggestion.title !== undefined && suggestion.title !== null
+      ? suggestion.title
+      : fallbackTitle || '';
+
+  const rawContent =
+    suggestion.content ?? suggestion.text ?? suggestion.message ?? '';
+
+  if (typeof rawContent !== 'string') {
+    return { title: rawTitle, content: '' };
+  }
+
+  try {
+    let jsonText = rawContent;
+    const codeBlockMatch = rawContent.match(/```(?:json)?\s*([\s\S]*?)```/i);
+    if (codeBlockMatch) {
+      jsonText = codeBlockMatch[1];
+    }
+
+    const braceMatch = jsonText.match(/\{[\s\S]*\}/);
+    if (braceMatch) {
+      jsonText = braceMatch[0];
+    }
+
+    const obj = JSON.parse(jsonText);
+
+    if (obj && (obj.title || obj.content)) {
+      return {
+        title: obj.title || rawTitle,
+        content: obj.content || '',
+      };
+    }
+  } catch (e) {
+    // מתעלמים אם אין JSON תקין
+  }
+
+  return {
+    title: rawTitle,
+    content: rawContent,
+  };
+}
 
 export default function CampaignPage() {
   const { candidateId } = useParams();
@@ -40,6 +86,10 @@ export default function CampaignPage() {
   const currentUserId = useSelector((state) => state.auth.userId);
   const userLoading = useSelector((state) => state.auth.loading);
 
+  const aiSuggestion = useSelector(selectAiSuggestion);
+  const aiLoading = useSelector(selectAiLoading);
+  const aiError = useSelector(selectAiError);
+
   // Local state
   const [newPost, setNewPost] = useState({ title: '', content: '' });
   const [newImageUrl, setNewImageUrl] = useState('');
@@ -52,33 +102,62 @@ export default function CampaignPage() {
   const [hasLiked, setHasLiked] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
 
-  // כדי לא להעלות צפייה פעמיים ב-StrictMode
+  // AI modal
+  const [showAiModal, setShowAiModal] = useState(false);
+  const [aiNote, setAiNote] = useState('');
+  const [aiGenerated, setAiGenerated] = useState(false);
+
   const hasIncrementedViewRef = useRef(false);
 
-  // טוענים קמפיין לפי candidateId
+  // === פונקציה נוחה לריענון הקמפיין מהשרת אחרי פעולות עריכה ===
+  const refetchCampaign = () => {
+    if (!candidateId) return;
+    dispatch(fetchCampaign(candidateId));
+  };
+
+  // === טעינת קמפיין + incrementView בקריאה אחת לוגית ===
   useEffect(() => {
-    if (candidateId) {
-      dispatch(fetchCampaign(candidateId));
-      // כשנכנסים לקמפיין חדש – מאפסים את הדגל
-      hasIncrementedViewRef.current = false;
-    }
+    if (!candidateId) return;
+
+    // בכל שינוי מועמד מאפס את הדגל
+    hasIncrementedViewRef.current = false;
+
+    dispatch(fetchCampaign(candidateId))
+      .unwrap()
+      .then((camp) => {
+        // פעם אחת בלבד נעשה incrementView
+        if (camp?._id && !hasIncrementedViewRef.current) {
+          hasIncrementedViewRef.current = true;
+          dispatch(incrementView(camp._id)).catch((err) => {
+            console.error('שגיאה בעדכון צפיות:', err);
+          });
+        }
+      })
+      .catch((err) => {
+        console.error('שגיאה בטעינת קמפיין:', err);
+      });
   }, [candidateId, dispatch]);
 
-  // אחרי שהקמפיין נטען ויש לו _id – מעלים צפייה פעם אחת למאונט הזה
-  useEffect(() => {
-    if (campaign?._id && !hasIncrementedViewRef.current) {
-      hasIncrementedViewRef.current = true;
-      dispatch(incrementView(campaign._id));
-    }
-  }, [campaign?._id, dispatch]);
-
-  // מעדכנים state מקומי כשקמפיין משתנה
+  // סנכרון תיאור ולייקים עם הקמפיין מהשרת
   useEffect(() => {
     if (campaign) {
-      if (campaign.description) setEditDescription(campaign.description);
-      if (campaign.likeCount) setLikeCount(campaign.likeCount);
+      if (campaign.description !== undefined) {
+        setEditDescription(campaign.description);
+      }
+      if (campaign.likeCount !== undefined) {
+        setLikeCount(campaign.likeCount);
+      }
     }
   }, [campaign]);
+
+  // אם מגיעה הצעת AI דרך redux (רענון וכד')
+  useEffect(() => {
+    if (aiSuggestion) {
+      const normalized = normalizeAiSuggestion(aiSuggestion, newPost.title);
+      setNewPost(normalized);
+      setAiGenerated(true);
+    }
+  }, [aiSuggestion]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Loading / Error
   if (userLoading) return <div className="loading-wrap">טוען משתמש…</div>;
@@ -86,26 +165,32 @@ export default function CampaignPage() {
     return <div className="loading-wrap">טוען קמפיין…</div>;
   if (campaignError) return <div className="err">שגיאה: {campaignError}</div>;
 
-  // Ownership logic
   const candidateUserId = candidate?.userId;
   const isCandidateOwner =
     currentUserId &&
     candidateUserId &&
     currentUserId.toString() === candidateUserId.toString();
 
-  // צפיות מהשרת
   const viewCount = campaign.viewCount || 0;
 
-  // Handlers
+  // === Handlers ===
+
   const handleUpdateCampaign = () => {
     dispatch(
       updateCampaign({
         campaignId: campaign._id,
         payload: { description: editDescription },
       })
-    );
-    setIsEditingDescription(false);
-    setIsEditMode(false);
+    )
+      .unwrap()
+      .then(() => {
+        refetchCampaign(); // מושך את הקמפיין המעודכן
+        setIsEditingDescription(false);
+        setIsEditMode(false);
+      })
+      .catch((err) => {
+        console.error('שגיאה בעדכון קמפיין:', err);
+      });
   };
 
   const handleAddPost = () => {
@@ -114,15 +199,25 @@ export default function CampaignPage() {
     dispatch(addPost({ campaignId: campaign._id, post: newPost }))
       .unwrap()
       .then(() => {
+        refetchCampaign(); // ריענון כדי לראות את הפוסט החדש
         setNewPost({ title: '', content: '' });
         setIsEditMode(false);
       })
-      .catch(() => { });
+      .catch((err) => {
+        console.error('שגיאה בהוספת פוסט:', err);
+      });
   };
 
   const handleDeletePost = (postId) => {
-    dispatch(deletePost({ campaignId: campaign._id, postId }));
-    setIsEditMode(false);
+    dispatch(deletePost({ campaignId: campaign._id, postId }))
+      .unwrap()
+      .then(() => {
+        refetchCampaign(); // ריענון כדי להעלים את הפוסט שנמחק
+        setIsEditMode(false);
+      })
+      .catch((err) => {
+        console.error('שגיאה במחיקת פוסט:', err);
+      });
   };
 
   const handleUploadGalleryFile = async (e) => {
@@ -133,7 +228,8 @@ export default function CampaignPage() {
       setUploadingImage(true);
       const url = await uploadImage(file);
       if (!url) return;
-      await dispatch(addImage({ campaignId: campaign._id, imageUrl: url }));
+      await dispatch(addImage({ campaignId: campaign._id, imageUrl: url })).unwrap();
+      refetchCampaign(); // ריענון גלריה
       setIsEditMode(false);
     } catch (err) {
       console.error('שגיאה בהעלאת תמונה לגלריה:', err);
@@ -146,17 +242,32 @@ export default function CampaignPage() {
 
   const handleAddImage = () => {
     if (!newImageUrl.trim()) return;
-    dispatch(addImage({ campaignId: campaign._id, imageUrl: newImageUrl }));
-    setNewImageUrl('');
-    setIsEditMode(false);
+    dispatch(addImage({ campaignId: campaign._id, imageUrl: newImageUrl }))
+      .unwrap()
+      .then(() => {
+        refetchCampaign(); // ריענון גלריה
+        setNewImageUrl('');
+        setIsEditMode(false);
+      })
+      .catch((err) => {
+        console.error('שגיאה בהוספת תמונה:', err);
+      });
   };
 
   const handleDeleteImage = (url) => {
-    dispatch(deleteImage({ campaignId: campaign._id, imageUrl: url }));
-    setIsEditMode(false);
+    dispatch(deleteImage({ campaignId: campaign._id, imageUrl: url }))
+      .unwrap()
+      .then(() => {
+        refetchCampaign(); // ריענון גלריה
+        setIsEditMode(false);
+      })
+      .catch((err) => {
+        console.error('שגיאה במחיקת תמונה:', err);
+      });
   };
 
   const handleLike = () => {
+    // עדיין לוקאלי בלבד – אם תרצי לייקים אמיתיים צריך thunk לשרת
     setHasLiked(!hasLiked);
     setLikeCount((prev) => (hasLiked ? prev - 1 : prev + 1));
   };
@@ -174,6 +285,45 @@ export default function CampaignPage() {
       navigator.clipboard.writeText(window.location.href);
       alert('הקישור הועתק ללוח!');
     }
+  };
+
+  // פתיחת חלון AI – שדות ריקים, עדיין לא נוצר פוסט
+  const handleAskAiForPost = () => {
+    if (!candidateId) return;
+    setNewPost({ title: '', content: '' });
+    setAiNote('');
+    setAiGenerated(false);
+    setShowAiModal(true);
+  };
+
+  // קריאה ל-AI מתוך המודאל
+  const handleGenerateWithAi = () => {
+    if (!candidateId) return;
+
+    dispatch(
+      generatePostSuggestion({
+        candidateId,
+        titleHint: newPost.title,
+        note: aiNote,
+      })
+    )
+      .unwrap()
+      .then((suggestion) => {
+        const normalized = normalizeAiSuggestion(suggestion, newPost.title);
+        setNewPost(normalized);
+        setAiGenerated(true);
+      })
+      .catch((err) => {
+        console.error('שגיאה ביצירת פוסט AI:', err);
+      });
+  };
+
+  // ביטול במודאל – לא שומרים פוסט, מנקים שדות
+  const handleCancelAiPost = () => {
+    setShowAiModal(false);
+    setNewPost({ title: '', content: '' });
+    setAiNote('');
+    setAiGenerated(false);
   };
 
   return (
@@ -242,9 +392,27 @@ export default function CampaignPage() {
                     setNewPost({ ...newPost, content: e.target.value })
                   }
                 />
-                <button className="vote-btn" onClick={handleAddPost}>
-                  הוסף פוסט
-                </button>
+
+                <div
+                  style={{
+                    display: 'flex',
+                    gap: '8px',
+                    marginTop: '8px',
+                    flexWrap: 'wrap',
+                  }}
+                >
+                  <button className="vote-btn" onClick={handleAddPost}>
+                    הוסף פוסט
+                  </button>
+
+                  <button
+                    type="button"
+                    className="vote-btn"
+                    onClick={handleAskAiForPost}
+                  >
+                    עזרה מ־AI
+                  </button>
+                </div>
               </div>
             )}
 
@@ -430,6 +598,112 @@ export default function CampaignPage() {
           >
             ×
           </button>
+        </div>
+      )}
+
+      {/* מודאל AI לפוסט קמפיין */}
+      {showAiModal && (
+        <div
+          className="lightbox-overlay ai-overlay"
+          onClick={handleCancelAiPost}
+        >
+          <div
+            className="info-card ai-modal-card"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="ai-modal-header">
+              <span className="ai-modal-icon">✨</span>
+              <h3>עזרה בכתיבת פוסט (AI)</h3>
+            </div>
+
+            <p className="ai-modal-subtitle">
+              המערכת תשתמש בשם המועמד/ת והקבוצה ותיצור פוסט קצר בגוף ראשון,
+              עם כמה אימוג׳ים מתאימים 😉
+            </p>
+
+            <div className="ai-field-group">
+              <label className="ai-label">
+                {aiGenerated
+                  ? 'כותרת הפוסט (ניתן לעריכה):'
+                  : 'כותרת מוצעת לפוסט (לא חובה):'}
+              </label>
+              <input
+                type="text"
+                className="ai-input"
+                placeholder={
+                  aiGenerated
+                    ? ''
+                    : `כותרת לפוסט עבור ${candidate?.name || 'המועמד/ת'} (לא חובה)`
+                }
+                value={newPost.title}
+                onChange={(e) =>
+                  setNewPost({ ...newPost, title: e.target.value })
+                }
+              />
+            </div>
+
+            <div className="ai-field-group">
+              <label className="ai-label">
+                {aiGenerated
+                  ? 'תוכן הפוסט (ניתן לעריכה):'
+                  : 'על מה לכתוב? (הערה ל-AI, לא חובה):'}
+              </label>
+              <textarea
+                className="ai-textarea"
+                rows={5}
+                placeholder={
+                  aiGenerated
+                    ? ''
+                    : 'לדוגמה: להתמקד בשקיפות, בעזרה לחברים בקבוצה, בניסיון האישי שלי...'
+                }
+                value={aiGenerated ? newPost.content : aiNote}
+                onChange={(e) => {
+                  if (aiGenerated) {
+                    setNewPost({ ...newPost, content: e.target.value });
+                  } else {
+                    setAiNote(e.target.value);
+                  }
+                }}
+              />
+            </div>
+
+            {!aiGenerated && (
+              <button
+                className="vote-btn ai-generate-btn"
+                type="button"
+                onClick={handleGenerateWithAi}
+                disabled={aiLoading}
+              >
+                {aiLoading ? 'מייצר פוסט…' : 'יצירת פוסט עם AI'}
+              </button>
+            )}
+
+            {aiError && <div className="err ai-error">{aiError}</div>}
+
+            {aiGenerated && (
+              <div className="ai-actions-row">
+                <button
+                  className="cg-btn-outline"
+                  type="button"
+                  onClick={handleCancelAiPost}
+                >
+                  ביטול
+                </button>
+                <button
+                  className="cg-btn"
+                  type="button"
+                  onClick={() => {
+                    handleAddPost();
+                    setShowAiModal(false);
+                    setAiGenerated(false);
+                  }}
+                  disabled={!newPost.title.trim()}
+                >
+                  שמור פוסט
+                </button>
+              </div>
+            )}
+          </div>
         </div>
       )}
     </div>

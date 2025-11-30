@@ -1,3 +1,4 @@
+// server/src/routes/campaign_routes.js
 const express = require('express');
 const router = express.Router();
 const {
@@ -10,6 +11,7 @@ const {
   addImage,
   deleteImage,
   incrementView,
+  getAiPostSuggestion,
 } = require('../controllers/campaign_controller');
 
 // קמפיין של מועמד
@@ -17,6 +19,9 @@ router.get('/candidate/:candidateId', getCampaign);
 
 // יצירת קמפיין למועמד
 router.post('/candidate/:candidateId', createCampaign);
+
+// ✨ הצעת פוסט בעזרת AI
+router.post('/candidate/:candidateId/ai-suggest-post', getAiPostSuggestion);
 
 // עדכון קמפיין
 router.put('/:campaignId', updateCampaign);
