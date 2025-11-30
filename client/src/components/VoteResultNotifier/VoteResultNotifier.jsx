@@ -83,10 +83,16 @@ export default function VoteResultNotifier() {
         if (!isAuthed) return;
         if (!finishedGroups.length) return;
 
-        // finishedGroups אמור כבר להיות "קבוצות שהמשתמש הצביע בהן והסתיימו"
         const candidate = finishedGroups.find((g) => {
             const gid = String(g.groupId);
-            return !notifiedSet.has(gid);
+
+            // ✅ אם יש שדה votedByMe – נסנן לפיו.
+            // ✅ אם אין שדה כזה – נניח true (כלומר ה־API כבר החזיר רק קבוצות שהמשתמש הצביע בהן).
+            const votedFlag = Object.prototype.hasOwnProperty.call(g, 'votedByMe')
+                ? g.votedByMe === true
+                : true;
+
+            return votedFlag && !notifiedSet.has(gid);
         });
 
         if (candidate) {
@@ -100,10 +106,12 @@ export default function VoteResultNotifier() {
     if (!currentGroup) return null;
 
     const gid = String(currentGroup.groupId);
-    const winnersNames =
+
+    // 👇 מציגים את *כל* הזוכים (למקרה של תיקו, כמה זוכים וכו')
+    const winnerNames =
         (currentGroup.winners || [])
+            .filter((w) => w && w.name)
             .map((w) => w.name)
-            .filter(Boolean)
             .join(', ');
 
     const markNotifiedAndClose = () => {
@@ -122,7 +130,6 @@ export default function VoteResultNotifier() {
 
         setCurrentGroup(null);
 
-        // אם השרת מחזיר גם slug – אפשר להשתמש בו, אחרת נשתמש בנתיב הרגיל לפי groupId
         const slug = currentGroup.groupSlug || gid;
         navigate(`/groups/${slug}`, {
             state: { groupId: gid },
@@ -143,9 +150,9 @@ export default function VoteResultNotifier() {
                     })}
                 </p>
 
-                {winnersNames && (
+                {winnerNames && (
                     <p className="vote-result-winners">
-                        {t('votes.results.winnersLabel', 'זוכה/ים:')} {winnersNames}
+                        {t('votes.results.winnersLabel', 'זוכה/ים:')} {winnerNames}
                     </p>
                 )}
 
