@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
+import ConfirmModal from '../../components/ConfirmModal/ConfirmModal';
 
 import {
   fetchGroupOnly,
@@ -73,6 +74,8 @@ export default function VotingDragPage() {
   const [selectedCandidate, setSelectedCandidate] = useState(null);
   const [isDraggingEnvelope, setIsDraggingEnvelope] = useState(false);
   const [envelopePosition, setEnvelopePosition] = useState({ x: 0, y: 0 });
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [candidateToVote, setCandidateToVote] = useState(null);
 
   // --- פתרון slug ל-id כשנכנסים ישירות ל-URL ---
   useEffect(() => {
@@ -123,6 +126,38 @@ export default function VotingDragPage() {
     dispatch(checkHasVoted({ groupId }));
   }, [dispatch, groupId]);
 
+  const confirmVote = (candidate) => {
+  if (hasVoted) return;
+  setCandidateToVote(candidate);
+  setShowConfirmModal(true);
+};
+
+const handleConfirmVote = async () => {
+  if (!candidateToVote) return;
+
+  // הכנס למעטפה
+  setSlipInEnvelope(candidateToVote);
+  setShowConfirmModal(false);
+
+  // עכשיו שולחים לקלפי
+  await handleBallotDrop({ preventDefault: () => {} });
+
+  setCandidateToVote(null);
+};
+
+const handleCancelVote = () => {
+  setShowConfirmModal(false);
+  setCandidateToVote(null);
+};
+const attemptVote = (candidate) => {
+  if (hasVoted || isSubmitting) return;
+
+  // שמירת המועמד שנבחר לאישור
+  setCandidateToVote(candidate);
+  setShowConfirmModal(true);
+};
+
+
   const handleSlipDragStart = (e, candidate) => {
     if (hasVoted) return;
     setDraggedSlip(candidate);
@@ -148,37 +183,82 @@ export default function VotingDragPage() {
     e.dataTransfer.dropEffect = 'move';
   };
 
-  const handleBallotDrop = async (e) => {
-    e.preventDefault();
-    if (!slipInEnvelope || hasVoted || isSubmitting) return;
+  // const handleBallotDrop = async (e) => {
+  //   e.preventDefault();
+  //   if (!slipInEnvelope || hasVoted || isSubmitting) return;
 
-    setIsDraggingEnvelope(false);
-    setEnvelopePosition({ x: 0, y: 0 });
+  //   setIsDraggingEnvelope(false);
+  //   setEnvelopePosition({ x: 0, y: 0 });
 
-    try {
-      setIsSubmitting(true);
-      await dispatch(
-        voteForCandidate({
-          groupId,
-          candidateId: slipInEnvelope._id,
-        }),
-      ).unwrap();
+  //   try {
+  //     setIsSubmitting(true);
+  //     await dispatch(
+  //       voteForCandidate({
+  //         groupId,
+  //         candidateId: slipInEnvelope._id,
+  //       }),
+  //     ).unwrap();
 
-      await dispatch(fetchCandidatesByGroup(groupId));
-    } catch (err) {
-      const msg = String(err || '');
-      if (
-        msg.includes('already voted') ||
-        msg.includes('כבר הצבעת')
-      ) {
-        // נתעלם, הסטייט יתעדכן מהשרת
-      } else {
-        toast.error(t('voting.voteErrorPrefix') + msg);
-      }
-    } finally {
-      setIsSubmitting(false);
+  //     await dispatch(fetchCandidatesByGroup(groupId));
+  //   } catch (err) {
+  //     const msg = String(err || '');
+  //     if (
+  //       msg.includes('already voted') ||
+  //       msg.includes('כבר הצבעת')
+  //     ) {
+  //       // נתעלם, הסטייט יתעדכן מהשרת
+  //     } else {
+  //       toast.error(t('voting.voteErrorPrefix') + msg);
+  //     }
+  //   } finally {
+  //     setIsSubmitting(false);
+  //   }
+  // };
+
+
+const handleBallotDrop = (e) => {
+  e.preventDefault();
+  if (!slipInEnvelope) return;
+
+  if (!candidateToVote) {
+    attemptVote(slipInEnvelope);
+    return;
+  }
+
+  voteForCandidateToBallot();
+};
+
+
+
+const voteForCandidateToBallot = async () => {
+  if (!slipInEnvelope || !groupId) return;
+
+  setIsSubmitting(true);
+  setIsDraggingEnvelope(false);
+  setEnvelopePosition({ x: 0, y: 0 });
+
+  try {
+    await dispatch(
+      voteForCandidate({
+        groupId,
+        candidateId: slipInEnvelope._id,
+      })
+    ).unwrap();
+
+    // רענון מועמדים אחרי ההצבעה
+    dispatch(fetchCandidatesByGroup(groupId));
+
+    // ריסet מעטפה אחרי הצבעה
+    setSlipInEnvelope(null);
+  } catch (err) {
+    const msg = String(err || '');
+    if (!msg.includes('already voted') && !msg.includes('כבר הצבעת')) {
+      toast.error(t('voting.voteErrorPrefix') + msg);
     }
-  };
+  } finally {
+    setIsSubmitting(false);
+  }
+};
 
   const handleEnvelopeDragStart = (e) => {
     if (!slipInEnvelope || hasVoted) return;
@@ -428,6 +508,13 @@ export default function VotingDragPage() {
               </div>
             )}
           </div>
+<button
+  className="vd-insert-button"
+  disabled={!selectedCandidate || hasVoted || slipInEnvelope?._id === selectedCandidate._id}
+  onClick={() => attemptVote(selectedCandidate)}
+>
+  {t('voting.insertEnvelope')}
+</button>
 
           <div className="vd-arrow">↓</div>
 
@@ -444,6 +531,8 @@ export default function VotingDragPage() {
                 : t('voting.dragEnvelopeToBallot')}
             </div>
           </div>
+
+
         </div>
       </div>
 
@@ -512,6 +601,16 @@ export default function VotingDragPage() {
           </div>
         </div>
       )}
+
+      <ConfirmModal
+  open={showConfirmModal}
+  message={`את/ה בטוח/ה רוצה להצביע למועמד ${candidateToVote?.name || ''}?`}
+  onConfirm={handleConfirmVote}
+  onCancel={handleCancelVote}
+/>
+
     </div>
+
+    
   );
 }
