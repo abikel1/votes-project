@@ -8,23 +8,17 @@ const postSchema = new mongoose.Schema({
 });
 
 const campaignSchema = new mongoose.Schema({
-  candidate: { 
-    type: mongoose.Schema.Types.ObjectId, 
-    ref: 'Candidate', 
-    required: true 
+  candidate: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Candidate',
+    required: true,
+    unique: true, // 👈 קמפיין אחד לכל מועמד
   },
 
   description: { type: String, default: '' },
-
-  // פוסטים
   posts: [postSchema],
-
-  // גלריית תמונות של הקמפיין (לא קשור לפוסטים)
-  gallery: [String], // ← מערך תמונות URL
-
-  // ספירת צפיות בקמפיין
+  gallery: [String],
   viewCount: { type: Number, default: 0 },
-
   createdAt: { type: Date, default: Date.now }
 });
 

@@ -1,4 +1,5 @@
 const campaignService = require('../services/campaign_service');
+const { generateCampaignPostForCandidate } = require('../services/ai_service');
 
 async function getCampaign(req, res) {
   try {
@@ -39,18 +40,19 @@ async function addPost(req, res) {
       req.params.campaignId,
       req.body
     );
-
-    // ⚠️ מחזירים את הקמפיין המלא
     res.json(campaign);
   } catch (err) {
     res.status(400).json({ message: err.message });
   }
 }
 
-
 async function updatePost(req, res) {
   try {
-    const campaign = await campaignService.updatePost(req.params.campaignId, req.params.postId, req.body);
+    const campaign = await campaignService.updatePost(
+      req.params.campaignId,
+      req.params.postId,
+      req.body
+    );
     res.json(campaign);
   } catch (err) {
     res.status(400).json({ message: err.message });
@@ -59,7 +61,10 @@ async function updatePost(req, res) {
 
 async function deletePost(req, res) {
   try {
-    const campaign = await campaignService.deletePost(req.params.campaignId, req.params.postId);
+    const campaign = await campaignService.deletePost(
+      req.params.campaignId,
+      req.params.postId
+    );
     res.json(campaign);
   } catch (err) {
     res.status(400).json({ message: err.message });
@@ -69,7 +74,10 @@ async function deletePost(req, res) {
 // ===== גלריית תמונות =====
 async function addImage(req, res) {
   try {
-    const campaign = await campaignService.addImageToGallery(req.params.campaignId, req.body.imageUrl);
+    const campaign = await campaignService.addImageToGallery(
+      req.params.campaignId,
+      req.body.imageUrl
+    );
     res.json(campaign);
   } catch (err) {
     res.status(400).json({ message: err.message });
@@ -78,7 +86,10 @@ async function addImage(req, res) {
 
 async function deleteImage(req, res) {
   try {
-    const campaign = await campaignService.deleteImageFromGallery(req.params.campaignId, req.body.imageUrl);
+    const campaign = await campaignService.deleteImageFromGallery(
+      req.params.campaignId,
+      req.body.imageUrl
+    );
     res.json(campaign);
   } catch (err) {
     res.status(400).json({ message: err.message });
@@ -95,6 +106,24 @@ async function incrementView(req, res) {
   }
 }
 
+// ===== AI =====
+async function getAiPostSuggestion(req, res) {
+  try {
+    const { candidateId } = req.params;
+    const { titleHint, note } = req.body || {};
+
+    const suggestion = await generateCampaignPostForCandidate(candidateId, {
+      titleHint,
+      note,
+    });
+
+    res.json({ ok: true, suggestion });
+  } catch (err) {
+    console.error('❌ AI error:', err);
+    res.status(500).json({ ok: false, message: err.message });
+  }
+}
+
 module.exports = {
   getCampaign,
   createCampaign,
@@ -105,4 +134,5 @@ module.exports = {
   addImage,
   deleteImage,
   incrementView,
+  getAiPostSuggestion,
 };

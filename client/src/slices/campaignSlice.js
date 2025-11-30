@@ -147,6 +147,28 @@ export const incrementView = createAsyncThunk(
   }
 );
 
+// ===== AI – הצעת פוסט אוטומטית =====
+export const generatePostSuggestion = createAsyncThunk(
+  'campaign/generatePostSuggestion',
+  async ({ candidateId, titleHint, note }, thunkAPI) => {
+    try {
+      const { data } = await http.post(
+        `/campaigns/candidate/${candidateId}/ai-suggest-post`,
+        { titleHint, note }
+      );
+      if (!data.ok) {
+        throw new Error(data.message || 'שגיאה מה-AI');
+      }
+      return data.suggestion; // { title, content }
+    } catch (err) {
+      return thunkAPI.rejectWithValue(
+        err.response?.data?.message || err.message || 'שגיאה'
+      );
+    }
+  }
+);
+
+
 // ===== Slice =====
 const campaignSlice = createSlice({
   name: 'campaign',
@@ -155,6 +177,10 @@ const campaignSlice = createSlice({
     data: null,       // הקמפיין
     candidate: null,  // המועמד של הקמפיין
     error: null,
+
+    aiLoading: false,
+    aiError: null,
+    aiSuggestion: null,
   },
   reducers: {},
   extraReducers: (builder) => {
@@ -166,7 +192,7 @@ const campaignSlice = createSlice({
       })
       .addCase(fetchCampaign.fulfilled, (state, action) => {
         state.loading = false;
-        state.data = action.payload.campaign;      // הקמפיין עצמו
+        state.data = action.payload.campaign;       // הקמפיין עצמו
         state.candidate = action.payload.candidate; // המועמד
       })
       .addCase(fetchCampaign.rejected, (state, action) => {
@@ -201,6 +227,21 @@ const campaignSlice = createSlice({
       // Views
       .addCase(incrementView.fulfilled, (state, action) => {
         state.data = action.payload; // viewCount מעודכן מגיע מהשרת
+      })
+
+      // AI suggestion
+      .addCase(generatePostSuggestion.pending, (state) => {
+        state.aiLoading = true;
+        state.aiError = null;
+        state.aiSuggestion = null;
+      })
+      .addCase(generatePostSuggestion.fulfilled, (state, action) => {
+        state.aiLoading = false;
+        state.aiSuggestion = action.payload; // { title, content }
+      })
+      .addCase(generatePostSuggestion.rejected, (state, action) => {
+        state.aiLoading = false;
+        state.aiError = action.payload;
       });
   },
 });
@@ -212,3 +253,7 @@ export const selectCampaign = (state) => state.campaign.data || null;
 export const selectCandidate = (state) => state.campaign.candidate || null;
 export const selectCampaignLoading = (state) => state.campaign.loading;
 export const selectCampaignError = (state) => state.campaign.error;
+
+export const selectAiSuggestion = (state) => state.campaign.aiSuggestion;
+export const selectAiLoading = (state) => state.campaign.aiLoading;
+export const selectAiError = (state) => state.campaign.aiError;
