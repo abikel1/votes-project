@@ -116,6 +116,7 @@ export default function CampaignPage() {
   };
 
   // === טעינת קמפיין + incrementView בקריאה אחת לוגית ===
+  // === טעינת קמפיין + incrementView בקריאה אחת לוגית ===
   useEffect(() => {
     if (!candidateId) return;
 
@@ -124,11 +125,14 @@ export default function CampaignPage() {
 
     dispatch(fetchCampaign(candidateId))
       .unwrap()
-      .then((camp) => {
-        // פעם אחת בלבד נעשה incrementView
-        if (camp?._id && !hasIncrementedViewRef.current) {
+      .then((res) => {
+        // res = { success, campaign, candidate }
+        const campaignId = res?.campaign?._id || res?._id;
+
+        if (campaignId && !hasIncrementedViewRef.current) {
           hasIncrementedViewRef.current = true;
-          dispatch(incrementView(camp._id)).catch((err) => {
+
+          dispatch(incrementView(campaignId)).catch((err) => {
             console.error('שגיאה בעדכון צפיות:', err);
           });
         }
