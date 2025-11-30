@@ -20,6 +20,7 @@ const {
   removeMember,
   getCandidateRequests,
   generateGroupDescription,
+  getAppliedGroupsController,
 } = require('../controllers/group_controller');
 
 const {
@@ -52,6 +53,7 @@ router.get('/my-join-status', auth, getMyJoinStatuses);
 router.get('/:id/my-membership', auth, getMyMembership);
 
 router.patch('/:id/members/remove', auth, removeMember);
+router.get('/applied', auth, getAppliedGroupsController);
 
 // ---------- slug ----------
 router.get('/slug/:slug', async (req, res) => {

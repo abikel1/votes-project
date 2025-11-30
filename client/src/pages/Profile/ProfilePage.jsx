@@ -24,6 +24,7 @@ export default function ProfilePage() {
   const message = useSelector((state) => state.auth.message);
   const [userGroups, setUserGroups] = useState({ created: [], joined: [] });
   const navigate = useNavigate();
+const [appliedGroups, setAppliedGroups] = useState([]);
 
   const [editMode, setEditMode] = useState(false);
 
@@ -57,6 +58,18 @@ export default function ProfilePage() {
       });
     }
   }, [user, token, dispatch]);
+useEffect(() => {
+  if (!user || !token) return;
+
+  // קבוצות שבהן את מועמדת
+  http.get('/groups/applied')
+    .then((res) => {
+      setAppliedGroups(res.data);
+    })
+    .catch((err) => {
+      console.error('Error fetching applied groups:', err);
+    });
+}, [user, token]);
 
   useEffect(() => {
     if (!user || !token) return;
@@ -379,7 +392,29 @@ export default function ProfilePage() {
             <li>{t('profile.noGroups', 'אין קבוצות')}</li>
           )}
         </ul>
+
+
+        
+      <div className="profile-groups-divider" />
+
+<h2>{t('profile.groupsApplied', 'קבוצות שבהן אני מועמד/ת')}</h2>
+<ul>
+  {appliedGroups.length > 0 ? (
+    appliedGroups.map((g) => (
+      <li key={g._id} className="group-item">
+        <span>{g.name}</span>
+        <button onClick={() => navigate(`/groups/${g._id}`)}>
+          {t('profile.viewGroup', 'לפרטי הקבוצה')}
+        </button>
+      </li>
+    ))
+  ) : (
+    <li>{t('profile.noGroups', 'אין קבוצות')}</li>
+  )}
+</ul>
+
       </div>
+
 
       {showPasswordModal && (
         <div className="modal-overlay">

@@ -13,6 +13,8 @@ const {
   removeGroupMemberService,
   getCandidateRequestsService,
   generateGroupDescriptionService,
+  getAppliedGroupsService
+  
 } = require('../services/group_service');
 const Group = require('../models/group_model');
 
@@ -209,7 +211,16 @@ async function getMyMembership(req, res) {
   }
 }
 
-
+async function getAppliedGroupsController(req, res) {
+  try {
+    if (!req.user) return res.status(401).json({ message: 'User not authenticated' });
+    const groups = await getAppliedGroups(req.user);
+    res.json(groups);
+  } catch (err) {
+    console.error('getAppliedGroups error:', err);
+    res.status(500).json({ message: err.message || 'Server error' });
+  }
+}
 
 // server/src/controllers/group_controller.js
 async function getCandidateRequests(req, res) {
@@ -238,6 +249,19 @@ async function generateGroupDescription(req, res) {
   }
 }
 
+async function getAppliedGroupsController(req, res) {
+  try {
+    if (!req.user) return res.status(401).json({ message: 'User not authenticated' });
+
+    // ❌ קודם היה: getAppliedGroups(req.user);
+    const groups = await getAppliedGroupsService(req.user); // ✅ השם הנכון
+    res.json(groups);
+  } catch (err) {
+    console.error('getAppliedGroups error:', err);
+    res.status(500).json({ message: err.message || 'Server error' });
+  }
+}
+
 
 module.exports = {
   createGroup,
@@ -256,4 +280,4 @@ module.exports = {
   removeMember,
   getCandidateRequests,
   generateGroupDescription,
-};
+getAppliedGroupsController};
