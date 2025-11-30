@@ -416,10 +416,15 @@ export default function GroupDetailPage() {
                     <div key={c._id} className={`candidate-card ${winnerIndex !== -1 ? 'winner' : ''}`}>
                       {c.photoUrl && (
                         <img
-                          src={c.photoUrl}
+                          src={c.photoUrl || '/h.jpg'}           // אם אין URL – ברירת מחדל
                           alt={c.name || 'תמונת מועמד'}
                           className="candidate-avatar"
+                          onError={(e) => {
+                            e.currentTarget.onerror = null;      // מונע loop אם גם הברירת מחדל לא קיימת
+                            e.currentTarget.src = '/h.jpg';     // מציב ברירת מחדל במקרה של שגיאה בטעינה
+                          }}
                         />
+
                       )}
 
                       {/* אם הקבוצה נגמרה והמועמד מנצח – הצג מקום */}
@@ -430,17 +435,17 @@ export default function GroupDetailPage() {
                       )}
 
 
-{c.userId && (
-  <button
-    className="campaign-btn"
-    onClick={() =>
-      navigate(`/campaign/${c._id}`, { state: { groupId } })
-    }
-    title="קמפיין שלי"
-  >
-    <FiZap size={16} />
-  </button>
-)}
+                      {c.userId && (
+                        <button
+                          className="campaign-btn"
+                          onClick={() =>
+                            navigate(`/campaign/${c._id}`, { state: { groupId } })
+                          }
+                          title="קמפיין שלי"
+                        >
+                          <FiZap size={16} />
+                        </button>
+                      )}
 
                       <div className="candidate-text">
                         <h4>{c.name}</h4>

@@ -19,6 +19,6 @@ export async function uploadImage(file, oldUrl = '') {
     throw new Error(data.message || 'Upload failed');
   }
 
-  // מניחים שהשרת מחזיר { url: '...' }
+  // מניחים שהשרת מחזיר { url: '...' }גגג
   return data.url;
 }

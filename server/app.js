@@ -42,6 +42,7 @@ app.use(
 // 2. Upload route — חשוב שיבוא לפני express.json()
 // ----------------------------------------------------------------------
 app.use('/api/upload', uploadRoutes);
+app.use('/uploads', express.static('uploads'));
 
 
 // ----------------------------------------------------------------------

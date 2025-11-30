@@ -559,8 +559,14 @@ export default function CampaignPage() {
                     className="gallery-item"
                     onClick={() => setSelectedImage(img)}
                   >
-                    <img src={img} alt={`תמונה ${idx + 1}`} />
-                    {isCandidateOwner && isEditMode && (
+                    <img
+                      src={img || '/q.jpg'}           // ברירת מחדל אם אין URL
+                      alt={`תמונה ${idx + 1}`}
+                      onError={(e) => {
+                        e.currentTarget.onerror = null; // מונע loop
+                        e.currentTarget.src = '/q.png';
+                      }}
+                    />                    {isCandidateOwner && isEditMode && (
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
