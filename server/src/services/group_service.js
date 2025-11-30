@@ -423,6 +423,18 @@ async function getCandidateRequestsService(groupId) {
   return group.candidateRequests || [];
 }
 
+async function getAppliedGroupsService(user) {
+  if (!user || !user._id) throw new Error('User required');
+
+  const groups = await Group.find({
+    'candidateRequests.userId': user._id
+  })
+    .lean()
+    .populate({ path: 'createdById', select: 'firstName lastName' });
+
+  return groups;
+}
+
 /* ===== AI תיאור קבוצה ===== */
 
 async function generateGroupDescriptionService(name, hint = '') {
@@ -521,4 +533,5 @@ module.exports = {
   rejectCandidateRequestService,
   getCandidateRequestsService,
   generateGroupDescriptionService,
+  getAppliedGroupsService
 };
