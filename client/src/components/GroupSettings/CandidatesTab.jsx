@@ -1,5 +1,7 @@
 // src/pages/GroupSettingsPage/CandidatesTab.jsx
+import React, { useState } from 'react';
 import CandidateForm from '../../components/GroupSettings/CandidateForm';
+import http from '../../api/http';
 
 export default function CandidatesTab({
   candidates,
@@ -12,13 +14,41 @@ export default function CandidatesTab({
   onAddCandidate,
   onDeleteCandidate,
   onOpenEditCandidate,
-  uploadingNew,
-  onUploadNew,
   newFileInputRef,
   clearNewPhoto,
 }) {
+  // ✅ State מקומי להעלאת תמונה
+  const [localUploading, setLocalUploading] = useState(false);
+
+  // ✅ פונקציה להעלאת תמונה
+  const onUploadNew = async (file) => {
+    if (!file) return;
+    try {
+      setLocalUploading(true);
+
+      const formData = new FormData();
+      formData.append('image', file);
+
+      const { data } = await http.post('http://localhost:3000/api/upload', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+
+      // שומרים רק URL כדי לא להעמיס על ה־Redux / האתר
+      setCandForm((prev) => ({
+        ...prev,
+        photoUrl: data.url,
+      }));
+    } catch (err) {
+      console.error('Upload error:', err);
+      alert('שגיאה בהעלאת התמונה');
+    } finally {
+      setLocalUploading(false);
+    }
+  };
+
   return (
     <section className="card">
+      {/* רשימת מועמדים קיימים */}
       <details open className="acc">
         <summary className="acc-sum">מועמדים</summary>
         <div className="acc-body">
@@ -35,11 +65,19 @@ export default function CandidatesTab({
                   <div className="row-main">
                     <div className="title">
                       {c.photoUrl && (
-<img
-  className="avatar"
-  src={c.photoUrl || '/h.jpg'}
-  alt={c.name || 'מועמד/ת'}
-/>
+
+
+                        <img
+                          src={c.photoUrl || '/h.jpg'}           // אם אין URL – ברירת מחדל
+                          alt={c.name || 'תמונת מועמד'}
+                          className="avatar"
+                          onError={(e) => {
+                            e.currentTarget.onerror = null;      // מונע loop אם גם הברירת מחדל לא קיימת
+                            e.currentTarget.src = '/h.jpg';     // מציב ברירת מחדל במקרה של שגיאה בטעינה
+                          }}
+                        />
+
+
                       )}
                       {c.name || '(ללא שם)'} {c.symbol ? `· ${c.symbol}` : ''}
                     </div>
@@ -52,13 +90,12 @@ export default function CandidatesTab({
                     >
                       עריכה
                     </button>
-                 <button
-  className="small danger"
-  onClick={() => onDeleteCandidate(c)} // c חייב להיות אובייקט עם _id
->
-  הסרה
-</button>
-
+                    <button
+                      className="small danger"
+                      onClick={() => onDeleteCandidate(c)}
+                    >
+                      הסרה
+                    </button>
                   </div>
                 </li>
               ))}
@@ -67,6 +104,7 @@ export default function CandidatesTab({
         </div>
       </details>
 
+      {/* הוספת מועמד/ת חדש/ה */}
       <details className="acc">
         <summary className="acc-sum">הוספת מועמד/ת</summary>
         <div className="acc-body">
@@ -78,12 +116,12 @@ export default function CandidatesTab({
               setCandErrors((prev) => ({ ...prev, [name]: undefined }));
             }}
             onSubmit={onAddCandidate}
-            uploading={uploadingNew}
+            uploading={localUploading}
             onUploadFile={onUploadNew}
             fileInputRef={newFileInputRef}
             clearPhoto={clearNewPhoto}
             submitLabel="הוסף/י מועמד/ת"
-            submitDisabled={uploadingNew}
+            submitDisabled={localUploading}
           />
         </div>
       </details>
