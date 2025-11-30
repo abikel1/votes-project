@@ -65,11 +65,19 @@ export default function CandidatesTab({
                   <div className="row-main">
                     <div className="title">
                       {c.photoUrl && (
+
+
                         <img
+                          src={c.photoUrl || '/h.jpg'}           // אם אין URL – ברירת מחדל
+                          alt={c.name || 'תמונת מועמד'}
                           className="avatar"
-                          src={c.photoUrl || '/h.jpg'}
-                          alt={c.name || 'מועמד/ת'}
+                          onError={(e) => {
+                            e.currentTarget.onerror = null;      // מונע loop אם גם הברירת מחדל לא קיימת
+                            e.currentTarget.src = '/h.jpg';     // מציב ברירת מחדל במקרה של שגיאה בטעינה
+                          }}
                         />
+
+
                       )}
                       {c.name || '(ללא שם)'} {c.symbol ? `· ${c.symbol}` : ''}
                     </div>
