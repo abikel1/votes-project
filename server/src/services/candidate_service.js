@@ -1,6 +1,7 @@
 // server/src/services/candidate_service.js
 const Candidate = require('../models/candidate_model');
 const Group = require('../models/group_model');
+const Campaign = require('../models/campaign_model'); // 👈 להוסיף שורה זו
 
 // יצירת מועמד
 async function createCandidateService(candidateData) {
@@ -54,6 +55,9 @@ async function deleteCandidateService(candidateId) {
     );
   }
 
+  // 👇 מחיקת הקמפיין של המועמד (אם קיים)
+  await Campaign.deleteMany({ candidate: candidate._id });
+
   // מוחקים את המועמד עצמו
   await Candidate.findByIdAndDelete(candidateId);
 
@@ -74,6 +78,7 @@ async function deleteCandidateService(candidateId) {
   // מחזירים את המועמד שנמחק (אם תרצי להשתמש בזה בצד קונטרולר)
   return candidate;
 }
+
 
 // קבלת מועמד לפי ID
 async function getCandidateByIdService(candidateId) {

@@ -8,7 +8,7 @@ const AuthTokenSchema = new Schema({
   // ⬅️ expiresAt מקבל ברירת מחדל של 10 דקות קדימה
   expiresAt: {
     type: Date,
-    index: true,
+    // index: true,
     default: () => new Date(Date.now() + 24 * 60 * 60 * 1000), // 24 שעות
   },
   createdByIP: String,

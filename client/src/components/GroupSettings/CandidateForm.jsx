@@ -25,7 +25,7 @@ export default function CandidateForm({
             />
             {errors.name && <div className="err small-err">{errors.name}</div>}
 
-            <label>תיאור</label>
+            <label>תיאור *</label>
             <textarea
                 className="input"
                 rows={3}
@@ -38,7 +38,7 @@ export default function CandidateForm({
                 <div className="err small-err">{errors.description}</div>
             )}
 
-            <label>סמל</label>
+            <label>סמל *</label>
             <input
                 className="input"
                 name="symbol"
