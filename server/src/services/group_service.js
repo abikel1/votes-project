@@ -2,6 +2,9 @@ const mongoose = require('mongoose');
 const Group = require('../models/group_model');
 const Candidate = require('../models/candidate_model');
 const User = require('../models/user_model');
+const Campaign = require('../models/campaign_model');
+const ChatMessage = require('../models/chat_message_model');
+const Vote = require('../models/vote_model'); // 👈 הוספנו
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 
 const genAI = process.env.GEMINI_API_KEY
@@ -70,6 +73,25 @@ async function updateGroupService(groupId, updateData) {
 }
 
 async function deleteGroupService(groupId) {
+  // קודם נאתר את כל המועמדים של הקבוצה
+  const candidates = await Candidate.find({ groupId }).select('_id');
+  const candidateIds = candidates.map(c => c._id);
+
+  // מוחקים את כל הקמפיינים שקשורים למועמדים האלה
+  if (candidateIds.length > 0) {
+    await Campaign.deleteMany({ candidate: { $in: candidateIds } });
+  }
+
+  // מוחקים את כל המועמדים של הקבוצה
+  await Candidate.deleteMany({ groupId });
+
+  // 👇 מוחקים את כל הודעות הצ'אט של הקבוצה
+  await ChatMessage.deleteMany({ groupId });
+
+  // 👇 מוחקים את כל ההצבעות של הקבוצה
+  await Vote.deleteMany({ groupId });
+
+  // לבסוף מוחקים את הקבוצה עצמה
   return Group.findByIdAndDelete(groupId);
 }
 
@@ -80,10 +102,10 @@ async function getGroupByIdService(groupId) {
 }
 
 async function getAllGroupsService() {
- return Group.find()
-  .lean()
-  .populate({ path: 'candidates', select: 'name photoUrl' })
-  .populate({ path: 'createdById', select: 'firstName lastName' });
+  return Group.find()
+    .lean()
+    .populate({ path: 'candidates', select: 'name photoUrl' })
+    .populate({ path: 'createdById', select: 'firstName lastName' });
 
 }
 

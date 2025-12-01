@@ -20,10 +20,20 @@ async function addChatMessageService(groupId, user, text) {
     const group = await Group.findById(groupId).lean();
     if (!group) throw new Error('Group not found');
 
+    // 👈 פה בונים שם תצוגה נורמלי מתוך המשתמש
+    const senderName =
+        (user.firstName && user.lastName)
+            ? `${user.firstName} ${user.lastName}`
+            : user.firstName ||
+            user.lastName ||
+            user.name ||
+            user.fullName ||
+            (user.email ? user.email.split('@')[0] : '');
+
     const msg = await ChatMessage.create({
         groupId,
         userId: user._id,
-        senderName: user.name || user.fullName || '',
+        senderName,
         senderEmail: (user.email || '').trim().toLowerCase(),
         text: text.trim(),
         deleted: false,
@@ -31,6 +41,7 @@ async function addChatMessageService(groupId, user, text) {
 
     return msg;
 }
+
 
 async function deleteChatMessageService(groupId, messageId, user) {
     if (!user) throw new Error('User required');

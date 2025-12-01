@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { FiMoreVertical, FiSmile, FiSend } from 'react-icons/fi';
+import { io } from 'socket.io-client';
 import http from '../../api/http';
 import EmojiPicker from 'emoji-picker-react';
 import './GroupChat.css';
@@ -37,25 +38,25 @@ export default function GroupChat({ groupId, canChat, currentUserId, isOwner }) 
     const [editingId, setEditingId] = useState(null);
     const messagesEndRef = useRef(null);
 
-    // האם המשתמש בתחתית הצ'אט כרגע
     const [isAtBottom, setIsAtBottom] = useState(true);
 
-    // סיכום שיחה
     const [summaryLoading, setSummaryLoading] = useState(false);
     const [summaryError, setSummaryError] = useState('');
     const [moreOpen, setMoreOpen] = useState(false);
 
-    // אימוג׳י
     const [showEmojiPicker, setShowEmojiPicker] = useState(false);
     const inputRef = useRef(null);
 
-    // גלילה למטה רק אם המשתמש בתחתית
+    const [socket, setSocket] = useState(null);
+
+    // גלילה למטה כשמגיעות הודעות ואנחנו בתחתית
     useEffect(() => {
         if (isAtBottom && messagesEndRef.current) {
             messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
         }
     }, [messages, isAtBottom]);
 
+    // טעינת הודעות ראשוניות ב-HTTP (פעם אחת לכל groupId)
     useEffect(() => {
         if (!groupId) return;
 
@@ -80,105 +81,157 @@ export default function GroupChat({ groupId, canChat, currentUserId, isOwner }) 
         };
 
         fetchMessages();
-        const intervalId = setInterval(fetchMessages, 5000);
 
         return () => {
             isCancelled = true;
-            clearInterval(intervalId);
         };
     }, [groupId]);
 
-    const handleSubmit = async (e) => {
+    // חיבור Socket.IO והאזנה לאירועים
+    useEffect(() => {
+        if (!groupId) return;
+
+        const apiBase = http.defaults?.baseURL || window.location.origin;
+        const socketBase = apiBase.replace(/\/api\/?$/, '');
+
+        const token = localStorage.getItem('token');
+
+        if (!token) {
+            console.warn('Socket: missing token, not connecting');
+            return;
+        }
+
+        const s = io(socketBase, {
+            withCredentials: true,
+            auth: { token },
+        });
+
+        s.on('connect_error', (err) => {
+            console.error('Socket connect_error:', err.message);
+        });
+
+        setSocket(s);
+
+        s.on('connect', () => {
+            s.emit('join-group-chat', { groupId });
+        });
+
+        s.on('chat:new-message', (msg) => {
+            setMessages((prev) => [...prev, msg]);
+        });
+
+        s.on('chat:message-updated', (msg) => {
+            setMessages((prev) =>
+                prev.map((m) =>
+                    String(m._id || m.id) === String(msg._id) ? msg : m
+                )
+            );
+        });
+
+        s.on('chat:message-deleted', (msg) => {
+            setMessages((prev) =>
+                prev.map((m) =>
+                    String(m._id || m.id) === String(msg._id)
+                        ? { ...m, ...msg }
+                        : m
+                )
+            );
+        });
+
+        // סיכום AI – עדכון כל ההודעות בזמן אמת לכל מי שבחדר
+        s.on('chat:summary-done', ({ summary, messages }) => {
+            setMessages(Array.isArray(messages) ? messages : []);
+            setSummaryLoading(false);
+            setSummaryError('');
+            setTimeout(() => {
+                if (messagesEndRef.current) {
+                    messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+                }
+            }, 50);
+        });
+
+        return () => {
+            s.off('chat:new-message');
+            s.off('chat:message-updated');
+            s.off('chat:message-deleted');
+            s.off('chat:summary-done');
+            s.disconnect();
+            setSocket(null);
+        };
+    }, [groupId]);
+
+    const handleSubmit = (e) => {
         e.preventDefault();
         if (!text.trim() || !groupId || !canChat) return;
+        if (!socket) return;
 
-        try {
-            setSending(true);
-            setError('');
+        setSending(true);
+        setError('');
 
-            if (editingId) {
-                const { data } = await http.patch(
-                    `/groups/${groupId}/chat/${editingId}`,
-                    { text: text.trim() }
-                );
-
-                if (Array.isArray(data)) {
-                    setMessages(data);
-                } else if (data.messages) {
-                    setMessages(data.messages);
-                } else {
-                    setMessages((prev) =>
-                        prev.map((m) =>
-                            (m._id || m.id) === editingId
-                                ? { ...m, text: text.trim(), deleted: false }
-                                : m
-                        )
-                    );
+        // עריכת הודעה
+        if (editingId) {
+            socket.emit(
+                'chat:update',
+                {
+                    groupId,
+                    messageId: editingId,
+                    text: text.trim(),
+                },
+                (res) => {
+                    if (!res || !res.ok) {
+                        setError(res?.message || 'שגיאה בעדכון ההודעה');
+                    }
+                    setSending(false);
                 }
-
-                setEditingId(null);
-                setText('');
-                return;
-            }
-
-            const { data } = await http.post(`/groups/${groupId}/chat`, {
-                text: text.trim(),
-            });
-
-            if (Array.isArray(data)) {
-                setMessages(data);
-            } else if (data.message) {
-                setMessages((prev) => [...prev, data.message]);
-            } else if (data.messages) {
-                setMessages(data.messages);
-            }
-
-            setText('');
-            // אחרי שליחת הודעה בד"כ נמצאים בתחתית, נחזיר דגל
-            setIsAtBottom(true);
-        } catch (err) {
-            console.error('failed to send chat message', err);
-            setError('שגיאה בשליחת ההודעה');
-        } finally {
-            setSending(false);
-        }
-    };
-
-    const handleDelete = async (messageId) => {
-        if (!messageId || !groupId) return;
-        if (!window.confirm('למחוק את ההודעה?')) return;
-
-        try {
-            setSending(true);
-            setError('');
-            const { data } = await http.delete(
-                `/groups/${groupId}/chat/${messageId}`
             );
 
-            if (Array.isArray(data)) {
-                setMessages(data);
-            } else if (data.messages) {
-                setMessages(data.messages);
-            } else {
-                setMessages((prev) =>
-                    prev.map((m) =>
-                        (m._id || m.id) === messageId
-                            ? { ...m, deleted: true, text: 'הודעה נמחקה' }
-                            : m
-                    )
-                );
-            }
+            setEditingId(null);
+            setText('');
+            return;
+        }
 
-            if (editingId === messageId) {
-                setEditingId(null);
-                setText('');
+        // הודעה חדשה
+        socket.emit(
+            'chat:send',
+            {
+                groupId,
+                text: text.trim(),
+            },
+            (res) => {
+                if (!res || !res.ok) {
+                    setError(res?.message || 'שגיאה בשליחת ההודעה');
+                }
+                setSending(false);
             }
-        } catch (err) {
-            console.error('failed to delete chat message', err);
-            setError('שגיאה במחיקת ההודעה');
-        } finally {
-            setSending(false);
-            setMenuOpenFor(null);
+        );
+
+        setText('');
+        setIsAtBottom(true);
+    };
+
+    const handleDelete = (messageId) => {
+        if (!messageId || !groupId) return;
+        if (!window.confirm('למחוק את ההודעה?')) return;
+        if (!socket) return;
+
+        setSending(true);
+        setError('');
+
+        socket.emit(
+            'chat:delete',
+            { groupId, messageId },
+            (res) => {
+                if (!res || !res.ok) {
+                    setError(res?.message || 'שגיאה במחיקת ההודעה');
+                }
+                setSending(false);
+                setMenuOpenFor(null);
+            }
+        );
+
+        if (editingId === messageId) {
+            setEditingId(null);
+            setText('');
         }
     };
 
@@ -203,33 +256,22 @@ export default function GroupChat({ groupId, canChat, currentUserId, isOwner }) 
         });
     };
 
-    const handleSummarize = async () => {
-        if (!groupId) return;
-        try {
-            setSummaryLoading(true);
-            setSummaryError('');
-            const { data } = await http.get(`/groups/${groupId}/chat/summary`);
+    const handleSummarize = () => {
+        if (!groupId || !socket) return;
 
-            if (Array.isArray(data.messages)) {
-                setMessages(data.messages);
-            }
+        setSummaryLoading(true);
+        setSummaryError('');
 
-            // אחרי סיכום נרצה להגיע לסוף
-            setTimeout(() => {
-                if (messagesEndRef.current) {
-                    messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+        socket.emit(
+            'chat:summarize',
+            { groupId },
+            (res) => {
+                if (!res || !res.ok) {
+                    setSummaryError(res?.message || 'שגיאה בסיכום השיחה');
+                    setSummaryLoading(false);
                 }
-            }, 50);
-        } catch (err) {
-            console.error('failed to summarize chat', err);
-            if (err.response && err.response.status === 404) {
-                setSummaryError('לא נמצא שירות סיכום בצד השרת (404).');
-            } else {
-                setSummaryError('שגיאה בסיכום השיחה');
             }
-        } finally {
-            setSummaryLoading(false);
-        }
+        );
     };
 
     const handleSummaryClickFromMenu = () => {
@@ -238,7 +280,6 @@ export default function GroupChat({ groupId, canChat, currentUserId, isOwner }) 
         handleSummarize();
     };
 
-    // קליק על אימוג׳י
     const handleEmojiClick = (emojiData) => {
         setText((prev) => prev + (emojiData.emoji || ''));
         setShowEmojiPicker(false);
@@ -265,7 +306,9 @@ export default function GroupChat({ groupId, canChat, currentUserId, isOwner }) 
                 )}
 
                 {error && <div className="group-chat-error">{error}</div>}
-                {summaryError && <div className="group-chat-error">{summaryError}</div>}
+                {summaryError && (
+                    <div className="group-chat-error">{summaryError}</div>
+                )}
 
                 {!loading && messages.length === 0 && !error && (
                     <div className="group-chat-status">
@@ -292,16 +335,13 @@ export default function GroupChat({ groupId, canChat, currentUserId, isOwner }) 
                             msg.senderName === 'AI' ||
                             msg.senderName === 'בינה מלאכותית';
 
-                        // האם זו הודעה של המשתמש הנוכחי (לא כולל AI)
                         const isMineBase =
                             !isAi &&
                             currentUserId &&
                             (msg.userId === currentUserId ||
                                 String(msg.userId) === String(currentUserId));
 
-                        // האם מותר למשתמש לנהל את ההודעה (עריכה/מחיקה)
                         const canManageMessage = isOwner || isMineBase;
-
                         const isDeleted = !!msg.deleted;
 
                         const displayName = isAi
@@ -316,8 +356,8 @@ export default function GroupChat({ groupId, canChat, currentUserId, isOwner }) 
                             null;
 
                         const textToShow = isDeleted
-                            ? (msg.text || 'הודעה נמחקה')
-                            : (msg.text || '');
+                            ? msg.text || 'הודעה נמחקה'
+                            : msg.text || '';
 
                         const initial = displayName ? displayName.trim().charAt(0) : '?';
 
@@ -338,7 +378,8 @@ export default function GroupChat({ groupId, canChat, currentUserId, isOwner }) 
                             >
                                 <div
                                     className={`group-chat-message ${isMineBase ? 'mine' : 'theirs'
-                                        } ${isDeleted ? 'deleted' : ''} ${isAi ? 'ai' : ''}`}
+                                        } ${isDeleted ? 'deleted' : ''} ${isAi ? 'ai' : ''
+                                        }`}
                                 >
                                     <div className="group-chat-message-header">
                                         <span className="group-chat-sender">{displayName}</span>
@@ -365,7 +406,6 @@ export default function GroupChat({ groupId, canChat, currentUserId, isOwner }) 
 
                                                     {menuOpenFor === id && (
                                                         <div className="group-chat-menu">
-                                                            {/* עריכה – רק על הודעה שלי ולא AI */}
                                                             {!isAi && isMineBase && (
                                                                 <button
                                                                     type="button"
@@ -374,7 +414,6 @@ export default function GroupChat({ groupId, canChat, currentUserId, isOwner }) 
                                                                     עריכה
                                                                 </button>
                                                             )}
-                                                            {/* מחיקה – גם שלי וגם של אחרים אם אני מנהל/ת */}
                                                             <button
                                                                 type="button"
                                                                 onClick={() => handleDelete(id)}
@@ -423,9 +462,7 @@ export default function GroupChat({ groupId, canChat, currentUserId, isOwner }) 
                 </div>
             )}
 
-            {/* שורת הקלט החדשה – פלוס מימין, שליחה משמאל */}
             <form className="group-chat-input-row" onSubmit={handleSubmit}>
-                {/* פלוס — בצד ימין */}
                 <div className="chat-more-wrapper">
                     <button
                         type="button"
@@ -453,7 +490,6 @@ export default function GroupChat({ groupId, canChat, currentUserId, isOwner }) 
                     )}
                 </div>
 
-                {/* קפסולת האינפוט עם האימוג׳י משמאל */}
                 <div className="chat-input-shell">
                     <input
                         ref={inputRef}
@@ -497,7 +533,6 @@ export default function GroupChat({ groupId, canChat, currentUserId, isOwner }) 
                     </div>
                 </div>
 
-                {/* שליחה — בצד שמאל עם אייקון מטוס */}
                 <button
                     type="submit"
                     className="chat-send-btn group-chat-send-btn"
