@@ -182,35 +182,44 @@ export default function GroupsPage() {
   const myEmail = lc(authEmail) || lc(localStorage.getItem('userEmail'));
   const myId = String(authId ?? localStorage.getItem('userId') ?? '');
 
-const filteredGroups = groups
-  .filter((g) => {
-    const gid = String(g._id);
-    const nameMatch = g.name?.toLowerCase().includes(searchTerm.toLowerCase());
-    if (!nameMatch) return false;
+  const filteredGroups = groups
+    .filter((g) => {
+      const gid = String(g._id);
+      const nameMatch = g.name?.toLowerCase().includes(searchTerm.toLowerCase());
+      if (!nameMatch) return false;
 
-    const isLocked = !!g.isLocked;
-    const isOwner = createdIdsSet.has(gid);
-    const isMember = joinedIdsSet.has(gid);
-    const now = new Date();
-    const candidateOpen = g.candidateEndDate && new Date(g.candidateEndDate) > now;
+      const isLocked = !!g.isLocked;
+      const isOwner = createdIdsSet.has(gid);
+      const isMember = joinedIdsSet.has(gid);
+      const now = new Date();
+      const candidateOpen = g.candidateEndDate && new Date(g.candidateEndDate) > now;
 
-    switch (filter) {
-      case 'open':
-        return !isLocked;
-      case 'locked':
-        return isLocked;
-      case 'joined':
-        return isMember;
-      case 'owned':
-        return isOwner;
-      case 'expired':
-        return new Date(g.endDate) < now;
-      case 'candidateOpen':  // ← הפילטר החדש
-        return candidateOpen;
-      default:
-        return true;
-    }
-  })
+      // הצבעה פתוחה: תאריך סיום הקבוצה בעתיד
+      // וגם או שאין תאריך הגשת מועמדות, או שהוא כבר עבר
+      const votingOpen =
+        g.endDate &&
+        new Date(g.endDate) > now &&
+        (!g.candidateEndDate || new Date(g.candidateEndDate) <= now);
+
+      switch (filter) {
+        case 'open':
+          return !isLocked;
+        case 'locked':
+          return isLocked;
+        case 'joined':
+          return isMember;
+        case 'owned':
+          return isOwner;
+        case 'expired':
+          return new Date(g.endDate) < now;
+        case 'candidateOpen':
+          return candidateOpen;
+        case 'votingOpen':
+          return votingOpen;
+        default:
+          return true;
+      }
+    })
     .sort((a, b) => {
       if (sortBy === 'creationDate')
         return new Date(b.creationDate) - new Date(a.creationDate);
@@ -312,16 +321,25 @@ const filteredGroups = groups
                   {t('groups.list.filters.expired')}
                 </label>
                 <label>
-  <input
-    type="radio"
-    name="filter"
-    value="candidateOpen"
-    checked={filter === 'candidateOpen'}
-    onChange={(e) => setFilter(e.target.value)}
-  />
-  {t('groups.list.filters.candidateOpen')}
-</label>
-
+                  <input
+                    type="radio"
+                    name="filter"
+                    value="candidateOpen"
+                    checked={filter === 'candidateOpen'}
+                    onChange={(e) => setFilter(e.target.value)}
+                  />
+                  {t('groups.list.filters.candidateOpen')}
+                </label>
+                <label>
+                  <input
+                    type="radio"
+                    name="filter"
+                    value="votingOpen"
+                    checked={filter === 'votingOpen'}
+                    onChange={(e) => setFilter(e.target.value)}
+                  />
+                  {t('groups.list.filters.votingOpen')}
+                </label>
               </div>
             )}
 
@@ -541,12 +559,12 @@ const filteredGroups = groups
                   )}
 
                   {g.candidateEndDate && new Date() < new Date(g.candidateEndDate) && (
-    <HiOutlineDocumentText 
-        size={20} 
-        className="groups-badge-candidate"
-        title="הגשת מועמדות פתוחה"
-    />
-)}
+                    <HiOutlineDocumentText
+                      size={20}
+                      className="groups-badge-candidate"
+                      title="הגשת מועמדות פתוחה"
+                    />
+                  )}
 
                 </div>
               </div>
