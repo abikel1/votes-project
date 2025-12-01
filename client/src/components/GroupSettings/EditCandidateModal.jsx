@@ -12,6 +12,7 @@ export default function EditCandidateModal({
   onUploadEdit,
   editFileInputRef,
   clearEditPhoto,
+  canEditName = true,
 }) {
   if (!open) return null;
 
@@ -31,14 +32,14 @@ export default function EditCandidateModal({
             name="name"
             value={editCandForm.name}
             onChange={onEditCandChange}
-            required
-            disabled={disabled}
+            required={canEditName}                  // 👈 חובה רק אם מותר לערוך
+            disabled={disabled || !canEditName}     // 👈 נעול כשאסור לערוך
           />
           {editCandErrors.name && (
             <div className="err small-err">{editCandErrors.name}</div>
           )}
 
-          <label>תיאור</label>
+          <label>תיאור *</label>
           <textarea
             className="input"
             rows={3}
@@ -52,7 +53,7 @@ export default function EditCandidateModal({
             <div className="err small-err">{editCandErrors.description}</div>
           )}
 
-          <label>סמל</label>
+          <label>סמל *</label>
           <input
             className="input"
             name="symbol"
