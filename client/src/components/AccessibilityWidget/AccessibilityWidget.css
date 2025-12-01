@@ -1,0 +1,83 @@
+/* כפתור הנגישות – גרסה קטנה וצמודה למטה */
+.accessibility-btn {
+  position: fixed;
+  top: 70%;                 /* ↓↓ מוריד את הכפתור למטה */
+  right: 0;
+  transform: translateY(-50%);
+
+  width: 38px;              /* ↓ צר יותר */
+  height: 70px;             /* ↓ נמוך יותר */
+
+  background: #003366;
+  color: #fff;
+
+  border: none;
+  cursor: pointer;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 40px 0 0 40px; /* קפסולה קטנה בצד */
+  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.25);
+
+  padding-right: 5px;       /* מרכז את האייקון */
+  z-index: 9999;
+}
+
+.accessibility-btn:hover {
+  background: #00284a;
+}
+
+/* כדי שהאייקון עצמו יהיה קטן ואלגנטי */
+.accessibility-btn svg {
+  width: 22px;
+  height: 22px;
+
+  background: white;
+  border-radius: 50%;
+  padding: 3px;
+  color: #003366;
+  border: 2px solid white;
+}
+
+/* פאנל נגישות מוקטן */
+.accessibility-panel {
+  position: fixed;
+  top: 70%;                 /* ↓ מיושר לפי הכפתור */
+  right: 55px;              /* קרוב יותר לכפתור */
+  transform: translateY(-50%);
+
+  width: 200px;             /* ↓ צר יותר */
+
+  background: white;
+  border-radius: 10px;
+  padding: 12px;            /* ↓ ריווח קטן יותר */
+
+  box-shadow: 0px 4px 15px rgba(0,0,0,0.25);
+
+  z-index: 9999;
+}
+
+.accessibility-panel h4 {
+  margin-top: 0;
+  margin-bottom: 10px;
+  text-align: center;
+  color: #003366;
+  font-size: 16px;          /* ↓ כותרת קטנה יותר */
+}
+
+.accessibility-panel button {
+  width: 100%;
+  padding: 8px;             /* ↓ כפתור דק יותר */
+  margin-top: 6px;
+  border-radius: 6px;
+  border: 1px solid #ddd;
+  background: #f2f2f2;
+  cursor: pointer;
+  font-size: 14px;          /* ↓ טקסט קטן ונעים */
+}
+
+.accessibility-panel button:hover {
+  background: #e4e4e4;
+}

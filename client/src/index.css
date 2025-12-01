@@ -46,3 +46,26 @@ html, body, #root {
   text-align: left;
 }
 
+:root {
+  --a11y-font-scale: 1;
+}
+
+/* כל הטקסטים באתר יגדלו לפי המשתנה הזה */
+body :where(
+  p,
+  span,
+  a,
+  li,
+  label,
+  button,
+  input,
+  textarea,
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6
+) {
+  font-size: calc(1em * var(--a11y-font-scale)) !important;
+}
