@@ -25,7 +25,6 @@ import { FiEdit3, FiEye, FiHeart, FiShare2, FiX } from 'react-icons/fi';
 import './CampaignPage.css';
 import { uploadImage } from '../../components/GroupSettings/uploadImage';
 import PostCard from './PostCard';
-import ImageUpload from '../../components/ImageUpload'
 // עוזר לניקוי תשובת AI
 function normalizeAiSuggestion(suggestion, fallbackTitle = '') {
   if (!suggestion) {
@@ -242,25 +241,30 @@ export default function CampaignPage() {
   };
 
   // גלריה
-  const handleUploadGalleryFile = async (e) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+const handleUploadGalleryFile = async (e) => {
+  const file = e.target.files?.[0];
+  if (!file) return;
 
-    try {
-      setUploadingImage(true);
-      const url = await uploadImage(file);
-      if (!url) return;
-      await dispatch(addImage({ campaignId: campaign._id, imageUrl: url })).unwrap();
-      refetchCampaign();
-      setIsEditMode(false);
-    } catch (err) {
-      console.error('שגיאה בהעלאת תמונה לגלריה:', err);
-      alert('שגיאה בהעלאת הקובץ');
-    } finally {
-      setUploadingImage(false);
-      e.target.value = '';
-    }
-  };
+  try {
+    setUploadingImage(true);
+    const url = await uploadImage(file);
+    if (!url) return;
+
+    // שמירה בגלריה של הקמפיין
+    await dispatch(addImage({ campaignId: campaign._id, imageUrl: url })).unwrap();
+
+    // רענון הקמפיין אחרי הוספה
+    refetchCampaign();
+    setIsEditMode(false);
+  } catch (err) {
+    console.error('שגיאה בהעלאת תמונה לגלריה:', err);
+    alert('שגיאה בהעלאת הקובץ');
+  } finally {
+    setUploadingImage(false);
+    e.target.value = '';
+  }
+};
+
 
   const handleAddImage = () => {
     if (!newImageUrl.trim()) return;
@@ -537,7 +541,6 @@ export default function CampaignPage() {
           </div>
 
           <h3 className="section-title">גלריית תמונות</h3>
-<ImageUpload onUpload={(url) => console.log("Uploaded URL:", url)} />
 
           {isCandidateOwner && isEditMode && (
             <div className="info-card">
@@ -579,36 +582,33 @@ export default function CampaignPage() {
 
           <div className="gallery-container">
             <div className="gallery-grid">
-              {campaign.gallery?.length ? (
-                campaign.gallery.map((img, idx) => (
-                  <div
-                    key={idx}
-                    className="gallery-item"
-                    onClick={() => setSelectedImage(img)}
-                  >
-                    <img
-                      src={img || '/q.jpg'}
-                      alt={`תמונה ${idx + 1}`}
-                      onError={(e) => {
-                        e.currentTarget.onerror = null;
-                        e.currentTarget.src = '/q.png';
-                      }}
-                    />
-                    {isCandidateOwner && isEditMode && (
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleDeleteImage(img);
-                        }}
-                      >
-                        ×
-                      </button>
-                    )}
-                  </div>
-                ))
-              ) : (
-                <div className="empty-state">אין תמונות בגלריה</div>
-              )}
+           {campaign.gallery?.length ? (
+  campaign.gallery.map((img, idx) => (
+    <div key={idx} className="gallery-item" onClick={() => setSelectedImage(img)}>
+      <img
+        src={img || '/q.jpg'}
+        alt={`תמונה ${idx + 1}`}
+        onError={(e) => {
+          e.currentTarget.onerror = null;
+          e.currentTarget.src = '/q.png';
+        }}
+      />
+      {isCandidateOwner && isEditMode && (
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            handleDeleteImage(img);
+          }}
+        >
+          ×
+        </button>
+      )}
+    </div>
+  ))
+) : (
+  <div className="empty-state">אין תמונות בגלריה</div>
+)}
+
             </div>
           </div>
         </div>

@@ -1,24 +1,19 @@
-// src/utils/uploadImage.js
-export async function uploadImage(file, oldUrl = '') {
-  if (!file) return null;
+export async function uploadImage(file) {
+  try {
+    const formData = new FormData();
+    formData.append('image', file);
 
-  const fd = new FormData();
-  fd.append('image', file);
-  if (oldUrl) {
-    fd.append('old', oldUrl);
+    const res = await fetch('http://localhost:3000/api/upload', {
+      method: 'POST',
+      body: formData,
+    });
+
+    if (!res.ok) throw new Error('Upload failed');
+
+    const data = await res.json();
+    return data.url; // URL של התמונה ב-Cloudinary
+  } catch (err) {
+    console.error(err);
+    return null;
   }
-
-  const res = await fetch('/api/upload', {
-    method: 'POST',
-    body: fd,
-  });
-
-  const data = await res.json();
-
-  if (!res.ok) {
-    throw new Error(data.message || 'Upload failed');
-  }
-
-  // מניחים שהשרת מחזיר { url: '...' }גגג
-  return data.url;
 }

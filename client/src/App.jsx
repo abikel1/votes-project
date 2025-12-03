@@ -26,7 +26,6 @@ import Footer from './components/Footer/Footer';
 import ContactPage from './pages/ContactForm/ContactForm.jsx';
 import ScrollToTop from './components/ScrollToTop.jsx';
 import CampaignPage from './pages/Campaign/CampaignPage';
-import ImageUpload from './components/ImageUpload.jsx';
 // 👇 ה־Guard
 import RequireAuth from './components/RequireAuth/RequireAuth.jsx';
 
@@ -111,7 +110,6 @@ export default function App() {
         <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
         <Route path="/about" element={<AboutPage />} />
         <Route path="/user-guide" element={<UserGuidePage />} />
-        <Route path="/sss" element={<ImageUpload />} />
 
 
         {/* דף פרטי קבוצה – פתוח לכולם */}
