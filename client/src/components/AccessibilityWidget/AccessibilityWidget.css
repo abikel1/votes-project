@@ -1,83 +1,193 @@
-/* כפתור הנגישות – גרסה קטנה וצמודה למטה */
+/* כפתור עגול כמו בדוגמה */
 .accessibility-btn {
   position: fixed;
-  top: 70%;                 /* ↓↓ מוריד את הכפתור למטה */
-  right: 0;
+  top: 50%;
+  right: 16px;
   transform: translateY(-50%);
+  width: 56px;
+  height: 56px;
 
-  width: 38px;              /* ↓ צר יותר */
-  height: 70px;             /* ↓ נמוך יותר */
-
-  background: #003366;
-  color: #fff;
-
-  border: none;
-  cursor: pointer;
+  background-color: #122b40;
+  border: 3px solid #ffffff;
+  border-radius: 50%;
 
   display: flex;
-  align-items: center;
   justify-content: center;
+  align-items: center;
 
-  border-radius: 40px 0 0 40px; /* קפסולה קטנה בצד */
-  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.25);
-
-  padding-right: 5px;       /* מרכז את האייקון */
+  color: #ffffff;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
   z-index: 9999;
 }
 
 .accessibility-btn:hover {
-  background: #00284a;
+  transform: scale(1.05);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.35);
 }
 
-/* כדי שהאייקון עצמו יהיה קטן ואלגנטי */
 .accessibility-btn svg {
-  width: 22px;
-  height: 22px;
-
-  background: white;
-  border-radius: 50%;
-  padding: 3px;
-  color: #003366;
-  border: 2px solid white;
+  font-size: 28px;
 }
 
-/* פאנל נגישות מוקטן */
+/* פאנל נגישות מעוצב */
 .accessibility-panel {
   position: fixed;
-  top: 70%;                 /* ↓ מיושר לפי הכפתור */
-  right: 55px;              /* קרוב יותר לכפתור */
+  top: 50%;
+  right: 90px;
   transform: translateY(-50%);
+  width: 320px;
+  max-width: 90vw;
 
-  width: 200px;             /* ↓ צר יותר */
-
-  background: white;
-  border-radius: 10px;
-  padding: 12px;            /* ↓ ריווח קטן יותר */
-
-  box-shadow: 0px 4px 15px rgba(0,0,0,0.25);
-
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 14px 16px;
+  box-shadow: 0 10px 25px rgba(15, 23, 42, 0.25);
   z-index: 9999;
+  direction: rtl;
+  font-family: inherit;
 }
 
-.accessibility-panel h4 {
-  margin-top: 0;
-  margin-bottom: 10px;
-  text-align: center;
-  color: #003366;
-  font-size: 16px;          /* ↓ כותרת קטנה יותר */
+/* כותרת הפאנל */
+.a11y-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
 }
 
-.accessibility-panel button {
-  width: 100%;
-  padding: 8px;             /* ↓ כפתור דק יותר */
-  margin-top: 6px;
-  border-radius: 6px;
-  border: 1px solid #ddd;
-  background: #f2f2f2;
+.a11y-panel-title {
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.a11y-close-btn {
+  border: none;
+  background: transparent;
+  font-size: 18px;
+  line-height: 1;
   cursor: pointer;
-  font-size: 14px;          /* ↓ טקסט קטן ונעים */
 }
 
-.accessibility-panel button:hover {
-  background: #e4e4e4;
+/* כותרת סקשן */
+.a11y-section {
+  margin-top: 10px;
+}
+
+.a11y-section-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #4b5563;
+  margin-bottom: 6px;
+}
+
+/* שורת אריחים */
+.a11y-tile-row {
+  display: flex;
+  gap: 8px;
+}
+
+/* אריח בסיסי */
+.a11y-tile {
+  flex: 1;
+  border-radius: 10px;
+  border: 1px solid #e5e7eb;
+  background: #f9fafb;
+  padding: 8px 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  text-align: right;
+  transition: 0.15s ease;
+}
+
+.a11y-tile:hover {
+  background: #eef2ff;
+  border-color: #3b82f6;
+}
+
+/* אריח שאפשר להדליק/לכבות */
+.a11y-toggle-tile {
+  position: relative;
+}
+
+.a11y-tile-active {
+  border-color: #15803d;
+  background: #ecfdf3;
+}
+
+/* V ירוק קטן */
+.a11y-check {
+  position: absolute;
+  top: 6px;
+  left: 8px;
+  font-size: 16px;
+  color: #15803d;
+}
+
+/* אייקון באריח */
+.a11y-tile-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: #e5edff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.a11y-tile-icon svg {
+  font-size: 20px;
+}
+
+/* טקסט באריח */
+.a11y-tile-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.a11y-tile-title {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.a11y-tile-sub {
+  font-size: 11px;
+  color: #6b7280;
+}
+
+/* כפתור איפוס */
+.a11y-reset-btn {
+  margin-top: 6px;
+  width: 100%;
+  border-radius: 999px;
+  border: 1px solid #e5e7eb;
+  background: #f3f4f6;
+  padding: 6px 8px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.a11y-reset-btn:hover {
+  background: #e5e7eb;
+}
+
+/* רספונסיביות – במסכים קטנים הפאנל קצת יורד */
+@media (max-width: 768px) {
+  .accessibility-panel {
+    top: auto;
+    bottom: 80px;
+    transform: none;
+    right: 16px;
+  }
+
+  .accessibility-btn {
+    top: auto;
+    bottom: 16px;
+    transform: none;
+  }
 }

@@ -41,7 +41,7 @@
   flex: 1;
   max-width: 400px;
   padding: 9px 14px;
-  font-size: 14px;
+  font-size: calc(14px * var(--a11y-font-scale));
   border: 1px solid #d5d5d5;
   outline: none;
   background: #fafafa;
@@ -111,7 +111,7 @@
   gap: 8px;
   padding: 7px 10px;
   cursor: pointer;
-  font-size: 13px;
+  font-size: calc(13px * var(--a11y-font-scale));
   color: #444;
   transition: background 0.1s;
 }
@@ -128,7 +128,7 @@
 /* כפתור יצירת קבוצה */
 .groups-create-btn {
   padding: 9px 20px;
-  font-size: 14px;
+  font-size: calc(14px * var(--a11y-font-scale));
   font-weight: 500;
   color: #ffffff;
   background: #333;
@@ -189,7 +189,7 @@
 }
 
 .groups-card-title {
-  font-size: 17px;
+  font-size: calc(17px * var(--a11y-font-scale));
   font-weight: 600;
   color: #222;
   margin: 0;
@@ -238,7 +238,7 @@
 
 /* תיאור קבוצה */
 .groups-card-desc {
-  font-size: 13px;
+  font-size: calc(13px * var(--a11y-font-scale));
   color: #666;
   line-height: 1.5;
   margin: 0 0 12px 0;
@@ -260,7 +260,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 13px;
+  font-size: calc(13px * var(--a11y-font-scale));
 }
 
 .groups-card-date-label {
@@ -282,7 +282,7 @@
 .groups-card-date-expired-text {
   margin-top: 10px;
   padding: 8px 10px;
-  font-size: 13px;
+  font-size: calc(13px * var(--a11y-font-scale));
   font-weight: 700;
   color: #b30000;
   background: #ffe5e5;
@@ -314,7 +314,7 @@
 .groups-action-btn {
   width: 100%;
   padding: 9px;
-  font-size: 13px;
+  font-size: calc(13px * var(--a11y-font-scale));
   font-weight: 500;
   color: #ffffff;
   background: #333;
@@ -341,7 +341,7 @@
   display: inline-block;
   width: 100%;
   padding: 8px 10px;
-  font-size: 12px;
+  font-size: calc(12px * var(--a11y-font-scale));
   font-weight: 500;
   text-align: center;
   color: #27ae60;
@@ -352,7 +352,7 @@
 /* הודעות */
 .groups-notice {
   padding: 10px;
-  font-size: 12px;
+  font-size: calc(12px * var(--a11y-font-scale));
   line-height: 1.4;
   margin-bottom: 10px;
 }
@@ -371,7 +371,7 @@
 
 .groups-hint {
   margin-top: 6px;
-  font-size: 11px;
+  font-size: calc(11px * var(--a11y-font-scale));
   color: #999;
   text-align: center;
 }
@@ -382,7 +382,7 @@
 .groups-empty {
   text-align: center;
   padding: 60px 20px;
-  font-size: 15px;
+  font-size: calc(15px * var(--a11y-font-scale));
   color: #777;
 }
 
@@ -401,7 +401,7 @@
 }
 
 .groups-empty-hint {
-  font-size: 13px;
+  font-size: calc(13px * var(--a11y-font-scale));
   color: #aaa;
   margin-top: 10px;
 }
@@ -471,7 +471,7 @@
 .groups-page-btn {
   min-width: 32px;
   padding: 6px 10px;
-  font-size: 13px;
+  font-size: calc(13px * var(--a11y-font-scale));
   border: 1px solid #d5d5d5;
   background: #ffffff;
   cursor: pointer;
@@ -505,7 +505,7 @@
   border: none;
   background: #333;
   color: #fff;
-  font-size: 32px;
+  font-size: calc(32px * var(--a11y-font-scale));
   line-height: 0;
   display: flex;
   align-items: center;
@@ -516,7 +516,6 @@
   /* 👇 חשוב כדי שהגודל ישתנה חלק */
   transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
 }
-
 
 .groups-fab:hover {
   background: #000;
@@ -531,17 +530,17 @@
     left: 16px;
     width: 50px;
     height: 50px;
-    font-size: 26px;
+    font-size: calc(26px * var(--a11y-font-scale));
   }
 }
 
 .groups-card-owner {
   display: flex;
-  justify-content:first baseline;
+  justify-content: first baseline;
   /* מעביר את כל השורה לצד ימין */
   gap: 6px;
   margin-bottom: 10px;
-  font-size: 14px;
+  font-size: calc(14px * var(--a11y-font-scale));
   color: #333;
 }
 
@@ -554,7 +553,6 @@
   font-weight: 500;
   color: #222;
 }
-
 
 .groups-badge-candidate {
   margin-left: 6px;
