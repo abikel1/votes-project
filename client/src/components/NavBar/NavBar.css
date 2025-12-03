@@ -38,7 +38,7 @@ body {
 }
 
 .site-name {
-  font-size: 24px;
+  font-size: calc(24px * var(--a11y-font-scale));;
   font-weight: bold;
 }
 
@@ -52,7 +52,7 @@ body {
 .links a {
   color: white;
   text-decoration: none;
-  font-size: 16px;
+  font-size: calc(16px * var(--a11y-font-scale));
   transition: color 0.3s;
 }
 
@@ -71,7 +71,7 @@ body {
   align-items: center;
   cursor: pointer;
   font-weight: bold;
-  font-size: 18px;
+  font-size: calc(18px * var(--a11y-font-scale));
   transition: background-color 0.3s;
     text-decoration: none;
     color: #003366;
@@ -89,7 +89,7 @@ body {
   color: #fff;
   padding: 6px 10px;
   cursor: pointer;
-  font-size: 14px;
+  font-size: calc(14px * var(--a11y-font-scale));
 }
 
 .logout-btn:hover {

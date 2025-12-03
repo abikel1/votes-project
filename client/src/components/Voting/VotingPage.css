@@ -29,13 +29,13 @@
 
 .vd-header h2 {
   margin: 0 0 8px;
-  font-size: 32px;
+  font-size: calc(32px * var(--a11y-font-scale));;
   font-weight: 700;
   color: var(--brand);
 }
 
 .vd-group-name {
-  font-size: 18px;
+  font-size: calc(18px * var(--a11y-font-scale));
   color: var(--muted);
   font-weight: 500;
 }
@@ -57,7 +57,7 @@
 
 .vd-slips-area h3 {
   margin: 0 0 12px;
-  font-size: 18px;
+  font-size: calc(18px * var(--a11y-font-scale));
   font-weight: 600;
   color: var(--text);
 }
@@ -145,7 +145,7 @@
 }
 
 .vd-envelope-label {
-  font-size: 16px;
+  font-size: calc(16px * var(--a11y-font-scale));
   font-weight: 600;
   color: #fff;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
@@ -167,13 +167,13 @@
 }
 
 .vd-slip-symbol-small {
-  font-size: 24px;
+  font-size: calc(24px * var(--a11y-font-scale));
   font-weight: 700;
   color: var(--brand);
 }
 
 .vd-arrow {
-  font-size: 40px;
+  font-size: calc(40px * var(--a11y-font-scale));
   color: var(--brand);
   animation: bounce 2s infinite;
 }
@@ -234,7 +234,7 @@
 }
 
 .vd-ballot-label {
-  font-size: 14px;
+  font-size: calc(14px * var(--a11y-font-scale));
   font-weight: 600;
   color: #fff;
   text-align: center;
@@ -343,7 +343,7 @@
   left: 16px;
   background: transparent;
   border: none;
-  font-size: 28px;
+  font-size: calc(28px * var(--a11y-font-scale));
   color: var(--muted);
   cursor: pointer;
   width: 36px;
@@ -365,7 +365,7 @@
 }
 
 .vd-modal-symbol {
-  font-size: 72px;
+  font-size: calc(72px * var(--a11y-font-scale));
   font-weight: 700;
   color: var(--brand);
   margin-bottom: 12px;
@@ -374,13 +374,13 @@
 
 .vd-modal-header h3 {
   margin: 0;
-  font-size: 28px;
+  font-size: calc(28px * var(--a11y-font-scale));
   font-weight: 700;
   color: var(--text);
 }
 
 .vd-modal-desc {
-  font-size: 16px;
+  font-size: calc(16px * var(--a11y-font-scale));
   line-height: 1.6;
   color: var(--text);
   margin-bottom: 20px;
@@ -402,7 +402,7 @@
 }
 
 .vd-modal-votes {
-  font-size: 18px;
+  font-size: calc(18px * var(--a11y-font-scale));
   color: var(--muted);
   text-align: center;
   padding: 12px;
@@ -412,7 +412,7 @@
 
 .vd-modal-votes strong {
   color: var(--brand);
-  font-size: 24px;
+  font-size: calc(24px * var(--a11y-font-scale));
 }
 
 .vd-select-button {
@@ -420,7 +420,7 @@
   color: white;
   border: none;
   padding: 12px 24px;
-  font-size: 16px;
+  font-size: calc(16px * var(--a11y-font-scale));
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -449,14 +449,14 @@
   padding: 32px;
   /* border-radius: 12px; */
   text-align: center;
-  font-size: 18px;
+  font-size: calc(18px * var(--a11y-font-scale));
 }
 
 .vd-back-button {
   background: none;
   border: none;
   color: #007bff;
-  font-size: 14px;
+  font-size: calc(14px * var(--a11y-font-scale));
   cursor: pointer;
   margin-bottom: 8px;
   padding: 0;
@@ -524,14 +524,14 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 30px;
+  font-size: calc(30px * var(--a11y-font-scale));
   color: #1e40af;
   margin: 0 auto 10px;
   border: 2px solid #e2e8f0;
 }
 
 .vd-slip-name {
-  font-size: 14px;
+  font-size: calc(14px * var(--a11y-font-scale));
   margin: 6px 0;
   color: #1e293b;
   font-weight: 700;
@@ -544,15 +544,15 @@
   padding: 3px 8px;
   margin: 4px 0;
   font-weight: 600;
-  font-size: 1px;
+  font-size: calc(1px * var(--a11y-font-scale));
   border: 1px solid #93c5fd;
 
-  font-size: 25px;
+  font-size: calc(25px * var(--a11y-font-scale));
   padding: 2px 6px;
 }
 
 .vd-slip-desc {
-  font-size: 11px;
+  font-size: calc(11px * var(--a11y-font-scale));
   color: #64748b;
   line-height: 1.3;
   margin: 6px 0;
@@ -561,7 +561,7 @@
 .vd-slip-votes {
   margin-top: 8px;
   font-weight: 700;
-  font-size: 14px;
+  font-size: calc(14px * var(--a11y-font-scale));
   color: #059669;
   background: #d1fae5;
   padding: 4px 10px;
@@ -616,11 +616,11 @@
   }
 
   .vd-header h2 {
-    font-size: 24px;
+    font-size: calc(24px * var(--a11y-font-scale));
   }
 
   .vd-group-name {
-    font-size: 16px;
+    font-size: calc(16px * var(--a11y-font-scale));
   }
 
   .vd-container {
@@ -637,7 +637,7 @@
   }
 
   .vd-envelope-label {
-    font-size: 14px;
+    font-size: calc(14px * var(--a11y-font-scale));
   }
 
   .vd-slip-in-envelope {
@@ -646,11 +646,11 @@
   }
 
   .vd-slip-symbol-small {
-    font-size: 20px;
+    font-size: calc(20px * var(--a11y-font-scale));
   }
 
   .vd-arrow {
-    font-size: 32px;
+    font-size: calc(32px * var(--a11y-font-scale));
   }
 
   .vd-ballot {
@@ -664,7 +664,7 @@
   }
 
   .vd-ballot-label {
-    font-size: 13px;
+    font-size: calc(13px * var(--a11y-font-scale));
     padding: 0 8px;
   }
 
@@ -683,11 +683,11 @@
   .vd-slip-photo-placeholder {
     width: 50px;
     height: 50px;
-    font-size: 24px;
+    font-size: calc(24px * var(--a11y-font-scale));
   }
 
   .vd-slip-name {
-    font-size: 13px;
+    font-size: calc(13px * var(--a11y-font-scale));
   }
 
   /* 
@@ -697,11 +697,11 @@
   } */
 
   .vd-slip-desc {
-    font-size: 10px;
+    font-size: calc(10px * var(--a11y-font-scale));
   }
 
   .vd-slip-votes {
-    font-size: 12px;
+    font-size: calc(12px * var(--a11y-font-scale));
     padding: 3px 8px;
   }
 
@@ -711,32 +711,32 @@
   }
 
   .vd-modal-symbol {
-    font-size: 56px;
+    font-size: calc(56px * var(--a11y-font-scale));
   }
 
   .vd-modal-header h3 {
-    font-size: 22px;
+    font-size: calc(22px * var(--a11y-font-scale));
   }
 
   .vd-modal-desc {
-    font-size: 14px;
+    font-size: calc(14px * var(--a11y-font-scale));
     padding: 12px;
   }
 
   .vd-select-button {
     padding: 10px 20px;
-    font-size: 14px;
+    font-size: calc(14px * var(--a11y-font-scale));
   }
 }
 
 /* מכשירים קטנים מאוד */
 @media (max-width: 480px) {
   .vd-header h2 {
-    font-size: 20px;
+    font-size: calc(20px * var(--a11y-font-scale));
   }
 
   .vd-group-name {
-    font-size: 14px;
+    font-size: calc(14px * var(--a11y-font-scale));
   }
 
   .vd-envelope {
@@ -764,41 +764,41 @@
   .vd-slip-photo-placeholder {
     width: 30px;
     height: 30px;
-    font-size: 20px;
+    font-size: calc(20px * var(--a11y-font-scale));
     margin-bottom: 6px;
   }
 
   .vd-slip-name {
-    font-size: 12px;
+    font-size: calc(12px * var(--a11y-font-scale));
     margin: 4px 0;
   }
 
   .vd-slip-symbol {
-    font-size: 20px;
+    font-size: calc(20px * var(--a11y-font-scale));
     padding: 2px 5px;
   }
 
   .vd-slip-desc {
-    font-size: 9px;
+    font-size: calc(9px * var(--a11y-font-scale));
     margin: 4px 0;
   }
 
   .vd-slip-votes {
-    font-size: 11px;
+    font-size: calc(11px * var(--a11y-font-scale));
     padding: 2px 6px;
     margin-top: 4px;
   }
 
   .vd-arrow {
-    font-size: 28px;
+    font-size: calc(28px * var(--a11y-font-scale));
   }
 
   .vd-modal-symbol {
-    font-size: 48px;
+    font-size: calc(48px * var(--a11y-font-scale));
   }
 
   .vd-modal-header h3 {
-    font-size: 20px;
+    font-size: calc(20px * var(--a11y-font-scale));
   }
 }
 
@@ -827,7 +827,7 @@
   color: #b91c1c;
   padding: 22px;
   /* border-radius: 12px; */
-  font-size: 18px;
+  font-size: calc(18px * var(--a11y-font-scale));
   line-height: 1.7;
   margin: 30px auto;
   text-align: center;
@@ -849,7 +849,7 @@
   /* כחול כהה */
   color: #ffffff;
   padding: 10px 22px;
-  font-size: 16px;
+  font-size: calc(16px * var(--a11y-font-scale));
   /* border-radius: 50px; */
   border: none;
   cursor: pointer;

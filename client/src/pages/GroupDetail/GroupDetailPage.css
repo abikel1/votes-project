@@ -21,7 +21,7 @@
 }
 
 .page-title {
-    font-size: 24px;
+    font-size: calc(24px * var(--a11y-font-scale));
     margin: 0 0 6px 0;
     color: #1e293b;
     font-weight: 700;
@@ -30,7 +30,7 @@
 .group-description {
     margin: 0;
     color: #64748b;
-    font-size: 13px;
+    font-size: calc(13px * var(--a11y-font-scale));
     line-height: 1.4;
 }
 
@@ -59,7 +59,7 @@
     border: 1px solid #ccc;
     padding: 6px 12px;
     cursor: pointer;
-    font-size: 14px;
+    font-size: calc(14px * var(--a11y-font-scale));
     margin-bottom: 10px;
     transition: 0.2s;
 }
@@ -68,11 +68,11 @@
     background: #e6e6e6;
 }
 
-.group-meta>div {
+.group-meta > div {
     display: flex;
     align-items: center;
     gap: 6px;
-    font-size: 13px;
+    font-size: calc(13px * var(--a11y-font-scale));
 }
 
 .meta-label {
@@ -83,7 +83,7 @@
 .meta-value {
     color: #003366;
     font-weight: 700;
-    font-size: 14px;
+    font-size: calc(14px * var(--a11y-font-scale));
 }
 
 .vote-btn {
@@ -92,7 +92,7 @@
     border: none;
     padding: 12px 24px;
     cursor: pointer;
-    font-size: 14px;
+    font-size: calc(14px * var(--a11y-font-scale));
     font-weight: 600;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     transition: all 0.2s ease;
@@ -155,7 +155,7 @@
 }
 
 .section-title {
-    font-size: 16px;
+    font-size: calc(16px * var(--a11y-font-scale));
     color: #1e293b;
     font-weight: 700;
     margin: 0 0 10px 0;
@@ -212,7 +212,7 @@
     align-items: center;
     justify-content: center;
     /* border-radius: 4px; */
-    font-size: 14px;
+    font-size: calc(14px * var(--a11y-font-scale));
     box-shadow: 0 0 4px rgba(0, 0, 0, 0.3);
     z-index: 2;
 }
@@ -236,7 +236,7 @@
 }
 
 .candidate-card h4 {
-    font-size: 14px;
+    font-size: calc(14px * var(--a11y-font-scale));
     margin: 6px 0;
     color: #1e293b;
     font-weight: 700;
@@ -249,13 +249,13 @@
     padding: 3px 8px;
     margin: 4px 0;
     font-weight: 600;
-    font-size: 11px;
+    font-size: calc(11px * var(--a11y-font-scale));
     border: 1px solid #93c5fd;
 }
 
 .candidate-card p {
     color: #64748b;
-    font-size: 11px;
+    font-size: calc(11px * var(--a11y-font-scale));
     line-height: 1.3;
     margin: 6px 0;
 }
@@ -263,28 +263,13 @@
 .votes-count {
     margin-top: 8px;
     font-weight: 700;
-    font-size: 14px;
+    font-size: calc(14px * var(--a11y-font-scale));
     color: #059669;
     background: #d1fae5;
     padding: 4px 10px;
     display: inline-block;
     border: 1px solid #6ee7b7;
 }
-
-/* .current-leader {
-    position: absolute;
-    top: -10px;
-    right: -10px;
-    background: #fbbf24;
-    width: 32px;
-    height: 32px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 18px;
-    box-shadow: 0 2px 6px rgba(251, 191, 36, 0.4);
-    border: 2px solid white;
-} */
 
 .right-section {
     display: flex;
@@ -318,7 +303,7 @@
 
 .pie-chart-container h3,
 .bar-chart-container h3 {
-    font-size: 15px;
+    font-size: calc(15px * var(--a11y-font-scale));
     color: #1e293b;
     margin: 0 0 10px 0;
     font-weight: 700;
@@ -335,7 +320,7 @@
 
 .loading-wrap {
     text-align: center;
-    font-size: 15px;
+    font-size: calc(15px * var(--a11y-font-scale));
     padding: 30px 20px;
     color: #64748b;
 }
@@ -349,13 +334,13 @@
     border: 1px solid #fca5a5;
     border-right: 3px solid #dc2626;
     font-weight: 600;
-    font-size: 13px;
+    font-size: calc(13px * var(--a11y-font-scale));
 }
 
 .no-votes-message {
     text-align: center;
     padding: 40px;
-    font-size: 15px;
+    font-size: calc(15px * var(--a11y-font-scale));
     color: #64748b;
     background: white;
     border: 1px solid #e2e8f0;
@@ -412,12 +397,12 @@
     }
 
     .page-title {
-        font-size: 20px;
+        font-size: calc(20px * var(--a11y-font-scale));
         margin-bottom: 4px;
     }
 
     .group-description {
-        font-size: 12px;
+        font-size: calc(12px * var(--a11y-font-scale));
     }
 
     .meta-and-button {
@@ -432,19 +417,19 @@
         justify-content: center;
     }
 
-    .group-meta>div {
-        font-size: 12px;
+    .group-meta > div {
+        font-size: calc(12px * var(--a11y-font-scale));
         gap: 4px;
     }
 
     .meta-value {
-        font-size: 13px;
+        font-size: calc(13px * var(--a11y-font-scale));
     }
 
     .vote-btn {
         width: 100%;
         padding: 12px;
-        font-size: 13px;
+        font-size: calc(13px * var(--a11y-font-scale));
     }
 
     .main-content-resizable {
@@ -481,23 +466,23 @@
     }
 
     .candidate-card h4 {
-        font-size: 13px;
+        font-size: calc(13px * var(--a11y-font-scale));
         margin: 4px 0;
     }
 
     .candidate-symbol {
-        font-size: 10px;
+        font-size: calc(10px * var(--a11y-font-scale));
         padding: 2px 6px;
         margin: 3px 0;
     }
 
     .candidate-card p {
-        font-size: 10px;
+        font-size: calc(10px * var(--a11y-font-scale));
         margin: 4px 0;
     }
 
     .votes-count {
-        font-size: 12px;
+        font-size: calc(12px * var(--a11y-font-scale));
         padding: 3px 8px;
         margin-top: 6px;
     }
@@ -505,7 +490,7 @@
     .current-leader {
         width: 28px;
         height: 28px;
-        font-size: 16px;
+        font-size: calc(16px * var(--a11y-font-scale));
         top: -8px;
         left: -8px;
     }
@@ -530,7 +515,7 @@
 
     .pie-chart-container h3,
     .bar-chart-container h3 {
-        font-size: 14px;
+        font-size: calc(14px * var(--a11y-font-scale));
         margin-bottom: 8px;
         padding-bottom: 6px;
     }
@@ -540,25 +525,25 @@
     }
 
     .section-title {
-        font-size: 15px;
+        font-size: calc(15px * var(--a11y-font-scale));
         margin-bottom: 8px;
         padding-bottom: 6px;
     }
 
     .loading-wrap {
         padding: 20px 15px;
-        font-size: 14px;
+        font-size: calc(14px * var(--a11y-font-scale));
     }
 
     .err {
         padding: 8px 12px;
-        font-size: 12px;
+        font-size: calc(12px * var(--a11y-font-scale));
         margin: 10px 0;
     }
 
     .no-votes-message {
         padding: 30px 20px;
-        font-size: 14px;
+        font-size: calc(14px * var(--a11y-font-scale));
     }
 }
 
@@ -574,11 +559,11 @@
     }
 
     .page-title {
-        font-size: 18px;
+        font-size: calc(18px * var(--a11y-font-scale));
     }
 
     .group-description {
-        font-size: 11px;
+        font-size: calc(11px * var(--a11y-font-scale));
     }
 
     .group-meta {
@@ -586,21 +571,21 @@
         gap: 10px;
     }
 
-    .group-meta>div {
-        font-size: 11px;
+    .group-meta > div {
+        font-size: calc(11px * var(--a11y-font-scale));
     }
 
     .meta-label {
-        font-size: 11px;
+        font-size: calc(11px * var(--a11y-font-scale));
     }
 
     .meta-value {
-        font-size: 12px;
+        font-size: calc(12px * var(--a11y-font-scale));
     }
 
     .vote-btn {
         padding: 10px;
-        font-size: 12px;
+        font-size: calc(12px * var(--a11y-font-scale));
     }
 
     .dashboard .candidates-grid {
@@ -619,24 +604,24 @@
     }
 
     .candidate-card h4 {
-        font-size: 12px;
+        font-size: calc(12px * var(--a11y-font-scale));
         margin: 3px 0;
     }
 
     .candidate-symbol {
-        font-size: 9px;
+        font-size: calc(9px * var(--a11y-font-scale));
         padding: 2px 5px;
         margin: 2px 0;
     }
 
     .candidate-card p {
-        font-size: 9px;
+        font-size: calc(9px * var(--a11y-font-scale));
         margin: 3px 0;
         line-height: 1.2;
     }
 
     .votes-count {
-        font-size: 11px;
+        font-size: calc(11px * var(--a11y-font-scale));
         padding: 2px 6px;
         margin-top: 4px;
     }
@@ -644,7 +629,7 @@
     .current-leader {
         width: 24px;
         height: 24px;
-        font-size: 14px;
+        font-size: calc(14px * var(--a11y-font-scale));
         top: -6px;
         left: -6px;
     }
@@ -674,7 +659,7 @@
 
     .pie-chart-container h3,
     .bar-chart-container h3 {
-        font-size: 13px;
+        font-size: calc(13px * var(--a11y-font-scale));
         margin-bottom: 6px;
         padding-bottom: 5px;
     }
@@ -684,24 +669,24 @@
     }
 
     .section-title {
-        font-size: 14px;
+        font-size: calc(14px * var(--a11y-font-scale));
         margin-bottom: 6px;
         padding-bottom: 5px;
     }
 
     .loading-wrap {
         padding: 15px 10px;
-        font-size: 13px;
+        font-size: calc(13px * var(--a11y-font-scale));
     }
 
     .err {
         padding: 6px 10px;
-        font-size: 11px;
+        font-size: calc(11px * var(--a11y-font-scale));
     }
 
     .no-votes-message {
         padding: 25px 15px;
-        font-size: 13px;
+        font-size: calc(13px * var(--a11y-font-scale));
     }
 }
 
@@ -770,12 +755,12 @@
 
 .group-header h2 {
     margin: 0;
-    font-size: 22px;
+    font-size: calc(22px * var(--a11y-font-scale));
     color: #003366;
 }
 
 .group-header p {
-    font-size: 14px;
+    font-size: calc(14px * var(--a11y-font-scale));
     color: #555;
     margin-top: 6px;
     line-height: 1.4;
@@ -803,20 +788,20 @@
 
 .info-card p {
     margin: 8px 0 4px 0;
-    font-size: 13px;
+    font-size: calc(13px * var(--a11y-font-scale));
     color: #555;
 }
 
 .info-card h4 {
     margin: 0;
-    font-size: 18px;
+    font-size: calc(18px * var(--a11y-font-scale));
     font-weight: 600;
     color: #003366;
 }
 
 .go-to-survey-btn {
     padding: 12px 18px;
-    font-size: 15px;
+    font-size: calc(15px * var(--a11y-font-scale));
     font-weight: 500;
     color: #fff;
     background-color: #1e3a8a;
@@ -846,11 +831,12 @@
 
 .candidate-text h4 {
     margin: 0 0 4px;
+    font-size: calc(14px * var(--a11y-font-scale));
 }
 
 .candidate-text p {
     margin: 0;
-    font-size: 0.9rem;
+    font-size: calc(14px * var(--a11y-font-scale));
     color: #555;
 }
 
@@ -871,7 +857,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 14px;
+    font-size: calc(14px * var(--a11y-font-scale));
     font-weight: 700;
     border: 2px solid white;
     /* border-radius: 4px; */
@@ -941,14 +927,14 @@
 }
 
 .header-title h2 {
-    font-size: 24px;
+    font-size: calc(24px * var(--a11y-font-scale));
     margin: 0;
     font-weight: 700;
     color: #1e293b;
 }
 
 .header-title p {
-    font-size: 13px;
+    font-size: calc(13px * var(--a11y-font-scale));
     color: #64748b;
     margin: 2px 0 0 0;
 }
@@ -975,7 +961,7 @@
     border: 1px solid #ccc;
     padding: 6px 10px;
     cursor: pointer;
-    font-size: 14px;
+    font-size: calc(14px * var(--a11y-font-scale));
     transition: 0.2s;
 }
 
@@ -1004,7 +990,7 @@
     border: 1px solid #d1d5db;
     background-color: #f1f5f9;
     cursor: pointer;
-    font-size: 0.9rem;
+    font-size: calc(0.9rem * var(--a11y-font-scale));
     transition: 0.2s;
 }
 
@@ -1013,7 +999,7 @@
 }
 
 .chat-toggle-btn svg {
-    font-size: 1.1rem;
+    font-size: calc(1.1rem * var(--a11y-font-scale));
 }
 
 /* כפתור צ'אט צף */

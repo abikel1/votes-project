@@ -56,7 +56,7 @@
 }
 
 .hero-title {
-  font-size: 3.5rem;
+  font-size: calc(3.5rem * var(--a11y-font-scale));
   font-weight: 700;
   color: #ffffff;
   margin-bottom: 16px;
@@ -65,7 +65,7 @@
 }
 
 .hero-subtitle {
-  font-size: 1.5rem;
+  font-size: calc(1.5rem * var(--a11y-font-scale));
   color: rgba(255,255,255,0.9);
   margin-bottom: 32px;
   font-weight: 300;
@@ -74,7 +74,7 @@
 
 .hero-cta {
   padding: 16px 40px;
-  font-size: 1.1rem;
+  font-size: calc(1.1rem * var(--a11y-font-scale));
   font-weight: 600;
   color: #003366;
   background: #ffffff;
@@ -95,7 +95,7 @@
 }
 
 .btn-icon {
-  font-size: 1.3rem;
+  font-size: calc(1.3rem * var(--a11y-font-scale));
 }
 
 .scroll-indicator {
@@ -105,7 +105,7 @@
   transform: translateX(-50%);
   text-align: center;
   color: rgba(255,255,255,0.8);
-  font-size: 0.9rem;
+  font-size: calc(0.9rem * var(--a11y-font-scale));
   animation: bounce 2s infinite;
 }
 
@@ -187,13 +187,13 @@
 }
 
 .header-title h2 {
-  font-size: 1.5rem;
+  font-size: calc(1.5rem * var(--a11y-font-scale));
   font-weight: 600;
   color: #222;
 }
 
 .header-icon {
-  font-size: 1.8rem;
+  font-size: calc(1.8rem * var(--a11y-font-scale));
 }
 
 .header-icon.active {
@@ -207,7 +207,7 @@
 .badge-count {
   padding: 6px 16px;
   border-radius: 20px;
-  font-size: 0.9rem;
+  font-size: calc(0.9rem * var(--a11y-font-scale));
   font-weight: 600;
 }
 
@@ -269,14 +269,14 @@
 }
 
 .card-title {
-  font-size: 1.1rem;
+  font-size: calc(1.1rem * var(--a11y-font-scale));
   font-weight: 600;
   color: #222;
   line-height: 1.4;
 }
 
 .card-description {
-  font-size: 0.9rem;
+  font-size: calc(0.9rem * var(--a11y-font-scale));
   color: #666;
   line-height: 1.5;
   display: -webkit-box;
@@ -297,12 +297,12 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  font-size: 0.9rem;
+  font-size: calc(0.9rem * var(--a11y-font-scale));
   color: #666;
 }
 
 .meta-icon {
-  font-size: 1.1rem;
+  font-size: calc(1.1rem * var(--a11y-font-scale));
   color: #999;
 }
 
@@ -324,7 +324,7 @@
   padding: 10px 16px;
   border: none;
   border-radius: 4px;
-  font-size: 0.95rem;
+  font-size: calc(0.95rem * var(--a11y-font-scale));
   font-weight: 500;
   cursor: pointer;
   display: flex;
@@ -365,7 +365,7 @@
   padding: 40px 20px;
   text-align: center;
   color: #999;
-  font-size: 0.95rem;
+  font-size: calc(0.95rem * var(--a11y-font-scale));
 }
 
 .empty-state-full {
@@ -379,20 +379,20 @@
 }
 
 .empty-icon {
-  font-size: 5rem;
+  font-size: calc(5rem * var(--a11y-font-scale));
   margin-bottom: 20px;
   opacity: 0.5;
 }
 
 .empty-state-full h2 {
-  font-size: 1.8rem;
+  font-size: calc(1.8rem * var(--a11y-font-scale));
   color: #222;
   margin: 0 0 12px 0;
 }
 
 .empty-state-full p {
   color: #666;
-  font-size: 1.1rem;
+  font-size: calc(1.1rem * var(--a11y-font-scale));
   margin: 0 0 30px 0;
 }
 
@@ -402,7 +402,7 @@
   color: white;
   border: none;
   border-radius: 4px;
-  font-size: 1.1rem;
+  font-size: calc(1.1rem * var(--a11y-font-scale));
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
@@ -430,7 +430,7 @@
 
 .action-btn {
   padding: 14px 28px;
-  font-size: 1rem;
+  font-size: calc(1rem * var(--a11y-font-scale));
   font-weight: 500;
   background: #ffffff;
   color: #333;
@@ -487,7 +487,7 @@
 
 .home-loading p {
   color: #666;
-  font-size: 1.1rem;
+  font-size: calc(1.1rem * var(--a11y-font-scale));
 }
 
 .home-error {
@@ -516,7 +516,7 @@
   color: white;
   border: none;
   border-radius: 4px;
-  font-size: 1rem;
+  font-size: calc(1rem * var(--a11y-font-scale));
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
@@ -530,11 +530,11 @@
 /* ========== Responsive ========== */
 @media (max-width: 968px) {
   .hero-title {
-    font-size: 2.5rem;
+    font-size: calc(2.5rem * var(--a11y-font-scale));
   }
   
   .hero-subtitle {
-    font-size: 1.2rem;
+    font-size: calc(1.2rem * var(--a11y-font-scale));
   }
   
   .content-wrapper {
@@ -553,16 +553,16 @@
   }
   
   .hero-title {
-    font-size: 2rem;
+    font-size: calc(2rem * var(--a11y-font-scale));
   }
   
   .hero-subtitle {
-    font-size: 1rem;
+    font-size: calc(1rem * var(--a11y-font-scale));
   }
   
   .hero-cta {
     padding: 12px 32px;
-    font-size: 1rem;
+    font-size: calc(1rem * var(--a11y-font-scale));
   }
   
   .groups-column {

@@ -22,7 +22,7 @@
 .contact-title {
   text-align: center;
   margin-bottom: 24px;
-  font-size: 26px;
+  font-size: calc(26px * var(--a11y-font-scale));
   font-weight: 700;
   color: #003366;
 }
@@ -40,7 +40,7 @@
 }
 
 .form-group label {
-  font-size: 14px;
+  font-size: calc(14px * var(--a11y-font-scale));
   font-weight: 600;
   color: #003366;
 }
@@ -48,7 +48,7 @@
 .form-group input,
 .form-group textarea {
   padding: 12px;
-  font-size: 15px;
+  font-size: calc(15px * var(--a11y-font-scale));
   border: 2px solid #c3cfe2;
   border-radius: 0;
   background: #fff;
@@ -68,19 +68,19 @@
 }
 
 .error-text {
-  font-size: 12px;
+  font-size: calc(12px * var(--a11y-font-scale));
   color: #cc0000;
 }
 
 .success-text {
-  font-size: 14px;
+  font-size: calc(14px * var(--a11y-font-scale));
   color: #007a00;
   margin-top: 8px;
 }
 
 .btn-primary {
   padding: 14px 0;
-  font-size: 16px;
+  font-size: calc(16px * var(--a11y-font-scale));
   font-weight: 600;
   border-radius: 0;
   border: none;
@@ -99,12 +99,13 @@
     padding: 30px 20px;
   }
 }
+
 /* וודא שכל הטקסטים בטופס משתמשים בפונט הראשי של האתר */
 .contact-form input,
 .contact-form textarea,
 .contact-form input::placeholder,
 .contact-form textarea::placeholder {
-  font-family: inherit; /* או הפונט הראשי של האתר, למשל "Arial, sans-serif" */
-  font-size: 16px;      /* אפשר להתאים לגודל הכללי */
-  font-weight: normal;  /* כדי שהטקסט לא יהיה מודגש */
+  font-family: inherit;
+  font-size: calc(16px * var(--a11y-font-scale));
+  font-weight: normal;
 }

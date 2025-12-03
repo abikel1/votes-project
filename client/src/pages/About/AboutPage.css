@@ -8,8 +8,10 @@
   text-align: center;
 }
 
+/* כותרת משנה */
 .about-subtitle {
-  font-size: 1.2rem;
+  /* 1.2rem → סקייל נגישות */
+  font-size: calc(1.2rem * var(--a11y-font-scale));
   color: #555;
   margin-bottom: 2rem;
 }
@@ -29,12 +31,14 @@
 }
 
 .card h3 {
-  font-size: 1.2rem;
+  /* 1.2rem → סקייל נגישות */
+  font-size: calc(1.2rem * var(--a11y-font-scale));
   margin-bottom: 0.5rem;
 }
 
 .card p {
-  font-size: 1rem;
+  /* 1rem → סקייל נגישות */
+  font-size: calc(1rem * var(--a11y-font-scale));
   color: #555;
 }
 
@@ -48,11 +52,14 @@
 }
 
 .highlight-card h2 {
+  /* אם תרצי שגם זה יוגדל/יקטן בצורה ברורה */
+  font-size: calc(1.6rem * var(--a11y-font-scale));
   margin-bottom: 1rem;
 }
 
 .highlight-card p {
-  font-size: 1.1rem;
+  /* 1.1rem → סקייל נגישות */
+  font-size: calc(1.1rem * var(--a11y-font-scale));
   line-height: 1.6;
 }
 
@@ -71,10 +78,13 @@
 }
 
 .mini-card h4 {
+  /* אפשר גם פה לתת גודל ברור שמגיב לסקייל */
+  font-size: calc(1.1rem * var(--a11y-font-scale));
   margin-bottom: 0.5rem;
 }
 
 .mini-card p {
-  font-size: 0.95rem;
+  /* 0.95rem → סקייל נגישות */
+  font-size: calc(0.95rem * var(--a11y-font-scale));
   color: #555;
 }

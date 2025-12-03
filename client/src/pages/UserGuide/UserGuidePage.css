@@ -9,7 +9,7 @@
 }
 
 .guide-subtitle {
-  font-size: 1.2rem;
+  font-size: calc(1.2rem * var(--a11y-font-scale));
   color: #555;
   margin-bottom: 2rem;
 }
@@ -29,12 +29,12 @@
 }
 
 .card h3 {
-  font-size: 1.2rem;
+  font-size: calc(1.2rem * var(--a11y-font-scale));
   margin-bottom: 0.5rem;
 }
 
 .card p {
-  font-size: 1rem;
+  font-size: calc(1rem * var(--a11y-font-scale));
   color: #555;
 }
 
@@ -52,7 +52,7 @@
 }
 
 .highlight-card p {
-  font-size: 1.1rem;
+  font-size: calc(1.1rem * var(--a11y-font-scale));
   line-height: 1.6;
 }
 
@@ -75,6 +75,6 @@
 }
 
 .mini-card p {
-  font-size: 0.95rem;
+  font-size: calc(0.95rem * var(--a11y-font-scale));
   color: #555;
 }
