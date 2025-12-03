@@ -9,7 +9,6 @@ export const fetchCampaign = createAsyncThunk(
   async (candidateId, thunkAPI) => {
     try {
       const { data } = await http.get(`/campaigns/candidate/${candidateId}`);
-      // data = { success, campaign, candidate }
       return data;
     } catch (err) {
       return thunkAPI.rejectWithValue(
@@ -28,7 +27,6 @@ export const createCampaign = createAsyncThunk(
         `/campaigns/candidate/${candidateId}`,
         payload
       );
-      // פה השרת מחזיר את הקמפיין עצמו (בלי wrapper)
       return data;
     } catch (err) {
       return thunkAPI.rejectWithValue(
@@ -38,13 +36,12 @@ export const createCampaign = createAsyncThunk(
   }
 );
 
-// עדכון קמפיין (תיאור וכו')
+// עדכון קמפיין
 export const updateCampaign = createAsyncThunk(
   'campaign/updateCampaign',
   async ({ campaignId, payload }, thunkAPI) => {
     try {
       const { data } = await http.put(`/campaigns/${campaignId}`, payload);
-      // השרת מחזיר את הקמפיין עצמו
       return data;
     } catch (err) {
       return thunkAPI.rejectWithValue(
@@ -56,7 +53,6 @@ export const updateCampaign = createAsyncThunk(
 
 // ===== פוסטים =====
 
-// הוספת פוסט
 export const addPost = createAsyncThunk(
   'campaign/addPost',
   async ({ campaignId, post }, thunkAPI) => {
@@ -65,7 +61,6 @@ export const addPost = createAsyncThunk(
         `/campaigns/${campaignId}/posts`,
         post
       );
-      // השרת מחזיר את הקמפיין המלא
       return data;
     } catch (err) {
       return thunkAPI.rejectWithValue(
@@ -75,7 +70,6 @@ export const addPost = createAsyncThunk(
   }
 );
 
-// עדכון פוסט
 export const updatePost = createAsyncThunk(
   'campaign/updatePost',
   async ({ campaignId, postId, post }, thunkAPI) => {
@@ -84,7 +78,6 @@ export const updatePost = createAsyncThunk(
         `/campaigns/${campaignId}/posts/${postId}`,
         post
       );
-      // השרת מחזיר את הקמפיין המלא
       return data;
     } catch (err) {
       return thunkAPI.rejectWithValue(
@@ -94,7 +87,6 @@ export const updatePost = createAsyncThunk(
   }
 );
 
-// מחיקת פוסט
 export const deletePost = createAsyncThunk(
   'campaign/deletePost',
   async ({ campaignId, postId }, thunkAPI) => {
@@ -102,7 +94,6 @@ export const deletePost = createAsyncThunk(
       const { data } = await http.delete(
         `/campaigns/${campaignId}/posts/${postId}`
       );
-      // השרת מחזיר את הקמפיין המלא
       return data;
     } catch (err) {
       return thunkAPI.rejectWithValue(
@@ -112,9 +103,50 @@ export const deletePost = createAsyncThunk(
   }
 );
 
+// 🆕 ===== תגובות =====
+
+export const addComment = createAsyncThunk(
+  'campaign/addComment',
+  async ({ campaignId, postId, content }, thunkAPI) => {
+    console.log(localStorage.getItem('token'));
+
+    try {
+      const token = localStorage.getItem('token'); // 🔑
+      const { data } = await http.post(
+        `/campaigns/${campaignId}/posts/${postId}/comments`,
+        { content },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      return data;
+    } catch (err) {
+      return thunkAPI.rejectWithValue(
+        err.response?.data?.message || 'שגיאה בהוספת תגובה'
+      );
+    }
+  }
+);
+
+
+export const deleteComment = createAsyncThunk(
+  'campaign/deleteComment',
+  async ({ campaignId, postId, commentId }, thunkAPI) => {
+    try {
+      const { data } = await http.delete(
+        `/campaigns/${campaignId}/posts/${postId}/comments/${commentId}`
+      );
+      return data;
+    } catch (err) {
+      return thunkAPI.rejectWithValue(
+        err.response?.data?.message || 'שגיאה במחיקת תגובה'
+      );
+    }
+  }
+);
+
 // ===== גלריית תמונות =====
 
-// הוספת תמונה לגלריה
 export const addImage = createAsyncThunk(
   'campaign/addImage',
   async ({ campaignId, imageUrl }, thunkAPI) => {
@@ -122,7 +154,6 @@ export const addImage = createAsyncThunk(
       const { data } = await http.put(`/campaigns/${campaignId}/gallery`, {
         imageUrl,
       });
-      // השרת מחזיר את הקמפיין המלא
       return data;
     } catch (err) {
       return thunkAPI.rejectWithValue(
@@ -132,7 +163,6 @@ export const addImage = createAsyncThunk(
   }
 );
 
-// מחיקת תמונה מהגלריה
 export const deleteImage = createAsyncThunk(
   'campaign/deleteImage',
   async ({ campaignId, imageUrl }, thunkAPI) => {
@@ -140,7 +170,6 @@ export const deleteImage = createAsyncThunk(
       const { data } = await http.delete(`/campaigns/${campaignId}/gallery`, {
         data: { imageUrl },
       });
-      // השרת מחזיר את הקמפיין המלא
       return data;
     } catch (err) {
       return thunkAPI.rejectWithValue(
@@ -152,13 +181,11 @@ export const deleteImage = createAsyncThunk(
 
 // ===== צפיות =====
 
-// הגדלת viewCount בקמפיין
 export const incrementView = createAsyncThunk(
   'campaign/incrementView',
   async (campaignId, thunkAPI) => {
     try {
       const { data } = await http.post(`/campaigns/${campaignId}/view`);
-      // השרת מחזיר את הקמפיין המלא עם viewCount מעודכן
       return data;
     } catch (err) {
       return thunkAPI.rejectWithValue(
@@ -168,7 +195,8 @@ export const incrementView = createAsyncThunk(
   }
 );
 
-// ===== AI – הצעת פוסט אוטומטית =====
+// ===== AI =====
+
 export const generatePostSuggestion = createAsyncThunk(
   'campaign/generatePostSuggestion',
   async ({ candidateId, titleHint, note }, thunkAPI) => {
@@ -180,7 +208,7 @@ export const generatePostSuggestion = createAsyncThunk(
       if (!data.ok) {
         throw new Error(data.message || 'שגיאה מה-AI');
       }
-      return data.suggestion; // { title, content }
+      return data.suggestion;
     } catch (err) {
       return thunkAPI.rejectWithValue(
         err.response?.data?.message || err.message || 'שגיאה מה-AI'
@@ -193,8 +221,8 @@ export const generatePostSuggestion = createAsyncThunk(
 
 const initialState = {
   loading: false,
-  data: null,       // הקמפיין
-  candidate: null,  // המועמד של הקמפיין
+  data: null,
+  candidate: null,
   error: null,
 
   aiLoading: false,
@@ -215,8 +243,8 @@ const campaignSlice = createSlice({
       })
       .addCase(fetchCampaign.fulfilled, (state, action) => {
         state.loading = false;
-        state.data = action.payload.campaign;       // הקמפיין עצמו
-        state.candidate = action.payload.candidate; // המועמד
+        state.data = action.payload.campaign;
+        state.candidate = action.payload.candidate;
       })
       .addCase(fetchCampaign.rejected, (state, action) => {
         state.loading = false;
@@ -225,7 +253,6 @@ const campaignSlice = createSlice({
 
       // ----- Create campaign -----
       .addCase(createCampaign.fulfilled, (state, action) => {
-        // כאן data = הקמפיין החדש
         state.data = action.payload;
         state.error = null;
       })
@@ -233,9 +260,9 @@ const campaignSlice = createSlice({
         state.error = action.payload;
       })
 
-      // ----- Update campaign (תיאור וכו') -----
+      // ----- Update campaign -----
       .addCase(updateCampaign.fulfilled, (state, action) => {
-        state.data = action.payload;  // קמפיין מעודכן
+        state.data = action.payload;
         state.error = null;
       })
       .addCase(updateCampaign.rejected, (state, action) => {
@@ -244,7 +271,7 @@ const campaignSlice = createSlice({
 
       // ----- Posts -----
       .addCase(addPost.fulfilled, (state, action) => {
-        state.data = action.payload;  // קמפיין מעודכן עם posts
+        state.data = action.payload;
         state.error = null;
       })
       .addCase(addPost.rejected, (state, action) => {
@@ -265,6 +292,22 @@ const campaignSlice = createSlice({
         state.error = action.payload;
       })
 
+      // 🆕 ----- Comments -----
+      .addCase(addComment.fulfilled, (state, action) => {
+        state.data = action.payload;
+        state.error = null;
+      })
+      .addCase(addComment.rejected, (state, action) => {
+        state.error = action.payload;
+      })
+      .addCase(deleteComment.fulfilled, (state, action) => {
+        state.data = action.payload;
+        state.error = null;
+      })
+      .addCase(deleteComment.rejected, (state, action) => {
+        state.error = action.payload;
+      })
+
       // ----- Gallery -----
       .addCase(addImage.fulfilled, (state, action) => {
         state.data = action.payload;
@@ -282,12 +325,10 @@ const campaignSlice = createSlice({
       })
 
       // ----- Views -----
-      // חשוב: לא משנים loading כאן כדי לא להדליק שוב "טוען קמפיין…"
       .addCase(incrementView.fulfilled, (state, action) => {
-        state.data = action.payload; // קמפיין עם viewCount מעודכן
+        state.data = action.payload;
       })
       .addCase(incrementView.rejected, (state, action) => {
-        // לא חוסם את המסך, רק שומר שגיאה אם צריך
         state.error = action.payload;
       })
 
@@ -299,7 +340,7 @@ const campaignSlice = createSlice({
       })
       .addCase(generatePostSuggestion.fulfilled, (state, action) => {
         state.aiLoading = false;
-        state.aiSuggestion = action.payload; // { title, content }
+        state.aiSuggestion = action.payload;
       })
       .addCase(generatePostSuggestion.rejected, (state, action) => {
         state.aiLoading = false;
