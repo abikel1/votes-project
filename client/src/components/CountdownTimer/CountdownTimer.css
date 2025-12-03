@@ -15,20 +15,20 @@
 }
 
 .count-number {
-  font-size: 15px;
+  font-size: calc(15px * var(--a11y-font-scale));
   font-weight: 700;
   color: #023466;
   margin: 0;             /* שלא יתווסף רווח דיפולטי */
 }
 
 .count-label {
-  font-size: 11px;
+  font-size: calc(11px * var(--a11y-font-scale));
   color: #023466;
   margin-top: 0px;       /* היה 2 — עכשיו צמוד יותר */
 }
 
 .count-sep {
-  font-size: 15px;
+  font-size: calc(15px * var(--a11y-font-scale));
   font-weight: 700;
   color: #023466;
   margin: 0 2px;         /* היה 6 — צמוד הרבה יותר */

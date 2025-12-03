@@ -12,7 +12,7 @@
 }
 
 .cg-title {
-  font-size: 26px;
+  font-size: calc(26px * var(--a11y-font-scale));
   color: #003366;
   margin-bottom: 28px;
   text-align: center;
@@ -38,7 +38,7 @@
   display: flex;
   flex-direction: column;
   gap: 6px;
-  font-size: 14px;
+  font-size: calc(14px * var(--a11y-font-scale));
   color: #003366;
   font-weight: 600;
 }
@@ -46,7 +46,7 @@
 .cg-input {
   width: 100%;
   padding: 12px 14px;
-  font-size: 15px;
+  font-size: calc(15px * var(--a11y-font-scale));
   border: 1.8px solid #003366;
   border-radius: 0;
   background: white;
@@ -64,8 +64,7 @@
 }
 
 .cg-desc-wrapper textarea {
-  padding-left: 46px;
-  /* מקום לאייקון משמאל (RTL) */
+  padding-left: 46px; /* מקום לאייקון משמאל (RTL) */
 }
 
 .cg-ai-icon-btn {
@@ -90,14 +89,14 @@
 }
 
 .cg-ai-icon-text {
-  font-size: 18px;
+  font-size: calc(18px * var(--a11y-font-scale));
   line-height: 1;
 }
 
 /* ===== Error Text ===== */
 .cg-error {
   color: #cc0000;
-  font-size: 13px;
+  font-size: calc(13px * var(--a11y-font-scale));
   margin-top: 4px;
 }
 
@@ -111,7 +110,7 @@
 .cg-btn {
   flex: 1;
   padding: 14px 0;
-  font-size: 16px;
+  font-size: calc(16px * var(--a11y-font-scale));
   font-weight: 600;
   background: #003366;
   color: #fff;
@@ -132,7 +131,7 @@
 .cg-btn-outline {
   flex: 1;
   padding: 14px 0;
-  font-size: 16px;
+  font-size: calc(16px * var(--a11y-font-scale));
   font-weight: 600;
   background: #ffffff;
   color: #003366;
@@ -150,7 +149,7 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  font-size: 14px;
+  font-size: calc(14px * var(--a11y-font-scale));
 }
 
 .switch {
@@ -189,11 +188,11 @@
   transition: 0.2s;
 }
 
-input:checked+.slider {
+input:checked + .slider {
   background-color: #003366;
 }
 
-input:checked+.slider:before {
+input:checked + .slider:before {
   transform: translateX(22px);
 }
 
@@ -221,14 +220,14 @@ input:checked+.slider:before {
 }
 
 .modal h3 {
-  font-size: 20px;
+  font-size: calc(20px * var(--a11y-font-scale));
   color: #003366;
   margin: 0;
 }
 
 .modal .muted {
   color: #738799;
-  font-size: 13px;
+  font-size: calc(13px * var(--a11y-font-scale));
 }
 
 .modal input.cg-input {
@@ -245,7 +244,7 @@ input:checked+.slider:before {
 
 .gs-btn {
   padding: 10px 16px;
-  font-size: 14px;
+  font-size: calc(14px * var(--a11y-font-scale));
   font-weight: 600;
   background: #003366;
   color: #fff;
@@ -273,6 +272,7 @@ input:checked+.slider:before {
   }
 }
 
+/* פונט כללי */
 * {
   font-family: 'Assistant', 'Heebo', Arial, sans-serif;
 }

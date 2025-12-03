@@ -21,13 +21,13 @@
 
 .confirm-modal h3 {
   margin-bottom: 12px;
-  font-size: 18px;
+  font-size: calc(18px * var(--a11y-font-scale));
   font-weight: 600;
 }
 
 .confirm-modal p {
   margin: 0;
-  font-size: 15px;
+  font-size: calc(15px * var(--a11y-font-scale));
   color: #333;
 }
 
@@ -43,7 +43,7 @@
   padding: 10px 20px;
   border: none;
   cursor: pointer;
-  font-size: 15px;
+  font-size: calc(15px * var(--a11y-font-scale));
   font-weight: 600;
 }
 

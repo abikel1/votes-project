@@ -50,14 +50,14 @@
 
   background: radial-gradient(circle at 30% 30%, #facc15, #eab308);
   color: #1f2933;
-  font-size: 1.2rem;
+  font-size: calc(1.2rem * var(--a11y-font-scale));
   box-shadow: 0 10px 25px rgba(234, 179, 8, 0.55);
 }
 
 /* כותרת */
 .vote-result-title {
   margin: 4px 0 10px;
-  font-size: 1.45rem;
+  font-size: calc(1.45rem * var(--a11y-font-scale));
   font-weight: 700;
   color: #111827;
 }
@@ -65,14 +65,14 @@
 /* טקסט ראשי */
 .vote-result-text {
   margin: 0 0 8px;
-  font-size: 1rem;
+  font-size: calc(1rem * var(--a11y-font-scale));
   color: #4b5563;
 }
 
 /* רשימת זוכים */
 .vote-result-winners {
   margin: 4px 0 18px;
-  font-size: 0.97rem;
+  font-size: calc(0.97rem * var(--a11y-font-scale));
   font-weight: 500;
   color: #111827;
 }
@@ -93,7 +93,7 @@
   padding: 9px 16px;
   cursor: pointer;
 
-  font-size: 0.95rem;
+  font-size: calc(0.95rem * var(--a11y-font-scale));
   font-weight: 500;
   font-family: inherit;
 
@@ -165,7 +165,7 @@
   }
 
   .vote-result-title {
-    font-size: 1.25rem;
+    font-size: calc(1.25rem * var(--a11y-font-scale));
   }
 
   .vote-result-actions {

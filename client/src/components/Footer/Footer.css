@@ -10,7 +10,7 @@
 .site-footer {
   background-color: #f9f9f9;
   padding: 24px 20px;
-  font-size: 14px;
+  font-size: calc(14px * var(--a11y-font-scale));
   border-top: 1px solid #003366;
   margin-top: 100px;
 }
@@ -91,7 +91,7 @@
   align-items: center;
   justify-content: center;
   margin-left: 12px;
-  font-size: 22px;
+  font-size: calc(22px * var(--a11y-font-scale));
   color: #333;
   transition: color 0.2s, transform 0.15s;
 }
@@ -105,7 +105,7 @@
   border-top: 1px solid #e0e0e0;
   padding-top: 12px;
   text-align: center;
-  font-size: 13px;
+  font-size: calc(13px * var(--a11y-font-scale));
   color: #666;
 }
 
@@ -125,7 +125,7 @@
   }
 
   .footer-social-icons a {
-    font-size: 24px;
+    font-size: calc(24px * var(--a11y-font-scale));
   }
 
 

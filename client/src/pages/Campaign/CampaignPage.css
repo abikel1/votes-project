@@ -40,7 +40,7 @@
 }
 
 .page-header h2 {
-  font-size: 24px;
+  font-size: calc(24px * var(--a11y-font-scale));
   margin: 0;
   color: #1e293b;
   font-weight: 700;
@@ -53,7 +53,7 @@
   padding: 3px 8px;
   margin: 4px 0;
   font-weight: 600;
-  font-size: 11px;
+  font-size: calc(11px * var(--a11y-font-scale));
   border: 1px solid #93c5fd;
 }
 
@@ -63,7 +63,7 @@
   gap: 20px;
   margin-top: 8px;
   color: #475569;
-  font-size: 13px;
+  font-size: calc(13px * var(--a11y-font-scale));
 }
 
 .stat-item {
@@ -79,7 +79,6 @@
   position: absolute;
   top: 12px;
   left: 16px;
-  /* אם RTL - תחליפי ל-right */
 }
 
 /* כפתורים */
@@ -105,7 +104,7 @@
   border: none;
   padding: 8px 16px;
   cursor: pointer;
-  font-size: 13px;
+  font-size: calc(13px * var(--a11y-font-scale));
   font-weight: 600;
   transition: all 0.2s ease;
 }
@@ -190,7 +189,7 @@
 
 /* ========== כותרות סקשן ========== */
 .section-title {
-  font-size: 16px;
+  font-size: calc(16px * var(--a11y-font-scale));
   color: #1e293b;
   font-weight: 700;
   margin: 0 0 10px 0;
@@ -231,7 +230,7 @@
 }
 
 .candidate-card h4 {
-  font-size: 14px;
+  font-size: calc(14px * var(--a11y-font-scale));
   margin: 0 0 8px 0;
   color: #1e293b;
   font-weight: 700;
@@ -239,7 +238,7 @@
 
 .candidate-card p {
   color: #64748b;
-  font-size: 13px;
+  font-size: calc(13px * var(--a11y-font-scale));
   line-height: 1.5;
   margin: 0;
   white-space: pre-wrap;
@@ -277,7 +276,7 @@
   width: 100%;
   padding: 10px 12px;
   border: 1px solid #e2e8f0;
-  font-size: 13px;
+  font-size: calc(13px * var(--a11y-font-scale));
   font-family: inherit;
   transition: border-color 0.2s;
   background: #ffffff;
@@ -303,7 +302,7 @@
   background: #f8fafc;
   cursor: pointer;
   width: 100%;
-  font-size: 13px;
+  font-size: calc(13px * var(--a11y-font-scale));
 }
 
 /* ========== גלריה ========== */
@@ -354,7 +353,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 18px;
+  font-size: calc(18px * var(--a11y-font-scale));
   font-weight: bold;
   opacity: 0;
   transition: opacity 0.2s;
@@ -376,7 +375,7 @@
   color: white;
   border: none;
   cursor: pointer;
-  font-size: 12px;
+  font-size: calc(12px * var(--a11y-font-scale));
   font-weight: 600;
   transition: background 0.2s;
 }
@@ -399,7 +398,7 @@
 
 .muted {
   color: #64748b;
-  font-size: 13px;
+  font-size: calc(13px * var(--a11y-font-scale));
   font-weight: 500;
 }
 
@@ -408,7 +407,7 @@
   text-align: center;
   padding: 40px 20px;
   color: #64748b;
-  font-size: 14px;
+  font-size: calc(14px * var(--a11y-font-scale));
   background: #f8fafc;
   border: 1px solid #e2e8f0;
 }
@@ -432,7 +431,7 @@
 
 .loading-wrap {
   text-align: center;
-  font-size: 15px;
+  font-size: calc(15px * var(--a11y-font-scale));
   padding: 30px 20px;
   color: #64748b;
 }
@@ -446,7 +445,7 @@
   border: 1px solid #fca5a5;
   border-right: 3px solid #dc2626;
   font-weight: 600;
-  font-size: 13px;
+  font-size: calc(13px * var(--a11y-font-scale));
 }
 
 /* ========== Lightbox (תמונות) ========== */
@@ -479,7 +478,7 @@
   border: none;
   width: 40px;
   height: 40px;
-  font-size: 24px;
+  font-size: calc(24px * var(--a11y-font-scale));
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -528,7 +527,7 @@
   }
 
   .page-header h2 {
-    font-size: 20px;
+    font-size: calc(20px * var(--a11y-font-scale));
   }
 
   .candidate-avatar {
@@ -537,17 +536,17 @@
   }
 
   .candidate-symbol {
-    font-size: 10px;
+    font-size: calc(10px * var(--a11y-font-scale));
     padding: 2px 6px;
   }
 
   .stats-row {
-    font-size: 12px;
+    font-size: calc(12px * var(--a11y-font-scale));
     gap: 15px;
   }
 
   .vote-btn {
-    font-size: 12px;
+    font-size: calc(12px * var(--a11y-font-scale));
     padding: 8px 12px;
   }
 
@@ -576,7 +575,7 @@
   }
 
   .section-title {
-    font-size: 15px;
+    font-size: calc(15px * var(--a11y-font-scale));
     margin-bottom: 8px;
     padding-bottom: 6px;
   }
@@ -608,7 +607,7 @@
   }
 
   .page-header h2 {
-    font-size: 18px;
+    font-size: calc(18px * var(--a11y-font-scale));
   }
 
   .candidate-avatar {
@@ -617,22 +616,22 @@
   }
 
   .candidate-symbol {
-    font-size: 9px;
+    font-size: calc(9px * var(--a11y-font-scale));
     padding: 2px 5px;
   }
 
   .stats-row {
-    font-size: 11px;
+    font-size: calc(11px * var(--a11y-font-scale));
     gap: 12px;
   }
 
   .vote-btn {
-    font-size: 11px;
+    font-size: calc(11px * var(--a11y-font-scale));
     padding: 6px 10px;
   }
 
   .section-title {
-    font-size: 14px;
+    font-size: calc(14px * var(--a11y-font-scale));
   }
 
   .info-card {
@@ -644,11 +643,11 @@
   }
 
   .candidate-card h4 {
-    font-size: 13px;
+    font-size: calc(13px * var(--a11y-font-scale));
   }
 
   .candidate-card p {
-    font-size: 12px;
+    font-size: calc(12px * var(--a11y-font-scale));
   }
 
   .gallery-grid {
@@ -703,7 +702,6 @@
 }
 
 @media (max-width: 768px) {
-
   .candidate-card,
   .info-card,
   .gallery-item {
@@ -728,7 +726,7 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  font-size: 14px;
+  font-size: calc(14px * var(--a11y-font-scale));
   text-align: center;
 }
 
@@ -776,12 +774,12 @@
 }
 
 .ai-modal-icon {
-  font-size: 26px;
+  font-size: calc(26px * var(--a11y-font-scale));
 }
 
 .ai-modal-header h3 {
   margin: 0;
-  font-size: 22px;
+  font-size: calc(22px * var(--a11y-font-scale));
   font-weight: 700;
   color: #0f172a;
 }
@@ -789,7 +787,7 @@
 .ai-modal-subtitle {
   margin: 0 0 16px 0;
   text-align: center;
-  font-size: 13px;
+  font-size: calc(13px * var(--a11y-font-scale));
   color: #64748b;
 }
 
@@ -799,7 +797,7 @@
 
 .ai-label {
   display: block;
-  font-size: 13px;
+  font-size: calc(13px * var(--a11y-font-scale));
   font-weight: 600;
   color: #334155;
   margin-bottom: 4px;
@@ -812,7 +810,7 @@
   padding: 8px 10px;
   border: 1px solid #d1d5db;
   border-radius: 4px;
-  font-size: 13px;
+  font-size: calc(13px * var(--a11y-font-scale));
   font-family: inherit;
   background: #ffffff;
 }
@@ -845,7 +843,7 @@
 }
 
 .ai-section-title {
-  font-size: 14px;
+  font-size: calc(14px * var(--a11y-font-scale));
   font-weight: 700;
   margin: 0 0 8px 0;
   color: #0f172a;
@@ -882,13 +880,13 @@
 }
 
 .ai-result-content {
-  font-size: 13px;
+  font-size: calc(13px * var(--a11y-font-scale));
   color: #475569;
   white-space: pre-wrap;
   line-height: 1.6;
 }
 
 .ai-result-placeholder {
-  font-size: 13px;
+  font-size: calc(13px * var(--a11y-font-scale));
   color: #9ca3af;
 }

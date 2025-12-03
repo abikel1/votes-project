@@ -26,6 +26,11 @@ import Footer from './components/Footer/Footer';
 import ContactPage from './pages/ContactForm/ContactForm.jsx';
 import ScrollToTop from './components/ScrollToTop.jsx';
 import CampaignPage from './pages/Campaign/CampaignPage';
+// <<<<<<< HEAD
+// =======
+import AccessibilityWidget from './components/AccessibilityWidget/AccessibilityWidget.jsx';
+
+// >>>>>>> f626efaa96775a3bd42eed6f5e1db18dfb2f900a
 // 👇 ה־Guard
 import RequireAuth from './components/RequireAuth/RequireAuth.jsx';
 
@@ -135,6 +140,7 @@ export default function App() {
       </Routes>
 
       <Footer />
+      <AccessibilityWidget />
     </div>
   );
 }

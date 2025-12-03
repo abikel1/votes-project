@@ -1,0 +1,193 @@
+/* כפתור עגול כמו בדוגמה */
+.accessibility-btn {
+  position: fixed;
+  top: 50%;
+  right: 16px;
+  transform: translateY(-50%);
+  width: 56px;
+  height: 56px;
+
+  background-color: #122b40;
+  border: 3px solid #ffffff;
+  border-radius: 50%;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  color: #ffffff;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  z-index: 9999;
+}
+
+.accessibility-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.35);
+}
+
+.accessibility-btn svg {
+  font-size: 28px;
+}
+
+/* פאנל נגישות מעוצב */
+.accessibility-panel {
+  position: fixed;
+  top: 50%;
+  right: 90px;
+  transform: translateY(-50%);
+  width: 320px;
+  max-width: 90vw;
+
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 14px 16px;
+  box-shadow: 0 10px 25px rgba(15, 23, 42, 0.25);
+  z-index: 9999;
+  direction: rtl;
+  font-family: inherit;
+}
+
+/* כותרת הפאנל */
+.a11y-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.a11y-panel-title {
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.a11y-close-btn {
+  border: none;
+  background: transparent;
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+/* כותרת סקשן */
+.a11y-section {
+  margin-top: 10px;
+}
+
+.a11y-section-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #4b5563;
+  margin-bottom: 6px;
+}
+
+/* שורת אריחים */
+.a11y-tile-row {
+  display: flex;
+  gap: 8px;
+}
+
+/* אריח בסיסי */
+.a11y-tile {
+  flex: 1;
+  border-radius: 10px;
+  border: 1px solid #e5e7eb;
+  background: #f9fafb;
+  padding: 8px 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  text-align: right;
+  transition: 0.15s ease;
+}
+
+.a11y-tile:hover {
+  background: #eef2ff;
+  border-color: #3b82f6;
+}
+
+/* אריח שאפשר להדליק/לכבות */
+.a11y-toggle-tile {
+  position: relative;
+}
+
+.a11y-tile-active {
+  border-color: #15803d;
+  background: #ecfdf3;
+}
+
+/* V ירוק קטן */
+.a11y-check {
+  position: absolute;
+  top: 6px;
+  left: 8px;
+  font-size: 16px;
+  color: #15803d;
+}
+
+/* אייקון באריח */
+.a11y-tile-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: #e5edff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.a11y-tile-icon svg {
+  font-size: 20px;
+}
+
+/* טקסט באריח */
+.a11y-tile-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.a11y-tile-title {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.a11y-tile-sub {
+  font-size: 11px;
+  color: #6b7280;
+}
+
+/* כפתור איפוס */
+.a11y-reset-btn {
+  margin-top: 6px;
+  width: 100%;
+  border-radius: 999px;
+  border: 1px solid #e5e7eb;
+  background: #f3f4f6;
+  padding: 6px 8px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.a11y-reset-btn:hover {
+  background: #e5e7eb;
+}
+
+/* רספונסיביות – במסכים קטנים הפאנל קצת יורד */
+@media (max-width: 768px) {
+  .accessibility-panel {
+    top: auto;
+    bottom: 80px;
+    transform: none;
+    right: 16px;
+  }
+
+  .accessibility-btn {
+    top: auto;
+    bottom: 16px;
+    transform: none;
+  }
+}

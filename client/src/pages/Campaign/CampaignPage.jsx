@@ -18,6 +18,8 @@ import {
   addComment,
   deleteComment,
 } from '../../slices/campaignSlice';
+import { updateCandidate } from '../../slices/candidateSlice';
+
 
 import { BiArrowBack } from 'react-icons/bi';
 import { FiEdit3, FiEye, FiHeart, FiShare2, FiX } from 'react-icons/fi';
@@ -26,6 +28,11 @@ import './CampaignPage.css';
 import { uploadImage } from '../../components/GroupSettings/uploadImage';
 import PostCard from './PostCard';
 // עוזר לניקוי תשובת AI
+
+import EditCandidateModal from '../../components/GroupSettings/EditCandidateModal';
+import http from '../../api/http';
+
+// ===== עוזר לניקוי תשובת ה-AI =====
 function normalizeAiSuggestion(suggestion, fallbackTitle = '') {
   if (!suggestion) {
     return { title: fallbackTitle || '', content: '', youtubeUrl: '' };
@@ -80,8 +87,8 @@ export default function CampaignPage() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
-  const groupId = location.state?.groupId || null;
 
+  const groupId = location.state?.groupId || null;
   // Redux state
   const campaign = useSelector(selectCampaign);
   const candidate = useSelector(selectCandidate);
@@ -117,6 +124,25 @@ export default function CampaignPage() {
 
   const hasIncrementedViewRef = useRef(false);
 
+// <<<<<<< HEAD
+// =======
+  // === NEW: סטייט למודאל עריכת מועמד ===
+  const [editCandidateOpen, setEditCandidateOpen] = useState(false);
+  const [editCandForm, setEditCandForm] = useState({
+    name: '',
+    description: '',
+    symbol: '',
+    photoUrl: '',
+  });
+  const [editCandErrors, setEditCandErrors] = useState({});
+  const [updatingThisCandidate, setUpdatingThisCandidate] = useState(false);
+  const [updateCandidateError, setUpdateCandidateError] = useState('');
+  const [uploadingEdit, setUploadingEdit] = useState(false);
+  const editFileInputRef = useRef(null);
+
+  const effectiveGroupId = groupId || campaign?.groupId || null;
+  // === פונקציה נוחה לריענון הקמפיין מהשרת אחרי פעולות עריכה ===
+// >>>>>>> f626efaa96775a3bd42eed6f5e1db18dfb2f900a
   const refetchCampaign = () => {
     if (!candidateId) return;
     dispatch(fetchCampaign(candidateId));
@@ -349,6 +375,107 @@ const handleUploadGalleryFile = async (e) => {
     setAiGenerated(false);
   };
 
+  // === NEW: פונקציות למודאל עריכת מועמד ===
+  const handleOpenEditCandidate = () => {
+    if (!candidate) return;
+
+    setEditCandForm({
+      name: candidate.name || '',
+      description: candidate.description || '',
+      symbol: candidate.symbol || '',
+      photoUrl: candidate.photoUrl || '',
+    });
+    setEditCandErrors({});
+    setUpdateCandidateError('');
+    setEditCandidateOpen(true);
+  };
+
+  const handleCancelEditCandidate = () => {
+    if (updatingThisCandidate) return;
+    setEditCandidateOpen(false);
+  };
+
+  const handleEditCandChange = (e) => {
+    const { name, value } = e.target;
+    setEditCandForm((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleUploadEdit = async (file) => {
+    if (!file) return;
+    setUploadingEdit(true);
+    setUpdateCandidateError('');
+
+    try {
+      const url = await uploadImage(file);
+      if (!url) throw new Error('לא התקבלה כתובת תמונה');
+      setEditCandForm((prev) => ({ ...prev, photoUrl: url }));
+    } catch (err) {
+      console.error('שגיאה בהעלאת תמונת מועמד:', err);
+      setUpdateCandidateError('שגיאה בהעלאת תמונת המועמד/ת');
+    } finally {
+      setUploadingEdit(false);
+    }
+  };
+
+  const clearEditPhoto = () => {
+    setEditCandForm((prev) => ({ ...prev, photoUrl: '' }));
+  };
+
+  const handleSaveEditedCandidate = (e) => {
+    e.preventDefault();
+
+    if (!effectiveGroupId || !candidateId) {
+      setUpdateCandidateError('חסר מזהה קבוצה או מועמד לעדכון');
+      return;
+    }
+
+    const { name, description, symbol, photoUrl } = editCandForm;
+
+    // ולידציות בסיסיות לטופס
+    const errors = {};
+    if (!name?.trim()) errors.name = 'שם מועמד/ת חובה';
+    if (!description?.trim()) errors.description = 'תיאור חובה';
+    if (!symbol?.trim()) errors.symbol = 'סמל חובה';
+
+    setEditCandErrors(errors);
+    if (Object.keys(errors).length > 0) {
+      return;
+    }
+
+    const patch = {
+      name: name.trim(),
+      description: (description || '').trim(),
+      symbol: (symbol || '').trim(),
+      photoUrl: (photoUrl || '').trim(),
+    };
+
+    setUpdateCandidateError('');
+    setUpdatingThisCandidate(true);
+
+    dispatch(
+      updateCandidate({
+        candidateId,              // מזהה המועמד מה־URL
+        groupId: effectiveGroupId,
+        patch,
+      })
+    )
+      .unwrap()
+      .then(() => {
+        setUpdatingThisCandidate(false);
+        setEditCandidateOpen(false);
+        refetchCampaign();        // כדי לעדכן שם/סמל/תמונה בקמפיין
+      })
+      .catch((err) => {
+        console.error('שגיאה בעדכון המועמד/ת:', err);
+        const msg =
+          err?.response?.data?.message ||
+          err?.message ||
+          'שגיאה בעדכון המועמד/ת';
+        setUpdateCandidateError(msg);
+        setUpdatingThisCandidate(false);
+      });
+  };
+
   return (
     <div className="page-wrap dashboard">
       {/* HEADER */}
@@ -385,9 +512,24 @@ const handleUploadGalleryFile = async (e) => {
           )}
 
           <h2>{candidate?.name}</h2>
+          {candidate?.description && (
+            <p className="candidate-description">
+              {candidate.description}
+            </p>
+          )}
 
           {candidate?.symbol && (
             <span className="candidate-symbol">{candidate.symbol}</span>
+          )}
+
+          {isCandidateOwner && isEditMode && (
+            <button
+              type="button"
+              className="vote-btn edit-candidate-btn"
+              onClick={handleOpenEditCandidate}
+            >
+              עריכת מועמד/ת
+            </button>
           )}
         </div>
       </div>
@@ -635,7 +777,28 @@ const handleUploadGalleryFile = async (e) => {
         </div>
       )}
 
-      {/* AI Modal */}
+{/* <<<<<<< HEAD */}
+{/* // ======= */}
+      {/* מודאל עריכת מועמד/ת */}
+      <EditCandidateModal
+        open={editCandidateOpen}
+        editCandForm={editCandForm}
+        editCandErrors={editCandErrors}
+        updatingThisCandidate={updatingThisCandidate}
+        updateCandidateError={updateCandidateError}
+        onEditCandChange={handleEditCandChange}
+        onSaveEditedCandidate={handleSaveEditedCandidate}
+        onCancelEditCandidate={handleCancelEditCandidate}
+        uploadingEdit={uploadingEdit}
+        onUploadEdit={handleUploadEdit}
+        editFileInputRef={editFileInputRef}
+        clearEditPhoto={clearEditPhoto}
+        canEditName={false}
+      />
+
+
+      {/* מודאל AI לפוסט קמפיין */}
+{/* >>>>>>> f626efaa96775a3bd42eed6f5e1db18dfb2f900a */}
       {showAiModal && (
         <div
           className="lightbox-overlay ai-overlay"
