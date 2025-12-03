@@ -12,7 +12,10 @@ const {
   deleteImage,
   incrementView,
   getAiPostSuggestion,
+  addComment,    // 🆕
+  deleteComment, // 🆕
 } = require('../controllers/campaign_controller');
+const auth = require('../middlewares/auth_middleware');
 
 // קמפיין של מועמד
 router.get('/candidate/:candidateId', getCampaign);
@@ -30,6 +33,10 @@ router.put('/:campaignId', updateCampaign);
 router.put('/:campaignId/posts', addPost);
 router.put('/:campaignId/posts/:postId', updatePost);
 router.delete('/:campaignId/posts/:postId', deletePost);
+
+// 🆕 ===== תגובות =====
+router.post('/:campaignId/posts/:postId/comments',auth, addComment);
+router.delete('/:campaignId/posts/:postId/comments/:commentId',auth, deleteComment);
 
 // ===== גלריית תמונות =====
 router.put('/:campaignId/gallery', addImage);

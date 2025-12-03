@@ -15,6 +15,8 @@ import {
   selectAiSuggestion,
   selectAiLoading,
   selectAiError,
+  addComment,
+  deleteComment,
 } from '../../slices/campaignSlice';
 import { updateCandidate } from '../../slices/candidateSlice';
 
@@ -24,6 +26,8 @@ import { FiEdit3, FiEye, FiHeart, FiShare2, FiX } from 'react-icons/fi';
 
 import './CampaignPage.css';
 import { uploadImage } from '../../components/GroupSettings/uploadImage';
+import PostCard from './PostCard';
+// עוזר לניקוי תשובת AI
 
 import EditCandidateModal from '../../components/GroupSettings/EditCandidateModal';
 import http from '../../api/http';
@@ -31,7 +35,7 @@ import http from '../../api/http';
 // ===== עוזר לניקוי תשובת ה-AI =====
 function normalizeAiSuggestion(suggestion, fallbackTitle = '') {
   if (!suggestion) {
-    return { title: fallbackTitle || '', content: '' };
+    return { title: fallbackTitle || '', content: '', youtubeUrl: '' };
   }
 
   const rawTitle =
@@ -43,7 +47,7 @@ function normalizeAiSuggestion(suggestion, fallbackTitle = '') {
     suggestion.content ?? suggestion.text ?? suggestion.message ?? '';
 
   if (typeof rawContent !== 'string') {
-    return { title: rawTitle, content: '' };
+    return { title: rawTitle, content: '', youtubeUrl: '' };
   }
 
   try {
@@ -64,15 +68,17 @@ function normalizeAiSuggestion(suggestion, fallbackTitle = '') {
       return {
         title: obj.title || rawTitle,
         content: obj.content || '',
+        youtubeUrl: obj.youtubeUrl || '',
       };
     }
   } catch (e) {
-    // מתעלמים אם אין JSON תקין
+    // אין JSON תקין
   }
 
   return {
     title: rawTitle,
     content: rawContent,
+    youtubeUrl: '',
   };
 }
 
@@ -96,7 +102,11 @@ export default function CampaignPage() {
   const aiError = useSelector(selectAiError);
 
   // Local state
-  const [newPost, setNewPost] = useState({ title: '', content: '' });
+  const [newPost, setNewPost] = useState({ 
+    title: '', 
+    content: '', 
+    youtubeUrl: '' 
+  });
   const [newImageUrl, setNewImageUrl] = useState('');
   const [editDescription, setEditDescription] = useState('');
   const [isEditingDescription, setIsEditingDescription] = useState(false);
@@ -114,6 +124,8 @@ export default function CampaignPage() {
 
   const hasIncrementedViewRef = useRef(false);
 
+// <<<<<<< HEAD
+// =======
   // === NEW: סטייט למודאל עריכת מועמד ===
   const [editCandidateOpen, setEditCandidateOpen] = useState(false);
   const [editCandForm, setEditCandForm] = useState({
@@ -130,23 +142,21 @@ export default function CampaignPage() {
 
   const effectiveGroupId = groupId || campaign?.groupId || null;
   // === פונקציה נוחה לריענון הקמפיין מהשרת אחרי פעולות עריכה ===
+// >>>>>>> f626efaa96775a3bd42eed6f5e1db18dfb2f900a
   const refetchCampaign = () => {
     if (!candidateId) return;
     dispatch(fetchCampaign(candidateId));
   };
 
-  // === טעינת קמפיין + incrementView בקריאה אחת לוגית ===
-  // === טעינת קמפיין + incrementView בקריאה אחת לוגית ===
+  // טעינת קמפיין + incrementView
   useEffect(() => {
     if (!candidateId) return;
 
-    // בכל שינוי מועמד מאפס את הדגל
     hasIncrementedViewRef.current = false;
 
     dispatch(fetchCampaign(candidateId))
       .unwrap()
       .then((res) => {
-        // res = { success, campaign, candidate }
         const campaignId = res?.campaign?._id || res?._id;
 
         if (campaignId && !hasIncrementedViewRef.current) {
@@ -162,7 +172,7 @@ export default function CampaignPage() {
       });
   }, [candidateId, dispatch]);
 
-  // סנכרון תיאור ולייקים עם הקמפיין מהשרת
+  // סנכרון תיאור ולייקים
   useEffect(() => {
     if (campaign) {
       if (campaign.description !== undefined) {
@@ -174,7 +184,7 @@ export default function CampaignPage() {
     }
   }, [campaign]);
 
-  // אם מגיעה הצעת AI דרך redux (רענון וכד')
+  // AI suggestion
   useEffect(() => {
     if (aiSuggestion) {
       const normalized = normalizeAiSuggestion(aiSuggestion, newPost.title);
@@ -183,7 +193,7 @@ export default function CampaignPage() {
     }
   }, [aiSuggestion]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Loading / Error
+  // Loading states
   if (userLoading) return <div className="loading-wrap">טוען משתמש…</div>;
   if (campaignLoading || !campaign)
     return <div className="loading-wrap">טוען קמפיין…</div>;
@@ -197,8 +207,7 @@ export default function CampaignPage() {
 
   const viewCount = campaign.viewCount || 0;
 
-  // === Handlers ===
-
+  // Handlers
   const handleUpdateCampaign = () => {
     dispatch(
       updateCampaign({
@@ -208,7 +217,7 @@ export default function CampaignPage() {
     )
       .unwrap()
       .then(() => {
-        refetchCampaign(); // מושך את הקמפיין המעודכן
+        refetchCampaign();
         setIsEditingDescription(false);
         setIsEditMode(false);
       })
@@ -223,8 +232,8 @@ export default function CampaignPage() {
     dispatch(addPost({ campaignId: campaign._id, post: newPost }))
       .unwrap()
       .then(() => {
-        refetchCampaign(); // ריענון כדי לראות את הפוסט החדש
-        setNewPost({ title: '', content: '' });
+        refetchCampaign();
+        setNewPost({ title: '', content: '', youtubeUrl: '' });
         setIsEditMode(false);
       })
       .catch((err) => {
@@ -233,10 +242,12 @@ export default function CampaignPage() {
   };
 
   const handleDeletePost = (postId) => {
+    if (!window.confirm('למחוק פוסט זה?')) return;
+    
     dispatch(deletePost({ campaignId: campaign._id, postId }))
       .unwrap()
       .then(() => {
-        refetchCampaign(); // ריענון כדי להעלים את הפוסט שנמחק
+        refetchCampaign();
         setIsEditMode(false);
       })
       .catch((err) => {
@@ -244,32 +255,49 @@ export default function CampaignPage() {
       });
   };
 
-  const handleUploadGalleryFile = async (e) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    try {
-      setUploadingImage(true);
-      const url = await uploadImage(file);
-      if (!url) return;
-      await dispatch(addImage({ campaignId: campaign._id, imageUrl: url })).unwrap();
-      refetchCampaign(); // ריענון גלריה
-      setIsEditMode(false);
-    } catch (err) {
-      console.error('שגיאה בהעלאת תמונה לגלריה:', err);
-      alert('שגיאה בהעלאת הקובץ');
-    } finally {
-      setUploadingImage(false);
-      e.target.value = '';
-    }
+  // תגובות
+  const handleAddComment = async (campaignId, postId, content) => {
+    await dispatch(addComment({ campaignId, postId, content })).unwrap();
+    refetchCampaign();
   };
+
+  const handleDeleteComment = async (campaignId, postId, commentId) => {
+    await dispatch(deleteComment({ campaignId, postId, commentId })).unwrap();
+    refetchCampaign();
+  };
+
+  // גלריה
+const handleUploadGalleryFile = async (e) => {
+  const file = e.target.files?.[0];
+  if (!file) return;
+
+  try {
+    setUploadingImage(true);
+    const url = await uploadImage(file);
+    if (!url) return;
+
+    // שמירה בגלריה של הקמפיין
+    await dispatch(addImage({ campaignId: campaign._id, imageUrl: url })).unwrap();
+
+    // רענון הקמפיין אחרי הוספה
+    refetchCampaign();
+    setIsEditMode(false);
+  } catch (err) {
+    console.error('שגיאה בהעלאת תמונה לגלריה:', err);
+    alert('שגיאה בהעלאת הקובץ');
+  } finally {
+    setUploadingImage(false);
+    e.target.value = '';
+  }
+};
+
 
   const handleAddImage = () => {
     if (!newImageUrl.trim()) return;
     dispatch(addImage({ campaignId: campaign._id, imageUrl: newImageUrl }))
       .unwrap()
       .then(() => {
-        refetchCampaign(); // ריענון גלריה
+        refetchCampaign();
         setNewImageUrl('');
         setIsEditMode(false);
       })
@@ -282,7 +310,7 @@ export default function CampaignPage() {
     dispatch(deleteImage({ campaignId: campaign._id, imageUrl: url }))
       .unwrap()
       .then(() => {
-        refetchCampaign(); // ריענון גלריה
+        refetchCampaign();
         setIsEditMode(false);
       })
       .catch((err) => {
@@ -291,7 +319,6 @@ export default function CampaignPage() {
   };
 
   const handleLike = () => {
-    // עדיין לוקאלי בלבד – אם תרצי לייקים אמיתיים צריך thunk לשרת
     setHasLiked(!hasLiked);
     setLikeCount((prev) => (hasLiked ? prev - 1 : prev + 1));
   };
@@ -311,16 +338,15 @@ export default function CampaignPage() {
     }
   };
 
-  // פתיחת חלון AI – שדות ריקים, עדיין לא נוצר פוסט
+  // AI
   const handleAskAiForPost = () => {
     if (!candidateId) return;
-    setNewPost({ title: '', content: '' });
+    setNewPost({ title: '', content: '', youtubeUrl: '' });
     setAiNote('');
     setAiGenerated(false);
     setShowAiModal(true);
   };
 
-  // קריאה ל-AI מתוך המודאל
   const handleGenerateWithAi = () => {
     if (!candidateId) return;
 
@@ -342,10 +368,9 @@ export default function CampaignPage() {
       });
   };
 
-  // ביטול במודאל – לא שומרים פוסט, מנקים שדות
   const handleCancelAiPost = () => {
     setShowAiModal(false);
-    setNewPost({ title: '', content: '' });
+    setNewPost({ title: '', content: '', youtubeUrl: '' });
     setAiNote('');
     setAiGenerated(false);
   };
@@ -532,6 +557,14 @@ export default function CampaignPage() {
                     setNewPost({ ...newPost, content: e.target.value })
                   }
                 />
+                <input
+                  type="text"
+                  placeholder="קישור YouTube (אופציונלי)"
+                  value={newPost.youtubeUrl}
+                  onChange={(e) =>
+                    setNewPost({ ...newPost, youtubeUrl: e.target.value })
+                  }
+                />
 
                 <div
                   style={{
@@ -559,18 +592,17 @@ export default function CampaignPage() {
             <div className="posts-list">
               {campaign.posts?.length ? (
                 campaign.posts.map((p) => (
-                  <div key={p._id} className="candidate-card">
-                    <h4>{p.title}</h4>
-                    <p>{p.content}</p>
-                    {isCandidateOwner && isEditMode && (
-                      <button
-                        onClick={() => handleDeletePost(p._id)}
-                        className="delete-btn"
-                      >
-                        מחיקה
-                      </button>
-                    )}
-                  </div>
+                  <PostCard
+                    key={p._id}
+                    post={p}
+                    campaignId={campaign._id}
+                    currentUserId={currentUserId}
+                    isCandidateOwner={isCandidateOwner}
+                    isEditMode={isEditMode}
+                    onDeletePost={handleDeletePost}
+                    onAddComment={handleAddComment}
+                    onDeleteComment={handleDeleteComment}
+                  />
                 ))
               ) : (
                 <div className="empty-state">אין פוסטים בקמפיין</div>
@@ -692,41 +724,39 @@ export default function CampaignPage() {
 
           <div className="gallery-container">
             <div className="gallery-grid">
-              {campaign.gallery?.length ? (
-                campaign.gallery.map((img, idx) => (
-                  <div
-                    key={idx}
-                    className="gallery-item"
-                    onClick={() => setSelectedImage(img)}
-                  >
-                    <img
-                      src={img || '/q.jpg'}           // ברירת מחדל אם אין URL
-                      alt={`תמונה ${idx + 1}`}
-                      onError={(e) => {
-                        e.currentTarget.onerror = null; // מונע loop
-                        e.currentTarget.src = '/q.png';
-                      }}
-                    />                    {isCandidateOwner && isEditMode && (
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleDeleteImage(img);
-                        }}
-                      >
-                        ×
-                      </button>
-                    )}
-                  </div>
-                ))
-              ) : (
-                <div className="empty-state">אין תמונות בגלריה</div>
-              )}
+           {campaign.gallery?.length ? (
+  campaign.gallery.map((img, idx) => (
+    <div key={idx} className="gallery-item" onClick={() => setSelectedImage(img)}>
+      <img
+        src={img || '/q.jpg'}
+        alt={`תמונה ${idx + 1}`}
+        onError={(e) => {
+          e.currentTarget.onerror = null;
+          e.currentTarget.src = '/q.png';
+        }}
+      />
+      {isCandidateOwner && isEditMode && (
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            handleDeleteImage(img);
+          }}
+        >
+          ×
+        </button>
+      )}
+    </div>
+  ))
+) : (
+  <div className="empty-state">אין תמונות בגלריה</div>
+)}
+
             </div>
           </div>
         </div>
       </div>
 
-      {/* Lightbox לתמונות */}
+      {/* Lightbox */}
       {selectedImage && (
         <div
           className="lightbox-overlay"
@@ -747,6 +777,8 @@ export default function CampaignPage() {
         </div>
       )}
 
+{/* <<<<<<< HEAD */}
+{/* // ======= */}
       {/* מודאל עריכת מועמד/ת */}
       <EditCandidateModal
         open={editCandidateOpen}
@@ -766,6 +798,7 @@ export default function CampaignPage() {
 
 
       {/* מודאל AI לפוסט קמפיין */}
+{/* >>>>>>> f626efaa96775a3bd42eed6f5e1db18dfb2f900a */}
       {showAiModal && (
         <div
           className="lightbox-overlay ai-overlay"
@@ -781,24 +814,19 @@ export default function CampaignPage() {
             </div>
 
             <p className="ai-modal-subtitle">
-              המערכת תשתמש בשם המועמד/ת והקבוצה ותיצור פוסט קצר בגוף ראשון,
-              עם כמה אימוג׳ים מתאימים 😉
+              המערכת תשתמש בשם המועמד/ת והקבוצה ותיצור פוסט קצר בגוף ראשון
             </p>
 
             <div className="ai-field-group">
               <label className="ai-label">
                 {aiGenerated
-                  ? 'כותרת הפוסט (ניתן לעריכה):'
-                  : 'כותרת מוצעת לפוסט (לא חובה):'}
+                  ? 'כותרת הפוסט:'
+                  : 'כותרת מוצעת:'}
               </label>
               <input
                 type="text"
                 className="ai-input"
-                placeholder={
-                  aiGenerated
-                    ? ''
-                    : `כותרת לפוסט עבור ${candidate?.name || 'המועמד/ת'} (לא חובה)`
-                }
+                placeholder={`כותרת לפוסט עבור ${candidate?.name || 'המועמד/ת'}`}
                 value={newPost.title}
                 onChange={(e) =>
                   setNewPost({ ...newPost, title: e.target.value })
@@ -808,18 +836,12 @@ export default function CampaignPage() {
 
             <div className="ai-field-group">
               <label className="ai-label">
-                {aiGenerated
-                  ? 'תוכן הפוסט (ניתן לעריכה):'
-                  : 'על מה לכתוב? (הערה ל-AI, לא חובה):'}
+                {aiGenerated ? 'תוכן:' : 'על מה לכתוב?'}
               </label>
               <textarea
                 className="ai-textarea"
                 rows={5}
-                placeholder={
-                  aiGenerated
-                    ? ''
-                    : 'לדוגמה: להתמקד בשקיפות, בעזרה לחברים בקבוצה, בניסיון האישי שלי...'
-                }
+                placeholder="לדוגמה: להתמקד בשקיפות, בעזרה לחברים בקבוצה..."
                 value={aiGenerated ? newPost.content : aiNote}
                 onChange={(e) => {
                   if (aiGenerated) {

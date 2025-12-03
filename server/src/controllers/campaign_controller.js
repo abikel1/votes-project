@@ -1,3 +1,4 @@
+// server/src/controllers/campaign_controller.js
 const campaignService = require('../services/campaign_service');
 const { generateCampaignPostForCandidate } = require('../services/ai_service');
 
@@ -71,6 +72,45 @@ async function deletePost(req, res) {
   }
 }
 
+// 🆕 ===== תגובות =====
+async function addComment(req, res) {
+  try {
+    const { campaignId, postId } = req.params;
+    const { content } = req.body;
+
+    // ✅ הבאת ה-ID של המשתמש מהמ middleware
+    const userId = req.user._id;
+
+    const campaign = await campaignService.addCommentToPost(
+      campaignId,
+      postId,
+      userId,
+      content
+    );
+    
+    res.json(campaign);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+}
+
+
+async function deleteComment(req, res) {
+  try {
+    const { campaignId, postId, commentId } = req.params;
+    
+    const campaign = await campaignService.deleteComment(
+      campaignId,
+      postId,
+      commentId
+    );
+    
+    res.json(campaign);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+}
+
 // ===== גלריית תמונות =====
 async function addImage(req, res) {
   try {
@@ -135,4 +175,6 @@ module.exports = {
   deleteImage,
   incrementView,
   getAiPostSuggestion,
+  addComment,    // 🆕
+  deleteComment, // 🆕
 };
