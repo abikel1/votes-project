@@ -810,7 +810,7 @@ const onAddCandidate = (e) => {
               onDeleteCandidate={handleDeleteCandidateClick}
               onOpenEditCandidate={openEditCandidate}
               uploadingNew={uploadingNew}
-              onUploadNew={(file) => handleUpload(file, 'new')}
+  onUploadNew={(file) => handleUpload(file, 'new')} // ✅ כאן
               newFileInputRef={newFileInputRef}
               clearNewPhoto={clearNewPhoto}
             />
