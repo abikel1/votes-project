@@ -136,7 +136,7 @@ export default function PostCard({
                     )}
                     <div className="comment-meta">
                       <span className="comment-author">
-                        {comment.user?.name || 'משתמש'}
+                        {comment.user?._id || 'משתמש'}
                       </span>
                       <span className="comment-date">
                         {new Date(comment.createdAt).toLocaleDateString('he-IL')}
