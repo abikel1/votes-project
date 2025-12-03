@@ -1,7 +1,7 @@
 // src/components/Campaign/PostCard.jsx
 import { useState } from 'react';
 import { FiTrash2, FiMessageSquare } from 'react-icons/fi';
-import { getYoutubeEmbedUrl } from '../../utils/youtubeHelper';
+// import { getYoutubeEmbedUrl } from '../../utils/youtubeHelper';
 import './PostCard.css';
 
 export default function PostCard({
@@ -18,9 +18,9 @@ export default function PostCard({
   const [newComment, setNewComment] = useState('');
   const [submittingComment, setSubmittingComment] = useState(false);
 
-  const youtubeEmbedUrl = post.youtubeUrl
-    ? getYoutubeEmbedUrl(post.youtubeUrl)
-    : null;
+//   const youtubeEmbedUrl = post.youtubeUrl
+//     ? getYoutubeEmbedUrl(post.youtubeUrl)
+//     : null;
 
   const handleSubmitComment = async () => {
     if (!newComment.trim() || submittingComment) return;
@@ -72,7 +72,7 @@ export default function PostCard({
       )}
 
       {/* YouTube */}
-      {youtubeEmbedUrl && (
+      {/* {youtubeEmbedUrl && (
         <div className="post-youtube-container">
           <iframe
             src={youtubeEmbedUrl}
@@ -83,7 +83,7 @@ export default function PostCard({
             className="post-youtube-iframe"
           />
         </div>
-      )}
+      )} */}
 
       {/* פוטר עם כפתור תגובות */}
       <div className="post-footer">

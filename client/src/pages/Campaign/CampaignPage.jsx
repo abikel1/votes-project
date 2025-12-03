@@ -25,7 +25,7 @@ import { FiEdit3, FiEye, FiHeart, FiShare2, FiX } from 'react-icons/fi';
 import './CampaignPage.css';
 import { uploadImage } from '../../components/GroupSettings/uploadImage';
 import PostCard from './PostCard';
-
+import ImageUpload from '../../components/ImageUpload'
 // עוזר לניקוי תשובת AI
 function normalizeAiSuggestion(suggestion, fallbackTitle = '') {
   if (!suggestion) {
@@ -537,6 +537,7 @@ export default function CampaignPage() {
           </div>
 
           <h3 className="section-title">גלריית תמונות</h3>
+<ImageUpload onUpload={(url) => console.log("Uploaded URL:", url)} />
 
           {isCandidateOwner && isEditMode && (
             <div className="info-card">
