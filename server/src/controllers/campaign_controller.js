@@ -4,12 +4,19 @@ const { generateCampaignPostForCandidate } = require('../services/ai_service');
 
 async function getCampaign(req, res) {
   try {
+    const currentUserId = req.user?._id;
+
     const campaign =
-      await campaignService.getCampaignByCandidate(req.params.candidateId);
+      await campaignService.getCampaignByCandidate(
+        req.params.candidateId,
+        currentUserId
+      );
+
     return res.json({
       success: true,
       campaign,
-      candidate: campaign.candidate
+      candidate: campaign.candidate,
+      campaignId: campaign._id
     });
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -164,6 +171,24 @@ async function getAiPostSuggestion(req, res) {
   }
 }
 
+async function likeCampaign(req, res) {
+  const userId = req.user._id;
+  const { campaignId } = req.params;
+
+  const updated = await campaignService.likeCampaign(campaignId, userId);
+  res.json(updated);
+}
+
+async function unlikeCampaign(req, res) {
+  const userId = req.user._id;
+  const { campaignId } = req.params;
+
+  const updated = await campaignService.unlikeCampaign(campaignId, userId);
+  res.json(updated);
+}
+
+
+
 module.exports = {
   getCampaign,
   createCampaign,
@@ -177,4 +202,6 @@ module.exports = {
   getAiPostSuggestion,
   addComment,    // 🆕
   deleteComment, // 🆕
+  likeCampaign,
+  unlikeCampaign
 };

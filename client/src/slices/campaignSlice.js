@@ -217,6 +217,24 @@ export const generatePostSuggestion = createAsyncThunk(
   }
 );
 
+export const toggleLike = createAsyncThunk(
+  'campaign/toggleLike',
+  async (campaignId, thunkAPI) => {
+    const state = thunkAPI.getState();
+    const hasLiked = state.campaign.data?.liked;
+
+    if (hasLiked) {
+      const { data } = await http.post(`/campaigns/${campaignId}/unlike`);
+      return data;
+    } else {
+      const { data } = await http.post(`/campaigns/${campaignId}/like`);
+      return data;
+    }
+  }
+);
+
+
+
 // ===== Slice =====
 
 const initialState = {
@@ -331,6 +349,15 @@ const campaignSlice = createSlice({
       .addCase(incrementView.rejected, (state, action) => {
         state.error = action.payload;
       })
+ .addCase(toggleLike.fulfilled, (state, action) => {
+  state.data.likeCount = action.payload.likeCount;
+  state.data.liked = action.payload.liked;
+})
+
+      .addCase(toggleLike.rejected, (state, action) => {
+        state.error = action.payload;
+      })
+
 
       // ----- AI suggestion -----
       .addCase(generatePostSuggestion.pending, (state) => {

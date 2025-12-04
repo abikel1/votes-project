@@ -21,30 +21,21 @@ export default function CandidatesTab({
   const [localUploading, setLocalUploading] = useState(false);
 
   // ✅ פונקציה להעלאת תמונה
-  const onUploadNew = async (file) => {
-    if (!file) return;
-    try {
-      setLocalUploading(true);
+const onUploadNew = async (file) => {
+  if (!file) return;
+  setLocalUploading(true);
 
-      const formData = new FormData();
-      formData.append('image', file);
+  const formData = new FormData();
+  formData.append('image', file);
 
-      const { data } = await http.post('http://localhost:3000/api/upload', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      });
+  const { data } = await http.post('/api/upload', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  });
 
-      // שומרים רק URL כדי לא להעמיס על ה־Redux / האתר
-      setCandForm((prev) => ({
-        ...prev,
-        photoUrl: data.url,
-      }));
-    } catch (err) {
-      console.error('Upload error:', err);
-      alert('שגיאה בהעלאת התמונה');
-    } finally {
-      setLocalUploading(false);
-    }
-  };
+  setCandForm((prev) => ({ ...prev, photoUrl: data.url }));
+  setLocalUploading(false);
+};
+
 
   return (
     <section className="card">

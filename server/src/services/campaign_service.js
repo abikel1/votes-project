@@ -1,10 +1,10 @@
 // server/src/services/campaign_service.js
 const Campaign = require('../models/campaign_model');
 
-async function getCampaignByCandidate(candidateId) {
+async function getCampaignByCandidate(candidateId, currentUserId) {
   let campaign = await Campaign.findOne({ candidate: candidateId })
     .populate("candidate")
-    .populate("posts.comments.user", "name photoUrl") // 🆕 populate למשתמשים בתגובות
+    .populate("posts.comments.user", "name photoUrl")
     .lean();
 
   if (!campaign) {
@@ -22,8 +22,18 @@ async function getCampaignByCandidate(candidateId) {
       .lean();
   }
 
-  return campaign;
+  // ✨ הוספת שדה liked
+  const liked =
+    currentUserId && Array.isArray(campaign.likes)
+      ? campaign.likes.includes(currentUserId.toString())
+      : false;
+
+  return {
+    ...campaign,
+    liked,
+  };
 }
+
 
 async function createCampaign(candidateId, data) {
   const campaign = new Campaign({ candidate: candidateId, ...data });
@@ -158,6 +168,42 @@ async function incrementViewCount(campaignId) {
   return campaign;
 }
 
+async function likeCampaign(campaignId, userId) {
+  const campaign = await Campaign.findById(campaignId);
+  if (!campaign) throw new Error("קמפיין לא נמצא");
+
+  if (!campaign.likes.includes(userId)) {
+    campaign.likes.push(userId);
+  }
+
+  campaign.likeCount = campaign.likes.length; // חובה לעדכן
+  await campaign.save();
+
+  return {
+    ...campaign.toObject(),
+    liked: true,
+  };
+}
+
+async function unlikeCampaign(campaignId, userId) {
+  const campaign = await Campaign.findById(campaignId);
+  if (!campaign) throw new Error("קמפיין לא נמצא");
+
+  campaign.likes = campaign.likes.filter(
+    id => id.toString() !== userId.toString()
+  );
+
+  campaign.likeCount = campaign.likes.length; // חובה לעדכן
+  await campaign.save();
+
+  return {
+    ...campaign.toObject(),
+    liked: false,
+  };
+}
+
+
+
 module.exports = {
   getCampaignByCandidate,
   createCampaign,
@@ -170,4 +216,6 @@ module.exports = {
   incrementViewCount,
   addCommentToPost, // 🆕
   deleteComment,    // 🆕
+  unlikeCampaign,
+  likeCampaign,
 };
