@@ -103,7 +103,7 @@ export default function VotingDragPage() {
   // בדיקה אם כבר הצבעתי – תוסף טוסט
   useEffect(() => {
     if (hasVoted && !hasShownVotedToast.current) {
-      toast(' הצבעתך נקלטה במערכת ', { icon: '🗳️' });
+      toast(t('voting.voteSuccessToast'), { icon: '🗳️' });
       hasShownVotedToast.current = true;
     }
   }, [hasVoted]);
@@ -127,37 +127,37 @@ export default function VotingDragPage() {
   }, [dispatch, groupId]);
 
   const confirmVote = (candidate) => {
-  if (hasVoted) return;
-  setCandidateToVote(candidate);
-  setShowConfirmModal(true);
-};
+    if (hasVoted) return;
+    setCandidateToVote(candidate);
+    setShowConfirmModal(true);
+  };
 
-const handleConfirmVote = async () => {
-  if (!candidateToVote) return;
+  const handleConfirmVote = async () => {
+    if (!candidateToVote) return;
 
-  // 🔵 הכנס למעטפה
-  setSlipInEnvelope(candidateToVote);
+    // 🔵 הכנס למעטפה
+    setSlipInEnvelope(candidateToVote);
 
-  setShowConfirmModal(false);
+    setShowConfirmModal(false);
 
-  // 🔵 ואז מבצעים את השליחה
-  await voteForCandidateToBallot();
+    // 🔵 ואז מבצעים את השליחה
+    await voteForCandidateToBallot();
 
-  setCandidateToVote(null);
-};
+    setCandidateToVote(null);
+  };
 
 
-const handleCancelVote = () => {
-  setShowConfirmModal(false);
-  setCandidateToVote(null);
-};
-const attemptVote = (candidate) => {
-  if (!candidate || hasVoted || isSubmitting) return;
+  const handleCancelVote = () => {
+    setShowConfirmModal(false);
+    setCandidateToVote(null);
+  };
+  const attemptVote = (candidate) => {
+    if (!candidate || hasVoted || isSubmitting) return;
 
-  // 🔵 פותחים מודל אישור
-  setCandidateToVote(candidate);
-  setShowConfirmModal(true);
-};
+    // 🔵 פותחים מודל אישור
+    setCandidateToVote(candidate);
+    setShowConfirmModal(true);
+  };
 
 
 
@@ -219,49 +219,49 @@ const attemptVote = (candidate) => {
   // };
 
 
-const handleBallotDrop = (e) => {
-  e.preventDefault();
-  if (!slipInEnvelope) return;
+  const handleBallotDrop = (e) => {
+    e.preventDefault();
+    if (!slipInEnvelope) return;
 
-  // 🔵 אם אין מועמד לאישור — מבקשים אישור
-  if (!candidateToVote) {
-    attemptVote(slipInEnvelope);
-    return;
-  }
-
-  // 🔵 אחרי אישור – מצביעים
-  voteForCandidateToBallot();
-};
-
-
-
-const voteForCandidateToBallot = async () => {
-  if (!slipInEnvelope || !groupId) return;
-
-  setIsSubmitting(true);
-  setIsDraggingEnvelope(false);
-  setEnvelopePosition({ x: 0, y: 0 });
-
-  try {
-    await dispatch(
-      voteForCandidate({
-        groupId,
-        candidateId: slipInEnvelope._id,
-      })
-    ).unwrap();
-
-    dispatch(fetchCandidatesByGroup(groupId));
-    setSlipInEnvelope(null);
-
-  } catch (err) {
-    const msg = String(err || '');
-    if (!msg.includes('already voted') && !msg.includes('כבר הצבעת')) {
-      toast.error(t('voting.voteErrorPrefix') + msg);
+    // 🔵 אם אין מועמד לאישור — מבקשים אישור
+    if (!candidateToVote) {
+      attemptVote(slipInEnvelope);
+      return;
     }
-  } finally {
-    setIsSubmitting(false);
-  }
-};
+
+    // 🔵 אחרי אישור – מצביעים
+    voteForCandidateToBallot();
+  };
+
+
+
+  const voteForCandidateToBallot = async () => {
+    if (!slipInEnvelope || !groupId) return;
+
+    setIsSubmitting(true);
+    setIsDraggingEnvelope(false);
+    setEnvelopePosition({ x: 0, y: 0 });
+
+    try {
+      await dispatch(
+        voteForCandidate({
+          groupId,
+          candidateId: slipInEnvelope._id,
+        })
+      ).unwrap();
+
+      dispatch(fetchCandidatesByGroup(groupId));
+      setSlipInEnvelope(null);
+
+    } catch (err) {
+      const msg = String(err || '');
+      if (!msg.includes('already voted') && !msg.includes('כבר הצבעת')) {
+        toast.error(t('voting.voteErrorPrefix') + msg);
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
 
   const handleEnvelopeDragStart = (e) => {
@@ -464,7 +464,11 @@ const voteForCandidateToBallot = async () => {
 
                   <img
                     src={c.photoUrl || '/h.jpg'}           // אם אין URL – ברירת מחדל
-                    alt={c.name || 'תמונת מועמד'}
+                    alt={
+                      c.name
+                        ? t('candidates.list.photoAltWithName', { name: c.name })
+                        : t('candidates.list.photoAlt')
+                    }
                     className="vd-slip-photo"
                     onError={(e) => {
                       e.currentTarget.onerror = null;      // מונע loop אם גם הברירת מחדל לא קיימת
@@ -512,14 +516,14 @@ const voteForCandidateToBallot = async () => {
               </div>
             )}
           </div>
-<button
-  className="vd-insert-button"
-  disabled={!slipInEnvelope || hasVoted}
-  // 🔵 תמיד מצביעים עבור slipInEnvelope
-  onClick={() => attemptVote(slipInEnvelope)}
->
-  {t('voting.insertEnvelope')}
-</button>
+          <button
+            className="vd-insert-button"
+            disabled={!slipInEnvelope || hasVoted}
+            // 🔵 תמיד מצביעים עבור slipInEnvelope
+            onClick={() => attemptVote(slipInEnvelope)}
+          >
+            {t('voting.insertEnvelope')}
+          </button>
 
 
           <div className="vd-arrow">↓</div>
@@ -574,13 +578,13 @@ const voteForCandidateToBallot = async () => {
               ×
             </button>
             <div className="vd-modal-header">
-           <button
-  className="vd-select-button"
-  onClick={() => {
-    setSlipInEnvelope(selectedCandidate);
-    closeModal();
-  }}
->
+              <button
+                className="vd-select-button"
+                onClick={() => {
+                  setSlipInEnvelope(selectedCandidate);
+                  closeModal();
+                }}
+              >
 
                 {t('voting.selectForVote')}
               </button>
@@ -610,14 +614,17 @@ const voteForCandidateToBallot = async () => {
       )}
 
       <ConfirmModal
-  open={showConfirmModal}
-  message={`את/ה בטוח/ה רוצה להצביע למועמד ${candidateToVote?.name || ''}?`}
-  onConfirm={handleConfirmVote}
-  onCancel={handleCancelVote}
-/>
+        open={showConfirmModal}
+        message={
+          candidateToVote
+            ? t('voting.confirmVoteMessage', { name: candidateToVote.name || '' })
+            : ''
+        } onConfirm={handleConfirmVote}
+        onCancel={handleCancelVote}
+      />
 
     </div>
 
-    
+
   );
 }

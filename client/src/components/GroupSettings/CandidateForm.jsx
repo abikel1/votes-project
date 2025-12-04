@@ -1,5 +1,6 @@
 // src/components/GroupSettings/CandidateForm.jsx
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 export default function CandidateForm({
     form,
@@ -10,12 +11,14 @@ export default function CandidateForm({
     onUploadFile,
     fileInputRef,
     clearPhoto,
-    submitLabel = 'שמור',
+    submitLabel = 'שמור', // אפשר אחר כך לעבור ל-t('common.save') מההורה
     submitDisabled = false,
 }) {
+    const { t } = useTranslation();
+
     return (
         <form onSubmit={onSubmit} className="field">
-            <label>שם *</label>
+            <label>{t('candidates.form.nameLabel')}</label>
             <input
                 className="input"
                 name="name"
@@ -23,9 +26,12 @@ export default function CandidateForm({
                 onChange={(e) => onChange('name', e.target.value)}
                 required
             />
-            {errors.name && <div className="err small-err">{errors.name}</div>}
+            {errors.name && (
+                <div className="err small-err">{t(errors.name)}</div>
+            )}
 
-            <label>תיאור *</label>
+
+            <label>{t('candidates.form.descriptionLabel')}</label>
             <textarea
                 className="input"
                 rows={3}
@@ -35,23 +41,23 @@ export default function CandidateForm({
                 required
             />
             {errors.description && (
-                <div className="err small-err">{errors.description}</div>
+                <div className="err small-err">{t(errors.description)}</div>
             )}
 
-            <label>סמל *</label>
+            <label>{t('candidates.form.symbolLabel')}</label>
             <input
                 className="input"
                 name="symbol"
                 value={form.symbol}
                 onChange={(e) => onChange('symbol', e.target.value)}
-                placeholder="למשל: א׳"
+                placeholder={t('candidates.form.symbolPlaceholder')}
                 required
             />
             {errors.symbol && (
-                <div className="err small-err">{errors.symbol}</div>
+                <div className="err small-err">{t(errors.symbol)}</div>
             )}
 
-            <label>תמונה</label>
+            <label>{t('candidates.form.photoLabel')}</label>
 
             {/* אינפוט נסתר ל"שינוי תמונה" */}
             {fileInputRef && (
@@ -77,14 +83,18 @@ export default function CandidateForm({
                         }
                         disabled={uploading}
                     />
-                    {uploading && <span className="muted">מעלה…</span>}
+                    {uploading && (
+                        <span className="muted">
+                            {t('candidates.form.uploading')}
+                        </span>
+                    )}
                 </div>
             ) : (
                 <div className="thumb-row">
                     <img
                         className="thumb"
                         src={form.photoUrl}
-                        alt="תצוגה מקדימה"
+                        alt={t('candidates.form.previewAlt')}
                     />
                     <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
                         {fileInputRef && (
@@ -94,7 +104,7 @@ export default function CandidateForm({
                                 onClick={() => fileInputRef.current?.click()}
                                 disabled={uploading}
                             >
-                                שינוי תמונה
+                                {t('candidates.form.changePhoto')}
                             </button>
                         )}
                         {clearPhoto && (
@@ -104,11 +114,15 @@ export default function CandidateForm({
                                 onClick={clearPhoto}
                                 disabled={uploading}
                             >
-                                הסרת תמונה
+                                {t('candidates.form.removePhoto')}
                             </button>
                         )}
                     </div>
-                    {uploading && <span className="muted">מעלה…</span>}
+                    {uploading && (
+                        <span className="muted">
+                            {t('candidates.form.uploading')}
+                        </span>
+                    )}
                 </div>
             )}
 

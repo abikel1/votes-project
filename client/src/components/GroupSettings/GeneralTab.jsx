@@ -1,4 +1,6 @@
 // src/pages/GroupSettingsPage/GeneralTab.jsx
+import { useTranslation } from 'react-i18next';
+
 export default function GeneralTab({
   group,
   form,
@@ -15,16 +17,18 @@ export default function GeneralTab({
   updateSuccess,
   updateLoading,
 }) {
-  // מוסיפים: תאריך של היום בפורמט YYYY-MM-DD כדי להשתמש בו ב-min
+  const { t } = useTranslation();
+
+  // תאריך של היום בפורמט YYYY-MM-DD כדי להשתמש בו ב-min
   const todayStr = new Date().toISOString().slice(0, 10);
 
   return (
     <section className="card">
       <div className="card-head">
-        <h3>פרטי הקבוצה</h3>
+        <h3>{t('groupSettings.general.title')}</h3>
         {!editMode && (
           <button className="gs-btn-outline" onClick={onEditClick}>
-            עריכה
+            {t('common.edit')}
           </button>
         )}
       </div>
@@ -32,20 +36,22 @@ export default function GeneralTab({
       {!editMode ? (
         <div className="read-grid">
           <div>
-            <small>שם</small>
+            <small>{t('groups.create.labels.name')}</small>
             <b>{group.name || '-'}</b>
           </div>
+
           <div>
-            <small>תיאור</small>
+            <small>{t('groups.create.labels.description')}</small>
             <div>{group.description || '-'}</div>
           </div>
+
           <div>
-            <small>מקס׳ זוכים</small>
+            <small>{t('groups.create.labels.maxWinners')}</small>
             <b>{group.maxWinners ?? 1}</b>
           </div>
 
-             <div>
-            <small>תאריך סיום הגשת מעומדות</small>
+          <div>
+            <small>{t('groups.create.labels.candidateEndDate')}</small>
             <b>
               {group.candidateEndDate
                 ? new Date(group.candidateEndDate).toLocaleDateString('he-IL')
@@ -54,43 +60,51 @@ export default function GeneralTab({
           </div>
 
           <div>
-            <small>תאריך סיום</small>
+            <small>{t('groups.create.labels.endDate')}</small>
             <b>
               {group.endDate
                 ? new Date(group.endDate).toLocaleDateString('he-IL')
                 : '-'}
             </b>
           </div>
+
           <div>
-            <small>סטטוס</small>
-            <b>{group.isLocked ? ' נעולה' : 'פתוחה'}</b>
+            <small>{t('groupSettings.general.status')}</small>
+            <b>
+              {group.isLocked
+                ? t('groups.create.status.locked')
+                : t('groups.create.status.open')}
+            </b>
           </div>
+
           {group.symbol && (
             <div>
-              <small>סמל</small>
+              <small>{t('groupSettings.general.symbolLabel')}</small>
               <b>{group.symbol}</b>
             </div>
           )}
+
           {group.photoUrl && (
             <div>
-              <small>תמונה</small>
+              <small>{t('groupSettings.general.photoLabel')}</small>
               <a
                 href={group.photoUrl}
                 className="link"
                 target="_blank"
                 rel="noreferrer"
               >
-                פתיחה
+                {t('groupSettings.general.photoOpen')}
               </a>
             </div>
           )}
+
           <div>
-            <small>נוצר ע״י</small>
+            <small>{t('groupSettings.general.createdBy')}</small>
             <b>{group.createdBy || '-'}</b>
           </div>
 
           <div>
-            <small>קישור שיתוף</small>
+            <small>{t('groupSettings.general.shareLinkLabel')}</small>
             {shareUrl ? (
               <div className="share-row">
                 <input
@@ -99,7 +113,7 @@ export default function GeneralTab({
                   readOnly
                   style={{ direction: 'ltr' }}
                   onFocus={(e) => e.target.select()}
-                  aria-label="קישור לשיתוף"
+                  aria-label={t('groupSettings.general.shareInputAria')}
                 />
                 <div className="share-actions">
                   <button
@@ -107,14 +121,16 @@ export default function GeneralTab({
                     type="button"
                     onClick={copyShareUrl}
                   >
-                    {copied ? 'הועתק ✓' : 'העתק'}
+                    {copied
+                      ? t('groupSettings.general.shareCopied')
+                      : t('groupSettings.general.shareCopy')}
                   </button>
                 </div>
 
                 <div className="muted share-hint">
                   {group.isLocked
-                    ? 'קבוצה נעולה: הקישור יבקש התחברות ואז ישלח בקשת הצטרפות.'
-                    : 'קבוצה פתוחה: הקישור מוביל ישירות לעמוד הקבוצה.'}
+                    ? t('groupSettings.general.shareHintLocked')
+                    : t('groupSettings.general.shareHintOpen')}
                 </div>
               </div>
             ) : (
@@ -124,18 +140,21 @@ export default function GeneralTab({
 
           {updateError && (
             <div className="err" style={{ marginTop: 6 }}>
-              {updateError}
+              {t(updateError)}
             </div>
           )}
+
           {updateSuccess && (
             <div className="ok" style={{ marginTop: 6 }}>
-              נשמר בהצלחה
+              {t('groupSettings.general.updateSuccess')}
             </div>
           )}
         </div>
       ) : (
         <form className="field" onSubmit={onSaveGroup}>
-          <label>שם *</label>
+          <label>
+            {t('groups.create.labels.name')} *
+          </label>
           <input
             className="input"
             name="name"
@@ -143,7 +162,8 @@ export default function GeneralTab({
             value={form.name}
             onChange={onGroupChange}
           />
-          <label>תיאור</label>
+
+          <label>{t('groups.create.labels.description')}</label>
           <textarea
             className="input"
             rows={3}
@@ -151,9 +171,10 @@ export default function GeneralTab({
             value={form.description}
             onChange={onGroupChange}
           />
+
           <div className="grid-2">
             <div>
-              <label>מקס׳ זוכים</label>
+              <label>{t('groups.create.labels.maxWinners')}</label>
               <input
                 className="input"
                 name="maxWinners"
@@ -163,29 +184,32 @@ export default function GeneralTab({
                 onChange={onGroupChange}
               />
             </div>
-               <div>
-              <label>תאריך סיום הגשת מועמדות</label>
+
+            <div>
+              <label>{t('groups.create.labels.candidateEndDate')}</label>
               <input
                 className="input"
                 name="candidateEndDate"
                 type="date"
                 value={form.candidateEndDate}
                 onChange={onGroupChange}
-                // min={todayStr}   // 🔹 כאן ההגבלה שלא ניתן לבחור תאריך עבר
+                // min={todayStr}
               />
             </div>
+
             <div>
-              <label>תאריך סיום</label>
+              <label>{t('groups.create.labels.endDate')}</label>
               <input
                 className="input"
                 name="endDate"
                 type="date"
                 value={form.endDate}
                 onChange={onGroupChange}
-                min={todayStr}   // 🔹 כאן ההגבלה שלא ניתן לבחור תאריך עבר
+                min={todayStr}
               />
             </div>
           </div>
+
           <label
             style={{
               display: 'flex',
@@ -200,24 +224,31 @@ export default function GeneralTab({
               checked={!!form.isLocked}
               onChange={onGroupChange}
             />
-            קבוצה נעולה (חברים נכנסים דרך בקשות)
+            {t('groupSettings.general.lockedHint')}
           </label>
-          <label>סמל (אופציונלי)</label>
+
+          <label>{t('groupSettings.general.symbolLabelOptional')}</label>
           <input
             className="input"
             name="symbol"
             value={form.symbol}
             onChange={onGroupChange}
-            placeholder="למשל: א׳"
+            placeholder={t('groupSettings.general.symbolPlaceholder')}
           />
+
           {updateError && (
             <div className="err" style={{ marginTop: 6 }}>
-              {updateError}
+              {t(updateError)}
             </div>
           )}
+
           <div className="actions-row">
-            <button className="gs-btn" type="submit" disabled={updateLoading}>
-              שמור
+            <button
+              className="gs-btn"
+              type="submit"
+              disabled={updateLoading}
+            >
+              {t('common.save')}
             </button>
             <button
               className="gs-btn-outline"
@@ -225,7 +256,7 @@ export default function GeneralTab({
               onClick={onCancelEdit}
               disabled={updateLoading}
             >
-              ביטול
+              {t('common.cancel')}
             </button>
           </div>
         </form>

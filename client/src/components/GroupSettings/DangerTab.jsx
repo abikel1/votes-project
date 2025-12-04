@@ -1,18 +1,24 @@
 // src/pages/GroupSettingsPage/DangerTab.jsx
+import { useTranslation } from 'react-i18next';
+
 export default function DangerTab({ onOpenDelete }) {
+  const { t } = useTranslation();
+
   return (
     <section className="card">
       <details open className="acc danger">
-        <summary className="acc-sum">מחיקת קבוצה</summary>
+        <summary className="acc-sum">
+          {t('groupSettings.danger.title')}
+        </summary>
         <div className="acc-body">
           <p className="danger-text">
-            מחיקה היא פעולה בלתי הפיכה. כל נתוני הקבוצה יימחקו לכולם.
+            {t('groupSettings.danger.warning')}
           </p>
           <button
             className="btn-danger"
             onClick={onOpenDelete}
           >
-            מחיקת הקבוצה…
+            {t('groupSettings.danger.deleteButton')}
           </button>
         </div>
       </details>

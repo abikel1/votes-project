@@ -1,22 +1,24 @@
 import React from 'react';
 import toast, { Toaster } from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
 
 export default function ToastDemo() {
-  
+  const { t, i18n } = useTranslation();
+
   const showSuccess = () => {
-    toast.success('הפעולה בוצעה בהצלחה!');
+    toast.success(t('toastDemo.success'));
   };
 
   const showError = () => {
-    toast.error('אופס! משהו השתבש');
+    toast.error(t('toastDemo.error'));
   };
 
   const showInfo = () => {
-    toast('זוהי הודעת מידע רגילה');
+    toast(t('toastDemo.info'));
   };
 
   const showWarning = () => {
-    toast('⚠️ אזהרה: שים לב לפרטים', {
+    toast(t('toastDemo.warning'), {
       icon: '⚠️',
       style: {
         background: '#fef3c7',
@@ -26,11 +28,11 @@ export default function ToastDemo() {
   };
 
   const showLoading = () => {
-    const loadingToast = toast.loading('טוען נתונים...');
-    
+    const loadingToast = toast.loading(t('toastDemo.loading'));
+
     setTimeout(() => {
       toast.dismiss(loadingToast);
-      toast.success('הנתונים נטענו!');
+      toast.success(t('toastDemo.loaded'));
     }, 2000);
   };
 
@@ -42,14 +44,14 @@ export default function ToastDemo() {
     });
 
     toast.promise(myPromise, {
-      loading: 'שומר נתונים...',
-      success: 'הנתונים נשמרו בהצלחה!',
-      error: 'שגיאה בשמירת הנתונים',
+      loading: t('toastDemo.promiseLoading'),
+      success: t('toastDemo.promiseSuccess'),
+      error: t('toastDemo.promiseError'),
     });
   };
 
   const showCustom = () => {
-    toast.custom((t) => (
+    toast.custom((tObj) => (
       <div
         style={{
           background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
@@ -60,16 +62,20 @@ export default function ToastDemo() {
           display: 'flex',
           alignItems: 'center',
           gap: '12px',
-          direction: 'rtl',
+          direction: i18n.language === 'he' ? 'rtl' : 'ltr',
         }}
       >
         <span style={{ fontSize: '24px' }}>🎉</span>
         <div>
-          <div style={{ fontWeight: 'bold', marginBottom: '4px' }}>הודעה מותאמת אישית!</div>
-          <div style={{ fontSize: '14px', opacity: 0.9 }}>זה עיצוב מיוחד שלך</div>
+          <div style={{ fontWeight: 'bold', marginBottom: '4px' }}>
+            {t('toastDemo.customTitle')}
+          </div>
+          <div style={{ fontSize: '14px', opacity: 0.9 }}>
+            {t('toastDemo.customText')}
+          </div>
         </div>
         <button
-          onClick={() => toast.dismiss(t.id)}
+          onClick={() => toast.dismiss(tObj.id)}
           style={{
             background: 'rgba(255,255,255,0.2)',
             border: 'none',
@@ -77,7 +83,7 @@ export default function ToastDemo() {
             padding: '8px 12px',
             borderRadius: '6px',
             cursor: 'pointer',
-            marginRight: 'auto',
+            marginInlineStart: 'auto',
           }}
         >
           ✕
@@ -87,31 +93,35 @@ export default function ToastDemo() {
   };
 
   const showLongText = () => {
-    toast('זוהי הודעה ארוכה יותר שמדגימה איך נראה טקסט ארוך בתוך ההודעה הקופצת. אפשר לראות שזה עובד מצוין גם עם תוכן רב.', {
+    toast(t('toastDemo.longText'), {
       duration: 5000,
     });
   };
 
   const showEmoji = () => {
-    toast('🚀 המערכת עולה לאוויר!', {
+    toast(t('toastDemo.emoji'), {
       icon: '🎯',
     });
   };
 
   const showMultiple = () => {
-    toast.success('הודעה ראשונה');
-    setTimeout(() => toast.error('הודעה שנייה'), 300);
-    setTimeout(() => toast('הודעה שלישית'), 600);
+    toast.success(t('toastDemo.multiFirst'));
+    setTimeout(() => toast.error(t('toastDemo.multiSecond')), 300);
+    setTimeout(() => toast(t('toastDemo.multiThird')), 600);
   };
 
+  const isHebrew = i18n.language === 'he';
+
   return (
-    <div style={{ 
-      minHeight: '100vh', 
-      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-      padding: '40px 20px',
-      fontFamily: 'Arial, sans-serif',
-    }}>
-      <Toaster 
+    <div
+      style={{
+        minHeight: '100vh',
+        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        padding: '40px 20px',
+        fontFamily: 'Arial, sans-serif',
+      }}
+    >
+      <Toaster
         position="top-center"
         reverseOrder={false}
         toastOptions={{
@@ -124,8 +134,8 @@ export default function ToastDemo() {
             padding: '16px',
             borderRadius: '8px',
             boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
-            direction: 'rtl',
-            textAlign: 'right',
+            direction: isHebrew ? 'rtl' : 'ltr',
+            textAlign: isHebrew ? 'right' : 'left',
           },
           success: {
             iconTheme: {
@@ -142,89 +152,101 @@ export default function ToastDemo() {
         }}
       />
 
-      <div style={{
-        maxWidth: '800px',
-        margin: '0 auto',
-        background: 'white',
-        borderRadius: '16px',
-        padding: '40px',
-        boxShadow: '0 20px 50px rgba(0,0,0,0.2)',
-      }}>
-        <h1 style={{
-          textAlign: 'center',
-          color: '#1f2937',
-          marginBottom: '10px',
-          fontSize: '32px',
-        }}>
-          🎨 דוגמאות React Hot Toast
+      <div
+        style={{
+          maxWidth: '800px',
+          margin: '0 auto',
+          background: 'white',
+          borderRadius: '16px',
+          padding: '40px',
+          boxShadow: '0 20px 50px rgba(0,0,0,0.2)',
+        }}
+      >
+        <h1
+          style={{
+            textAlign: 'center',
+            color: '#1f2937',
+            marginBottom: '10px',
+            fontSize: '32px',
+          }}
+        >
+          {t('toastDemo.title')}
         </h1>
-        <p style={{
-          textAlign: 'center',
-          color: '#6b7280',
-          marginBottom: '40px',
-        }}>
-          לחץ על הכפתורים לראות סוגי הודעות שונות
+        <p
+          style={{
+            textAlign: 'center',
+            color: '#6b7280',
+            marginBottom: '40px',
+          }}
+        >
+          {t('toastDemo.subtitle')}
         </p>
 
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-          gap: '16px',
-        }}>
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+            gap: '16px',
+          }}
+        >
           <button onClick={showSuccess} style={buttonStyle('#10b981')}>
-            ✓ הודעת הצלחה
+            {t('toastDemo.buttons.success')}
           </button>
 
           <button onClick={showError} style={buttonStyle('#ef4444')}>
-            ✕ הודעת שגיאה
+            {t('toastDemo.buttons.error')}
           </button>
 
           <button onClick={showInfo} style={buttonStyle('#3b82f6')}>
-            ℹ הודעת מידע
+            {t('toastDemo.buttons.info')}
           </button>
 
           <button onClick={showWarning} style={buttonStyle('#f59e0b')}>
-            ⚠ הודעת אזהרה
+            {t('toastDemo.buttons.warning')}
           </button>
 
           <button onClick={showLoading} style={buttonStyle('#8b5cf6')}>
-            ⏳ הודעת טעינה
+            {t('toastDemo.buttons.loading')}
           </button>
 
           <button onClick={showPromise} style={buttonStyle('#ec4899')}>
-            🔄 Promise Toast
+            {t('toastDemo.buttons.promise')}
           </button>
 
           <button onClick={showCustom} style={buttonStyle('#6366f1')}>
-            ✨ הודעה מותאמת
+            {t('toastDemo.buttons.custom')}
           </button>
 
           <button onClick={showLongText} style={buttonStyle('#14b8a6')}>
-            📝 טקסט ארוך
+            {t('toastDemo.buttons.longText')}
           </button>
 
           <button onClick={showEmoji} style={buttonStyle('#f97316')}>
-            🎯 עם אמוג'י
+            {t('toastDemo.buttons.emoji')}
           </button>
 
           <button onClick={showMultiple} style={buttonStyle('#a855f7')}>
-            📚 מספר הודעות
+            {t('toastDemo.buttons.multiple')}
           </button>
         </div>
 
-        <div style={{
-          marginTop: '40px',
-          padding: '20px',
-          background: '#f3f4f6',
-          borderRadius: '8px',
-          direction: 'rtl',
-        }}>
-          <h3 style={{ marginBottom: '10px', color: '#1f2937' }}>💡 טיפים:</h3>
+        <div
+          style={{
+            marginTop: '40px',
+            padding: '20px',
+            background: '#f3f4f6',
+            borderRadius: '8px',
+            direction: isHebrew ? 'rtl' : 'ltr',
+          }}
+        >
+          <h3 style={{ marginBottom: '10px', color: '#1f2937' }}>
+            {t('toastDemo.tipsTitle')}
+          </h3>
           <ul style={{ color: '#4b5563', lineHeight: '1.8' }}>
-            <li>ההודעות נעלמות אוטומטית אחרי 3 שניות</li>
-            <li>אפשר לסגור הודעה ידנית בלחיצה עליה</li>
-            <li>מספר הודעות יכולות להופיע בו זמנית</li>
-            <li>כל הודעה מקבלת אנימציה חלקה</li>
+            <li>{t('toastDemo.tips.autoHide')}</li>
+            <li>{t('toastDemo.tips.close')}</li>
+            <li>{t('toastDemo.tips.multiple')}</li>
+            <li>{t('toastDemo.tips.animation')}</li>
           </ul>
         </div>
       </div>
@@ -243,7 +265,4 @@ const buttonStyle = (color) => ({
   cursor: 'pointer',
   transition: 'all 0.2s',
   boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
-  ':hover': {
-    transform: 'translateY(-2px)',
-  }
 });
