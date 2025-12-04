@@ -205,7 +205,7 @@ useEffect(() => {
 }, [campaign, currentUserId]);
 
 
-console.log("campaign.liked:", campaign?.liked);
+// console.log("campaign.liked:", campaign?.liked);
 
   // AI suggestion
   useEffect(() => {

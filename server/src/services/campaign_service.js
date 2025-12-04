@@ -4,10 +4,11 @@ const Campaign = require('../models/campaign_model');
 async function getCampaignByCandidate(candidateId, currentUserId) {
   let campaign = await Campaign.findOne({ candidate: candidateId })
     .populate("candidate")
-    .populate("posts.comments.user", "name photoUrl")
+  .populate("posts.comments.user", "firstName lastName photoUrl") // חשוב שמות + תמונה
     .lean();
 
   if (!campaign) {
+    
     const newCampaign = await Campaign.create({
       candidate: candidateId,
       description: "",
@@ -18,7 +19,7 @@ async function getCampaignByCandidate(candidateId, currentUserId) {
 
     campaign = await Campaign.findById(newCampaign._id)
       .populate("candidate")
-      .populate("posts.comments.user", "name photoUrl")
+      .populate("posts.comments.user", "firstName lastName photoUrl")
       .lean();
   }
 
