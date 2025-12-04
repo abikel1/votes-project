@@ -1,10 +1,10 @@
-// src/components/Campaign/PostCard.jsx
 import { useState } from 'react';
 import { FiTrash2, FiMessageSquare } from 'react-icons/fi';
 import './PostCard.css';
 import { useSelector } from 'react-redux';
 import { selectUsersMap } from '../../slices/usersSlice';
 import { useTranslation } from 'react-i18next';
+import ConfirmModal from '../../components/ConfirmModal/ConfirmModal';
 
 export default function PostCard({
   post,
@@ -19,6 +19,11 @@ export default function PostCard({
   const [showComments, setShowComments] = useState(false);
   const [newComment, setNewComment] = useState('');
   const [submittingComment, setSubmittingComment] = useState(false);
+
+  // ✅ state למודל
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [commentToDelete, setCommentToDelete] = useState(null);
+
   const usersMap = useSelector(selectUsersMap);
   const { t, i18n } = useTranslation();
 
@@ -36,20 +41,34 @@ export default function PostCard({
     }
   };
 
-  const handleDeleteComment = async (commentId) => {
-    if (!window.confirm(t('campaign.comments.confirmDelete'))) return;
+  // ✅ הפונקציה לפתיחת המודל
+  const confirmDeleteComment = (commentId) => {
+    setCommentToDelete(commentId);
+    setConfirmOpen(true);
+  };
+
+  // ✅ הפונקציה שמבוצעת כשמאשרים את המחיקה
+  const handleConfirmDelete = async () => {
+    if (!commentToDelete) return;
     try {
-      await onDeleteComment(campaignId, post._id, commentId);
+      await onDeleteComment(campaignId, post._id, commentToDelete);
     } catch (err) {
       console.error('שגיאה במחיקת תגובה:', err);
+    } finally {
+      setConfirmOpen(false);
+      setCommentToDelete(null);
     }
+  };
+
+  const handleCancelDelete = () => {
+    setConfirmOpen(false);
+    setCommentToDelete(null);
   };
 
   const commentsCount = post.comments?.length || 0;
 
   return (
     <div className="post-card">
-      {/* כותרת */}
       <div className="post-header">
         <h4>{post.title}</h4>
         {isCandidateOwner && isEditMode && (
@@ -63,17 +82,14 @@ export default function PostCard({
         )}
       </div>
 
-      {/* תוכן */}
       <p className="post-content">{post.content}</p>
 
-      {/* תמונה */}
       {post.image && (
         <div className="post-image-container">
           <img src={post.image} alt={post.title} className="post-image" />
         </div>
       )}
 
-      {/* פוטר עם כפתור תגובות */}
       <div className="post-footer">
         <button
           className="post-comments-toggle"
@@ -86,10 +102,8 @@ export default function PostCard({
         </button>
       </div>
 
-      {/* תגובות */}
       {showComments && (
         <div className="post-comments-section">
-          {/* טופס הוספת תגובה */}
           {currentUserId && (
             <div className="comment-form">
               <textarea
@@ -111,17 +125,14 @@ export default function PostCard({
             </div>
           )}
 
-          {/* רשימת תגובות */}
           <div className="comments-list">
             {post.comments && post.comments.length > 0 ? (
               post.comments.map((comment) => {
                 const userId = comment.user?._id || comment.user;
-
                 const user = comment.user;
                 const userFullName = user
                   ? `${user.firstName || ''} ${user.lastName || ''}`.trim()
                   : t('campaign.comments.anonymousUser');
-
                 const dateStr = new Date(comment.createdAt).toLocaleDateString(
                   i18n.language === 'he' ? 'he-IL' : 'en-GB'
                 );
@@ -143,8 +154,9 @@ export default function PostCard({
                       </div>
 
                       {(currentUserId === userId || isCandidateOwner) && (
+                        // ✅ כאן משתמשים בפונקציה החדשה לפתיחת המודל
                         <button
-                          onClick={() => handleDeleteComment(comment._id)}
+                          onClick={() => confirmDeleteComment(comment._id)}
                           className="comment-delete-btn"
                           title={t('campaign.comments.deleteButtonTitle')}
                         >
@@ -158,11 +170,17 @@ export default function PostCard({
                 );
               })
             ) : (
-              <div className="empty-comments">
-                {t('campaign.comments.empty')}
-              </div>
+              <div className="empty-comments">{t('campaign.comments.empty')}</div>
             )}
           </div>
+
+          {/* ✅ קומפוננטת המודל */}
+          <ConfirmModal
+            open={confirmOpen}
+            message={t('campaign.comments.confirmDelete')}
+            onConfirm={handleConfirmDelete}
+            onCancel={handleCancelDelete}
+          />
         </div>
       )}
     </div>
