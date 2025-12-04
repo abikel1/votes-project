@@ -24,26 +24,28 @@ export default function CandidatesTab({
   const [localUploading, setLocalUploading] = useState(false);
 
   // ✅ פונקציה להעלאת תמונה
-  const onUploadNew = async (file) => {
-    if (!file) return;
-    setLocalUploading(true);
+const onUploadNew = async (file) => {
+  console.log('Uploading file:', file); // ← בדיקה
+  if (!file) return;
+  setLocalUploading(true);
 
-    try {
-      const formData = new FormData();
-      formData.append('image', file);
+  try {
+    const formData = new FormData();
+    formData.append('image', file);
 
-      const { data } = await http.post('/api/upload', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      });
+    const { data } = await http.post('/upload', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
 
-      setCandForm((prev) => ({ ...prev, photoUrl: data.url }));
-    } catch (err) {
-      console.error('Upload error:', err);
-      alert(t('candidates.upload.error'));
-    } finally {
-      setLocalUploading(false);
-    }
-  };
+    setCandForm((prev) => ({ ...prev, photoUrl: data.url }));
+  } catch (err) {
+    console.error('Upload error:', err);
+    alert(t('candidates.upload.error'));
+  } finally {
+    setLocalUploading(false);
+  }
+};
+
 
   return (
     <section className="card">
