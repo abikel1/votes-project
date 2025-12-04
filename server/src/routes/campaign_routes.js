@@ -14,11 +14,15 @@ const {
   getAiPostSuggestion,
   addComment,    // 🆕
   deleteComment, // 🆕
+  likeCampaign,
+  unlikeCampaign
+
 } = require('../controllers/campaign_controller');
 const auth = require('../middlewares/auth_middleware');
 
+
 // קמפיין של מועמד
-router.get('/candidate/:candidateId', getCampaign);
+router.get('/candidate/:candidateId', auth, getCampaign);
 
 // יצירת קמפיין למועמד
 router.post('/candidate/:candidateId', createCampaign);
@@ -35,8 +39,8 @@ router.put('/:campaignId/posts/:postId', updatePost);
 router.delete('/:campaignId/posts/:postId', deletePost);
 
 // 🆕 ===== תגובות =====
-router.post('/:campaignId/posts/:postId/comments',auth, addComment);
-router.delete('/:campaignId/posts/:postId/comments/:commentId',auth, deleteComment);
+router.post('/:campaignId/posts/:postId/comments', auth, addComment);
+router.delete('/:campaignId/posts/:postId/comments/:commentId', auth, deleteComment);
 
 // ===== גלריית תמונות =====
 router.put('/:campaignId/gallery', addImage);
@@ -44,5 +48,8 @@ router.delete('/:campaignId/gallery', deleteImage);
 
 // ===== צפיות =====
 router.post('/:campaignId/view', incrementView);
+router.post('/:campaignId/like', auth, likeCampaign);
+router.post('/:campaignId/unlike', auth, unlikeCampaign);
+
 
 module.exports = router;

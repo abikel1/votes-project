@@ -890,3 +890,20 @@
   font-size: calc(13px * var(--a11y-font-scale));
   color: #9ca3af;
 }
+
+
+.like-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  font-size: inherit;
+}
+
+.heart.liked {
+  color: red;
+  fill: red;
+}
