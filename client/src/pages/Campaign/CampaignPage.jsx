@@ -17,10 +17,9 @@ import {
   selectAiError,
   addComment,
   deleteComment,
-  toggleLike 
+  toggleLike
 } from '../../slices/campaignSlice';
 import { updateCandidate } from '../../slices/candidateSlice';
-
 
 import { BiArrowBack } from 'react-icons/bi';
 import { FiEdit3, FiEye, FiHeart, FiShare2, FiX } from 'react-icons/fi';
@@ -28,10 +27,9 @@ import { FiEdit3, FiEye, FiHeart, FiShare2, FiX } from 'react-icons/fi';
 import './CampaignPage.css';
 import { uploadImage } from '../../components/GroupSettings/uploadImage';
 import PostCard from './PostCard';
-// עוזר לניקוי תשובת AI
-
 import EditCandidateModal from '../../components/GroupSettings/EditCandidateModal';
 import http from '../../api/http';
+import { useTranslation } from 'react-i18next';
 
 // ===== עוזר לניקוי תשובת ה-AI =====
 function normalizeAiSuggestion(suggestion, fallbackTitle = '') {
@@ -83,13 +81,12 @@ function normalizeAiSuggestion(suggestion, fallbackTitle = '') {
   };
 }
 
-
-
 export default function CampaignPage() {
   const { candidateId } = useParams();
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
+  const { t } = useTranslation();
 
   const groupId = location.state?.groupId || null;
   // Redux state
@@ -105,10 +102,10 @@ export default function CampaignPage() {
   const aiError = useSelector(selectAiError);
 
   // Local state
-  const [newPost, setNewPost] = useState({ 
-    title: '', 
-    content: '', 
-    youtubeUrl: '' 
+  const [newPost, setNewPost] = useState({
+    title: '',
+    content: '',
+    youtubeUrl: ''
   });
   const [newImageUrl, setNewImageUrl] = useState('');
   const [editDescription, setEditDescription] = useState('');
@@ -117,7 +114,7 @@ export default function CampaignPage() {
   const [uploadingImage, setUploadingImage] = useState(false);
 
   const [likeCount, setLikeCount] = useState(0);
-const [hasLiked, setHasLiked] = useState(false);
+  const [hasLiked, setHasLiked] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
 
   // AI modal
@@ -127,9 +124,7 @@ const [hasLiked, setHasLiked] = useState(false);
 
   const hasIncrementedViewRef = useRef(false);
 
-// <<<<<<< HEAD
-// =======
-  // === NEW: סטייט למודאל עריכת מועמד ===
+  // === סטייט למודאל עריכת מועמד ===
   const [editCandidateOpen, setEditCandidateOpen] = useState(false);
   const [editCandForm, setEditCandForm] = useState({
     name: '',
@@ -144,22 +139,22 @@ const [hasLiked, setHasLiked] = useState(false);
   const editFileInputRef = useRef(null);
 
   const effectiveGroupId = groupId || campaign?.groupId || null;
+
   // === פונקציה נוחה לריענון הקמפיין מהשרת אחרי פעולות עריכה ===
-// >>>>>>> f626efaa96775a3bd42eed6f5e1db18dfb2f900a
   const refetchCampaign = () => {
     if (!candidateId) return;
     dispatch(fetchCampaign(candidateId));
   };
 
   const handleToggleLike = async () => {
-  try {
-    const result = await dispatch(toggleLike(campaign._id)).unwrap();
-    setLikeCount(result.likeCount);
-    setHasLiked(result.liked);
-  } catch (err) {
-    console.error('שגיאה בלייק:', err);
-  }
-};
+    try {
+      const result = await dispatch(toggleLike(campaign._id)).unwrap();
+      setLikeCount(result.likeCount);
+      setHasLiked(result.liked);
+    } catch (err) {
+      console.error('שגיאה בלייק:', err);
+    }
+  };
 
   // טעינת קמפיין + incrementView
   useEffect(() => {
@@ -185,27 +180,13 @@ const [hasLiked, setHasLiked] = useState(false);
       });
   }, [candidateId, dispatch]);
 
-  // סנכרון תיאור ולייקים
-  // useEffect(() => {
-  //   if (campaign) {
-  //     if (campaign.description !== undefined) {
-  //       setEditDescription(campaign.description);
-  //     }
-  //     if (campaign.likeCount !== undefined) {
-  //       setLikeCount(campaign.likeCount);
-  //     }
-  //   }
-  // }, [campaign]);
-
-useEffect(() => {
-  if (campaign && currentUserId) {
-    setLikeCount(campaign.likes?.length || 0);
-    setHasLiked(campaign.likes?.includes(currentUserId) || false);
-  }
-}, [campaign, currentUserId]);
-
-
-// console.log("campaign.liked:", campaign?.liked);
+  // סנכרון לייקים
+  useEffect(() => {
+    if (campaign && currentUserId) {
+      setLikeCount(campaign.likes?.length || 0);
+      setHasLiked(campaign.likes?.includes(currentUserId) || false);
+    }
+  }, [campaign, currentUserId]);
 
   // AI suggestion
   useEffect(() => {
@@ -217,10 +198,29 @@ useEffect(() => {
   }, [aiSuggestion]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Loading states
-  if (userLoading) return <div className="loading-wrap">טוען משתמש…</div>;
-  if (campaignLoading || !campaign)
-    return <div className="loading-wrap">טוען קמפיין…</div>;
-  if (campaignError) return <div className="err">שגיאה: {campaignError}</div>;
+  if (userLoading) {
+    return (
+      <div className="loading-wrap">
+        {t('campaign.loadingUser')}
+      </div>
+    );
+  }
+
+  if (campaignLoading || !campaign) {
+    return (
+      <div className="loading-wrap">
+        {t('campaign.loading')}
+      </div>
+    );
+  }
+
+  if (campaignError) {
+    return (
+      <div className="err">
+        {t('campaign.errorPrefix')}{campaignError}
+      </div>
+    );
+  }
 
   const candidateUserId = candidate?.userId;
   const isCandidateOwner =
@@ -265,8 +265,8 @@ useEffect(() => {
   };
 
   const handleDeletePost = (postId) => {
-    if (!window.confirm('למחוק פוסט זה?')) return;
-    
+    if (!window.confirm(t('campaign.posts.confirmDelete'))) return;
+
     dispatch(deletePost({ campaignId: campaign._id, postId }))
       .unwrap()
       .then(() => {
@@ -290,30 +290,29 @@ useEffect(() => {
   };
 
   // גלריה
-const handleUploadGalleryFile = async (e) => {
-  const file = e.target.files?.[0];
-  if (!file) return;
+  const handleUploadGalleryFile = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
 
-  try {
-    setUploadingImage(true);
-    const url = await uploadImage(file);
-    if (!url) return;
+    try {
+      setUploadingImage(true);
+      const url = await uploadImage(file);
+      if (!url) return;
 
-    // שמירה בגלריה של הקמפיין
-    await dispatch(addImage({ campaignId: campaign._id, imageUrl: url })).unwrap();
+      // שמירה בגלריה של הקמפיין
+      await dispatch(addImage({ campaignId: campaign._id, imageUrl: url })).unwrap();
 
-    // רענון הקמפיין אחרי הוספה
-    refetchCampaign();
-    setIsEditMode(false);
-  } catch (err) {
-    console.error('שגיאה בהעלאת תמונה לגלריה:', err);
-    alert('שגיאה בהעלאת הקובץ');
-  } finally {
-    setUploadingImage(false);
-    e.target.value = '';
-  }
-};
-
+      // רענון הקמפיין אחרי הוספה
+      refetchCampaign();
+      setIsEditMode(false);
+    } catch (err) {
+      console.error('שגיאה בהעלאת תמונה לגלריה:', err);
+      alert(t('common.uploadError'));
+    } finally {
+      setUploadingImage(false);
+      e.target.value = '';
+    }
+  };
 
   const handleAddImage = () => {
     if (!newImageUrl.trim()) return;
@@ -341,23 +340,22 @@ const handleUploadGalleryFile = async (e) => {
       });
   };
 
-  const handleLike = () => {
-    setHasLiked(!hasLiked);
-    setLikeCount((prev) => (hasLiked ? prev - 1 : prev + 1));
-  };
-
   const handleShare = () => {
+    const shareText = t('campaign.share.text', {
+      name: candidate?.name || '',
+    });
+
     if (navigator.share) {
       navigator
         .share({
           title: candidate?.name,
-          text: `בואו להכיר את ${candidate?.name}`,
+          text: shareText,
           url: window.location.href,
         })
         .catch(console.error);
     } else {
       navigator.clipboard.writeText(window.location.href);
-      alert('הקישור הועתק ללוח!');
+      alert(t('common.linkCopied'));
     }
   };
 
@@ -398,7 +396,7 @@ const handleUploadGalleryFile = async (e) => {
     setAiGenerated(false);
   };
 
-  // === NEW: פונקציות למודאל עריכת מועמד ===
+  // === פונקציות למודאל עריכת מועמד ===
   const handleOpenEditCandidate = () => {
     if (!candidate) return;
 
@@ -434,7 +432,7 @@ const handleUploadGalleryFile = async (e) => {
       setEditCandForm((prev) => ({ ...prev, photoUrl: url }));
     } catch (err) {
       console.error('שגיאה בהעלאת תמונת מועמד:', err);
-      setUpdateCandidateError('שגיאה בהעלאת תמונת המועמד/ת');
+      setUpdateCandidateError(t('campaign.editCandidate.uploadError'));
     } finally {
       setUploadingEdit(false);
     }
@@ -448,7 +446,7 @@ const handleUploadGalleryFile = async (e) => {
     e.preventDefault();
 
     if (!effectiveGroupId || !candidateId) {
-      setUpdateCandidateError('חסר מזהה קבוצה או מועמד לעדכון');
+      setUpdateCandidateError(t('campaign.editCandidate.missingIds'));
       return;
     }
 
@@ -456,9 +454,9 @@ const handleUploadGalleryFile = async (e) => {
 
     // ולידציות בסיסיות לטופס
     const errors = {};
-    if (!name?.trim()) errors.name = 'שם מועמד/ת חובה';
-    if (!description?.trim()) errors.description = 'תיאור חובה';
-    if (!symbol?.trim()) errors.symbol = 'סמל חובה';
+    if (!name?.trim()) errors.name = t('campaign.editCandidate.errors.nameRequired');
+    if (!description?.trim()) errors.description = t('campaign.editCandidate.errors.descriptionRequired');
+    if (!symbol?.trim()) errors.symbol = t('campaign.editCandidate.errors.symbolRequired');
 
     setEditCandErrors(errors);
     if (Object.keys(errors).length > 0) {
@@ -493,7 +491,7 @@ const handleUploadGalleryFile = async (e) => {
         const msg =
           err?.response?.data?.message ||
           err?.message ||
-          'שגיאה בעדכון המועמד/ת';
+          t('campaign.editCandidate.genericError');
         setUpdateCandidateError(msg);
         setUpdatingThisCandidate(false);
       });
@@ -509,7 +507,7 @@ const handleUploadGalleryFile = async (e) => {
             onClick={() =>
               navigate(groupId ? `/groups/${groupId}` : '/groups')
             }
-            title="חזרה"
+            title={t('common.back')}
           >
             <BiArrowBack size={20} />
           </button>
@@ -518,7 +516,11 @@ const handleUploadGalleryFile = async (e) => {
             <button
               className="icon-btn"
               onClick={() => setIsEditMode(!isEditMode)}
-              title={isEditMode ? 'סיום עריכה' : 'עריכת הדף'}
+              title={
+                isEditMode
+                  ? t('campaign.header.finishEdit')
+                  : t('campaign.header.editPage')
+              }
             >
               {isEditMode ? <FiX size={20} /> : <FiEdit3 size={20} />}
             </button>
@@ -551,7 +553,7 @@ const handleUploadGalleryFile = async (e) => {
               className="vote-btn edit-candidate-btn"
               onClick={handleOpenEditCandidate}
             >
-              עריכת מועמד/ת
+              {t('campaign.editCandidate')}
             </button>
           )}
         </div>
@@ -561,20 +563,22 @@ const handleUploadGalleryFile = async (e) => {
         {/* LEFT: POSTS */}
         <div className="left-section" style={{ width: '35%' }}>
           <div className="candidates-container">
-            <h3 className="section-title">פוסטים</h3>
+            <h3 className="section-title">
+              {t('campaign.sections.posts')}
+            </h3>
 
             {isCandidateOwner && isEditMode && (
               <div className="info-card">
                 <input
                   type="text"
-                  placeholder="כותרת פוסט"
+                  placeholder={t('campaign.posts.new.titlePlaceholder')}
                   value={newPost.title}
                   onChange={(e) =>
                     setNewPost({ ...newPost, title: e.target.value })
                   }
                 />
                 <textarea
-                  placeholder="תוכן הפוסט"
+                  placeholder={t('campaign.posts.new.contentPlaceholder')}
                   value={newPost.content}
                   onChange={(e) =>
                     setNewPost({ ...newPost, content: e.target.value })
@@ -582,7 +586,7 @@ const handleUploadGalleryFile = async (e) => {
                 />
                 <input
                   type="text"
-                  placeholder="קישור YouTube (אופציונלי)"
+                  placeholder={t('campaign.posts.new.youtubePlaceholder')}
                   value={newPost.youtubeUrl}
                   onChange={(e) =>
                     setNewPost({ ...newPost, youtubeUrl: e.target.value })
@@ -598,7 +602,7 @@ const handleUploadGalleryFile = async (e) => {
                   }}
                 >
                   <button className="vote-btn" onClick={handleAddPost}>
-                    הוסף פוסט
+                    {t('campaign.posts.new.addButton')}
                   </button>
 
                   <button
@@ -606,7 +610,7 @@ const handleUploadGalleryFile = async (e) => {
                     className="vote-btn"
                     onClick={handleAskAiForPost}
                   >
-                    עזרה מ־AI
+                    {t('campaign.posts.new.aiHelpButton')}
                   </button>
                 </div>
               </div>
@@ -628,7 +632,9 @@ const handleUploadGalleryFile = async (e) => {
                   />
                 ))
               ) : (
-                <div className="empty-state">אין פוסטים בקמפיין</div>
+                <div className="empty-state">
+                  {t('campaign.posts.empty')}
+                </div>
               )}
             </div>
           </div>
@@ -641,7 +647,9 @@ const handleUploadGalleryFile = async (e) => {
 
         {/* RIGHT: DESCRIPTION + GALLERY */}
         <div className="right-section" style={{ width: '65%' }}>
-          <h3 className="section-title">אודות</h3>
+          <h3 className="section-title">
+            {t('campaign.sections.about')}
+          </h3>
 
           <div className="info-card">
             {isEditingDescription ? (
@@ -649,7 +657,7 @@ const handleUploadGalleryFile = async (e) => {
                 <textarea
                   value={editDescription}
                   onChange={(e) => setEditDescription(e.target.value)}
-                  placeholder="הוסף תיאור לקמפיין"
+                  placeholder={t('campaign.description.placeholder')}
                 />
                 <div
                   style={{
@@ -659,7 +667,7 @@ const handleUploadGalleryFile = async (e) => {
                   }}
                 >
                   <button className="vote-btn" onClick={handleUpdateCampaign}>
-                    שמור
+                    {t('common.save')}
                   </button>
                   <button
                     className="delete-btn"
@@ -668,19 +676,21 @@ const handleUploadGalleryFile = async (e) => {
                       setIsEditMode(false);
                     }}
                   >
-                    ביטול
+                    {t('common.cancel')}
                   </button>
                 </div>
               </div>
             ) : (
               <div>
-                <p>{editDescription || 'אין תיאור קמפיין עדיין'}</p>
+                <p>
+                  {editDescription || t('campaign.description.empty')}
+                </p>
                 {isCandidateOwner && isEditMode && (
                   <button
                     onClick={() => setIsEditingDescription(true)}
                     className="vote-btn"
                   >
-                    ערוך תיאור
+                    {t('campaign.description.editButton')}
                   </button>
                 )}
               </div>
@@ -691,31 +701,31 @@ const handleUploadGalleryFile = async (e) => {
           <div className="stats-cards">
             <div className="stat-box">
               <FiEye size={20} />
-              <span>{viewCount} צפיות</span>
+              <span>
+                {viewCount} {t('campaign.stats.views')}
+              </span>
             </div>
 
-    <div className="stat-box clickable">
-<button className="icon-btn" onClick={handleToggleLike}>
-  <FiHeart
-    size={24}
-    color={hasLiked ? 'red' : 'gray'}
-    style={{ fill: hasLiked ? 'red' : 'none' }}
-  />
-  <span>{likeCount}</span>
-</button>
-
-</div>
-
-
-
+            <div className="stat-box clickable">
+              <button className="icon-btn" onClick={handleToggleLike}>
+                <FiHeart
+                  size={24}
+                  color={hasLiked ? 'red' : 'gray'}
+                  style={{ fill: hasLiked ? 'red' : 'none' }}
+                />
+                <span>{likeCount}</span>
+              </button>
+            </div>
 
             <div className="stat-box clickable" onClick={handleShare}>
               <FiShare2 size={20} />
-              <span>שתף</span>
+              <span>{t('campaign.stats.share')}</span>
             </div>
           </div>
 
-          <h3 className="section-title">גלריית תמונות</h3>
+          <h3 className="section-title">
+            {t('campaign.sections.gallery')}
+          </h3>
 
           {isCandidateOwner && isEditMode && (
             <div className="info-card">
@@ -728,7 +738,7 @@ const handleUploadGalleryFile = async (e) => {
               >
                 <input
                   type="text"
-                  placeholder="קישור לתמונה"
+                  placeholder={t('campaign.gallery.upload.linkPlaceholder')}
                   value={newImageUrl}
                   onChange={(e) => setNewImageUrl(e.target.value)}
                   style={{ flex: 1 }}
@@ -738,12 +748,14 @@ const handleUploadGalleryFile = async (e) => {
                   onClick={handleAddImage}
                   disabled={!newImageUrl.trim()}
                 >
-                  הוסף
+                  {t('campaign.gallery.upload.addButton')}
                 </button>
               </div>
 
               <div className="upload-row">
-                <span className="muted">או העלאה מהמחשב:</span>
+                <span className="muted">
+                  {t('campaign.gallery.upload.orText')}
+                </span>
                 <input
                   type="file"
                   accept="image/*"
@@ -757,33 +769,40 @@ const handleUploadGalleryFile = async (e) => {
 
           <div className="gallery-container">
             <div className="gallery-grid">
-           {campaign.gallery?.length ? (
-  campaign.gallery.map((img, idx) => (
-    <div key={idx} className="gallery-item" onClick={() => setSelectedImage(img)}>
-      <img
-        src={img || '/q.jpg'}
-        alt={`תמונה ${idx + 1}`}
-        onError={(e) => {
-          e.currentTarget.onerror = null;
-          e.currentTarget.src = '/q.png';
-        }}
-      />
-      {isCandidateOwner && isEditMode && (
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            handleDeleteImage(img);
-          }}
-        >
-          ×
-        </button>
-      )}
-    </div>
-  ))
-) : (
-  <div className="empty-state">אין תמונות בגלריה</div>
-)}
-
+              {campaign.gallery?.length ? (
+                campaign.gallery.map((img, idx) => (
+                  <div
+                    key={idx}
+                    className="gallery-item"
+                    onClick={() => setSelectedImage(img)}
+                  >
+                    <img
+                      src={img || '/q.jpg'}
+                      alt={t('campaign.gallery.imageAlt', {
+                        index: idx + 1,
+                      })}
+                      onError={(e) => {
+                        e.currentTarget.onerror = null;
+                        e.currentTarget.src = '/q.png';
+                      }}
+                    />
+                    {isCandidateOwner && isEditMode && (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDeleteImage(img);
+                        }}
+                      >
+                        ×
+                      </button>
+                    )}
+                  </div>
+                ))
+              ) : (
+                <div className="empty-state">
+                  {t('campaign.gallery.empty')}
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -797,7 +816,7 @@ const handleUploadGalleryFile = async (e) => {
         >
           <img
             src={selectedImage}
-            alt="תמונה מוגדלת"
+            alt={t('campaign.gallery.lightboxAlt')}
             className="lightbox-image"
             onClick={(e) => e.stopPropagation()}
           />
@@ -810,8 +829,6 @@ const handleUploadGalleryFile = async (e) => {
         </div>
       )}
 
-{/* <<<<<<< HEAD */}
-{/* // ======= */}
       {/* מודאל עריכת מועמד/ת */}
       <EditCandidateModal
         open={editCandidateOpen}
@@ -829,9 +846,7 @@ const handleUploadGalleryFile = async (e) => {
         canEditName={false}
       />
 
-
       {/* מודאל AI לפוסט קמפיין */}
-{/* >>>>>>> f626efaa96775a3bd42eed6f5e1db18dfb2f900a */}
       {showAiModal && (
         <div
           className="lightbox-overlay ai-overlay"
@@ -843,23 +858,27 @@ const handleUploadGalleryFile = async (e) => {
           >
             <div className="ai-modal-header">
               <span className="ai-modal-icon">✨</span>
-              <h3>עזרה בכתיבת פוסט (AI)</h3>
+              <h3>{t('campaign.ai.modal.title')}</h3>
             </div>
 
             <p className="ai-modal-subtitle">
-              המערכת תשתמש בשם המועמד/ת והקבוצה ותיצור פוסט קצר בגוף ראשון
+              {t('campaign.ai.modal.subtitle')}
             </p>
 
             <div className="ai-field-group">
               <label className="ai-label">
                 {aiGenerated
-                  ? 'כותרת הפוסט:'
-                  : 'כותרת מוצעת:'}
+                  ? t('campaign.ai.modal.titleLabelGenerated')
+                  : t('campaign.ai.modal.titleLabel')}
               </label>
               <input
                 type="text"
                 className="ai-input"
-                placeholder={`כותרת לפוסט עבור ${candidate?.name || 'המועמד/ת'}`}
+                placeholder={t('campaign.ai.modal.titlePlaceholder', {
+                  name:
+                    candidate?.name ||
+                    t('campaign.ai.modal.candidateFallback'),
+                })}
                 value={newPost.title}
                 onChange={(e) =>
                   setNewPost({ ...newPost, title: e.target.value })
@@ -869,12 +888,14 @@ const handleUploadGalleryFile = async (e) => {
 
             <div className="ai-field-group">
               <label className="ai-label">
-                {aiGenerated ? 'תוכן:' : 'על מה לכתוב?'}
+                {aiGenerated
+                  ? t('campaign.ai.modal.contentLabelGenerated')
+                  : t('campaign.ai.modal.contentLabel')}
               </label>
               <textarea
                 className="ai-textarea"
                 rows={5}
-                placeholder="לדוגמה: להתמקד בשקיפות, בעזרה לחברים בקבוצה..."
+                placeholder={t('campaign.ai.modal.contentPlaceholder')}
                 value={aiGenerated ? newPost.content : aiNote}
                 onChange={(e) => {
                   if (aiGenerated) {
@@ -893,7 +914,9 @@ const handleUploadGalleryFile = async (e) => {
                 onClick={handleGenerateWithAi}
                 disabled={aiLoading}
               >
-                {aiLoading ? 'מייצר פוסט…' : 'יצירת פוסט עם AI'}
+                {aiLoading
+                  ? t('campaign.ai.modal.generating')
+                  : t('campaign.ai.modal.generateButton')}
               </button>
             )}
 
@@ -906,7 +929,7 @@ const handleUploadGalleryFile = async (e) => {
                   type="button"
                   onClick={handleCancelAiPost}
                 >
-                  ביטול
+                  {t('common.cancel')}
                 </button>
                 <button
                   className="cg-btn"
@@ -918,7 +941,7 @@ const handleUploadGalleryFile = async (e) => {
                   }}
                   disabled={!newPost.title.trim()}
                 >
-                  שמור פוסט
+                  {t('campaign.ai.modal.savePost')}
                 </button>
               </div>
             )}

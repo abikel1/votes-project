@@ -805,7 +805,79 @@ i18n
                                 noVotes: '🕐 אין הצבעות — לא ניתן להציג גרפים',
                             },
                         },
-                    }
+                    },
+                    // campaign page
+                    'campaign.loadingUser': 'טוען משתמש…',
+                    'campaign.loading': 'טוען קמפיין…',
+                    'campaign.errorPrefix': 'שגיאה: ',
+
+                    'common.back': 'חזרה',
+                    'common.linkCopied': 'הקישור הועתק ללוח!',
+
+                    'campaign.header.finishEdit': 'סיום עריכה',
+                    'campaign.header.editPage': 'עריכת הדף',
+
+                    'campaign.editCandidate': 'עריכת מועמד/ת',
+
+                    'campaign.sections.posts': 'פוסטים',
+                    'campaign.sections.about': 'אודות',
+                    'campaign.sections.gallery': 'גלריית תמונות',
+
+                    'campaign.posts.new.titlePlaceholder': 'כותרת פוסט',
+                    'campaign.posts.new.contentPlaceholder': 'תוכן הפוסט',
+                    'campaign.posts.new.youtubePlaceholder': 'קישור YouTube (אופציונלי)',
+                    'campaign.posts.new.addButton': 'הוסף פוסט',
+                    'campaign.posts.new.aiHelpButton': 'עזרה מ־AI',
+                    'campaign.posts.empty': 'אין פוסטים בקמפיין',
+                    'campaign.posts.confirmDelete': 'למחוק פוסט זה?',
+
+                    'campaign.description.placeholder': 'הוסף תיאור לקמפיין',
+                    'campaign.description.empty': 'אין תיאור קמפיין עדיין',
+                    'campaign.description.editButton': 'ערוך תיאור',
+
+                    'campaign.stats.views': 'צפיות',
+                    'campaign.stats.share': 'שתף',
+                    'campaign.share.text': 'בואו להכיר את {{name}}',
+
+                    'campaign.gallery.upload.linkPlaceholder': 'קישור לתמונה',
+                    'campaign.gallery.upload.addButton': 'הוסף',
+                    'campaign.gallery.upload.orText': 'או העלאה מהמחשב:',
+                    'campaign.gallery.empty': 'אין תמונות בגלריה',
+                    'campaign.gallery.imageAlt': 'תמונה {{index}}',
+                    'campaign.gallery.lightboxAlt': 'תמונה מוגדלת',
+
+                    'campaign.ai.modal.title': 'עזרה בכתיבת פוסט (AI)',
+                    'campaign.ai.modal.subtitle':
+                        'המערכת תשתמש בשם המועמד/ת והקבוצה ותיצור פוסט קצר בגוף ראשון',
+                    'campaign.ai.modal.titleLabelGenerated': 'כותרת הפוסט:',
+                    'campaign.ai.modal.titleLabel': 'כותרת מוצעת:',
+                    'campaign.ai.modal.titlePlaceholder': 'כותרת לפוסט עבור {{name}}',
+                    'campaign.ai.modal.candidateFallback': 'המועמד/ת',
+                    'campaign.ai.modal.contentLabelGenerated': 'תוכן:',
+                    'campaign.ai.modal.contentLabel': 'על מה לכתוב?',
+                    'campaign.ai.modal.contentPlaceholder':
+                        'לדוגמה: להתמקד בשקיפות, בעזרה לחברים בקבוצה...',
+                    'campaign.ai.modal.generateButton': 'יצירת פוסט עם AI',
+                    'campaign.ai.modal.generating': 'מייצר פוסט…',
+                    'campaign.ai.modal.savePost': 'שמור פוסט',
+
+                    'campaign.editCandidate.uploadError': 'שגיאה בהעלאת תמונת המועמד/ת',
+                    'campaign.editCandidate.missingIds': 'חסר מזהה קבוצה או מועמד לעדכון',
+                    'campaign.editCandidate.errors.nameRequired': 'שם מועמד/ת חובה',
+                    'campaign.editCandidate.errors.descriptionRequired': 'תיאור חובה',
+                    'campaign.editCandidate.errors.symbolRequired': 'סמל חובה',
+                    'campaign.editCandidate.genericError': 'שגיאה בעדכון המועמד/ת',
+
+                    'campaign.posts.deletePostTitle': 'מחק פוסט',
+
+                    'campaign.comments.toggleLabel': '{{count}} תגובות',
+                    'campaign.comments.confirmDelete': 'למחוק תגובה זו?',
+                    'campaign.comments.placeholder': 'כתוב תגובה...',
+                    'campaign.comments.sending': 'שולח...',
+                    'campaign.comments.send': 'שלח',
+                    'campaign.comments.empty': 'אין תגובות עדיין',
+                    'campaign.comments.anonymousUser': 'משתמש',
+                    'campaign.comments.deleteButtonTitle': 'מחק תגובה',
 
 
                 },
@@ -1593,7 +1665,80 @@ i18n
                                 noVotes: '🕐 No votes — cannot display charts',
                             },
                         },
-                    }
+                    },
+                    // campaign page
+                    'campaign.loadingUser': 'Loading user…',
+                    'campaign.loading': 'Loading campaign…',
+                    'campaign.errorPrefix': 'Error: ',
+
+                    'common.back': 'Back',
+                    'common.linkCopied': 'Link copied to clipboard!',
+
+                    'campaign.header.finishEdit': 'Finish editing',
+                    'campaign.header.editPage': 'Edit page',
+
+                    'campaign.editCandidate': 'Edit candidate',
+
+                    'campaign.sections.posts': 'Posts',
+                    'campaign.sections.about': 'About',
+                    'campaign.sections.gallery': 'Image gallery',
+
+                    'campaign.posts.new.titlePlaceholder': 'Post title',
+                    'campaign.posts.new.contentPlaceholder': 'Post content',
+                    'campaign.posts.new.youtubePlaceholder': 'YouTube link (optional)',
+                    'campaign.posts.new.addButton': 'Add post',
+                    'campaign.posts.new.aiHelpButton': 'Help from AI',
+                    'campaign.posts.empty': 'No posts in this campaign',
+                    'campaign.posts.confirmDelete': 'Delete this post?',
+
+                    'campaign.description.placeholder': 'Add a description for the campaign',
+                    'campaign.description.empty': 'No campaign description yet',
+                    'campaign.description.editButton': 'Edit description',
+
+                    'campaign.stats.views': 'views',
+                    'campaign.stats.share': 'Share',
+                    'campaign.share.text': 'Come meet {{name}}',
+
+                    'campaign.gallery.upload.linkPlaceholder': 'Image link',
+                    'campaign.gallery.upload.addButton': 'Add',
+                    'campaign.gallery.upload.orText': 'Or upload from your computer:',
+                    'campaign.gallery.empty': 'No images in the gallery',
+                    'campaign.gallery.imageAlt': 'Image {{index}}',
+                    'campaign.gallery.lightboxAlt': 'Enlarged image',
+
+                    'campaign.ai.modal.title': 'Help writing a post (AI)',
+                    'campaign.ai.modal.subtitle':
+                        'The system will use the candidate and group names and generate a short first-person post.',
+                    'campaign.ai.modal.titleLabelGenerated': 'Post title:',
+                    'campaign.ai.modal.titleLabel': 'Suggested title:',
+                    'campaign.ai.modal.titlePlaceholder': 'Post title for {{name}}',
+                    'campaign.ai.modal.candidateFallback': 'the candidate',
+                    'campaign.ai.modal.contentLabelGenerated': 'Content:',
+                    'campaign.ai.modal.contentLabel': 'What to write about?',
+                    'campaign.ai.modal.contentPlaceholder':
+                        'For example: focus on transparency, helping group members...',
+                    'campaign.ai.modal.generateButton': 'Generate post with AI',
+                    'campaign.ai.modal.generating': 'Generating post…',
+                    'campaign.ai.modal.savePost': 'Save post',
+
+                    'campaign.editCandidate.uploadError': 'Error uploading candidate image',
+                    'campaign.editCandidate.missingIds': 'Missing group or candidate id for update',
+                    'campaign.editCandidate.errors.nameRequired': 'Candidate name is required',
+                    'campaign.editCandidate.errors.descriptionRequired': 'Description is required',
+                    'campaign.editCandidate.errors.symbolRequired': 'Symbol is required',
+                    'campaign.editCandidate.genericError': 'Error updating candidate',
+
+                    'campaign.posts.deletePostTitle': 'Delete post',
+
+                    'campaign.comments.toggleLabel': '{{count}} comments',
+                    'campaign.comments.confirmDelete': 'Delete this comment?',
+                    'campaign.comments.placeholder': 'Write a comment...',
+                    'campaign.comments.sending': 'Sending...',
+                    'campaign.comments.send': 'Send',
+                    'campaign.comments.empty': 'No comments yet',
+                    'campaign.comments.anonymousUser': 'User',
+                    'campaign.comments.deleteButtonTitle': 'Delete comment',
+
 
 
                 },
