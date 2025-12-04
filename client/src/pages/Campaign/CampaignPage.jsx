@@ -17,6 +17,7 @@ import {
   selectAiError,
   addComment,
   deleteComment,
+  toggleLike 
 } from '../../slices/campaignSlice';
 import { updateCandidate } from '../../slices/candidateSlice';
 
@@ -82,6 +83,8 @@ function normalizeAiSuggestion(suggestion, fallbackTitle = '') {
   };
 }
 
+
+
 export default function CampaignPage() {
   const { candidateId } = useParams();
   const dispatch = useDispatch();
@@ -114,7 +117,7 @@ export default function CampaignPage() {
   const [uploadingImage, setUploadingImage] = useState(false);
 
   const [likeCount, setLikeCount] = useState(0);
-  const [hasLiked, setHasLiked] = useState(false);
+const [hasLiked, setHasLiked] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
 
   // AI modal
@@ -148,6 +151,16 @@ export default function CampaignPage() {
     dispatch(fetchCampaign(candidateId));
   };
 
+  const handleToggleLike = async () => {
+  try {
+    const result = await dispatch(toggleLike(campaign._id)).unwrap();
+    setLikeCount(result.likeCount);
+    setHasLiked(result.liked);
+  } catch (err) {
+    console.error('שגיאה בלייק:', err);
+  }
+};
+
   // טעינת קמפיין + incrementView
   useEffect(() => {
     if (!candidateId) return;
@@ -173,16 +186,26 @@ export default function CampaignPage() {
   }, [candidateId, dispatch]);
 
   // סנכרון תיאור ולייקים
-  useEffect(() => {
-    if (campaign) {
-      if (campaign.description !== undefined) {
-        setEditDescription(campaign.description);
-      }
-      if (campaign.likeCount !== undefined) {
-        setLikeCount(campaign.likeCount);
-      }
-    }
-  }, [campaign]);
+  // useEffect(() => {
+  //   if (campaign) {
+  //     if (campaign.description !== undefined) {
+  //       setEditDescription(campaign.description);
+  //     }
+  //     if (campaign.likeCount !== undefined) {
+  //       setLikeCount(campaign.likeCount);
+  //     }
+  //   }
+  // }, [campaign]);
+
+useEffect(() => {
+  if (campaign && currentUserId) {
+    setLikeCount(campaign.likes?.length || 0);
+    setHasLiked(campaign.likes?.includes(currentUserId) || false);
+  }
+}, [campaign, currentUserId]);
+
+
+// console.log("campaign.liked:", campaign?.liked);
 
   // AI suggestion
   useEffect(() => {
@@ -671,10 +694,20 @@ const handleUploadGalleryFile = async (e) => {
               <span>{viewCount} צפיות</span>
             </div>
 
-            <div className="stat-box clickable" onClick={handleLike}>
-              <FiHeart size={22} color={hasLiked ? 'red' : 'inherit'} />
-              <span>{likeCount} אהבו</span>
-            </div>
+    <div className="stat-box clickable">
+<button className="icon-btn" onClick={handleToggleLike}>
+  <FiHeart
+    size={24}
+    color={hasLiked ? 'red' : 'gray'}
+    style={{ fill: hasLiked ? 'red' : 'none' }}
+  />
+  <span>{likeCount}</span>
+</button>
+
+</div>
+
+
+
 
             <div className="stat-box clickable" onClick={handleShare}>
               <FiShare2 size={20} />

@@ -1,3 +1,5 @@
+import React from 'react';
+
 import { useEffect, useRef, useState } from 'react';
 import { FiMoreVertical, FiSmile, FiSend } from 'react-icons/fi';
 import { io } from 'socket.io-client';
@@ -5,6 +7,8 @@ import http from '../../api/http';
 import EmojiPicker from 'emoji-picker-react';
 import './GroupChat.css';
 import { useTranslation } from 'react-i18next';
+import ConfirmModal from '../../components/ConfirmModal/ConfirmModal';
+
 
 const AVATAR_COLORS = [
     '#4f46e5',
@@ -51,6 +55,8 @@ export default function GroupChat({ groupId, canChat, currentUserId, isOwner }) 
     const inputRef = useRef(null);
 
     const [socket, setSocket] = useState(null);
+const [confirmOpen, setConfirmOpen] = React.useState(false);
+const [messageToDelete, setMessageToDelete] = React.useState(null);
 
     // גלילה למטה כשמגיעות הודעות ואנחנו בתחתית
     useEffect(() => {
@@ -212,31 +218,13 @@ export default function GroupChat({ groupId, canChat, currentUserId, isOwner }) 
         setIsAtBottom(true);
     };
 
-    const handleDelete = (messageId) => {
-        if (!messageId || !groupId) return;
-        if (!window.confirm(t('chat.confirmDelete'))) return;
-        if (!socket) return;
+const handleDelete = (messageId) => {
+    if (!messageId || !groupId) return;
+    setMessageToDelete(messageId);
+    setConfirmOpen(true);
+};
 
-        setSending(true);
-        setError('');
 
-        socket.emit(
-            'chat:delete',
-            { groupId, messageId },
-            (res) => {
-                if (!res || !res.ok) {
-                    setError('chat.errors.deleteFailed');
-                }
-                setSending(false);
-                setMenuOpenFor(null);
-            }
-        );
-
-        if (editingId === messageId) {
-            setEditingId(null);
-            setText('');
-        }
-    };
 
     const handleStartEdit = (msg) => {
         const id = msg._id || msg.id;
@@ -249,6 +237,39 @@ export default function GroupChat({ groupId, canChat, currentUserId, isOwner }) 
         setEditingId(null);
         setText('');
     };
+
+    const handleConfirmDelete = () => {
+    if (!messageToDelete || !groupId || !socket) return;
+
+    setSending(true);
+    setError('');
+
+    socket.emit(
+        'chat:delete',
+        { groupId, messageId: messageToDelete },
+        (res) => {
+            if (!res || !res.ok) {
+                setError(res?.message || 'שגיאה במחיקת ההודעה');
+            }
+            setSending(false);
+            setMenuOpenFor(null);
+        }
+    );
+
+    if (editingId === messageToDelete) {
+        setEditingId(null);
+        setText('');
+    }
+
+    setConfirmOpen(false);
+    setMessageToDelete(null);
+};
+
+const handleCancelDelete = () => {
+    setConfirmOpen(false);
+    setMessageToDelete(null);
+};
+
 
     const formatTime = (dateString) => {
         if (!dateString) return '';
@@ -558,6 +579,14 @@ export default function GroupChat({ groupId, canChat, currentUserId, isOwner }) 
                     <FiSend size={16} />
                 </button>
             </form>
+
+            <ConfirmModal
+    open={confirmOpen}
+    message="למחוק את ההודעה?"
+    onConfirm={handleConfirmDelete}
+    onCancel={handleCancelDelete}
+/>
+
         </div>
     );
 }

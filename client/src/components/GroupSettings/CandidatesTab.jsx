@@ -26,25 +26,17 @@ export default function CandidatesTab({
   // ✅ פונקציה להעלאת תמונה
   const onUploadNew = async (file) => {
     if (!file) return;
-    try {
-      setLocalUploading(true);
+    setLocalUploading(true);
 
+    try {
       const formData = new FormData();
       formData.append('image', file);
 
-      const { data } = await http.post(
-        'http://localhost:3000/api/upload',
-        formData,
-        {
-          headers: { 'Content-Type': 'multipart/form-data' },
-        },
-      );
+      const { data } = await http.post('/api/upload', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
 
-      // שומרים רק URL כדי לא להעמיס על ה־Redux / האתר
-      setCandForm((prev) => ({
-        ...prev,
-        photoUrl: data.url,
-      }));
+      setCandForm((prev) => ({ ...prev, photoUrl: data.url }));
     } catch (err) {
       console.error('Upload error:', err);
       alert(t('candidates.upload.error'));
@@ -64,10 +56,7 @@ export default function CandidatesTab({
           {candLoading ? (
             <div>{t('candidates.list.loading')}</div>
           ) : candError ? (
-            <div className="err">
-              {/* אם candError הוא key – יתרגם; אם טקסט רגיל – יציג אותו כמו שהוא */}
-              {t(candError)}
-            </div>
+            <div className="err">{candError}</div>
           ) : !candidates.length ? (
             <div className="muted">
               {t('candidates.list.empty')}
@@ -80,7 +69,7 @@ export default function CandidatesTab({
                     <div className="title">
                       {c.photoUrl && (
                         <img
-                          src={c.photoUrl || '/h.jpg'} // אם אין URL – ברירת מחדל
+                          src={c.photoUrl || '/h.jpg'}
                           alt={
                             c.name
                               ? t('candidates.list.photoAltWithName', {
@@ -95,13 +84,16 @@ export default function CandidatesTab({
                           }}
                         />
                       )}
+
                       {c.name || t('candidates.list.noName')}{' '}
                       {c.symbol ? `· ${c.symbol}` : ''}
                     </div>
+
                     {c.description && (
                       <div className="sub">{c.description}</div>
                     )}
                   </div>
+
                   <div className="row-actions">
                     <button
                       className="small"

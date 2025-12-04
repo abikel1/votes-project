@@ -3,6 +3,8 @@ import { useState } from 'react';
 import { FiTrash2, FiMessageSquare } from 'react-icons/fi';
 // import { getYoutubeEmbedUrl } from '../../utils/youtubeHelper';
 import './PostCard.css';
+import { useSelector } from 'react-redux';
+import { selectUsersMap } from '../../slices/usersSlice';
 
 export default function PostCard({
   post,
@@ -17,10 +19,11 @@ export default function PostCard({
   const [showComments, setShowComments] = useState(false);
   const [newComment, setNewComment] = useState('');
   const [submittingComment, setSubmittingComment] = useState(false);
+  const usersMap = useSelector(selectUsersMap);
 
-//   const youtubeEmbedUrl = post.youtubeUrl
-//     ? getYoutubeEmbedUrl(post.youtubeUrl)
-//     : null;
+  //   const youtubeEmbedUrl = post.youtubeUrl
+  //     ? getYoutubeEmbedUrl(post.youtubeUrl)
+  //     : null;
 
   const handleSubmitComment = async () => {
     if (!newComment.trim() || submittingComment) return;
@@ -122,46 +125,57 @@ export default function PostCard({
           )}
 
           {/* רשימת תגובות */}
-          <div className="comments-list">
-            {post.comments && post.comments.length > 0 ? (
-              post.comments.map((comment) => (
-                <div key={comment._id} className="comment-item">
-                  <div className="comment-header">
-                    {comment.user?.photoUrl && (
-                      <img
-                        src={comment.user.photoUrl}
-                        alt={comment.user.name}
-                        className="comment-avatar"
-                      />
-                    )}
-                    <div className="comment-meta">
-                      <span className="comment-author">
-                        {comment.user?._id || 'משתמש'}
-                      </span>
-                      <span className="comment-date">
-                        {new Date(comment.createdAt).toLocaleDateString('he-IL')}
-                      </span>
-                    </div>
+   {/* רשימת תגובות */}
+{/* רשימת תגובות */}
+<div className="comments-list">
+  {post.comments && post.comments.length > 0 ? (
+   post.comments.map((comment) => {
 
-                    {/* מחיקת תגובה - רק אם זה המשתמש שכתב או בעל הקמפיין */}
-                    {(currentUserId === comment.user?._id || isCandidateOwner) && (
-                      <button
-                        onClick={() => handleDeleteComment(comment._id)}
-                        className="comment-delete-btn"
-                        title="מחק תגובה"
-                      >
-                        <FiTrash2 size={14} />
-                      </button>
-                    )}
-                  </div>
+  const userId = comment.user?._id || comment.user;
 
-                  <p className="comment-content">{comment.content}</p>
-                </div>
-              ))
-            ) : (
-              <div className="empty-comments">אין תגובות עדיין</div>
-            )}
-          </div>
+
+const user = comment.user;
+const userFullName = user
+  ? `${user.firstName || ''} ${user.lastName || ''}`.trim()
+  : 'משתמש';
+
+
+  return (
+    <div key={comment._id} className="comment-item">
+      <div className="comment-header">
+        {user?.photoUrl && (
+          <img src={user.photoUrl} alt={userFullName} className="comment-avatar" />
+        )}
+
+        <div className="comment-meta">
+          <span className="comment-author">{userFullName}</span>
+          <span className="comment-date">
+            {new Date(comment.createdAt).toLocaleDateString('he-IL')}
+          </span>
+        </div>
+
+        {(currentUserId === userId || isCandidateOwner) && (
+          <button
+            onClick={() => handleDeleteComment(comment._id)}
+            className="comment-delete-btn"
+            title="מחק תגובה"
+          >
+            <FiTrash2 size={14} />
+          </button>
+        )}
+      </div>
+
+      <p className="comment-content">{comment.content}</p>
+    </div>
+  );
+})
+
+  ) : (
+    <div className="empty-comments">אין תגובות עדיין</div>
+  )}
+</div>
+
+
         </div>
       )}
     </div>
