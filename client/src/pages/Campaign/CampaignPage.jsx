@@ -83,9 +83,6 @@ function normalizeAiSuggestion(suggestion, fallbackTitle = '') {
   };
 }
 
-socket.on('campaignUpdated', (updatedCampaign) => {
-  dispatch(updateCampaignState(updatedCampaign)); // פעולה שמעדכנת את Redux
-});
 
 
 export default function CampaignPage() {
