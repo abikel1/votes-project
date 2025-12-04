@@ -3,7 +3,16 @@ import { useEffect, useMemo, useState, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
-import { FaUsers, FaUserPlus, FaUserCheck, FaUserTimes, FaExclamationTriangle, FaInfoCircle } from 'react-icons/fa';
+import {
+  FaUsers,
+  FaUserPlus,
+  FaUserCheck,
+  FaExclamationTriangle,
+  FaInfoCircle,
+} from 'react-icons/fa';
+import { BiArrowBack } from 'react-icons/bi';
+import { useTranslation } from 'react-i18next';
+
 import { uploadImage } from './uploadImage';
 import {
   fetchGroupWithMembers,
@@ -24,6 +33,9 @@ import {
   selectCandidatesErrorForGroup,
   selectCandidateUpdating,
   selectCandidateUpdateError,
+  approveCandidateRequest,
+  rejectCandidateRequest,
+  fetchCandidateRequestsByGroup,
 } from '../../slices/candidateSlice';
 
 import {
@@ -41,9 +53,9 @@ import {
   selectVotersLoadingForGroup,
   selectVotersErrorForGroup,
 } from '../../slices/votesSlice';
-import { BiArrowBack } from 'react-icons/bi';
 
 import { upsertUsers } from '../../slices/usersSlice';
+
 import ConfirmModal from '../../components/ConfirmModal/ConfirmModal';
 import GeneralTab from './GeneralTab';
 import CandidatesTab from './CandidatesTab';
@@ -54,13 +66,6 @@ import DangerTab from './DangerTab';
 import EditCandidateModal from './EditCandidateModal';
 import DeleteGroupModal from './DeleteGroupModal';
 import CandidateRequestsTab from './CandidateRequestsTab';
-import {
-  approveCandidateRequest,
-  rejectCandidateRequest,
-  fetchCandidateRequestsByGroup,
-} from '../../slices/candidateSlice';
-
-
 
 import './GroupSettingsPage.css';
 
@@ -78,6 +83,8 @@ import http from '../../api/http';
 // ---------- קומפוננטה ראשית ----------
 
 export default function GroupSettingsPage() {
+  const { t } = useTranslation();
+
   const { groupSlug } = useParams();
   const location = useLocation();
 
@@ -101,8 +108,9 @@ export default function GroupSettingsPage() {
   } = useSelector((s) => s.groups);
 
   const enrichedMembers = useSelector(selectSelectedGroupMembersEnriched);
-  const { userId, userEmail, firstName, lastName, isAdmin } = useSelector((s) => s.auth);
-  // const { userId, userEmail, firstName, lastName } = useSelector((s) => s.auth);
+  const { userId, userEmail, firstName, lastName, isAdmin } = useSelector(
+    (s) => s.auth,
+  );
 
   const candidates =
     useSelector(selectCandidatesForGroup(groupId || '')) || EMPTY_ARR;
@@ -187,8 +195,7 @@ export default function GroupSettingsPage() {
   const editFileInputRef = useRef(null);
 
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-const [selectedCandidate, setSelectedCandidate] = useState(null);
-
+  const [selectedCandidate, setSelectedCandidate] = useState(null);
 
   // שיתוף
   const [copied, setCopied] = useState(false);
@@ -226,7 +233,6 @@ const [selectedCandidate, setSelectedCandidate] = useState(null);
     dispatch(fetchVotersByGroup(groupId));
   }, [dispatch, groupId]);
 
-
   useEffect(() => {
     if (!groupId || !group?.isLocked) return;
     dispatch(fetchJoinRequests(groupId));
@@ -262,7 +268,7 @@ const [selectedCandidate, setSelectedCandidate] = useState(null);
       group?.createdBy &&
       userEmail &&
       String(group.createdBy).trim().toLowerCase() ===
-      String(userEmail).trim().toLowerCase();
+        String(userEmail).trim().toLowerCase();
 
     const byId =
       group?.createdById &&
@@ -275,7 +281,7 @@ const [selectedCandidate, setSelectedCandidate] = useState(null);
       lastName &&
       !String(group.createdBy).includes('@') &&
       String(group.createdBy).trim().toLowerCase() ===
-      `${firstName} ${lastName}`.trim().toLowerCase();
+        `${firstName} ${lastName}`.trim().toLowerCase();
 
     return !!(byEmail || byId || byFullName);
   }, [group, userEmail, userId, firstName, lastName]);
@@ -284,33 +290,36 @@ const [selectedCandidate, setSelectedCandidate] = useState(null);
 
   const slug = group ? makeSlug(group.name || groupSlug || groupId) : groupSlug;
 
-const handleDeleteCandidateClick = (candidate) => {
-  if (!candidate || !candidate._id) {
-    console.error('Candidate invalid:', candidate);
-    return;
-  }
-  setSelectedCandidate(candidate);
-  setShowDeleteConfirm(true);
-};
+  const handleDeleteCandidateClick = (candidate) => {
+    if (!candidate || !candidate._id) {
+      console.error('Candidate invalid:', candidate);
+      return;
+    }
+    setSelectedCandidate(candidate);
+    setShowDeleteConfirm(true);
+  };
 
-const confirmDeleteCandidate = async () => {
-  if (!selectedCandidate || !selectedCandidate._id) {
-    toast.error('מחיקת המועמד נכשלה – מזהה לא נמצא');
-    setShowDeleteConfirm(false);
-    return;
-  }
+  const onDeleteCandidate = (cid) =>
+    dispatch(deleteCandidate({ candidateId: cid, groupId }))
+      .unwrap()
+      .then(() => dispatch(fetchCandidatesByGroup(groupId)));
 
-  try {
-    await onDeleteCandidate(String(selectedCandidate._id));
-    setShowDeleteConfirm(false);
-    setSelectedCandidate(null);
-  } catch (e) {
-    toast.error('מחיקת המועמד נכשלה');
-    console.error(e);
-  }
-};
+  const confirmDeleteCandidate = async () => {
+    if (!selectedCandidate || !selectedCandidate._id) {
+      toast.error(t('candidates.errors.deleteIdMissing'));
+      setShowDeleteConfirm(false);
+      return;
+    }
 
-
+    try {
+      await onDeleteCandidate(String(selectedCandidate._id));
+      setShowDeleteConfirm(false);
+      setSelectedCandidate(null);
+    } catch (e) {
+      toast.error(t('candidates.errors.deleteFailed'));
+      console.error(e);
+    }
+  };
 
   const sharePath = useMemo(() => {
     if (!group) return '';
@@ -356,8 +365,8 @@ const confirmDeleteCandidate = async () => {
   if (!slugResolved && !groupId) {
     return (
       <div className="gs-wrap">
-        <h2>הגדרות קבוצה</h2>
-        <div>טוען נתוני קבוצה...</div>
+        <h2>{t('groupSettings.pageTitle')}</h2>
+        <div>{t('groupSettings.loadingResolving')}</div>
       </div>
     );
   }
@@ -366,10 +375,10 @@ const confirmDeleteCandidate = async () => {
   if (slugResolved && !groupId) {
     return (
       <div className="gs-wrap">
-        <h2>הגדרות קבוצה</h2>
-        <div className="err">הקבוצה לא נמצאה.</div>
+        <h2>{t('groupSettings.pageTitle')}</h2>
+        <div className="err">{t('groupSettings.notFound')}</div>
         <button className="gs-btn" onClick={() => navigate('/groups')}>
-          חזרה לרשימת הקבוצות
+          {t('groupSettings.backToGroups')}
         </button>
       </div>
     );
@@ -378,8 +387,8 @@ const confirmDeleteCandidate = async () => {
   if (groupLoading) {
     return (
       <div className="gs-wrap">
-        <h2>הגדרות קבוצה</h2>
-        <div>טוען...</div>
+        <h2>{t('groupSettings.pageTitle')}</h2>
+        <div>{t('groupSettings.loading')}</div>
       </div>
     );
   }
@@ -387,10 +396,10 @@ const confirmDeleteCandidate = async () => {
   if (groupError) {
     return (
       <div className="gs-wrap">
-        <h2>הגדרות קבוצה</h2>
-        <div className="err">{groupError}</div>
+        <h2>{t('groupSettings.pageTitle')}</h2>
+        <div className="err">{t(groupError)}</div>
         <button className="gs-btn" onClick={() => navigate('/groups')}>
-          חזרה לרשימת הקבוצות
+          {t('groupSettings.backToGroups')}
         </button>
       </div>
     );
@@ -399,10 +408,10 @@ const confirmDeleteCandidate = async () => {
   if (!group) {
     return (
       <div className="gs-wrap">
-        <h2>הגדרות קבוצה</h2>
-        <div>לא נמצאה קבוצה.</div>
+        <h2>{t('groupSettings.pageTitle')}</h2>
+        <div>{t('groupSettings.noGroup')}</div>
         <button className="gs-btn" onClick={() => navigate('/groups')}>
-          חזרה לרשימת הקבוצות
+          {t('groupSettings.backToGroups')}
         </button>
       </div>
     );
@@ -412,16 +421,12 @@ const confirmDeleteCandidate = async () => {
   if (!isOwnerOrAdmin) {
     return (
       <div className="gs-wrap">
-        <h2>הגדרות קבוצה</h2>
+        <h2>{t('groupSettings.pageTitle')}</h2>
         <div className="err">
-          אין לך הרשאות ניהול לקבוצה זו.
-          <br />
-          רק מנהל/ת הקבוצה יכול/ה לצפות ולהתאים את ההגדרות.
-          <br />
-          אם את/ה צריך/ה שינוי, אפשר לפנות למנהל/ת הקבוצה.
+          {t('groupSettings.noPermissionText')}
         </div>
         <button className="gs-btn" onClick={() => navigate('/groups')}>
-          חזרה לרשימת הקבוצות
+          {t('groupSettings.backToGroups')}
         </button>
       </div>
     );
@@ -446,7 +451,6 @@ const confirmDeleteCandidate = async () => {
       });
   };
 
-
   const onGroupChange = (e) => {
     const { name, value, type, checked } = e.target;
     setForm((prev) => ({
@@ -455,8 +459,8 @@ const confirmDeleteCandidate = async () => {
         name === 'maxWinners'
           ? Number(value)
           : type === 'checkbox'
-            ? checked
-            : value,
+          ? checked
+          : value,
     }));
   };
 
@@ -464,10 +468,12 @@ const confirmDeleteCandidate = async () => {
     e.preventDefault();
 
     const groupEnd = form.endDate ? new Date(form.endDate) : null;
-    const candEnd = form.candidateEndDate ? new Date(form.candidateEndDate) : null;
+    const candEnd = form.candidateEndDate
+      ? new Date(form.candidateEndDate)
+      : null;
 
     if (groupEnd && candEnd && candEnd > groupEnd) {
-      toast.error("תאריך סיום הגשת מועמדות לא יכול להיות אחרי תאריך סיום הקבוצה");
+      toast.error(t('groups.create.errors.candidateAfterGroup'));
       return; // מונע שליחת הבקשה לשרת
     }
 
@@ -477,8 +483,12 @@ const confirmDeleteCandidate = async () => {
       symbol: (form.symbol || '').trim(),
       maxWinners: Number(form.maxWinners) || 1,
       isLocked: !!form.isLocked,
-      ...(form.endDate ? { endDate: new Date(form.endDate).toISOString() } : {}),
-      ...(form.candidateEndDate ? { candidateEndDate: new Date(form.candidateEndDate).toISOString() } : {}),
+      ...(form.endDate
+        ? { endDate: new Date(form.endDate).toISOString() }
+        : {}),
+      ...(form.candidateEndDate
+        ? { candidateEndDate: new Date(form.candidateEndDate).toISOString() }
+        : {}),
     };
 
     await dispatch(updateGroup({ groupId, patch })).unwrap();
@@ -487,9 +497,6 @@ const confirmDeleteCandidate = async () => {
     dispatch(fetchGroupWithMembers(groupId));
     dispatch(fetchVotersByGroup(groupId));
   };
-
-
-
 
   const onCancelEdit = () => {
     setEditMode(false);
@@ -502,52 +509,44 @@ const confirmDeleteCandidate = async () => {
         maxWinners: group.maxWinners ?? 1,
         endDate: toLocalDateInputValue(group.endDate),
         candidateEndDate: toLocalDateInputValue(group.candidateEndDate),
-
         isLocked: !!group.isLocked,
       });
     }
   };
 
-const onAddCandidate = (e) => {
-  e.preventDefault();
+  const onAddCandidate = (e) => {
+    e.preventDefault();
 
-  const errors = validateCandidateFields(candForm);
+    const errors = validateCandidateFields(candForm);
 
-  if (!candForm.name.trim()) {
-    toast.error('שם מועמד/ת חובה');
-  }
+    if (!candForm.name.trim()) {
+      toast.error(t('candidates.validation.nameRequired'));
+    }
 
-  setCandErrors(errors);
+    setCandErrors(errors);
 
-  if (Object.keys(errors).length > 0) {
-    return;
-  }
+    if (Object.keys(errors).length > 0) {
+      return;
+    }
 
-  // ✅ כאן מוסיפים ברירת מחדל לתמונה אם לא קיימת
-  const candidateData = {
-    ...candForm,
-    photoUrl: candForm.photoUrl || '/h.jpg',
-  };
+    const candidateData = {
+      ...candForm,
+      photoUrl: candForm.photoUrl || '/h.jpg',
+    };
 
-  dispatch(createCandidate({ groupId, ...candidateData }))
-    .unwrap()
-    .then(() => {
-      setCandForm({
-        name: '',
-        description: '',
-        symbol: '',
-        photoUrl: '',
-      });
-      setCandErrors({});
-    })
-    .then(() => dispatch(fetchCandidatesByGroup(groupId)));
-};
-
-
-  const onDeleteCandidate = (cid) =>
-    dispatch(deleteCandidate({ candidateId: cid, groupId }))
+    dispatch(createCandidate({ groupId, ...candidateData }))
       .unwrap()
+      .then(() => {
+        setCandForm({
+          name: '',
+          description: '',
+          symbol: '',
+          photoUrl: '',
+        });
+        setCandErrors({});
+      })
       .then(() => dispatch(fetchCandidatesByGroup(groupId)));
+  };
 
   const doDeleteGroup = async () => {
     try {
@@ -555,7 +554,7 @@ const onAddCandidate = (e) => {
       setDeleteOpen(false);
       navigate('/groups');
     } catch (e) {
-      toast.error(e || 'מחיקה נכשלה');
+      toast.error(t('groups.errors.deleteFailed'));
     }
   };
 
@@ -591,7 +590,7 @@ const onAddCandidate = (e) => {
     const { _id, name, description, symbol, photoUrl } = editCandForm;
 
     if (!name?.trim()) {
-      toast.error('שם מועמד/ת חובה');
+      toast.error(t('candidates.validation.nameRequired'));
     }
 
     const errors = validateCandidateFields({ name, description, symbol });
@@ -615,7 +614,7 @@ const onAddCandidate = (e) => {
       setEditCandErrors({});
       dispatch(fetchCandidatesByGroup(groupId));
     } catch (err) {
-      toast.error(err || 'עדכון נכשל');
+      toast.error(err || t('candidates.errors.updateFailed'));
     }
   };
 
@@ -645,14 +644,13 @@ const onAddCandidate = (e) => {
       return url;
     } catch (err) {
       console.error('Upload error:', err);
-      alert('שגיאה בהעלאת הקובץ');
+      alert(t('common.uploadError'));
       return null;
     } finally {
       if (mode === 'new') setUploadingNew(false);
       if (mode === 'edit') setUploadingEdit(false);
     }
   }
-
 
   const clearNewPhoto = () =>
     setCandForm((prev) => ({ ...prev, photoUrl: '' }));
@@ -705,7 +703,7 @@ const onAddCandidate = (e) => {
       if (group.isLocked) dispatch(fetchJoinRequests(groupId));
       dispatch(fetchGroupWithMembers(groupId));
     } catch (e) {
-      toast.error(e || 'Failed to remove member');
+      toast.error(t('groups.errors.removeMemberFailed'));
     }
   };
 
@@ -718,30 +716,7 @@ const onAddCandidate = (e) => {
 
   return (
     <div className="gs-wrap">
-
-      {/* <div className="gs-header">
-        <h2>הגדרות קבוצה</h2>
-        <div className="gs-actions">
-          <button className="gs-btn" onClick={() => navigate('/groups')}>
-            לרשימת הקבוצות
-          </button>
-
-          <button
-            className="gs-btn"
-            onClick={() =>
-              navigate(`/groups/${slug}`, {
-                state: { groupId },
-              })
-            }
-          >
-            פרטי הקבוצה
-          </button>
-        </div>
-      </div> */}
-
       <div className="gs-header clean-header">
-
-
         {/* כותרת מרכזית */}
         <div className="header-title">
           <h2>{group.name}</h2>
@@ -756,7 +731,7 @@ const onAddCandidate = (e) => {
               state: { groupId },
             })
           }
-          title="פרטי הקבוצה"
+          title={t('groupSettings.header.detailsTooltip')}
         >
           <FaInfoCircle size={24} />
         </button>
@@ -765,14 +740,11 @@ const onAddCandidate = (e) => {
         <button
           className="icon-btn"
           onClick={() => navigate('/groups')}
-          title="חזרה לקבוצות"
+          title={t('groupSettings.header.backTooltip')}
         >
           <BiArrowBack size={24} />
         </button>
       </div>
-
-
-
 
       {/* layout: תוכן משמאל + סיידבר מימין */}
       <div className="gs-main-layout">
@@ -798,33 +770,31 @@ const onAddCandidate = (e) => {
           )}
 
           {activeTab === 'candidates' && (
-            <CandidatesTab
-              candidates={candidates}
-              candLoading={candLoading}
-              candError={candError}
-              candForm={candForm}
-              candErrors={candErrors}
-              setCandForm={setCandForm}
-              setCandErrors={setCandErrors}
-              onAddCandidate={onAddCandidate}
-              onDeleteCandidate={handleDeleteCandidateClick}
-              onOpenEditCandidate={openEditCandidate}
-              uploadingNew={uploadingNew}
-  onUploadNew={(file) => handleUpload(file, 'new')} // ✅ כאן
-              newFileInputRef={newFileInputRef}
-              clearNewPhoto={clearNewPhoto}
-            />
+            <>
+              <CandidatesTab
+                candidates={candidates}
+                candLoading={candLoading}
+                candError={candError}
+                candForm={candForm}
+                candErrors={candErrors}
+                setCandForm={setCandForm}
+                setCandErrors={setCandErrors}
+                onAddCandidate={onAddCandidate}
+                onDeleteCandidate={handleDeleteCandidateClick}
+                onOpenEditCandidate={openEditCandidate}
+                uploadingNew={uploadingNew}
+                onUploadNew={(file) => handleUpload(file, 'new')}
+                newFileInputRef={newFileInputRef}
+                clearNewPhoto={clearNewPhoto}
+              />
+
+              <CandidateRequestsTab
+                groupId={groupId}
+                onApprove={handleApprove}
+                onReject={handleReject}
+              />
+            </>
           )}
-
-          {activeTab === 'candidates' && (
-            <CandidateRequestsTab
-              groupId={groupId}
-              onApprove={handleApprove}
-              onReject={handleReject}
-            />
-          )}
-
-
 
           {activeTab === 'voters' && (
             <VotersTab
@@ -855,7 +825,6 @@ const onAddCandidate = (e) => {
             </>
           )}
 
-
           {activeTab === 'danger' && (
             <DangerTab
               onOpenDelete={() => {
@@ -867,22 +836,23 @@ const onAddCandidate = (e) => {
         </div>
 
         {/* סיידבר הניווט מימין */}
-
         <aside className="gs-sidebar-tabs">
           <button
             className={`side-tab ${activeTab === 'general' ? 'active' : ''}`}
             onClick={() => setActiveTab('general')}
           >
             <FaInfoCircle style={{ marginInlineEnd: 6 }} />
-            פרטי קבוצה
+            {t('groupSettings.sidebar.general')}
           </button>
 
           <button
-            className={`side-tab ${activeTab === 'candidates' ? 'active' : ''}`}
+            className={`side-tab ${
+              activeTab === 'candidates' ? 'active' : ''
+            }`}
             onClick={() => setActiveTab('candidates')}
           >
             <FaUserPlus style={{ marginInlineEnd: 6 }} />
-            מועמדים
+            {t('groupSettings.sidebar.candidates')}
           </button>
 
           <button
@@ -890,27 +860,29 @@ const onAddCandidate = (e) => {
             onClick={() => setActiveTab('voters')}
           >
             <FaUserCheck style={{ marginInlineEnd: 6 }} />
-            מצביעים
+            {t('groupSettings.sidebar.voters')}
           </button>
 
           {group.isLocked && (
             <button
-              className={`side-tab ${activeTab === 'members' ? 'active' : ''}`}
+              className={`side-tab ${
+                activeTab === 'members' ? 'active' : ''
+              }`}
               onClick={() => setActiveTab('members')}
             >
               <FaUsers style={{ marginInlineEnd: 6 }} />
-              משתתפי הקבוצה  
+              {t('groupSettings.sidebar.members')}
             </button>
           )}
 
-
-
           <button
-            className={`side-tab danger ${activeTab === 'danger' ? 'active' : ''}`}
+            className={`side-tab danger ${
+              activeTab === 'danger' ? 'active' : ''
+            }`}
             onClick={() => setActiveTab('danger')}
           >
             <FaExclamationTriangle style={{ marginInlineEnd: 6 }} />
-            מחיקה
+            {t('groupSettings.sidebar.danger')}
           </button>
         </aside>
       </div>
@@ -941,31 +913,39 @@ const onAddCandidate = (e) => {
         clearEditPhoto={clearEditPhoto}
       />
 
+      {/* הסרת משתתף */}
       <ConfirmModal
         open={showConfirm}
         message={
           selectedMember
-            ? `להסיר את ${selectedMember.member.name ||
-            selectedMember.member.email ||
-            selectedMember.memberId
-            } מהקבוצה?`
+            ? t('groupSettings.removeMemberConfirm', {
+                name:
+                  selectedMember.member.name ||
+                  selectedMember.member.email ||
+                  selectedMember.memberId,
+              })
             : ''
         }
         onConfirm={confirmDelete}
         onCancel={cancelDelete}
       />
 
+      {/* מחיקת מועמד */}
       <ConfirmModal
-  open={showDeleteConfirm}
-  message={
-    selectedCandidate
-      ? `להסיר את ${selectedCandidate.name || selectedCandidate.symbol || '(ללא שם)'}?`
-      : ''
-  }
-  onConfirm={confirmDeleteCandidate}
-  onCancel={() => setShowDeleteConfirm(false)}
-/>
-
+        open={showDeleteConfirm}
+        message={
+          selectedCandidate
+            ? t('groupSettings.deleteCandidateConfirm', {
+                name:
+                  selectedCandidate.name ||
+                  selectedCandidate.symbol ||
+                  t('common.noName'),
+              })
+            : ''
+        }
+        onConfirm={confirmDeleteCandidate}
+        onCancel={() => setShowDeleteConfirm(false)}
+      />
     </div>
   );
 }

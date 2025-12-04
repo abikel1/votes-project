@@ -28,8 +28,7 @@ export default function CreateGroupPage() {
     name: '',
     description: '',
     endDate: '',
-    candidateEndDate: '', // <-- חדש
-
+    candidateEndDate: '',
     maxWinners: 1,
     isLocked: false,
   });
@@ -58,11 +57,10 @@ export default function CreateGroupPage() {
     setForm((prev) => ({ ...prev, isLocked: !prev.isLocked }));
   };
 
-
   // פתיחת חלון AI
   const openAiModal = () => {
     if (!form.name.trim()) {
-      toast.error('קודם צריך למלא שם קבוצה');
+      toast.error(t('groups.create.ai.fillNameFirstError'));
       return;
     }
     setAiModalOpen(true);
@@ -91,14 +89,8 @@ export default function CreateGroupPage() {
       return;
     }
 
-    if (!form.candidateEndDate) {
-      toast.error('תאריך סיום הגשת מועמדות חובה');
-      return;
-    }
-
     if (new Date(form.candidateEndDate) > new Date(form.endDate)) {
       toast.error(t('groups.create.errors.candidateAfterGroup'));
-
       return;
     }
 
@@ -108,8 +100,7 @@ export default function CreateGroupPage() {
       maxWinners: Number(form.maxWinners) || 1,
       isLocked: !!form.isLocked,
       endDate: new Date(form.endDate).toISOString(),
-      candidateEndDate: new Date(form.candidateEndDate).toISOString(), // <-- חדש
-
+      candidateEndDate: new Date(form.candidateEndDate).toISOString(),
     };
 
     dispatch(createGroup(payload));
@@ -148,7 +139,6 @@ export default function CreateGroupPage() {
       // אפשר לשים fallback אם תרצי
     }
   };
-
 
   const finishToGroup = () => {
     setShowModal(false);
@@ -197,12 +187,13 @@ export default function CreateGroupPage() {
               type="button"
               className="cg-ai-icon-btn"
               onClick={openAiModal}
-              title="עזרה בכתיבת תיאור עם AI"
+              title={t('groups.create.ai.tooltip')}
             >
               <span className="cg-ai-icon-text">✨</span>
             </button>
           </div>
         </label>
+
         {/* תאריך סיום הגשת מועמדות */}
         <label className="cg-label">
           {t('groups.create.labels.candidateEndDate')} *
@@ -216,6 +207,7 @@ export default function CreateGroupPage() {
             required
           />
         </label>
+
         {/* תאריך סיום קבוצה */}
         <label className="cg-label">
           {t('groups.create.labels.endDate')} *
@@ -228,7 +220,7 @@ export default function CreateGroupPage() {
             onChange={onChange}
             required
           />
-        </label >
+        </label>
 
         {/* מקסימום זוכים */}
         <label className="cg-label">
@@ -243,7 +235,6 @@ export default function CreateGroupPage() {
             onChange={onChange}
           />
         </label>
-
 
         {/* מצב קבוצה – פתוחה/נעולה */}
         <div className="cg-label">
@@ -262,9 +253,7 @@ export default function CreateGroupPage() {
           </div>
         </div>
 
-        {createError && (
-          <div className="cg-error">{createError}</div>
-        )}
+        {createError && <div className="cg-error">{createError}</div>}
 
         <div className="cg-actions">
           <button className="cg-btn" type="submit" disabled={createLoading}>
@@ -278,83 +267,74 @@ export default function CreateGroupPage() {
             onClick={() => navigate('/groups')}
           >
             {t('groups.create.buttons.cancel')}
-
-          </button >
-        </div >
-      </form >
+          </button>
+        </div>
+      </form>
 
       {/* מודל ה-AI החדש */}
-      < AiDescriptionModal
+      <AiDescriptionModal
         isOpen={aiModalOpen}
         groupName={form.name}
         onApply={(desc) => {
           setForm((prev) => ({ ...prev, description: desc }));
           setAiModalOpen(false);
-        }
-        }
+        }}
         onClose={() => setAiModalOpen(false)}
       />
 
       {/* חלון אחרי יצירת קבוצה */}
-      {
-        showModal && selectedGroup?._id && (
-          <div className="modal-backdrop" onClick={() => setShowModal(false)}>
-            <div className="modal" onClick={(e) => e.stopPropagation()}>
-              <h3 style={{ marginBottom: 8 }}>
-                {t('groups.create.modal.title')}
-              </h3>
+      {showModal && selectedGroup?._id && (
+        <div className="modal-backdrop" onClick={() => setShowModal(false)}>
+          <div className="modal" onClick={(e) => e.stopPropagation()}>
+            <h3 style={{ marginBottom: 8 }}>
+              {t('groups.create.modal.title')}
+            </h3>
 
-              {selectedGroup.isLocked && (
-                <div className="muted" style={{ marginBottom: 8 }}>
-                  {t('groups.create.modal.lockedInfo')}
-
-                </div >
-              )
-              }
-
-              <div style={{ marginBottom: 12 }}>
-                <div>{t('groups.create.modal.shareLinkLabel')}</div>
-                <div style={{ display: 'flex', gap: 8, marginTop: 6 }}>
-
-                  <input
-                    className="cg-input"
-                    readOnly
-                    value={prettyShareUrl}
-                    onFocus={(e) => e.target.select()}
-                    style={{ direction: 'ltr', textAlign: 'left' }}
-                  />
-
-                  <button
-                    className="gs-btn"
-                    type="button"
-                    onClick={copyShareUrl}
-                  >
-                    {copied
-                      ? t('groups.create.modal.shareCopied')
-                      : t('groups.create.modal.shareCopy')}
-                  </button>
-                </div>
+            {selectedGroup.isLocked && (
+              <div className="muted" style={{ marginBottom: 8 }}>
+                {t('groups.create.modal.lockedInfo')}
               </div>
+            )}
 
-              <div
-                className="actions-row"
-                style={{
-                  marginTop: 12,
-                  display: 'flex',
-                  gap: 8,
-                  justifyContent: 'flex-end',
-                }}
-              >
-                <button className="gs-btn" type="button" onClick={finishToGroup}>
-                  {t('groups.create.modal.finish')}
+            <div style={{ marginBottom: 12 }}>
+              <div>{t('groups.create.modal.shareLinkLabel')}</div>
+              <div style={{ display: 'flex', gap: 8, marginTop: 6 }}>
+                <input
+                  className="cg-input"
+                  readOnly
+                  value={prettyShareUrl}
+                  onFocus={(e) => e.target.select()}
+                  style={{ direction: 'ltr', textAlign: 'left' }}
+                />
 
+                <button
+                  className="gs-btn"
+                  type="button"
+                  onClick={copyShareUrl}
+                >
+                  {copied
+                    ? t('groups.create.modal.shareCopied')
+                    : t('groups.create.modal.shareCopy')}
                 </button>
               </div>
-            </div >
-          </div >
-        )}
-    </div >
+            </div>
+
+            <div
+              className="actions-row"
+              style={{
+                marginTop: 12,
+                display: 'flex',
+                gap: 8,
+                justifyContent: 'flex-end',
+              }}
+            >
+              <button className="gs-btn" type="button" onClick={finishToGroup}>
+                {t('groups.create.modal.finish')}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
   );
 }
-
-

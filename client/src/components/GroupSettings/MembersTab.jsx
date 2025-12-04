@@ -1,5 +1,6 @@
 // src/pages/GroupSettingsPage/MembersTab.jsx
 import MemberRow from './MemberRow';
+import { useTranslation } from 'react-i18next';
 
 export default function MembersTab({
   group,
@@ -7,13 +8,19 @@ export default function MembersTab({
   isOwner,
   onRemoveMember,
 }) {
+  const { t } = useTranslation();
+
   return (
     <section className="card">
       <details open className="acc">
-        <summary className="acc-sum">משתתפי הקבוצה</summary>
+        <summary className="acc-sum">
+          {t('members.title')}
+        </summary>
         <div className="acc-body">
           {!enrichedMembers?.length ? (
-            <div className="muted">אין משתתפים עדיין.</div>
+            <div className="muted">
+              {t('members.empty')}
+            </div>
           ) : (
             <ul className="list">
               {enrichedMembers.map((m) => {

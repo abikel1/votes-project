@@ -4,6 +4,7 @@ import { io } from 'socket.io-client';
 import http from '../../api/http';
 import EmojiPicker from 'emoji-picker-react';
 import './GroupChat.css';
+import { useTranslation } from 'react-i18next';
 
 const AVATAR_COLORS = [
     '#4f46e5',
@@ -29,11 +30,13 @@ function getColorForUser(key) {
 }
 
 export default function GroupChat({ groupId, canChat, currentUserId, isOwner }) {
+    const { t } = useTranslation();
+
     const [messages, setMessages] = useState([]);
     const [text, setText] = useState('');
     const [loading, setLoading] = useState(false);
     const [sending, setSending] = useState(false);
-    const [error, setError] = useState('');
+    const [error, setError] = useState('');           // נשמור KEY, לא טקסט
     const [menuOpenFor, setMenuOpenFor] = useState(null);
     const [editingId, setEditingId] = useState(null);
     const messagesEndRef = useRef(null);
@@ -41,7 +44,7 @@ export default function GroupChat({ groupId, canChat, currentUserId, isOwner }) 
     const [isAtBottom, setIsAtBottom] = useState(true);
 
     const [summaryLoading, setSummaryLoading] = useState(false);
-    const [summaryError, setSummaryError] = useState('');
+    const [summaryError, setSummaryError] = useState(''); // גם כאן KEY
     const [moreOpen, setMoreOpen] = useState(false);
 
     const [showEmojiPicker, setShowEmojiPicker] = useState(false);
@@ -73,7 +76,7 @@ export default function GroupChat({ groupId, canChat, currentUserId, isOwner }) 
             } catch (err) {
                 if (!isCancelled) {
                     console.error('failed to fetch chat messages', err);
-                    setError('שגיאה בטעינת ההודעות');
+                    setError('chat.errors.loadFailed');
                 }
             } finally {
                 if (!isCancelled) setLoading(false);
@@ -179,7 +182,7 @@ export default function GroupChat({ groupId, canChat, currentUserId, isOwner }) 
                 },
                 (res) => {
                     if (!res || !res.ok) {
-                        setError(res?.message || 'שגיאה בעדכון ההודעה');
+                        setError('chat.errors.updateFailed');
                     }
                     setSending(false);
                 }
@@ -199,7 +202,7 @@ export default function GroupChat({ groupId, canChat, currentUserId, isOwner }) 
             },
             (res) => {
                 if (!res || !res.ok) {
-                    setError(res?.message || 'שגיאה בשליחת ההודעה');
+                    setError('chat.errors.sendFailed');
                 }
                 setSending(false);
             }
@@ -211,7 +214,7 @@ export default function GroupChat({ groupId, canChat, currentUserId, isOwner }) 
 
     const handleDelete = (messageId) => {
         if (!messageId || !groupId) return;
-        if (!window.confirm('למחוק את ההודעה?')) return;
+        if (!window.confirm(t('chat.confirmDelete'))) return;
         if (!socket) return;
 
         setSending(true);
@@ -222,7 +225,7 @@ export default function GroupChat({ groupId, canChat, currentUserId, isOwner }) 
             { groupId, messageId },
             (res) => {
                 if (!res || !res.ok) {
-                    setError(res?.message || 'שגיאה במחיקת ההודעה');
+                    setError('chat.errors.deleteFailed');
                 }
                 setSending(false);
                 setMenuOpenFor(null);
@@ -267,7 +270,7 @@ export default function GroupChat({ groupId, canChat, currentUserId, isOwner }) 
             { groupId },
             (res) => {
                 if (!res || !res.ok) {
-                    setSummaryError(res?.message || 'שגיאה בסיכום השיחה');
+                    setSummaryError('chat.errors.summaryFailed');
                     setSummaryLoading(false);
                 }
             }
@@ -291,28 +294,36 @@ export default function GroupChat({ groupId, canChat, currentUserId, isOwner }) 
     return (
         <div className="group-chat">
             <div className="group-chat-header-row">
-                <div className="group-chat-top-title">צ'אט</div>
+                <div className="group-chat-top-title">{t('chat.title')}</div>
             </div>
 
             {!canChat && (
                 <div className="group-chat-note">
-                    ניתן לקרוא הודעות בלבד. רק חברי קבוצה יכולים לכתוב.
+                    {t('chat.readOnlyNote')}
                 </div>
             )}
 
             <div className="group-chat-body">
                 {loading && messages.length === 0 && (
-                    <div className="group-chat-status">טוען הודעות…</div>
+                    <div className="group-chat-status">
+                        {t('chat.loading')}
+                    </div>
                 )}
 
-                {error && <div className="group-chat-error">{error}</div>}
+                {error && (
+                    <div className="group-chat-error">
+                        {t(error)}
+                    </div>
+                )}
                 {summaryError && (
-                    <div className="group-chat-error">{summaryError}</div>
+                    <div className="group-chat-error">
+                        {t(summaryError)}
+                    </div>
                 )}
 
                 {!loading && messages.length === 0 && !error && (
                     <div className="group-chat-status">
-                        אין הודעות עדיין. אפשר להתחיל את השיחה 🙂
+                        {t('chat.noMessages')}
                     </div>
                 )}
 
@@ -346,7 +357,7 @@ export default function GroupChat({ groupId, canChat, currentUserId, isOwner }) 
 
                         const displayName = isAi
                             ? 'AI'
-                            : msg.senderName || msg.senderEmail || 'משתתף';
+                            : msg.senderName || msg.senderEmail || t('chat.participantFallback');
 
                         const avatarUrl =
                             msg.senderAvatar ||
@@ -356,7 +367,7 @@ export default function GroupChat({ groupId, canChat, currentUserId, isOwner }) 
                             null;
 
                         const textToShow = isDeleted
-                            ? msg.text || 'הודעה נמחקה'
+                            ? msg.text || t('chat.messageDeleted')
                             : msg.text || '';
 
                         const initial = displayName ? displayName.trim().charAt(0) : '?';
@@ -373,13 +384,14 @@ export default function GroupChat({ groupId, canChat, currentUserId, isOwner }) 
                         return (
                             <div
                                 key={id}
-                                className={`group-chat-message-row ${isMineBase ? 'mine' : 'theirs'
-                                    } ${isAi ? 'ai' : ''}`}
+                                className={`group-chat-message-row ${
+                                    isMineBase ? 'mine' : 'theirs'
+                                } ${isAi ? 'ai' : ''}`}
                             >
                                 <div
-                                    className={`group-chat-message ${isMineBase ? 'mine' : 'theirs'
-                                        } ${isDeleted ? 'deleted' : ''} ${isAi ? 'ai' : ''
-                                        }`}
+                                    className={`group-chat-message ${
+                                        isMineBase ? 'mine' : 'theirs'
+                                    } ${isDeleted ? 'deleted' : ''} ${isAi ? 'ai' : ''}`}
                                 >
                                     <div className="group-chat-message-header">
                                         <span className="group-chat-sender">{displayName}</span>
@@ -399,7 +411,7 @@ export default function GroupChat({ groupId, canChat, currentUserId, isOwner }) 
                                                                 prev === id ? null : id
                                                             )
                                                         }
-                                                        title="אפשרויות"
+                                                        title={t('chat.menu.optionsTitle')}
                                                     >
                                                         <FiMoreVertical size={14} />
                                                     </button>
@@ -411,14 +423,14 @@ export default function GroupChat({ groupId, canChat, currentUserId, isOwner }) 
                                                                     type="button"
                                                                     onClick={() => handleStartEdit(msg)}
                                                                 >
-                                                                    עריכה
+                                                                    {t('chat.menu.edit')}
                                                                 </button>
                                                             )}
                                                             <button
                                                                 type="button"
                                                                 onClick={() => handleDelete(id)}
                                                             >
-                                                                מחיקה
+                                                                {t('chat.menu.delete')}
                                                             </button>
                                                         </div>
                                                     )}
@@ -455,9 +467,9 @@ export default function GroupChat({ groupId, canChat, currentUserId, isOwner }) 
 
             {editingId && (
                 <div className="group-chat-edit-bar">
-                    <span>עורך/ת הודעה</span>
+                    <span>{t('chat.editingBar.text')}</span>
                     <button type="button" onClick={handleCancelEdit}>
-                        ביטול
+                        {t('chat.editingBar.cancel')}
                     </button>
                 </div>
             )}
@@ -471,7 +483,7 @@ export default function GroupChat({ groupId, canChat, currentUserId, isOwner }) 
                             setMoreOpen((prev) => !prev);
                             setShowEmojiPicker(false);
                         }}
-                        title="פעולות נוספות"
+                        title={t('chat.moreButton.title')}
                         disabled={!canChat || sending}
                     >
                         +
@@ -484,7 +496,9 @@ export default function GroupChat({ groupId, canChat, currentUserId, isOwner }) 
                                 onClick={handleSummaryClickFromMenu}
                                 disabled={summaryLoading || messages.length === 0}
                             >
-                                {summaryLoading ? 'מסכם…' : 'סיכום שיחה AI'}
+                                {summaryLoading
+                                    ? t('chat.moreMenu.summarizing')
+                                    : t('chat.moreMenu.summary')}
                             </button>
                         </div>
                     )}
@@ -495,7 +509,9 @@ export default function GroupChat({ groupId, canChat, currentUserId, isOwner }) 
                         ref={inputRef}
                         type="text"
                         placeholder={
-                            canChat ? 'הקלד/י הודעה…' : 'אין לך הרשאה לכתוב בצ׳אט'
+                            canChat
+                                ? t('chat.input.placeholder')
+                                : t('chat.input.readonlyPlaceholder')
                         }
                         value={text}
                         onChange={(e) => setText(e.target.value)}
@@ -514,7 +530,7 @@ export default function GroupChat({ groupId, canChat, currentUserId, isOwner }) 
                                 setShowEmojiPicker((prev) => !prev);
                                 setMoreOpen(false);
                             }}
-                            title="אימוג׳ים"
+                            title={t('chat.emojiButton.title')}
                             disabled={!canChat || sending}
                         >
                             <FiSmile size={18} />
@@ -524,7 +540,7 @@ export default function GroupChat({ groupId, canChat, currentUserId, isOwner }) 
                             <div className="emoji-picker-popover">
                                 <EmojiPicker
                                     onEmojiClick={handleEmojiClick}
-                                    searchPlaceholder="חיפוש"
+                                    searchPlaceholder={t('chat.emoji.searchPlaceholder')}
                                     previewConfig={{ showPreview: false }}
                                     lazyLoadEmojis
                                 />
@@ -537,7 +553,7 @@ export default function GroupChat({ groupId, canChat, currentUserId, isOwner }) 
                     type="submit"
                     className="chat-send-btn group-chat-send-btn"
                     disabled={!canChat || sending || !text.trim()}
-                    title="שליחת הודעה"
+                    title={t('chat.sendButton.title')}
                 >
                     <FiSend size={16} />
                 </button>

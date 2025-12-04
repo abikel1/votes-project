@@ -1,4 +1,6 @@
 // src/pages/GroupSettingsPage/JoinRequestsTab.jsx
+import { useTranslation } from 'react-i18next';
+
 export default function JoinRequestsTab({
   groupId,
   reqs,
@@ -7,17 +9,33 @@ export default function JoinRequestsTab({
   onApprove,
   onReject,
 }) {
+  const { t, i18n } = useTranslation();
+
+  const formatDateTime = (iso) => {
+    if (!iso) return '';
+    try {
+      return new Date(iso).toLocaleString(
+        i18n.language === 'he' ? 'he-IL' : 'en-GB',
+      );
+    } catch {
+      return iso;
+    }
+  };
+
   return (
     <section className="card">
       <details open className="acc">
-        <summary className="acc-sum">בקשות הצטרפות</summary>
+        <summary className="acc-sum">
+          {t('joinRequests.title')}
+        </summary>
         <div className="acc-body">
           {reqsLoading ? (
-            <div>טוען בקשות…</div>
+            <div>{t('joinRequests.loading')}</div>
           ) : reqsError ? (
+            // שגיאה גולמית מהשרת – משאירים כמו שהיא, לא מנסים לתרגם
             <div className="err">{reqsError}</div>
           ) : !reqs.length ? (
-            <div className="muted">אין בקשות כרגע.</div>
+            <div className="muted">{t('joinRequests.empty')}</div>
           ) : (
             <ul className="list">
               {reqs.map((r) => (
@@ -25,7 +43,7 @@ export default function JoinRequestsTab({
                   <div className="row-main">
                     <div className="title">{r.name || r.email}</div>
                     <div className="sub">
-                      {r.email} · {new Date(r.createdAt).toLocaleString('he-IL')}
+                      {r.email} · {formatDateTime(r.createdAt)}
                     </div>
                   </div>
                   <div className="row-actions">
@@ -33,13 +51,13 @@ export default function JoinRequestsTab({
                       className="small"
                       onClick={() => onApprove(r)}
                     >
-                      אשר/י
+                      {t('joinRequests.approve')}
                     </button>
                     <button
                       className="small danger"
                       onClick={() => onReject(r)}
                     >
-                      דחה/י
+                      {t('joinRequests.reject')}
                     </button>
                   </div>
                 </li>

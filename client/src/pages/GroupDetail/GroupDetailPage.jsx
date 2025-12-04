@@ -4,9 +4,9 @@ import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { HiClock, HiUserGroup, HiUser, HiOutlineBadgeCheck } from 'react-icons/hi';
 import toast from 'react-hot-toast';
-import { FiSettings, FiMessageSquare, FiX, FiStar } from 'react-icons/fi';
+import { FiSettings, FiMessageSquare, FiX } from 'react-icons/fi';
 import { BiArrowBack } from 'react-icons/bi';
-import { FiZap } from "react-icons/fi";
+import { FiZap } from 'react-icons/fi';
 
 import CountdownTimer from '../../components/CountdownTimer/CountdownTimer';
 import GroupChat from '../../components/GroupChat/GroupChat';
@@ -41,6 +41,7 @@ import {
 
 import http from '../../api/http';
 import CandidateApplyForm from '../../components/CandidateApplyForm';
+import { useTranslation } from 'react-i18next';
 
 // צבעים לגרפים
 const COLORS = [
@@ -67,6 +68,7 @@ export default function GroupDetailPage() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
+  const { t } = useTranslation();
 
   const navGroupId = location.state?.groupId || null;
   const [groupId, setGroupId] = useState(navGroupId);
@@ -118,11 +120,10 @@ export default function GroupDetailPage() {
   const createdById = String(group?.createdById ?? '');
 
   const isOwner =
-    isAdmin || // 👑 אדמין נחשב כמו בעל/ת הקבוצה
+    isAdmin ||
     !!group?.isOwner ||
     (!!myEmail && !!createdByEmail && myEmail === createdByEmail) ||
     (!!myId && !!createdById && myId === createdById);
-
 
   const isMember =
     !!joinedIdsSet &&
@@ -186,19 +187,19 @@ export default function GroupDetailPage() {
   if (groupError) {
     return (
       <div className="group-detail-error">
-        שגיאה בטעינת הקבוצה.
+        {t('groups.detail.error.loadFailed')}
         <button
           className="group-detail-back-btn"
           onClick={() => navigate('/groups')}
         >
-          חזרה לרשימת הקבוצות
+          {t('groups.detail.buttons.backToList')}
         </button>
       </div>
     );
   }
 
   if (!groupId) {
-    return <div className="loading-wrap">טוען נתוני קבוצה…</div>;
+    return <div className="loading-wrap">{t('groups.detail.loading')}</div>;
   }
 
   const now = new Date();
@@ -227,7 +228,7 @@ export default function GroupDetailPage() {
   }
 
   if (groupLoading || !group) {
-    return <div className="loading-wrap">טוען נתוני קבוצה…</div>;
+    return <div className="loading-wrap">{t('groups.detail.loading')}</div>;
   }
 
   // candidateRequests מהשרת (מגיעים ב-getGroupById)
@@ -256,13 +257,14 @@ export default function GroupDetailPage() {
             className="back-btn"
             onClick={() => navigate('/groups')}
           >
-            כל הקבוצות
+            {t('groups.detail.buttons.backToGroups')}
           </button>
 
-          <h2 className="page-title">קבוצה נעולה</h2>
+          <h2 className="page-title">
+            {t('groups.detail.locked.title')}
+          </h2>
           <p className="group-description">
-            קבוצה זו נעולה. כדי לבקש הצטרפות עליה יש להתחבר למערכת ולאחר מכן לשלוח
-            בקשת הצטרפות מעמוד &quot;קבוצות&quot;.
+            {t('groups.detail.locked.mustLogin')}
           </p>
         </div>
 
@@ -278,7 +280,7 @@ export default function GroupDetailPage() {
               })
             }
           >
-            בקשת הצטרפות
+            {t('groups.detail.buttons.joinRequest')}
           </button>
         </div>
       </div>
@@ -294,13 +296,14 @@ export default function GroupDetailPage() {
             className="back-btn"
             onClick={() => navigate('/groups')}
           >
-            כל הקבוצות
+            {t('groups.detail.buttons.backToGroups')}
           </button>
 
-          <h2 className="page-title">קבוצה נעולה</h2>
+          <h2 className="page-title">
+            {t('groups.detail.locked.title')}
+          </h2>
           <p className="group-description">
-            אינך מחובר/ת לקבוצה זו. כדי להצטרף, חזור/י לעמוד הקבוצות ולחץ/י על
-            &quot;בקשת הצטרפות&quot; בקבוצה המתאימה.
+            {t('groups.detail.locked.notMember')}
           </p>
         </div>
       </div>
@@ -316,7 +319,7 @@ export default function GroupDetailPage() {
   };
 
   const formatDate = (dateString) => {
-    if (!dateString) return 'לא זמין';
+    if (!dateString) return t('groups.detail.meta.notAvailable');
     const date = new Date(dateString);
     return date.toLocaleDateString('he-IL');
   };
@@ -331,7 +334,9 @@ export default function GroupDetailPage() {
     .map((c) => ({ name: c.name, value: c.votesCount || 0 }));
 
   const barData = (sortedCandidates || []).map((c) => ({
-    name: c.name ? (c.name.length > 12 ? c.name.substring(0, 12) + '...' : c.name) : 'לא ידוע',
+    name: c.name
+      ? (c.name.length > 12 ? c.name.substring(0, 12) + '...' : c.name)
+      : t('groups.detail.candidates.unknownName'),
     votesCount: c.votesCount || 0,
   }));
 
@@ -347,7 +352,11 @@ export default function GroupDetailPage() {
         </div>
 
         {isOwner && (
-          <button className="icon-btn" onClick={goSettings} title="הגדרות קבוצה">
+          <button
+            className="icon-btn"
+            onClick={goSettings}
+            title={t('groups.detail.buttons.settings')}
+          >
             <FiSettings size={20} />
           </button>
         )}
@@ -356,7 +365,7 @@ export default function GroupDetailPage() {
         <button
           className="icon-btn"
           onClick={() => navigate('/groups')}
-          title="חזרה לקבוצות"
+          title={t('groups.detail.buttons.backToGroups')}
         >
           <BiArrowBack size={20} />
         </button>
@@ -365,15 +374,21 @@ export default function GroupDetailPage() {
       <div className="meta-and-button">
         <div className="group-meta">
           <div>
-            <span className="meta-label">תאריך יצירה:</span>
+            <span className="meta-label">
+              {t('groups.detail.meta.creationDate')}
+            </span>
             <span className="meta-value">{formatDate(group.creationDate)}</span>
           </div>
           <div>
-            <span className="meta-label">תאריך סיום:</span>
+            <span className="meta-label">
+              {t('groups.detail.meta.endDate')}
+            </span>
             <span className="meta-value">{formatDate(group.endDate)}</span>
           </div>
           <div>
-            <span className="meta-label">סך הצבעות:</span>
+            <span className="meta-label">
+              {t('groups.detail.meta.totalVotes')}
+            </span>
             <span className="meta-value">{totalVotes}</span>
           </div>
         </div>
@@ -383,7 +398,7 @@ export default function GroupDetailPage() {
             className="vote-btn"
             onClick={() => {
               if (!isAuthed) {
-                toast.error('אינך מחובר/ת. כדי להצביע צריך להתחבר.');
+                toast.error(t('groups.detail.toast.mustLoginToVote'));
                 return;
               }
 
@@ -392,20 +407,28 @@ export default function GroupDetailPage() {
               });
             }}
           >
-            להצבעה בקלפי
+            {t('groups.detail.buttons.goVote')}
           </button>
         )}
       </div>
 
-      {errorCandidates && <p className="err">❌ שגיאה: {errorCandidates}</p>}
+      {errorCandidates && (
+        <p className="err">
+          ❌ {t('groups.detail.error.candidatesFailed')}: {errorCandidates}
+        </p>
+      )}
 
       <div className="main-content-resizable" ref={containerRef}>
         {/* צד שמאל – מועמדים */}
         <div className="left-section" style={{ width: `${leftWidth}%` }}>
           <div className="candidates-container">
-            <h3 className="section-title">המועמדים</h3>
+            <h3 className="section-title">
+              {t('groups.detail.candidates.title')}
+            </h3>
 
-            {loadingCandidates && <p>טוען מועמדים...</p>}
+            {loadingCandidates && (
+              <p>{t('groups.detail.candidates.loading')}</p>
+            )}
 
             {!loadingCandidates && candidates.length > 0 && (
               <div className="candidates-grid">
@@ -413,18 +436,21 @@ export default function GroupDetailPage() {
                   const winnerIndex = winners.findIndex((w) => w._id === c._id);
 
                   return (
-                    <div key={c._id} className={`candidate-card ${winnerIndex !== -1 ? 'winner' : ''}`}>
+                    <div
+                      key={c._id}
+                      className={`candidate-card ${winnerIndex !== -1 ? 'winner' : ''
+                        }`}
+                    >
                       {c.photoUrl && (
                         <img
-                          src={c.photoUrl || '/h.jpg'}           // אם אין URL – ברירת מחדל
-                          alt={c.name || 'תמונת מועמד'}
+                          src={c.photoUrl || '/h.jpg'}
+                          alt={t('groups.detail.candidates.imageAlt')}
                           className="candidate-avatar"
                           onError={(e) => {
-                            e.currentTarget.onerror = null;      // מונע loop אם גם הברירת מחדל לא קיימת
-                            e.currentTarget.src = '/h.jpg';     // מציב ברירת מחדל במקרה של שגיאה בטעינה
+                            e.currentTarget.onerror = null;
+                            e.currentTarget.src = '/h.jpg';
                           }}
                         />
-
                       )}
 
                       {/* אם הקבוצה נגמרה והמועמד מנצח – הצג מקום */}
@@ -434,14 +460,15 @@ export default function GroupDetailPage() {
                         </div>
                       )}
 
-
                       {c.userId && (
                         <button
                           className="campaign-btn"
                           onClick={() =>
-                            navigate(`/campaign/${c._id}`, { state: { groupId } })
+                            navigate(`/campaign/${c._id}`, {
+                              state: { groupId },
+                            })
                           }
-                          title="קמפיין שלי"
+                          title={t('groups.detail.candidates.myCampaignTitle')}
                         >
                           <FiZap size={16} />
                         </button>
@@ -452,10 +479,11 @@ export default function GroupDetailPage() {
                         {c.description && <p>{c.description}</p>}
                       </div>
 
-
-
                       {isGroupExpired && (
-                        <div className="votes-count">{c.votesCount || 0} קולות</div>
+                        <div className="votes-count">
+                          {c.votesCount || 0}{' '}
+                          {t('groups.detail.candidates.cardVotesSuffix')}
+                        </div>
                       )}
                     </div>
                   );
@@ -463,7 +491,9 @@ export default function GroupDetailPage() {
               </div>
             )}
 
-            {!loadingCandidates && candidates.length === 0 && <p>אין מועמדים</p>}
+            {!loadingCandidates && candidates.length === 0 && (
+              <p>{t('groups.detail.candidates.none')}</p>
+            )}
           </div>
         </div>
 
@@ -494,23 +524,23 @@ export default function GroupDetailPage() {
               <div className="group-info-grid">
                 <div className="info-card">
                   <HiClock size={28} color="#1e3a8a" />
-                  <p>זמן עד סיום</p>
+                  <p>{t('groups.detail.infoCards.timeLeft')}</p>
                   <CountdownTimer endDate={group.endDate} />
                 </div>
 
                 <div className="info-card">
                   <HiUserGroup size={28} color="#1e3a8a" />
-                  <p>סך הצבעות</p>
+                  <p>{t('groups.detail.infoCards.totalVotes')}</p>
                   <h4>{totalVotes}</h4>
                 </div>
                 <div className="info-card">
                   <HiUser size={28} color="#1e3a8a" />
-                  <p>מספר מועמדים</p>
+                  <p>{t('groups.detail.infoCards.candidatesCount')}</p>
                   <h4>{candidates.length}</h4>
                 </div>
                 <div className="info-card">
                   <HiOutlineBadgeCheck size={28} color="#1e3a8a" />
-                  <p>מספר מקומות לזוכים</p>
+                  <p>{t('groups.detail.infoCards.winnersCount')}</p>
                   <h4>{group.maxWinners}</h4>
                 </div>
               </div>
@@ -520,7 +550,7 @@ export default function GroupDetailPage() {
           {isGroupExpired && totalVotes > 0 && (
             <div className="charts">
               <div className="pie-chart-container">
-                <h3>אחוזי הצבעה</h3>
+                <h3>{t('groups.detail.charts.pieTitle')}</h3>
                 <ResponsiveContainer width="100%" height={250}>
                   <PieChart>
                     <Pie
@@ -538,14 +568,20 @@ export default function GroupDetailPage() {
                         />
                       ))}
                     </Pie>
-                    <Tooltip formatter={(v) => `${v} קולות`} />
+                    <Tooltip
+                      formatter={(v) =>
+                        `${v} ${t(
+                          'groups.detail.charts.tooltipVotesSuffix',
+                        )}`
+                      }
+                    />
                     <Legend verticalAlign="bottom" height={25} />
                   </PieChart>
                 </ResponsiveContainer>
               </div>
 
               <div className="bar-chart-container">
-                <h3>מספר קולות</h3>
+                <h3>{t('groups.detail.charts.barTitle')}</h3>
                 <ResponsiveContainer width="100%" height={250}>
                   <BarChart data={barData}>
                     <XAxis
@@ -556,7 +592,13 @@ export default function GroupDetailPage() {
                       interval={0}
                     />
                     <YAxis />
-                    <Tooltip formatter={(v) => `${v} קולות`} />
+                    <Tooltip
+                      formatter={(v) =>
+                        `${v} ${t(
+                          'groups.detail.charts.tooltipVotesSuffix',
+                        )}`
+                      }
+                    />
                     <Bar dataKey="votesCount" fill="#003366" />
                   </BarChart>
                 </ResponsiveContainer>
@@ -566,7 +608,7 @@ export default function GroupDetailPage() {
 
           {isGroupExpired && totalVotes === 0 && (
             <div className="no-votes-message">
-              🕐 אין הצבעות — לא ניתן להציג גרפים
+              {t('groups.detail.charts.noVotes')}
             </div>
           )}
         </div>
@@ -595,7 +637,6 @@ export default function GroupDetailPage() {
           )}
         </>
       )}
-
     </div>
   );
 }

@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import CandidateForm from '../../components/GroupSettings/CandidateForm';
 import http from '../../api/http';
+import { useTranslation } from 'react-i18next';
 
 export default function CandidatesTab({
   candidates,
@@ -17,6 +18,8 @@ export default function CandidatesTab({
   newFileInputRef,
   clearNewPhoto,
 }) {
+  const { t } = useTranslation();
+
   // ✅ State מקומי להעלאת תמונה
   const [localUploading, setLocalUploading] = useState(false);
 
@@ -29,9 +32,13 @@ export default function CandidatesTab({
       const formData = new FormData();
       formData.append('image', file);
 
-      const { data } = await http.post('http://localhost:3000/api/upload', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      });
+      const { data } = await http.post(
+        'http://localhost:3000/api/upload',
+        formData,
+        {
+          headers: { 'Content-Type': 'multipart/form-data' },
+        },
+      );
 
       // שומרים רק URL כדי לא להעמיס על ה־Redux / האתר
       setCandForm((prev) => ({
@@ -40,7 +47,7 @@ export default function CandidatesTab({
       }));
     } catch (err) {
       console.error('Upload error:', err);
-      alert('שגיאה בהעלאת התמונה');
+      alert(t('candidates.upload.error'));
     } finally {
       setLocalUploading(false);
     }
@@ -50,14 +57,21 @@ export default function CandidatesTab({
     <section className="card">
       {/* רשימת מועמדים קיימים */}
       <details open className="acc">
-        <summary className="acc-sum">מועמדים</summary>
+        <summary className="acc-sum">
+          {t('candidates.tab.title')}
+        </summary>
         <div className="acc-body">
           {candLoading ? (
-            <div>טוען מועמדים…</div>
+            <div>{t('candidates.list.loading')}</div>
           ) : candError ? (
-            <div className="err">{candError}</div>
+            <div className="err">
+              {/* אם candError הוא key – יתרגם; אם טקסט רגיל – יציג אותו כמו שהוא */}
+              {t(candError)}
+            </div>
           ) : !candidates.length ? (
-            <div className="muted">אין מועמדים בקבוצה.</div>
+            <div className="muted">
+              {t('candidates.list.empty')}
+            </div>
           ) : (
             <ul className="list">
               {candidates.map((c) => (
@@ -65,36 +79,41 @@ export default function CandidatesTab({
                   <div className="row-main">
                     <div className="title">
                       {c.photoUrl && (
-
-
                         <img
-                          src={c.photoUrl || '/h.jpg'}           // אם אין URL – ברירת מחדל
-                          alt={c.name || 'תמונת מועמד'}
+                          src={c.photoUrl || '/h.jpg'} // אם אין URL – ברירת מחדל
+                          alt={
+                            c.name
+                              ? t('candidates.list.photoAltWithName', {
+                                  name: c.name,
+                                })
+                              : t('candidates.list.photoAlt')
+                          }
                           className="avatar"
                           onError={(e) => {
-                            e.currentTarget.onerror = null;      // מונע loop אם גם הברירת מחדל לא קיימת
-                            e.currentTarget.src = '/h.jpg';     // מציב ברירת מחדל במקרה של שגיאה בטעינה
+                            e.currentTarget.onerror = null;
+                            e.currentTarget.src = '/h.jpg';
                           }}
                         />
-
-
                       )}
-                      {c.name || '(ללא שם)'} {c.symbol ? `· ${c.symbol}` : ''}
+                      {c.name || t('candidates.list.noName')}{' '}
+                      {c.symbol ? `· ${c.symbol}` : ''}
                     </div>
-                    {c.description && <div className="sub">{c.description}</div>}
+                    {c.description && (
+                      <div className="sub">{c.description}</div>
+                    )}
                   </div>
                   <div className="row-actions">
                     <button
                       className="small"
                       onClick={() => onOpenEditCandidate(c)}
                     >
-                      עריכה
+                      {t('candidates.list.edit')}
                     </button>
                     <button
                       className="small danger"
                       onClick={() => onDeleteCandidate(c)}
                     >
-                      הסרה
+                      {t('candidates.list.remove')}
                     </button>
                   </div>
                 </li>
@@ -106,7 +125,9 @@ export default function CandidatesTab({
 
       {/* הוספת מועמד/ת חדש/ה */}
       <details className="acc">
-        <summary className="acc-sum">הוספת מועמד/ת</summary>
+        <summary className="acc-sum">
+          {t('candidates.add.title')}
+        </summary>
         <div className="acc-body">
           <CandidateForm
             form={candForm}
@@ -120,7 +141,7 @@ export default function CandidatesTab({
             onUploadFile={onUploadNew}
             fileInputRef={newFileInputRef}
             clearPhoto={clearNewPhoto}
-            submitLabel="הוסף/י מועמד/ת"
+            submitLabel={t('candidates.add.submit')}
             submitDisabled={localUploading}
           />
         </div>

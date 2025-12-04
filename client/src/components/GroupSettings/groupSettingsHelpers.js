@@ -30,12 +30,12 @@ export function getReqUserId(r) {
   return (
     String(
       r.userId ??
-        r.user_id ??
-        r.applicantId ??
-        r.applicant_id ??
-        r.user?._id ??
-        r.user?.id ??
-        '',
+      r.user_id ??
+      r.applicantId ??
+      r.applicant_id ??
+      r.user?._id ??
+      r.user?.id ??
+      '',
     ) || null
   );
 }
@@ -84,19 +84,19 @@ export function validateCandidateFields({ name, description, symbol }) {
   const trimmedSymbol = (symbol || '').trim();
 
   if (!trimmedName) {
-    errors.name = 'שם הוא שדה חובה';
+    errors.name = 'candidates.validation.nameRequired';
   } else if (trimmedName.length < 2) {
-    errors.name = 'השם צריך להיות לפחות באורך 2 תווים';
+    errors.name = 'candidates.validation.nameTooShort';
   } else if (trimmedName.length > 50) {
-    errors.name = 'השם ארוך מדי (מקסימום 50 תווים)';
+    errors.name = 'candidates.validation.nameTooLong';
   }
 
   if (trimmedDesc && trimmedDesc.length > 500) {
-    errors.description = 'התיאור ארוך מדי (מקסימום 500 תווים)';
+    errors.description = 'candidates.validation.descriptionTooLong';
   }
 
   if (trimmedSymbol && trimmedSymbol.length > 3) {
-    errors.symbol = 'הסמל יכול להכיל עד 3 תווים';
+    errors.symbol = 'candidates.validation.symbolTooLong';
   }
 
   return errors;

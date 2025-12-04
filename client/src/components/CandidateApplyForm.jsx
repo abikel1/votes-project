@@ -1,6 +1,7 @@
 // src/components/CandidateApplyForm.jsx
 import { useDispatch, useSelector } from 'react-redux';
 import { useState, useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import toast from 'react-hot-toast';
 
 import {
@@ -17,6 +18,7 @@ import '../pages/Register/RegisterPage.css';
 
 export default function CandidateApplyForm({ groupId, candidateRequests = [] }) {
   const dispatch = useDispatch();
+  const { t } = useTranslation();
 
   const loading = useSelector(selectApplyingCandidate);
   const error = useSelector(selectApplyCandidateError);
@@ -74,61 +76,61 @@ export default function CandidateApplyForm({ groupId, candidateRequests = [] }) 
       setForm((prev) => ({ ...prev, photoUrl: url }));
     } catch (err) {
       console.error('Upload error:', err);
-      toast.error('שגיאה בהעלאת התמונה');
+      toast.error(t('candidates.upload.error'));
     } finally {
       setUploading(false);
     }
   };
 
-const handleSubmit = async (e) => {
-  e.preventDefault();
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-  if (!groupId) {
-    toast.error('קבוצה לא תקינה');
-    return;
-  }
-
-  if (!form.name.trim()) {
-    setErrors((prev) => ({ ...prev, name: 'שם מלא חובה' }));
-    toast.error('שם מלא חובה');
-    return;
-  }
-
-  try {
-    // ✅ כאן מוסיפים ברירת מחדל אם אין תמונה
-    const candidateData = {
-      groupId,
-      name: form.name.trim(),
-      description: form.description.trim(),
-      symbol: form.symbol.trim(),
-      photoUrl: form.photoUrl.trim() || '/h.jpg', // ← ברירת מחדל
-    };
-
-    const out = await dispatch(applyCandidate(candidateData)).unwrap();
-
-    if (out?.request) {
-      setUserRequest(out.request);
+    if (!groupId) {
+      toast.error(t('candidateApply.invalidGroup'));
+      return;
     }
 
-    toast.success('בקשת המועמדות הוגשה למנהל/ת הקבוצה!');
-    setForm({ name: '', description: '', symbol: '', photoUrl: '' });
-    setErrors({});
-    clearPhoto();
-  } catch (err) {
-    const message = err?.message || 'שגיאה בלתי צפויה';
-    toast.error(message);
-  }
-};
+    if (!form.name.trim()) {
+      const msg = t('candidateApply.nameRequired');
+      setErrors((prev) => ({ ...prev, name: msg }));
+      toast.error(msg);
+      return;
+    }
+
+    try {
+      const candidateData = {
+        groupId,
+        name: form.name.trim(),
+        description: form.description.trim(),
+        symbol: form.symbol.trim(),
+        photoUrl: form.photoUrl.trim() || '/h.jpg',
+      };
+
+      const out = await dispatch(applyCandidate(candidateData)).unwrap();
+
+      if (out?.request) {
+        setUserRequest(out.request);
+      }
+
+      toast.success(t('candidateApply.success'));
+      setForm({ name: '', description: '', symbol: '', photoUrl: '' });
+      setErrors({});
+      clearPhoto();
+    } catch (err) {
+      const message = err?.message || t('candidateApply.genericError');
+      toast.error(message);
+    }
+  };
 
 
   if (!groupId) {
-    return <p>❌ אין ID של קבוצה. נסי לרענן את העמוד.</p>;
+    return <p>{t('candidateApply.invalidGroup')}</p>;
   }
 
   if (!userId && !userEmail) {
     return (
       <div className="alert alert-info">
-        כדי להגיש מועמדות יש להתחבר למערכת.
+        {t('candidateApply.mustLogin')}
       </div>
     );
   }
@@ -138,7 +140,7 @@ const handleSubmit = async (e) => {
     if (userRequest.status === 'pending') {
       return (
         <div className="alert alert-info">
-          📝 בקשת המועמדות שלך נמצאת בבדיקה אצל המנהל/ת
+          {t('candidateApply.status.pending')}
         </div>
       );
     }
@@ -146,7 +148,7 @@ const handleSubmit = async (e) => {
     if (userRequest.status === 'approved') {
       return (
         <div className="alert alert-success">
-          ✅ בקשת המועמדות שלך אושרה. את/ה כבר מועמד/ת בקבוצה זו.
+          {t('candidateApply.status.approved')}
         </div>
       );
     }
@@ -157,20 +159,20 @@ const handleSubmit = async (e) => {
       {/* נדחה */}
       {userRequest?.status === 'rejected' && (
         <div className="alert alert-warning">
-          ⚠️ בקשת המועמדות שלך נדחתה – ניתן להגיש בקשה חדשה
+          {t('candidateApply.status.rejected')}
         </div>
       )}
 
       {/* נמחק */}
       {userRequest?.status === 'removed' && (
         <div className="alert alert-warning">
-          ⚠️ המועמדות הקודמת שלך נמחקה ע&quot;י המנהל/ת – ניתן להגיש בקשה חדשה
+          {t('candidateApply.status.removed')}
         </div>
       )}
 
       <div className="auth-header">
-        <h1>הגש מועמדות</h1>
-        <p>מלא/י את הפרטים למועמדות בקבוצה</p>
+        <h1>{t('candidateApply.title')}</h1>
+        <p>{t('candidateApply.subtitle')}</p>
       </div>
 
       <CandidateForm
@@ -182,7 +184,7 @@ const handleSubmit = async (e) => {
         onUploadFile={handleUpload}
         fileInputRef={fileInputRef}
         clearPhoto={clearPhoto}
-        submitLabel={loading ? 'טוען...' : 'הגש מועמדות'}
+        submitLabel={loading ? t('candidateApply.submitting') : t('candidateApply.submit')}
         submitDisabled={loading || uploading}
       />
 

@@ -96,6 +96,10 @@ i18n
                     'voting.noName': 'ללא שם',
 
                     'voting.voteErrorPrefix': 'שגיאה בהצבעה: ',
+
+                    'voting.insertEnvelope': 'הכנס מעטפה לקלפי',
+                    'voting.voteSuccessToast': 'הצבעתך נקלטה במערכת',
+                    'voting.confirmVoteMessage': 'את/ה בטוח/ה רוצה להצביע למועמד {{name}}?',
                     // === address autocomplete ===
                     'address.cityPlaceholder': '*עיר',
                     'address.streetPlaceholder': '*כתובת / רחוב',
@@ -518,6 +522,292 @@ i18n
                     'votes.errors.notLoggedIn': 'עליך להתחבר לפני ההצבעה',
                     'votes.errors.voteFailed': 'הצבעה נכשלה',
                     'votes.errors.fetchVotersFailed': 'טעינת רשימת המצביעים נכשלה',
+                    // === chat (group chat) ===
+                    'chat.title': "צ'אט",
+                    'chat.readOnlyNote': 'ניתן לקרוא הודעות בלבד. רק חברי קבוצה יכולים לכתוב.',
+                    'chat.loading': 'טוען הודעות…',
+                    'chat.noMessages': 'אין הודעות עדיין. אפשר להתחיל את השיחה 🙂',
+                    'chat.participantFallback': 'משתתף',
+                    'chat.messageDeleted': 'הודעה נמחקה',
+
+                    'chat.menu.optionsTitle': 'אפשרויות',
+                    'chat.menu.edit': 'עריכה',
+                    'chat.menu.delete': 'מחיקה',
+
+                    'chat.confirmDelete': 'למחוק את ההודעה?',
+                    'chat.editingBar.text': 'עורך/ת הודעה',
+                    'chat.editingBar.cancel': 'ביטול',
+
+                    'chat.moreButton.title': 'פעולות נוספות',
+                    'chat.moreMenu.summary': 'סיכום שיחה AI',
+                    'chat.moreMenu.summarizing': 'מסכם…',
+
+                    'chat.input.placeholder': 'הקלד/י הודעה…',
+                    'chat.input.readonlyPlaceholder': "אין לך הרשאה לכתוב בצ׳אט",
+
+                    'chat.emojiButton.title': 'אימוג׳ים',
+                    'chat.emoji.searchPlaceholder': 'חיפוש',
+
+                    'chat.sendButton.title': 'שליחת הודעה',
+
+                    'chat.errors.loadFailed': 'שגיאה בטעינת ההודעות',
+                    'chat.errors.sendFailed': 'שגיאה בשליחת ההודעה',
+                    'chat.errors.updateFailed': 'שגיאה בעדכון ההודעה',
+                    'chat.errors.deleteFailed': 'שגיאה במחיקת ההודעה',
+                    'chat.errors.summaryFailed': 'שגיאה בסיכום השיחה',
+                    // === candidates form ===
+                    'candidates.form.nameLabel': 'שם *',
+                    'candidates.form.descriptionLabel': 'תיאור *',
+                    'candidates.form.symbolLabel': 'סמל *',
+                    'candidates.form.symbolPlaceholder': 'למשל: א׳',
+                    'candidates.form.photoLabel': 'תמונה',
+                    'candidates.form.previewAlt': 'תצוגה מקדימה',
+                    'candidates.form.changePhoto': 'שינוי תמונה',
+                    'candidates.form.removePhoto': 'הסרת תמונה',
+                    'candidates.form.uploading': 'מעלה…',
+                    // === candidate requests tab ===
+                    'candidates.requests.title': 'בקשות מועמדות',
+                    'candidates.requests.loading': 'טוען…',
+                    'candidates.requests.empty': 'אין בקשות.',
+                    'candidates.requests.approve': 'אשר/י',
+                    'candidates.requests.reject': 'דחה/י',
+                    // === candidates tab (list & add) ===
+                    'candidates.tab.title': 'מועמדים',
+                    'candidates.list.loading': 'טוען מועמדים…',
+                    'candidates.list.empty': 'אין מועמדים בקבוצה.',
+                    'candidates.list.noName': '(ללא שם)',
+                    'candidates.list.photoAlt': 'תמונת מועמד',
+                    'candidates.list.photoAltWithName': 'תמונת מועמד {{name}}',
+                    'candidates.list.edit': 'עריכה',
+                    'candidates.list.remove': 'הסרה',
+
+                    'candidates.add.title': 'הוספת מועמד/ת',
+                    'candidates.add.submit': 'הוסף/י מועמד/ת',
+
+                    'candidates.upload.error': 'שגיאה בהעלאת התמונה',
+                    // === group settings – danger zone ===
+                    'groupSettings.danger.title': 'מחיקת קבוצה',
+                    'groupSettings.danger.warning': 'מחיקה היא פעולה בלתי הפיכה. כל נתוני הקבוצה יימחקו לכולם.',
+                    'groupSettings.danger.deleteButton': 'מחיקת הקבוצה…',
+                    // === group settings – delete modal ===
+                    'groupSettings.deleteModal.title': 'מחק/י את הקבוצה',
+                    'groupSettings.deleteModal.typeToConfirm': 'כדי לאשר, הקלד/י בתיבה את',
+                    'groupSettings.deleteModal.mustMatch': 'יש להקליד בדיוק את הערך לעיל',
+                    'groupSettings.deleteModal.deleteForever': 'מחיקת הקבוצה לצמיתות',
+                    // === edit candidate modal ===
+                    'candidates.edit.title': 'עריכת מועמד/ת',
+                    'candidates.edit.save': 'שמור/י',
+                    'candidates.edit.saving': 'שומר/ת…',
+                    // === common ===
+                    'common.edit': 'עריכה',
+
+                    // === group settings – general tab ===
+                    'groupSettings.general.title': 'פרטי הקבוצה',
+                    'groupSettings.general.status': 'סטטוס',
+                    'groupSettings.general.symbolLabel': 'סמל',
+                    'groupSettings.general.photoLabel': 'תמונה',
+                    'groupSettings.general.photoOpen': 'פתיחה',
+                    'groupSettings.general.createdBy': 'נוצר ע״י',
+                    'groupSettings.general.shareLinkLabel': 'קישור שיתוף',
+                    'groupSettings.general.shareInputAria': 'קישור לשיתוף',
+                    'groupSettings.general.shareCopy': 'העתק',
+                    'groupSettings.general.shareCopied': 'הועתק ✓',
+                    'groupSettings.general.shareHintLocked':
+                        'קבוצה נעולה: הקישור יבקש התחברות ואז ישלח בקשת הצטרפות.',
+                    'groupSettings.general.shareHintOpen':
+                        'קבוצה פתוחה: הקישור מוביל ישירות לעמוד הקבוצה.',
+                    'groupSettings.general.updateSuccess': 'נשמר בהצלחה',
+                    'groupSettings.general.lockedHint': 'קבוצה נעולה (חברים נכנסים דרך בקשות)',
+                    'groupSettings.general.symbolLabelOptional': 'סמל (אופציונלי)',
+                    'groupSettings.general.symbolPlaceholder': 'למשל: א׳',
+                    // === candidates validation ===
+                    'candidates.validation.nameRequired': 'שם הוא שדה חובה',
+                    'candidates.validation.nameTooShort': 'השם צריך להיות לפחות באורך 2 תווים',
+                    'candidates.validation.nameTooLong': 'השם ארוך מדי (מקסימום 50 תווים)',
+                    'candidates.validation.descriptionTooLong': 'התיאור ארוך מדי (מקסימום 500 תווים)',
+                    'candidates.validation.symbolTooLong': 'הסמל יכול להכיל עד 3 תווים',
+                    // === common ===
+                    'common.edit': 'עריכה',
+                    'common.uploadError': 'שגיאה בהעלאת הקובץ',
+                    'common.noName': 'ללא שם',
+
+                    // === group settings – page ===
+                    'groupSettings.pageTitle': 'הגדרות קבוצה',
+                    'groupSettings.loadingResolving': 'טוען נתוני קבוצה...',
+                    'groupSettings.loading': 'טוען...',
+                    'groupSettings.notFound': 'הקבוצה לא נמצאה.',
+                    'groupSettings.noGroup': 'לא נמצאה קבוצה.',
+                    'groupSettings.backToGroups': 'חזרה לרשימת הקבוצות',
+                    'groupSettings.noPermissionText':
+                        'אין לך הרשאות ניהול לקבוצה זו. רק מנהל/ת הקבוצה יכול/ה לצפות ולהתאים את ההגדרות. אם את/ה צריך/ה שינוי, אפשר לפנות למנהל/ת הקבוצה.',
+
+                    // header buttons
+                    'groupSettings.header.detailsTooltip': 'פרטי הקבוצה',
+                    'groupSettings.header.backTooltip': 'חזרה לקבוצות',
+
+                    // sidebar
+                    'groupSettings.sidebar.general': 'פרטי קבוצה',
+                    'groupSettings.sidebar.candidates': 'מועמדים',
+                    'groupSettings.sidebar.voters': 'מצביעים',
+                    'groupSettings.sidebar.members': 'משתתפי הקבוצה',
+                    'groupSettings.sidebar.danger': 'מחיקה',
+
+                    // confirm actions
+                    'groupSettings.removeMemberConfirm': 'להסיר את {{name}} מהקבוצה?',
+                    'groupSettings.deleteCandidateConfirm': 'להסיר את {{name}}?',
+
+                    // candidates – מחיקה
+                    'candidates.errors.deleteIdMissing': 'מחיקת המועמד נכשלה – מזהה לא נמצא',
+                    joinRequests: {
+                        title: 'בקשות הצטרפות',
+                        loading: 'טוען בקשות…',
+                        empty: 'אין בקשות כרגע.',
+                        approve: 'אשר/י',
+                        reject: 'דחה/י',
+                    },
+
+                    members: {
+                        noName: '(ללא שם)',
+                        created: 'נוצר',
+                        joined: 'הצטרף',
+                        remove: 'הסרה',
+                    },
+                    members: {
+                        noName: '(ללא שם)',
+                        created: 'נוצר',
+                        joined: 'הצטרף',
+                        remove: 'הסרה',
+                        title: 'משתתפי הקבוצה',
+                        empty: 'אין משתתפים עדיין.',
+                    },
+                    voters: {
+                        title: 'המצביעים',
+                        loading: 'טוען מצביעים…',
+                        empty: 'אין מצביעים עדיין.',
+                    },
+                    candidateApply: {
+                        invalidGroup: '❌ קבוצה לא תקינה. נסי לרענן את העמוד.',
+                        mustLogin: 'כדי להגיש מועמדות יש להתחבר למערכת.',
+                        status: {
+                            pending: '📝 בקשת המועמדות שלך נמצאת בבדיקה אצל המנהל/ת',
+                            approved: '✅ בקשת המועמדות שלך אושרה. את/ה כבר מועמד/ת בקבוצה זו.',
+                            rejected: '⚠️ בקשת המועמדות שלך נדחתה – ניתן להגיש בקשה חדשה',
+                            removed: '⚠️ המועמדות הקודמת שלך נמחקה ע"י המנהל/ת – ניתן להגיש בקשה חדשה',
+                        },
+                        title: 'הגש מועמדות',
+                        subtitle: 'מלא/י את הפרטים למועמדות בקבוצה',
+                        nameRequired: 'שם מלא חובה',
+                        submit: 'הגש מועמדות',
+                        submitting: 'טוען...',
+                        success: 'בקשת המועמדות הוגשה למנהל/ת הקבוצה!',
+                        genericError: 'שגיאה בלתי צפויה',
+                    },
+                    toastDemo: {
+                        title: '🎨 דוגמאות React Hot Toast',
+                        subtitle: 'לחץ על הכפתורים לראות סוגי הודעות שונות',
+
+                        // טקסטים של הטוסטים
+                        success: 'הפעולה בוצעה בהצלחה!',
+                        error: 'אופס! משהו השתבש',
+                        info: 'זוהי הודעת מידע רגילה',
+                        warning: '⚠️ אזהרה: שים לב לפרטים',
+                        loading: 'טוען נתונים...',
+                        loaded: 'הנתונים נטענו!',
+                        promiseLoading: 'שומר נתונים...',
+                        promiseSuccess: 'הנתונים נשמרו בהצלחה!',
+                        promiseError: 'שגיאה בשמירת הנתונים',
+                        customTitle: 'הודעה מותאמת אישית!',
+                        customText: 'זה עיצוב מיוחד שלך',
+                        longText:
+                            'זוהי הודעה ארוכה יותר שמדגימה איך נראה טקסט ארוך בתוך ההודעה הקופצת. אפשר לראות שזה עובד מצוין גם עם תוכן רב.',
+                        emoji: '🚀 המערכת עולה לאוויר!',
+                        multiFirst: 'הודעה ראשונה',
+                        multiSecond: 'הודעה שנייה',
+                        multiThird: 'הודעה שלישית',
+
+                        // כפתורים
+                        buttons: {
+                            success: '✓ הודעת הצלחה',
+                            error: '✕ הודעת שגיאה',
+                            info: 'ℹ הודעת מידע',
+                            warning: '⚠ הודעת אזהרה',
+                            loading: '⏳ הודעת טעינה',
+                            promise: '🔄 Promise Toast',
+                            custom: '✨ הודעה מותאמת',
+                            longText: '📝 טקסט ארוך',
+                            emoji: '🎯 עם אמוג׳י',
+                            multiple: '📚 מספר הודעות',
+                        },
+
+                        // קופסת הטיפים
+                        tipsTitle: '💡 טיפים:',
+                        tips: {
+                            autoHide: 'ההודעות נעלמות אוטומטית אחרי 3 שניות',
+                            close: 'אפשר לסגור הודעה ידנית בלחיצה עליה',
+                            multiple: 'מספר הודעות יכולות להופיע בו זמנית',
+                            animation: 'כל הודעה מקבלת אנימציה חלקה',
+                        },
+                    },
+                    'groups.create.ai.fillNameFirstError': 'קודם צריך למלא שם קבוצה',
+                    'groups.create.ai.tooltip': 'עזרה בכתיבת תיאור עם AI',
+                    // למשל תחת groups.detail
+                    groups: {
+                        // ...
+                        detail: {
+                            error: {
+                                loadFailed: 'שגיאה בטעינת הקבוצה.',
+                                candidatesFailed: 'שגיאה בטעינת המועמדים',
+                            },
+                            buttons: {
+                                backToList: 'חזרה לרשימת הקבוצות',
+                                backToGroups: 'כל הקבוצות',
+                                joinRequest: 'בקשת הצטרפות',
+                                goVote: 'להצבעה בקלפי',
+                                settings: 'הגדרות קבוצה',
+                            },
+                            locked: {
+                                title: 'קבוצה נעולה',
+                                mustLogin:
+                                    'קבוצה זו נעולה. כדי לבקש הצטרפות עליה יש להתחבר למערכת ולאחר מכן לשלוח בקשת הצטרפות מעמוד "קבוצות".',
+                                notMember:
+                                    'אינך מחובר/ת לקבוצה זו. כדי להצטרף, חזור/י לעמוד הקבוצות ולחץ/י על "בקשת הצטרפות" בקבוצה המתאימה.',
+                            },
+                            loading: 'טוען נתוני קבוצה…',
+                            meta: {
+                                creationDate: 'תאריך יצירה:',
+                                endDate: 'תאריך סיום:',
+                                totalVotes: 'סך הצבעות:',
+                                notAvailable: 'לא זמין',
+                            },
+                            toast: {
+                                mustLoginToVote: 'אינך מחובר/ת. כדי להצביע צריך להתחבר.',
+                            },
+                            candidates: {
+                                title: 'המועמדים',
+                                loading: 'טוען מועמדים...',
+                                none: 'אין מועמדים',
+                                imageAlt: 'תמונת מועמד',
+                                votesLabelShort: 'קולות',
+                                unknownName: 'לא ידוע',
+                                cardVotesSuffix: 'קולות',
+                                myCampaignTitle: 'קמפיין שלי',
+                            },
+                            infoCards: {
+                                timeLeft: 'זמן עד סיום',
+                                totalVotes: 'סך הצבעות',
+                                candidatesCount: 'מספר מועמדים',
+                                winnersCount: 'מספר מקומות לזוכים',
+                            },
+                            charts: {
+                                pieTitle: 'אחוזי הצבעה',
+                                barTitle: 'מספר קולות',
+                                tooltipVotesSuffix: 'קולות',
+                                noVotes: '🕐 אין הצבעות — לא ניתן להציג גרפים',
+                            },
+                        },
+                    }
+
+
                 },
             },
             en: {
@@ -593,6 +883,10 @@ i18n
                     'voting.noName': 'No name',
 
                     'voting.voteErrorPrefix': 'Voting error: ',
+
+                    'voting.insertEnvelope': 'Insert envelope into ballot',
+                    'voting.voteSuccessToast': 'Your vote has been recorded',
+                    'voting.confirmVoteMessage': 'Are you sure you want to vote for candidate {{name}}?',
                     // === address autocomplete ===
                     'address.cityPlaceholder': '*City',
                     'address.streetPlaceholder': '*Address / Street',
@@ -1017,6 +1311,290 @@ i18n
                     'votes.errors.notLoggedIn': 'You must be logged in to vote',
                     'votes.errors.voteFailed': 'Voting failed',
                     'votes.errors.fetchVotersFailed': 'Failed to load voters list',
+                    // === chat (group chat) ===
+                    'chat.title': 'Chat',
+                    'chat.readOnlyNote': 'You can only read messages. Only group members can write.',
+                    'chat.loading': 'Loading messages…',
+                    'chat.noMessages': 'No messages yet. Start the conversation 🙂',
+                    'chat.participantFallback': 'Participant',
+                    'chat.messageDeleted': 'Message deleted',
+
+                    'chat.menu.optionsTitle': 'Options',
+                    'chat.menu.edit': 'Edit',
+                    'chat.menu.delete': 'Delete',
+
+                    'chat.confirmDelete': 'Delete this message?',
+                    'chat.editingBar.text': 'Editing message',
+                    'chat.editingBar.cancel': 'Cancel',
+
+                    'chat.moreButton.title': 'More actions',
+                    'chat.moreMenu.summary': 'AI chat summary',
+                    'chat.moreMenu.summarizing': 'Summarizing…',
+
+                    'chat.input.placeholder': 'Type a message…',
+                    'chat.input.readonlyPlaceholder': "You don't have permission to write in this chat",
+
+                    'chat.emojiButton.title': 'Emojis',
+                    'chat.emoji.searchPlaceholder': 'Search',
+
+                    'chat.sendButton.title': 'Send message',
+
+                    'chat.errors.loadFailed': 'Failed to load messages',
+                    'chat.errors.sendFailed': 'Failed to send message',
+                    'chat.errors.updateFailed': 'Failed to update message',
+                    'chat.errors.deleteFailed': 'Failed to delete message',
+                    'chat.errors.summaryFailed': 'Failed to summarize chat',
+                    // === candidates form ===
+                    'candidates.form.nameLabel': 'Name *',
+                    'candidates.form.descriptionLabel': 'Description *',
+                    'candidates.form.symbolLabel': 'Symbol *',
+                    'candidates.form.symbolPlaceholder': 'e.g.: A',
+                    'candidates.form.photoLabel': 'Image',
+                    'candidates.form.previewAlt': 'Preview',
+                    'candidates.form.changePhoto': 'Change image',
+                    'candidates.form.removePhoto': 'Remove image',
+                    'candidates.form.uploading': 'Uploading…',
+                    // === candidate requests tab ===
+                    'candidates.requests.title': 'Candidate requests',
+                    'candidates.requests.loading': 'Loading…',
+                    'candidates.requests.empty': 'No requests.',
+                    'candidates.requests.approve': 'Approve',
+                    'candidates.requests.reject': 'Reject',
+                    // === candidates tab (list & add) ===
+                    'candidates.tab.title': 'Candidates',
+                    'candidates.list.loading': 'Loading candidates…',
+                    'candidates.list.empty': 'No candidates in this group.',
+                    'candidates.list.noName': '(No name)',
+                    'candidates.list.photoAlt': 'Candidate picture',
+                    'candidates.list.photoAltWithName': 'Picture of candidate {{name}}',
+                    'candidates.list.edit': 'Edit',
+                    'candidates.list.remove': 'Remove',
+
+                    'candidates.add.title': 'Add candidate',
+                    'candidates.add.submit': 'Add candidate',
+
+                    'candidates.upload.error': 'Error uploading image',
+                    // === group settings – danger zone ===
+                    'groupSettings.danger.title': 'Delete Group',
+                    'groupSettings.danger.warning':
+                        'Deleting is irreversible. All group data will be removed for all members.',
+                    'groupSettings.danger.deleteButton': 'Delete group…',
+                    // === group settings – delete modal ===
+                    'groupSettings.deleteModal.title': 'Delete the group',
+                    'groupSettings.deleteModal.typeToConfirm': 'To confirm, type the following:',
+                    'groupSettings.deleteModal.mustMatch': 'You must type the exact value above',
+                    'groupSettings.deleteModal.deleteForever': 'Delete group permanently',
+                    // === edit candidate modal ===
+                    'candidates.edit.title': 'Edit candidate',
+                    'candidates.edit.save': 'Save',
+                    'candidates.edit.saving': 'Saving…',
+                    // === common ===
+                    'common.edit': 'Edit',
+
+                    // === group settings – general tab ===
+                    'groupSettings.general.title': 'Group details',
+                    'groupSettings.general.status': 'Status',
+                    'groupSettings.general.symbolLabel': 'Symbol',
+                    'groupSettings.general.photoLabel': 'Image',
+                    'groupSettings.general.photoOpen': 'Open',
+                    'groupSettings.general.createdBy': 'Created by',
+                    'groupSettings.general.shareLinkLabel': 'Share link',
+                    'groupSettings.general.shareInputAria': 'Share link',
+                    'groupSettings.general.shareCopy': 'Copy',
+                    'groupSettings.general.shareCopied': 'Copied ✓',
+                    'groupSettings.general.shareHintLocked':
+                        'Locked group: the link will ask the user to log in and then send a join request.',
+                    'groupSettings.general.shareHintOpen':
+                        'Open group: the link leads directly to the group page.',
+                    'groupSettings.general.updateSuccess': 'Saved successfully',
+                    'groupSettings.general.lockedHint': 'Locked group (members join via requests)',
+                    'groupSettings.general.symbolLabelOptional': 'Symbol (optional)',
+                    'groupSettings.general.symbolPlaceholder': 'e.g.: A',
+                    // === candidates validation ===
+                    'candidates.validation.nameRequired': 'Name is required',
+                    'candidates.validation.nameTooShort': 'Name must be at least 2 characters long',
+                    'candidates.validation.nameTooLong': 'Name is too long (maximum 50 characters)',
+                    'candidates.validation.descriptionTooLong': 'Description is too long (maximum 500 characters)',
+                    'candidates.validation.symbolTooLong': 'Symbol can contain up to 3 characters',
+                    // === common ===
+                    'common.edit': 'Edit',
+                    'common.uploadError': 'An error occurred while uploading the file',
+                    'common.noName': 'No name',
+
+                    // === group settings – page ===
+                    'groupSettings.pageTitle': 'Group settings',
+                    'groupSettings.loadingResolving': 'Loading group data...',
+                    'groupSettings.loading': 'Loading...',
+                    'groupSettings.notFound': 'Group not found.',
+                    'groupSettings.noGroup': 'No group found.',
+                    'groupSettings.backToGroups': 'Back to groups list',
+                    'groupSettings.noPermissionText':
+                        'You do not have management permissions for this group. Only the group owner/admin can view and change the settings. If you need a change, please contact the group admin.',
+
+                    // header buttons
+                    'groupSettings.header.detailsTooltip': 'Group details',
+                    'groupSettings.header.backTooltip': 'Back to groups',
+
+                    // sidebar
+                    'groupSettings.sidebar.general': 'Group details',
+                    'groupSettings.sidebar.candidates': 'Candidates',
+                    'groupSettings.sidebar.voters': 'Voters',
+                    'groupSettings.sidebar.members': 'Group members',
+                    'groupSettings.sidebar.danger': 'Danger zone',
+
+                    // confirm actions
+                    'groupSettings.removeMemberConfirm': 'Remove {{name}} from the group?',
+                    'groupSettings.deleteCandidateConfirm': 'Remove {{name}}?',
+
+                    // candidates – delete
+                    'candidates.errors.deleteIdMissing': 'Candidate deletion failed – id not found',
+                    joinRequests: {
+                        title: 'Join requests',
+                        loading: 'Loading requests…',
+                        empty: 'No requests at the moment.',
+                        approve: 'Approve',
+                        reject: 'Reject',
+                    },
+                    members: {
+                        noName: '(No name)',
+                        created: 'Created',
+                        joined: 'Joined',
+                        remove: 'Remove',
+                    },
+                    members: {
+                        noName: '(No name)',
+                        created: 'Created',
+                        joined: 'Joined',
+                        remove: 'Remove',
+                        title: 'Group members',
+                        empty: 'No members yet.',
+                    },
+                    voters: {
+                        title: 'Voters',
+                        loading: 'Loading voters…',
+                        empty: 'No voters yet.',
+                    },
+                    candidateApply: {
+                        invalidGroup: '❌ Invalid group. Please refresh the page.',
+                        mustLogin: 'You must be logged in to apply as a candidate.',
+                        status: {
+                            pending: '📝 Your candidate request is being reviewed by the admin.',
+                            approved: '✅ Your candidate request was approved. You are already a candidate in this group.',
+                            rejected: '⚠️ Your candidate request was rejected – you may submit a new request.',
+                            removed: '⚠️ Your previous candidacy was removed by the admin – you may submit a new request.',
+                        },
+                        title: 'Apply as candidate',
+                        subtitle: 'Fill in your details to apply as a candidate in this group',
+                        nameRequired: 'Full name is required',
+                        submit: 'Submit application',
+                        submitting: 'Submitting...',
+                        success: 'Your candidate request has been sent to the group admin!',
+                        genericError: 'Unexpected error occurred',
+                    },
+                    toastDemo: {
+                        title: '🎨 React Hot Toast Examples',
+                        subtitle: 'Click the buttons to see different types of toasts',
+
+                        // Toast texts
+                        success: 'Action completed successfully!',
+                        error: 'Oops! Something went wrong',
+                        info: 'This is a regular info message',
+                        warning: '⚠️ Warning: please pay attention to the details',
+                        loading: 'Loading data...',
+                        loaded: 'Data loaded!',
+                        promiseLoading: 'Saving data...',
+                        promiseSuccess: 'Data saved successfully!',
+                        promiseError: 'Error saving data',
+                        customTitle: 'Custom toast message!',
+                        customText: 'This is your special design',
+                        longText:
+                            'This is a longer message to demonstrate how a long text looks inside the toast. It works great even with lots of content.',
+                        emoji: '🚀 The system is launching!',
+                        multiFirst: 'First message',
+                        multiSecond: 'Second message',
+                        multiThird: 'Third message',
+
+                        // Buttons
+                        buttons: {
+                            success: '✓ Success toast',
+                            error: '✕ Error toast',
+                            info: 'ℹ Info toast',
+                            warning: '⚠ Warning toast',
+                            loading: '⏳ Loading toast',
+                            promise: '🔄 Promise toast',
+                            custom: '✨ Custom toast',
+                            longText: '📝 Long text',
+                            emoji: '🎯 With emoji',
+                            multiple: '📚 Multiple toasts',
+                        },
+
+                        // Tips box
+                        tipsTitle: '💡 Tips:',
+                        tips: {
+                            autoHide: 'Toasts disappear automatically after 3 seconds',
+                            close: 'You can close a toast manually by clicking it',
+                            multiple: 'Multiple toasts can be displayed at the same time',
+                            animation: 'Each toast has a smooth animation',
+                        },
+                    },
+                    'groups.create.ai.fillNameFirstError': 'Please fill in a group name first',
+                    'groups.create.ai.tooltip': 'Help writing a description with AI',
+                    groups: {
+                        // ...
+                        detail: {
+                            error: {
+                                loadFailed: 'Failed to load group.',
+                                candidatesFailed: 'Failed to load candidates.',
+                            },
+                            buttons: {
+                                backToList: 'Back to groups list',
+                                backToGroups: 'All groups',
+                                joinRequest: 'Request to join',
+                                goVote: 'Go to ballot',
+                                settings: 'Group settings',
+                            },
+                            locked: {
+                                title: 'Locked group',
+                                mustLogin:
+                                    'This group is locked. To request joining, please log in and send a join request from the "Groups" page.',
+                                notMember:
+                                    "You are not a member of this group. To join, go back to the groups page and click \"Request to join\" on the relevant group.",
+                            },
+                            loading: 'Loading group data…',
+                            meta: {
+                                creationDate: 'Creation date:',
+                                endDate: 'End date:',
+                                totalVotes: 'Total votes:',
+                                notAvailable: 'N/A',
+                            },
+                            toast: {
+                                mustLoginToVote: 'You are not logged in. Please log in to vote.',
+                            },
+                            candidates: {
+                                title: 'Candidates',
+                                loading: 'Loading candidates...',
+                                none: 'No candidates yet',
+                                imageAlt: 'Candidate image',
+                                votesLabelShort: 'votes',
+                                unknownName: 'Unknown',
+                                cardVotesSuffix: 'votes',
+                                myCampaignTitle: 'My campaign',
+                            },
+                            infoCards: {
+                                timeLeft: 'Time remaining',
+                                totalVotes: 'Total votes',
+                                candidatesCount: 'Number of candidates',
+                                winnersCount: 'Number of winner spots',
+                            },
+                            charts: {
+                                pieTitle: 'Voting distribution',
+                                barTitle: 'Number of votes',
+                                tooltipVotesSuffix: 'votes',
+                                noVotes: '🕐 No votes — cannot display charts',
+                            },
+                        },
+                    }
+
 
                 },
             },
