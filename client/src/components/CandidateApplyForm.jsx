@@ -42,6 +42,9 @@ export default function CandidateApplyForm({ groupId, candidateRequests = [] }) 
 
   const [userRequest, setUserRequest] = useState(null);
 
+  // 👇 חדש: קובץ שמחכים לחתוך
+  const [fileToCrop, setFileToCrop] = useState(null);
+
   useEffect(() => {
     const emailNorm = (userEmail || '').trim().toLowerCase();
 
@@ -66,13 +69,17 @@ export default function CandidateApplyForm({ groupId, candidateRequests = [] }) 
     setForm((prev) => ({ ...prev, photoUrl: '' }));
   };
 
+  // ❌ זה היה קודם handleUpload שעשה upload ישיר
+  // ✅ עכשיו – רק שומר את הקובץ לחיתוך ופותח מודאל
   const handleUpload = async (file) => {
     if (!file) return;
 
     try {
       setUploading(true);
-      const url = await uploadImage(file, form.photoUrl || '');
+
+      const url = await uploadImage(file);
       if (!url) return;
+
       setForm((prev) => ({ ...prev, photoUrl: url }));
     } catch (err) {
       console.error('Upload error:', err);
@@ -81,6 +88,7 @@ export default function CandidateApplyForm({ groupId, candidateRequests = [] }) 
       setUploading(false);
     }
   };
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -121,7 +129,6 @@ export default function CandidateApplyForm({ groupId, candidateRequests = [] }) 
       toast.error(message);
     }
   };
-
 
   if (!groupId) {
     return <p>{t('candidateApply.invalidGroup')}</p>;
@@ -181,14 +188,25 @@ export default function CandidateApplyForm({ groupId, candidateRequests = [] }) 
         onChange={handleFieldChange}
         onSubmit={handleSubmit}
         uploading={uploading}
-        onUploadFile={handleUpload}
+        onUploadFile={handleUpload}  // 👈 עכשיו
         fileInputRef={fileInputRef}
         clearPhoto={clearPhoto}
         submitLabel={loading ? t('candidateApply.submitting') : t('candidateApply.submit')}
         submitDisabled={loading || uploading}
       />
 
+
       {error && <p className="error-text">❌ {error}</p>}
+
+      {/* מודאל חיתוך – נפתח רק כשיש fileToCrop */}
+      {/* {fileToCrop && (
+        <ImageCropModal
+          file={fileToCrop}
+          aspect={1} // 1:1 – פרופיל
+          onCancel={() => setFileToCrop(null)}
+          onCropped={handleCroppedFile}
+        />
+      )} */}
     </div>
   );
 }

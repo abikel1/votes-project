@@ -33,9 +33,11 @@ const onUploadNew = async (file) => {
     const formData = new FormData();
     formData.append('image', file);
 
-    const { data } = await http.post('/upload', formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
-    });
+
+      const { data } = await http.post('/upload', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+
 
     setCandForm((prev) => ({ ...prev, photoUrl: data.url }));
   } catch (err) {
@@ -45,6 +47,7 @@ const onUploadNew = async (file) => {
     setLocalUploading(false);
   }
 };
+
 
 
   return (
