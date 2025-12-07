@@ -1,5 +1,7 @@
 // src/pages/GroupSettingsPage/EditCandidateModal.jsx
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import ImageCropModal from '../../components/ImageCropModal';
 
 export default function EditCandidateModal({
   open,
@@ -17,10 +19,33 @@ export default function EditCandidateModal({
   canEditName = true,
 }) {
   const { t } = useTranslation();
+  const [fileToCrop, setFileToCrop] = useState(null); // 👈 קובץ לחיתוך במודאל
 
   if (!open) return null;
 
   const disabled = updatingThisCandidate;
+
+  // בחירת קובץ (גם מהאינפוט הנסתר וגם מהגלוי)
+  const handleFileChange = (e) => {
+    const file = e.target.files?.[0];
+    if (!file || disabled || uploadingEdit) return;
+
+    setFileToCrop(file);   // 👈 פותח מודאל החיתוך
+    e.target.value = '';   // כדי שאפשר יהיה לבחור שוב אותו קובץ
+  };
+
+  // אחרי שהמשתמש סיים חיתוך ולחץ "שמור"
+  const handleCroppedFile = (croppedFile) => {
+    setFileToCrop(null);
+    if (!croppedFile || !onUploadEdit) return;
+
+    // שולחים להורה כבר את הקובץ החתוך
+    onUploadEdit(croppedFile);
+  };
+
+  const handleCancelCrop = () => {
+    setFileToCrop(null);
+  };
 
   return (
     <div
@@ -78,12 +103,13 @@ export default function EditCandidateModal({
           {/* Image */}
           <label>{t('candidates.form.photoLabel')}</label>
 
+          {/* אינפוט נסתר ל"שינוי תמונה" */}
           <input
             ref={editFileInputRef}
             type="file"
             accept="image/*"
             style={{ display: 'none' }}
-            onChange={(e) => onUploadEdit(e.target.files?.[0])}
+            onChange={handleFileChange}   // 👈 דרך המודאל
             disabled={disabled || uploadingEdit}
           />
 
@@ -92,7 +118,7 @@ export default function EditCandidateModal({
               <input
                 type="file"
                 accept="image/*"
-                onChange={(e) => onUploadEdit(e.target.files?.[0])}
+                onChange={handleFileChange}  // 👈 גם כאן
                 disabled={disabled || uploadingEdit}
               />
               {(disabled || uploadingEdit) && (
@@ -165,6 +191,16 @@ export default function EditCandidateModal({
             </button>
           </div>
         </form>
+
+        {/* מודאל חיתוך – נפתח כשיש fileToCrop */}
+        {fileToCrop && (
+          <ImageCropModal
+            file={fileToCrop}
+            aspect={1}          // 1:1 לפרופיל עגול
+            onCancel={handleCancelCrop}
+            onCropped={handleCroppedFile}
+          />
+        )}
       </div>
     </div>
   );
