@@ -1,24 +1,64 @@
 // server/src/controllers/campaign_controller.js
 const campaignService = require('../services/campaign_service');
 const { generateCampaignPostForCandidate } = require('../services/ai_service');
+const Group = require('../models/group_model'); // 👈 לוודא שיש כזה
 
 async function getCampaign(req, res) {
   try {
     const currentUserId = req.user?._id;
+    const { candidateId } = req.params;
 
     const campaign =
       await campaignService.getCampaignByCandidate(
-        req.params.candidateId,
+        candidateId,
         currentUserId
       );
+
+    const candidate = campaign.candidate;
+
+    // נניח שלמועמד יש groupId
+    const groupId = candidate.groupId || candidate.group;
+    if (!groupId) {
+      return res.status(500).json({
+        message: 'לקמפיין אין קבוצה משויכת',
+      });
+    }
+
+    const group = await Group.findById(groupId).lean();
+    if (!group) {
+      return res.status(404).json({ message: 'קבוצה לא נמצאה' });
+    }
+
+    const isLocked = !!group.isLocked;
+
+    const isMember =
+      Array.isArray(group.members) &&
+      group.members.some((m) =>
+        m.user
+          ? String(m.user) === String(currentUserId)
+          : String(m) === String(currentUserId)
+      );
+
+    const isAdmin = req.user?.role === 'admin';
+
+    // אם הקבוצה נעולה והמשתמש לא חבר בה – חוסמים
+    if (isLocked && !isMember && !isAdmin) {
+      return res.status(403).json({
+        ok: false,
+        code: 'GROUP_LOCKED',
+        message: 'הקבוצה נעולה. כדי לצפות בקמפיין עליך לבקש להצטרף לקבוצה.',
+        groupId: String(groupId),
+      });
+    }
 
     return res.json({
       success: true,
       campaign,
       candidate: campaign.candidate,
-      campaignId: campaign._id
+      campaignId: campaign._id,
     });
   } catch (err) {
+    console.error('getCampaign error:', err);
     res.status(500).json({ message: err.message });
   }
 }
@@ -94,7 +134,7 @@ async function addComment(req, res) {
       userId,
       content
     );
-    
+
     res.json(campaign);
   } catch (err) {
     res.status(400).json({ message: err.message });
@@ -105,13 +145,13 @@ async function addComment(req, res) {
 async function deleteComment(req, res) {
   try {
     const { campaignId, postId, commentId } = req.params;
-    
+
     const campaign = await campaignService.deleteComment(
       campaignId,
       postId,
       commentId
     );
-    
+
     res.json(campaign);
   } catch (err) {
     res.status(400).json({ message: err.message });
