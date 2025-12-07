@@ -96,6 +96,20 @@ export default function GroupDetailPage() {
   const containerRef = useRef(null);
 
   const [isChatOpen, setIsChatOpen] = useState(false);
+  
+  // טאב פעיל במובייל: 'candidates' או 'info'
+  const [activeTab, setActiveTab] = useState('candidates');
+
+  // זיהוי גודל מסך
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   // ===== קריאת מזהי משתמש/מייל והרשאות בסיס =====
   const gidStr = group?._id ? String(group._id) : '';
@@ -418,9 +432,30 @@ export default function GroupDetailPage() {
         </p>
       )}
 
+      {/* במובייל: טאבים למטה */}
+      {isMobile && (
+        <div className="mobile-tabs">
+          <button
+            className={`mobile-tab ${activeTab === 'candidates' ? 'active' : ''}`}
+            onClick={() => setActiveTab('candidates')}
+          >
+            מועמדים
+          </button>
+          <button
+            className={`mobile-tab ${activeTab === 'info' ? 'active' : ''}`}
+            onClick={() => setActiveTab('info')}
+          >
+            מידע וגרפים
+          </button>
+        </div>
+      )}
+
       <div className="main-content-resizable" ref={containerRef}>
         {/* צד שמאל – מועמדים */}
-        <div className="left-section" style={{ width: `${leftWidth}%` }}>
+        <div 
+          className={`left-section ${isMobile && activeTab !== 'candidates' ? 'hidden' : ''}`}
+          style={!isMobile ? { width: `${leftWidth}%` } : {}}
+        >
           <div className="candidates-container">
             <h3 className="section-title">
               {t('groups.detail.candidates.title')}
@@ -497,18 +532,20 @@ export default function GroupDetailPage() {
           </div>
         </div>
 
-        {/* פס גרירה */}
-        <div
-          className="resize-handle"
-          onMouseDown={() => setIsDragging(true)}
-        >
-          <div className="resize-line" />
-        </div>
+        {/* פס גרירה - רק במסכים גדולים */}
+        {!isMobile && (
+          <div
+            className="resize-handle"
+            onMouseDown={() => setIsDragging(true)}
+          >
+            <div className="resize-line" />
+          </div>
+        )}
 
         {/* צד ימין – מידע / גרפים / טפסים */}
         <div
-          className="right-section"
-          style={{ width: `${100 - leftWidth}%` }}
+          className={`right-section ${isMobile && activeTab !== 'info' ? 'hidden' : ''}`}
+          style={!isMobile ? { width: `${100 - leftWidth}%` } : {}}
         >
           {isCandidatePhase && (
             <div className="candidate-form-card">

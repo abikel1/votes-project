@@ -113,11 +113,13 @@ export default function PostCard({
                 rows={2}
                 disabled={submittingComment}
               />
-              <button
-                onClick={handleSubmitComment}
-                disabled={!newComment.trim() || submittingComment}
-                className="comment-submit-btn"
-              >
+           <button
+  type="button"
+  onClick={handleSubmitComment}
+  disabled={!newComment.trim() || submittingComment}
+  className="comment-submit-btn"
+>
+
                 {submittingComment
                   ? t('campaign.comments.sending')
                   : t('campaign.comments.send')}
