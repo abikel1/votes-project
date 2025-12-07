@@ -546,3 +546,513 @@ button.small.danger:hover {
         text-align: center;
     }
 }
+
+
+/* GroupSettingsPage.css */
+
+/* --- משתנים גלובליים לשימוש חוזר --- */
+:root {
+  --gs-primary: #003366;
+  --gs-primary-hover: #095eb5;
+  --gs-bg: #f9f9f9;
+  --gs-border: #e6e6e6;
+  --gs-text: #222;
+  --gs-text-muted: #666;
+  --gs-danger: #b80d0d;
+}
+
+/* מבנה כללי */
+.gs-wrap {
+  direction: rtl;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  color: var(--gs-text);
+  font-family: "Assistant", "Segoe UI", sans-serif;
+  box-sizing: border-box;
+}
+
+/* כותרת */
+.gs-header {
+  margin-bottom: 24px;
+}
+
+.clean-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.header-title h2 {
+  margin: 0 0 6px;
+  font-size: calc(1.85em * var(--a11y-font-scale, 1));
+}
+
+.header-title p {
+  margin: 0;
+  color: var(--gs-text-muted);
+}
+
+.gs-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.icon-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--gs-primary);
+  padding: 8px;
+  /* border-radius: 50%; */
+  transition: background 0.2s;
+}
+
+.icon-btn:hover {
+  background: #eef4ff;
+}
+
+/* --- Layout ראשי --- */
+.gs-main-layout {
+  display: flex;
+  flex-direction: row-reverse; /* סיידבר בצד ימין ויזואלית בדסקטופ */
+  gap: 24px;
+  align-items: flex-start;
+  margin-top: 16px;
+}
+
+/* אזור התוכן המרכזי */
+.gs-tab-panel {
+  flex: 1;
+  min-width: 0; /* מונע גלישה של תוכן רחב בתוך הפלקס */
+}
+
+/* --- סיידבר (דסקטופ) --- */
+.gs-sidebar-tabs {
+  width: 240px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 0;
+  background: transparent;
+  flex-shrink: 0;
+  position: sticky;
+  top: 20px; /* נדבק למעלה בגלילה */
+}
+
+.side-tab {
+  padding: 12px 16px;
+  text-align: right;
+  cursor: pointer;
+  background: #fff;
+  border: 1px solid transparent;
+  /* border-radius: 6px; */
+  font-weight: 500;
+  color: #444;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.side-tab:hover {
+  background: #fff;
+  color: var(--gs-primary);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.side-tab.active {
+  background: var(--gs-primary);
+  color: white;
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(0, 51, 102, 0.2);
+}
+
+.side-tab.danger {
+  color: var(--gs-danger);
+}
+
+.side-tab.danger:hover {
+  background: #fff5f5;
+}
+
+.side-tab.danger.active {
+  background: var(--gs-danger);
+  color: #fff;
+}
+
+/* --- כרטיסים וגרידים --- */
+.card {
+  border: 1px solid var(--gs-border);
+  padding: 24px;
+  background: #fff;
+  /* border-radius: 8px; */
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+  margin-bottom: 20px;
+}
+
+.card-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+  font-weight: 700;
+  font-size: calc(1.1rem * var(--a11y-font-scale, 1));
+  border-bottom: 1px solid #f0f0f0;
+  padding-bottom: 12px;
+}
+
+/* טפסים */
+.field {
+  margin-bottom: 16px;
+}
+
+.field label {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 600;
+  color: #333;
+  font-size: 0.95rem;
+}
+
+.input,
+textarea.input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #dcdcdc;
+  /* border-radius: 6px; */
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  font-family: inherit;
+  font-size: 1rem; /* מונע זום באייפון */
+  box-sizing: border-box;
+}
+
+.input:focus,
+textarea.input:focus {
+  border-color: var(--gs-primary);
+  box-shadow: 0 0 0 3px rgba(11, 116, 218, 0.12);
+}
+
+textarea.input {
+  resize: vertical;
+  min-height: 80px;
+}
+
+/* Grid Layouts */
+.grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.read-grid {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: 120px 1fr; /* כותרת קבועה, תוכן גמיש */
+  align-items: baseline;
+}
+
+.read-grid small {
+  color: var(--gs-text-muted);
+  font-weight: 500;
+}
+
+/* רשימות */
+.list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #fff;
+  border: 1px solid #eee;
+  padding: 12px;
+  /* border-radius: 6px; */
+  transition: background 0.15s;
+}
+
+.row:hover {
+  background: #fafafa;
+}
+
+.row-main {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+  overflow: hidden;
+}
+
+.thumb {
+  width: 48px;
+  height: 48px;
+  /* border-radius: 6px; */
+  object-fit: cover;
+  background: #eee;
+  flex-shrink: 0;
+}
+
+.info {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.title {
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sub {
+  font-size: 0.85em;
+  color: var(--gs-text-muted);
+}
+
+.row-actions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+/* כפתורים */
+.gs-btn, .gs-btn-outline {
+  padding: 10px 18px;
+  /* border-radius: 6px; */
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.95rem;
+  border: 1px solid transparent;
+  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.gs-btn {
+  background: var(--gs-primary);
+  color: #fff;
+}
+
+.gs-btn:hover:not(:disabled) {
+  background: var(--gs-primary-hover);
+  transform: translateY(-1px);
+}
+
+.gs-btn-outline {
+  background: #fff;
+  color: var(--gs-primary);
+  border-color: var(--gs-primary);
+}
+
+.gs-btn-outline:hover:not(:disabled) {
+  background: #f0f7ff;
+}
+
+button.small {
+  padding: 6px 10px;
+  font-size: 0.85rem;
+  /* border-radius: 4px; */
+  border: 1px solid #ddd;
+  background: #fff;
+  cursor: pointer;
+}
+
+button.small:hover {
+  background: #f5f5f5;
+  border-color: #ccc;
+}
+
+button.small.danger {
+  color: #c00;
+  border-color: #fdd;
+  background: #fff5f5;
+}
+
+button.small.danger:hover {
+  background: #fee;
+}
+
+/* Share Section */
+.share-row {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+  flex-wrap: wrap;
+}
+
+.share-input {
+  flex: 1;
+  background: #f9f9f9;
+  font-family: monospace;
+  direction: ltr;
+  text-align: left;
+}
+
+/* --- Modal --- */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  padding: 20px;
+  backdrop-filter: blur(2px);
+}
+
+.modal {
+  width: 100%;
+  max-width: 500px;
+  background: #fff;
+  padding: 24px;
+  /* border-radius: 12px; */
+  box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+/* =========================================
+   Responsive / Mobile Styles
+   ========================================= */
+
+@media (max-width: 900px) {
+  .gs-wrap {
+    padding: 12px;
+  }
+  
+  /* שינוי כיוון ה-Layout: עמודה אחת */
+  .gs-main-layout {
+    flex-direction: column; 
+    gap: 16px;
+  }
+  
+  /* חשוב מאוד: מזיזים את הסיידבר למעלה ויזואלית
+     למרות שהוא מופיע אחרי התוכן ב-HTML 
+  */
+  .gs-sidebar-tabs {
+    order: -1; 
+    width: 100%;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    
+    /* הופך לסרגל גלילה אופקי */
+    flex-direction: row;
+    overflow-x: auto;
+    white-space: nowrap;
+    background: #fff;
+    padding: 8px 4px;
+    border-bottom: 1px solid #eee;
+    box-shadow: 0 4px 6px -4px rgba(0,0,0,0.1);
+    
+    /* הסתרת פס גלילה */
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+  }
+  
+  .gs-sidebar-tabs::-webkit-scrollbar {
+    display: none;
+  }
+
+  .side-tab {
+    flex: 0 0 auto; /* לא מתכווץ */
+    padding: 8px 14px;
+    font-size: 0.9rem;
+    /* border-radius: 20px; עיצוב כפתורי "Chips" */
+    background: #f5f5f5;
+    border: 1px solid #eee;
+  }
+  
+  .side-tab.active {
+    background: var(--gs-primary);
+    color: #fff;
+    border-color: var(--gs-primary);
+  }
+
+  /* כותרת קומפקטית יותר */
+  .clean-header {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .gs-actions {
+    width: 100%;
+    justify-content: flex-end;
+    border-top: 1px solid #eee;
+    padding-top: 8px;
+  }
+
+  /* גריד שדות */
+  .grid-2 {
+    grid-template-columns: 1fr;
+  }
+  
+  .read-grid {
+    grid-template-columns: 1fr; /* תווית מעל תוכן */
+    gap: 4px;
+    margin-bottom: 12px;
+  }
+  
+  .read-grid small {
+    font-size: 0.85em;
+    color: #888;
+  }
+  
+  .card {
+    padding: 16px;
+  }
+
+  /* רשימות במובייל */
+  .row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  
+  .row-main {
+    width: 100%;
+  }
+  
+  .row-actions {
+    width: 100%;
+    justify-content: flex-end;
+    border-top: 1px solid #f5f5f5;
+    padding-top: 8px;
+  }
+
+  /* כפתורים רחבים במובייל */
+  .gs-btn, .gs-btn-outline {
+    width: 100%;
+  }
+
+  .actions-row {
+    flex-direction: column;
+  }
+  
+  .share-row {
+    flex-direction: column;
+  }
+  
+  .share-actions {
+    width: 100%;
+    display: flex;
+  }
+  
+  .share-actions button {
+    flex: 1;
+  }
+}
