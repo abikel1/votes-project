@@ -32,7 +32,7 @@ export default function CandidatesTab({
       const formData = new FormData();
       formData.append('image', file);
 
-      const { data } = await http.post('/api/upload', formData, {
+      const { data } = await http.post('/upload', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
 

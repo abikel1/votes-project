@@ -30,6 +30,7 @@ import PostCard from './PostCard';
 import EditCandidateModal from '../../components/GroupSettings/EditCandidateModal';
 import http from '../../api/http';
 import { useTranslation } from 'react-i18next';
+import ImageCropModal from '../../components/ImageCropModal';
 
 // ===== עוזר לניקוי תשובת ה-AI =====
 function normalizeAiSuggestion(suggestion, fallbackTitle = '') {
@@ -87,6 +88,8 @@ export default function CampaignPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const { t } = useTranslation();
+
+  const [galleryFileToCrop, setGalleryFileToCrop] = useState(null);
 
   const groupId = location.state?.groupId || null;
   // Redux state
@@ -289,20 +292,33 @@ export default function CampaignPage() {
     refetchCampaign();
   };
 
-  // גלריה
-  const handleUploadGalleryFile = async (e) => {
+  // 👇 במקום handleUploadGalleryFile הישן
+
+  // כשבוחרים קובץ לגלריה – רק פותח מודאל חיתוך
+  const handleGalleryFileChange = (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
+    setGalleryFileToCrop(file);   // 👈 מפעיל את המודאל
+    e.target.value = '';          // כדי שאפשר שוב לבחור אותו קובץ
+  };
+
+  // אחרי חיתוך ושמירה
+  const handleCroppedGalleryFile = async (croppedFile) => {
+    if (!croppedFile) {
+      setGalleryFileToCrop(null);
+      return;
+    }
+
     try {
       setUploadingImage(true);
-      const url = await uploadImage(file);
+      const url = await uploadImage(croppedFile);
       if (!url) return;
 
-      // שמירה בגלריה של הקמפיין
-      await dispatch(addImage({ campaignId: campaign._id, imageUrl: url })).unwrap();
+      await dispatch(
+        addImage({ campaignId: campaign._id, imageUrl: url })
+      ).unwrap();
 
-      // רענון הקמפיין אחרי הוספה
       refetchCampaign();
       setIsEditMode(false);
     } catch (err) {
@@ -310,9 +326,10 @@ export default function CampaignPage() {
       alert(t('common.uploadError'));
     } finally {
       setUploadingImage(false);
-      e.target.value = '';
+      setGalleryFileToCrop(null);   // לסגור את המודאל
     }
   };
+
 
   const handleAddImage = () => {
     if (!newImageUrl.trim()) return;
@@ -759,7 +776,7 @@ export default function CampaignPage() {
                 <input
                   type="file"
                   accept="image/*"
-                  onChange={handleUploadGalleryFile}
+                  onChange={handleGalleryFileChange}
                   disabled={uploadingImage}
                 />
                 {uploadingImage && <div className="loading-spinner" />}
@@ -845,6 +862,18 @@ export default function CampaignPage() {
         clearEditPhoto={clearEditPhoto}
         canEditName={false}
       />
+
+      {/* מודאל חיתוך לתמונות גלריה (ריבוע) */}
+      {galleryFileToCrop && (
+        <ImageCropModal
+          file={galleryFileToCrop}
+          aspect={1}             // ריבוע
+          cropShape="rect"       // 👈 כאן ההבדל מהפרופיל
+          onCancel={() => setGalleryFileToCrop(null)}
+          onCropped={handleCroppedGalleryFile}
+        />
+      )}
+
 
       {/* מודאל AI לפוסט קמפיין */}
       {showAiModal && (
