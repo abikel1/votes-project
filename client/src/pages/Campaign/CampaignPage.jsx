@@ -17,7 +17,9 @@ import {
   selectAiError,
   addComment,
   deleteComment,
-  toggleLike
+  toggleLike,
+  selectCampaignLocked,
+  selectCampaignLockedGroupId,
 } from '../../slices/campaignSlice';
 import { updateCandidate } from '../../slices/candidateSlice';
 
@@ -30,7 +32,7 @@ import PostCard from './PostCard';
 import EditCandidateModal from '../../components/GroupSettings/EditCandidateModal';
 import http from '../../api/http';
 import { useTranslation } from 'react-i18next';
-
+import toast from 'react-hot-toast';
 // ===== עוזר לניקוי תשובת ה-AI =====
 function normalizeAiSuggestion(suggestion, fallbackTitle = '') {
   if (!suggestion) {
@@ -89,11 +91,15 @@ export default function CampaignPage() {
   const { t } = useTranslation();
 
   const groupId = location.state?.groupId || null;
+
   // Redux state
   const campaign = useSelector(selectCampaign);
   const candidate = useSelector(selectCandidate);
   const campaignLoading = useSelector((state) => state.campaign.loading);
   const campaignError = useSelector((state) => state.campaign.error);
+  const isLocked = useSelector(selectCampaignLocked);               // 🔒
+  const lockedGroupId = useSelector(selectCampaignLockedGroupId);   // 🔒
+
   const currentUserId = useSelector((state) => state.auth.userId);
   const userLoading = useSelector((state) => state.auth.loading);
 
@@ -122,6 +128,9 @@ export default function CampaignPage() {
   const [aiNote, setAiNote] = useState('');
   const [aiGenerated, setAiGenerated] = useState(false);
 
+  // 🔗 מודאל שיתוף
+  const [showShareModal, setShowShareModal] = useState(false);
+
   const hasIncrementedViewRef = useRef(false);
 
   // === סטייט למודאל עריכת מועמד ===
@@ -138,7 +147,8 @@ export default function CampaignPage() {
   const [uploadingEdit, setUploadingEdit] = useState(false);
   const editFileInputRef = useRef(null);
 
-  const effectiveGroupId = groupId || campaign?.groupId || null;
+  // groupId "יעיל" – גם מהמיקום, גם מהקמפיין, וגם מהשגיאה אם נעול
+  const effectiveGroupId = groupId || campaign?.groupId || lockedGroupId || null;
 
   // === פונקציה נוחה לריענון הקמפיין מהשרת אחרי פעולות עריכה ===
   const refetchCampaign = () => {
@@ -197,11 +207,61 @@ export default function CampaignPage() {
     }
   }, [aiSuggestion]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Loading states
+  // Loading / Locked states
   if (userLoading) {
     return (
       <div className="loading-wrap">
         {t('campaign.loadingUser')}
+      </div>
+    );
+  }
+
+  // 🔒 קמפיין נעול בגלל קבוצה נעולה
+  if (isLocked) {
+    return (
+      <div className="page-wrap dashboard">
+        <div className="page-header">
+          <button
+            className="icon-btn"
+            onClick={() =>
+              navigate(
+                effectiveGroupId ? `/groups/${effectiveGroupId}` : '/groups'
+              )
+            }
+            title={t('common.back')}
+          >
+            <BiArrowBack size={20} />
+          </button>
+
+          <h2>
+            {t('campaign.locked.title', 'הקמפיין נעול')}
+          </h2>
+        </div>
+
+        <div className="info-card" style={{ maxWidth: 480, margin: '24px auto' }}>
+          <p style={{ marginBottom: 16 }}>
+            {t(
+              'campaign.locked.message',
+              'אין לך גישה לקמפיין הזה. הקבוצה נעולה וצריך לבקש הצטרפות כדי לצפות בתוכן.'
+            )}
+          </p>
+
+          {effectiveGroupId && (
+            <button
+              className="vote-btn"
+              onClick={() =>
+                navigate(`/groups/${effectiveGroupId}`, {
+                  state: { groupId: effectiveGroupId },
+                })
+              }
+            >
+              {t(
+                'campaign.locked.goToGroup',
+                'לעמוד הקבוצה כדי לבקש הצטרפות'
+              )}
+            </button>
+          )}
+        </div>
       </div>
     );
   }
@@ -229,6 +289,8 @@ export default function CampaignPage() {
     currentUserId.toString() === candidateUserId.toString();
 
   const viewCount = campaign.viewCount || 0;
+  const shareUrl =
+    typeof window !== 'undefined' ? window.location.href : '';
 
   // Handlers
   const handleUpdateCampaign = () => {
@@ -340,22 +402,19 @@ export default function CampaignPage() {
       });
   };
 
-  const handleShare = () => {
-    const shareText = t('campaign.share.text', {
-      name: candidate?.name || '',
-    });
+  // 🔗 פתיחת/סגירת מודאל שיתוף
+  const handleOpenShare = () => setShowShareModal(true);
+  const handleCloseShare = () => setShowShareModal(false);
 
-    if (navigator.share) {
-      navigator
-        .share({
-          title: candidate?.name,
-          text: shareText,
-          url: window.location.href,
+  const handleCopyShareLink = () => {
+    if (!shareUrl) return;
+    if (navigator.clipboard?.writeText) {
+      navigator.clipboard
+        .writeText(shareUrl)
+        .then(() => {
+          toast.success(t('groups.create.toast.linkCopied'));
         })
         .catch(console.error);
-    } else {
-      navigator.clipboard.writeText(window.location.href);
-      alert(t('common.linkCopied'));
     }
   };
 
@@ -505,7 +564,7 @@ export default function CampaignPage() {
           <button
             className="icon-btn"
             onClick={() =>
-              navigate(groupId ? `/groups/${groupId}` : '/groups')
+              navigate(effectiveGroupId ? `/groups/${effectiveGroupId}` : '/groups')
             }
             title={t('common.back')}
           >
@@ -717,7 +776,8 @@ export default function CampaignPage() {
               </button>
             </div>
 
-            <div className="stat-box clickable" onClick={handleShare}>
+            {/* כפתור שתף פותח מודאל */}
+            <div className="stat-box clickable" onClick={handleOpenShare}>
               <FiShare2 size={20} />
               <span>{t('campaign.stats.share')}</span>
             </div>
@@ -808,7 +868,7 @@ export default function CampaignPage() {
         </div>
       </div>
 
-      {/* Lightbox */}
+      {/* Lightbox לתמונה */}
       {selectedImage && (
         <div
           className="lightbox-overlay"
@@ -948,6 +1008,52 @@ export default function CampaignPage() {
           </div>
         </div>
       )}
+
+      {/* מודאל שיתוף קישור */}
+      {showShareModal && (
+        <div
+          className="lightbox-overlay share-overlay"
+          onClick={handleCloseShare}
+        >
+          <div
+            className="share-modal-card"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="share-header">
+              {t('campaign.share.linkLabel', 'קישור לשיתוף:')}
+            </div>
+
+            <div className="share-input-row">
+              {/* כפתור העתק – בצד שמאל (ב-RTL) */}
+              <button
+                type="button"
+                className="vote-btn share-copy-btn"
+                onClick={handleCopyShareLink}
+              >
+                {t('campaign.share.copy', 'העתק')}
+              </button>
+
+              <input
+                type="text"
+                readOnly
+                value={shareUrl}
+                className="share-input"
+              />
+            </div>
+
+            <div className="share-actions">
+              <button
+                type="button"
+                className="vote-btn"
+                onClick={handleCloseShare}
+              >
+                {t('campaign.share.done', 'סיום')}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }

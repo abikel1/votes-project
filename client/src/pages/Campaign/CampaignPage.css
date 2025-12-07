@@ -702,6 +702,7 @@
 }
 
 @media (max-width: 768px) {
+
   .candidate-card,
   .info-card,
   .gallery-item {
@@ -906,4 +907,69 @@
 .heart.liked {
   color: red;
   fill: red;
+}
+
+/* ===== Share modal ===== */
+
+.share-overlay {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.share-modal-card {
+  direction: rtl;
+  background: #ffffff;
+  /* border-radius: 10px; */
+  padding: 24px 28px;
+  max-width: 480px;
+  width: 90%;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.18);
+  text-align: right;
+}
+
+.share-header {
+  font-size: 1rem;
+  font-weight: 500;
+  margin-bottom: 16px;
+}
+
+.share-input-row {
+  display: flex;
+  flex-direction: row-reverse;
+  /* כדי שהכפתור יהיה משמאל והשדה מימין ב-RTL */
+  align-items: stretch;
+  gap: 10px;
+}
+
+.share-input {
+  flex: 1;
+  padding: 8px 10px;
+  border: 1px solid #003366;
+  /* border-radius: 4px; */
+  font-size: 0.95rem;
+  background-color: #f9fafb;
+  direction: ltr;
+  /* שהקישור עצמו יהיה אנגלי שמאל-לימין */
+}
+
+.share-input:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(0, 51, 102, 0.25);
+}
+
+.share-copy-btn {
+  min-width: 90px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.share-actions {
+  margin-top: 20px;
+  text-align: center;
+}
+
+.share-actions .vote-btn {
+  min-width: 120px;
 }
