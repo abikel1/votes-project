@@ -249,11 +249,7 @@ export default function CampaignPage() {
           {effectiveGroupId && (
             <button
               className="vote-btn"
-              onClick={() =>
-                navigate(`/groups/${effectiveGroupId}`, {
-                  state: { groupId: effectiveGroupId },
-                })
-              }
+              onClick={() => navigate('/groups')}
             >
               {t(
                 'campaign.locked.goToGroup',
