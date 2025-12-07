@@ -591,3 +591,13 @@
     gap: 8px;
   }
 }
+
+/* בתוך HomePage.css או קובץ CSS מתאים */
+.hero-content {
+  display: flex;
+  flex-direction: column; /* מסדר את כל התוכן בעמודה */
+  align-items: center;    /* מרכז אופקית */
+  gap: 16px;              /* רווח בין הכפתורים והטקסט */
+/* margin-bottom: 20px; */
+}
+

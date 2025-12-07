@@ -1056,3 +1056,21 @@ button.small.danger:hover {
     flex: 1;
   }
 }
+
+/* הודעות מרכזיות עם מסגרת */
+.candidate-alert {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    border: 2px solid #003366; /* צבע המסגרת */
+    background: #f0f4ff; /* צבע רקע עדין */
+    color: #003366;
+    padding: 16px;
+    margin: 12px 0;
+    font-weight: 600;
+    font-size: 1rem;
+    border-radius: 6px;
+    width: 100%;
+    box-sizing: border-box;
+}
