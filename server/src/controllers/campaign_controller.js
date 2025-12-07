@@ -16,7 +16,7 @@ async function getCampaign(req, res) {
 
     const candidate = campaign.candidate;
 
-    // נניח שלמועמד יש groupId
+    // מזהה הקבוצה של המועמד/ת
     const groupId = candidate.groupId || candidate.group;
     if (!groupId) {
       return res.status(500).json({
@@ -29,8 +29,10 @@ async function getCampaign(req, res) {
       return res.status(404).json({ message: 'קבוצה לא נמצאה' });
     }
 
+    // 🔒 האם הקבוצה נעולה
     const isLocked = !!group.isLocked;
 
+    // 👥 האם המשתמש/ת חברה בקבוצה
     const isMember =
       Array.isArray(group.members) &&
       group.members.some((m) =>
@@ -39,18 +41,46 @@ async function getCampaign(req, res) {
           : String(m) === String(currentUserId)
       );
 
-    const isAdmin = req.user?.role === 'admin';
+    // 👤 פרטי המשתמש/ת הנוכחית
+    const myEmail = (req.user?.email || '').trim().toLowerCase();
+    const myId = String(currentUserId || '');
 
-    // אם הקבוצה נעולה והמשתמש לא חבר בה – חוסמים
-    if (isLocked && !isMember && !isAdmin) {
+    // 👑 פרטי בעלת הקבוצה (לפי כל האפשרויות במודל)
+    const createdByEmail = (
+      group.createdBy ??
+      group.created_by ??
+      group.createdByEmail ??
+      group.ownerEmail ??
+      group.owner ??
+      ''
+    )
+      .trim()
+      .toLowerCase();
+
+    const createdById = String(group.createdById || '');
+
+    // 👑 האם המשתמש/ת אדמין
+    const isAdmin = req.user?.role === 'admin' || req.user?.isAdmin;
+
+    // 👑 האם המשתמש/ת בעלת הקבוצה (או אדמין)
+    const isOwner =
+      isAdmin ||
+      !!group.isOwner ||
+      (!!myEmail && !!createdByEmail && myEmail === createdByEmail) ||
+      (!!myId && !!createdById && myId === createdById);
+
+    // ❌ אם הקבוצה נעולה, ולא חברה, ולא בעלת הקבוצה → חוסמים
+    if (isLocked && !isMember && !isOwner) {
       return res.status(403).json({
         ok: false,
         code: 'GROUP_LOCKED',
-        message: 'הקבוצה נעולה. כדי לצפות בקמפיין עליך לבקש להצטרף לקבוצה.',
+        message:
+          'הקבוצה נעולה. כדי לצפות בקמפיין עליך לבקש להצטרף לקבוצה.',
         groupId: String(groupId),
       });
     }
 
+    // ✅ מותר לצפות בקמפיין
     return res.json({
       success: true,
       campaign,
@@ -62,6 +92,7 @@ async function getCampaign(req, res) {
     res.status(500).json({ message: err.message });
   }
 }
+
 
 async function createCampaign(req, res) {
   try {
