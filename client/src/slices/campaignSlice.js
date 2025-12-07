@@ -11,9 +11,13 @@ export const fetchCampaign = createAsyncThunk(
       const { data } = await http.get(`/campaigns/candidate/${candidateId}`);
       return data;
     } catch (err) {
-      return thunkAPI.rejectWithValue(
-        err.response?.data?.message || 'שגיאה בטעינת הקמפיין'
-      );
+      const status = err.response?.status;
+      const code = err.response?.data?.code;
+      const message =
+        err.response?.data?.message || 'שגיאה בטעינת הקמפיין';
+      const groupId = err.response?.data?.groupId;
+
+      return thunkAPI.rejectWithValue({ status, code, message, groupId });
     }
   }
 );
@@ -57,10 +61,7 @@ export const addPost = createAsyncThunk(
   'campaign/addPost',
   async ({ campaignId, post }, thunkAPI) => {
     try {
-      const { data } = await http.put(
-        `/campaigns/${campaignId}/posts`,
-        post
-      );
+      const { data } = await http.put(`/campaigns/${campaignId}/posts`, post);
       return data;
     } catch (err) {
       return thunkAPI.rejectWithValue(
@@ -103,15 +104,14 @@ export const deletePost = createAsyncThunk(
   }
 );
 
-// 🆕 ===== תגובות =====
+// ===== תגובות =====
 
 export const addComment = createAsyncThunk(
   'campaign/addComment',
   async ({ campaignId, postId, content }, thunkAPI) => {
-    console.log(localStorage.getItem('token'));
-
     try {
-      const token = localStorage.getItem('token'); // 🔑
+      const token = localStorage.getItem('token');
+
       const { data } = await http.post(
         `/campaigns/${campaignId}/posts/${postId}/comments`,
         { content },
@@ -119,7 +119,8 @@ export const addComment = createAsyncThunk(
           headers: { Authorization: `Bearer ${token}` },
         }
       );
-      return data;
+
+      return data; // מחזיר את הפוסט המעודכן בלבד!
     } catch (err) {
       return thunkAPI.rejectWithValue(
         err.response?.data?.message || 'שגיאה בהוספת תגובה'
@@ -128,7 +129,6 @@ export const addComment = createAsyncThunk(
   }
 );
 
-
 export const deleteComment = createAsyncThunk(
   'campaign/deleteComment',
   async ({ campaignId, postId, commentId }, thunkAPI) => {
@@ -136,7 +136,7 @@ export const deleteComment = createAsyncThunk(
       const { data } = await http.delete(
         `/campaigns/${campaignId}/posts/${postId}/comments/${commentId}`
       );
-      return data;
+      return data; // גם פה עדיף להחזיר רק פוסט מעודכן
     } catch (err) {
       return thunkAPI.rejectWithValue(
         err.response?.data?.message || 'שגיאה במחיקת תגובה'
@@ -232,9 +232,6 @@ export const toggleLike = createAsyncThunk(
     }
   }
 );
-
-
-
 // ===== Slice =====
 
 const initialState = {
@@ -242,6 +239,10 @@ const initialState = {
   data: null,
   candidate: null,
   error: null,
+
+  // 🔒 קמפיין נעול בגלל קבוצה נעולה
+  locked: false,
+  lockedGroupId: null,
 
   aiLoading: false,
   aiError: null,
@@ -258,88 +259,87 @@ const campaignSlice = createSlice({
       .addCase(fetchCampaign.pending, (state) => {
         state.loading = true;
         state.error = null;
+        state.locked = false;
+        state.lockedGroupId = null;
       })
       .addCase(fetchCampaign.fulfilled, (state, action) => {
         state.loading = false;
         state.data = action.payload.campaign;
         state.candidate = action.payload.candidate;
+        state.locked = false;
+        state.lockedGroupId = null;
       })
       .addCase(fetchCampaign.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload || 'שגיאה בטעינת הקמפיין';
+
+        // אם החזרנו אובייקט עשיר מ-rejectWithValue
+        if (action.payload && typeof action.payload === 'object') {
+          state.error =
+            action.payload.message || 'שגיאה בטעינת הקמפיין';
+
+          state.locked =
+            action.payload.code === 'GROUP_LOCKED' ||
+            action.payload.status === 403;
+
+          state.lockedGroupId = state.locked
+            ? action.payload.groupId || null
+            : null;
+        } else {
+          state.error = action.payload || 'שגיאה בטעינת הקמפיין';
+          state.locked = false;
+          state.lockedGroupId = null;
+        }
       })
 
-      // ----- Create campaign -----
+      // ----- Create -----
       .addCase(createCampaign.fulfilled, (state, action) => {
         state.data = action.payload;
-        state.error = null;
-      })
-      .addCase(createCampaign.rejected, (state, action) => {
-        state.error = action.payload;
       })
 
       // ----- Update campaign -----
       .addCase(updateCampaign.fulfilled, (state, action) => {
         state.data = action.payload;
-        state.error = null;
-      })
-      .addCase(updateCampaign.rejected, (state, action) => {
-        state.error = action.payload;
       })
 
       // ----- Posts -----
       .addCase(addPost.fulfilled, (state, action) => {
         state.data = action.payload;
-        state.error = null;
-      })
-      .addCase(addPost.rejected, (state, action) => {
-        state.error = action.payload;
       })
       .addCase(updatePost.fulfilled, (state, action) => {
         state.data = action.payload;
-        state.error = null;
-      })
-      .addCase(updatePost.rejected, (state, action) => {
-        state.error = action.payload;
       })
       .addCase(deletePost.fulfilled, (state, action) => {
         state.data = action.payload;
-        state.error = null;
-      })
-      .addCase(deletePost.rejected, (state, action) => {
-        state.error = action.payload;
       })
 
-      // 🆕 ----- Comments -----
+      // 🆕 ----- Comments (הכי חשוב!!) -----
       .addCase(addComment.fulfilled, (state, action) => {
-        state.data = action.payload;
-        state.error = null;
+        const updatedPost = action.payload; // פוסט בודד שחזר מהשרת
+        const index = state.data.posts.findIndex(
+          (p) => p._id === updatedPost._id
+        );
+
+        if (index !== -1) {
+          state.data.posts[index] = updatedPost; // מעדכן רק את הפוסט
+        }
       })
-      .addCase(addComment.rejected, (state, action) => {
-        state.error = action.payload;
-      })
+
       .addCase(deleteComment.fulfilled, (state, action) => {
-        state.data = action.payload;
-        state.error = null;
-      })
-      .addCase(deleteComment.rejected, (state, action) => {
-        state.error = action.payload;
+        const updatedPost = action.payload;
+        const index = state.data.posts.findIndex(
+          (p) => p._id === updatedPost._id
+        );
+        if (index !== -1) {
+          state.data.posts[index] = updatedPost;
+        }
       })
 
       // ----- Gallery -----
       .addCase(addImage.fulfilled, (state, action) => {
         state.data = action.payload;
-        state.error = null;
-      })
-      .addCase(addImage.rejected, (state, action) => {
-        state.error = action.payload;
       })
       .addCase(deleteImage.fulfilled, (state, action) => {
         state.data = action.payload;
-        state.error = null;
-      })
-      .addCase(deleteImage.rejected, (state, action) => {
-        state.error = action.payload;
       })
 
       // ----- Views -----
@@ -349,17 +349,19 @@ const campaignSlice = createSlice({
       .addCase(incrementView.rejected, (state, action) => {
         state.error = action.payload;
       })
- .addCase(toggleLike.fulfilled, (state, action) => {
-  state.data.likeCount = action.payload.likeCount;
-  state.data.liked = action.payload.liked;
-})
-
+      // .addCase(toggleLike.fulfilled, (state, action) => {
+      //   if (!state.data) return;
+      //   state.data.likeCount = action.payload.likeCount;
+      //   state.data.liked = action.payload.liked;
+      // })
       .addCase(toggleLike.rejected, (state, action) => {
         state.error = action.payload;
       })
+      .addCase(toggleLike.fulfilled, (state, action) => {
+        state.data.likeCount = action.payload.likeCount;
+        state.data.liked = action.payload.liked;
+      })
 
-
-      // ----- AI suggestion -----
       .addCase(generatePostSuggestion.pending, (state) => {
         state.aiLoading = true;
         state.aiError = null;
@@ -383,6 +385,10 @@ export const selectCampaign = (state) => state.campaign.data || null;
 export const selectCandidate = (state) => state.campaign.candidate || null;
 export const selectCampaignLoading = (state) => state.campaign.loading;
 export const selectCampaignError = (state) => state.campaign.error;
+
+export const selectCampaignLocked = (state) => state.campaign.locked;
+export const selectCampaignLockedGroupId = (state) =>
+  state.campaign.lockedGroupId;
 
 export const selectAiSuggestion = (state) => state.campaign.aiSuggestion;
 export const selectAiLoading = (state) => state.campaign.aiLoading;

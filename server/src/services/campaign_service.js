@@ -59,12 +59,15 @@ async function addPostToCampaign(campaignId, post) {
     createdAt: new Date()
   });
 
-  await campaign.save();
-  
-  // 🆕 החזרת קמפיין עם populate
-  return Campaign.findById(campaignId)
-    .populate("candidate")
-    .populate("posts.comments.user", "name photoUrl");
+ await campaign.save();
+
+const updatedCampaign = await Campaign.findById(campaignId)
+  .populate("posts.comments.user", "firstName lastName photoUrl");
+
+const newPost = updatedCampaign.posts[updatedCampaign.posts.length - 1];
+
+return newPost;
+
 }
 
 async function updatePost(campaignId, postId, postData) {
@@ -79,11 +82,13 @@ async function updatePost(campaignId, postId, postData) {
   post.image = postData.image ?? post.image;
   post.youtubeUrl = postData.youtubeUrl ?? post.youtubeUrl; // 🆕
 
-  await campaign.save();
-  
-  return Campaign.findById(campaignId)
-    .populate("candidate")
-    .populate("posts.comments.user", "name photoUrl");
+ await campaign.save();
+
+const updatedCampaign = await Campaign.findById(campaignId)
+  .populate("posts.comments.user", "firstName lastName photoUrl");
+
+return updatedCampaign.posts.id(postId);
+
 }
 
 async function deletePost(campaignId, postId) {
@@ -95,7 +100,7 @@ async function deletePost(campaignId, postId) {
   
   return Campaign.findById(campaignId)
     .populate("candidate")
-    .populate("posts.comments.user", "name photoUrl");
+    .populate("posts.comments.user", "firstName lastName photoUrl");
 }
 
 // 🆕 ===== תגובות =====
@@ -114,9 +119,13 @@ async function addCommentToPost(campaignId, postId, userId, content) {
 
   await campaign.save();
   
-  return Campaign.findById(campaignId)
-    .populate("candidate")
-    .populate("posts.comments.user", "name photoUrl");
+ const updatedCampaign = await Campaign.findById(campaignId)
+  .populate("posts.comments.user", "firstName lastName photoUrl");
+
+const updatedPost = updatedCampaign.posts.id(postId);
+
+return updatedPost;
+
 }
 
 async function deleteComment(campaignId, postId, commentId) {
@@ -130,9 +139,11 @@ async function deleteComment(campaignId, postId, commentId) {
   
   await campaign.save();
   
-  return Campaign.findById(campaignId)
-    .populate("candidate")
-    .populate("posts.comments.user", "name photoUrl");
+ const updatedCampaign = await Campaign.findById(campaignId)
+  .populate("posts.comments.user", "firstName lastName photoUrl");
+
+return updatedCampaign.posts.id(postId);
+
 }
 
 // ===== גלריית תמונות =====
@@ -162,7 +173,7 @@ async function incrementViewCount(campaignId) {
     { new: true }
   )
     .populate('candidate')
-    .populate("posts.comments.user", "name photoUrl");
+    .populate("posts.comments.user", "firstName lastName photoUrl");
 
   if (!campaign) throw new Error('קמפיין לא נמצא');
 
