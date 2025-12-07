@@ -643,14 +643,14 @@ export default function CampaignPage() {
                     setNewPost({ ...newPost, content: e.target.value })
                   }
                 />
-                <input
+                {/* <input
                   type="text"
                   placeholder={t('campaign.posts.new.youtubePlaceholder')}
                   value={newPost.youtubeUrl}
                   onChange={(e) =>
                     setNewPost({ ...newPost, youtubeUrl: e.target.value })
                   }
-                />
+                /> */}
 
                 <div
                   style={{
