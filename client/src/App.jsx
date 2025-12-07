@@ -71,6 +71,8 @@ export default function App() {
       <Toaster
         position="top-center"
         reverseOrder={false}
+        containerStyle={{ zIndex: 999999 }}   // ✅ זה הפתרון לבעיה שלך
+
         toastOptions={{
           duration: 3000,
           style: {
