@@ -33,8 +33,6 @@ export default function VotingDragPage() {
 
   // id שהגיע מניווט פנימי (כפתור "להצבעה בקלפי")
   const navGroupId = location.state?.groupId || null;
-  const hasShownVotedToast = useRef(false);
-
   // state פנימי ל-id
   const [groupId, setGroupId] = useState(navGroupId);
   const [slugResolved, setSlugResolved] = useState(!!navGroupId);
@@ -76,7 +74,9 @@ export default function VotingDragPage() {
   const [envelopePosition, setEnvelopePosition] = useState({ x: 0, y: 0 });
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [candidateToVote, setCandidateToVote] = useState(null);
-
+  const [hasCheckedForGroup, setHasCheckedForGroup] = useState(false);
+  const hasShownAlreadyVotedToast = useRef(false); // 👈 חדש – כדי לא להראות פעמיים
+  const justVotedRef = useRef(false);
   // --- פתרון slug ל-id כשנכנסים ישירות ל-URL ---
   useEffect(() => {
     // אם הגיע id מהניווט – משתמשים בו
@@ -100,13 +100,7 @@ export default function VotingDragPage() {
       }
     })();
   }, [navGroupId, groupSlug]);
-  // בדיקה אם כבר הצבעתי – תוסף טוסט
-  useEffect(() => {
-    if (hasVoted && !hasShownVotedToast.current) {
-      toast(t('voting.voteSuccessToast'), { icon: '🗳️' });
-      hasShownVotedToast.current = true;
-    }
-  }, [hasVoted]);
+
   // טעינת נתוני קבוצה + מועמדים
   useEffect(() => {
     if (!groupId) return;
@@ -121,10 +115,48 @@ export default function VotingDragPage() {
   }, [dispatch, groupId]);
 
   // בדיקה אם כבר הצבעתי
+  // בדיקה אם כבר הצבעתי לקבוצה הזו (עם סימון שסיימנו לבדוק)
   useEffect(() => {
     if (!groupId) return;
-    dispatch(checkHasVoted({ groupId }));
+
+    // מתחילים בדיקה חדשה לקבוצה הזו
+    setHasCheckedForGroup(false);
+
+    dispatch(checkHasVoted({ groupId }))
+      .unwrap()
+      .catch((err) => {
+        console.error('checkHasVoted failed:', err);
+      })
+      .finally(() => {
+        // סיימנו לבדוק מול השרת עבור הקבוצה הזו
+        setHasCheckedForGroup(true);
+      });
   }, [dispatch, groupId]);
+  // כשהקבוצה מתחלפת – מאפסים דגלים של טוסטים
+  useEffect(() => {
+    hasShownAlreadyVotedToast.current = false;
+    justVotedRef.current = false;
+  }, [groupId]);
+
+  // אחרי שסיימנו לבדוק מול השרת – אם כבר הצבענו בקבוצה הזו, מציגים טוסט
+  // אחרי שסיימנו לבדוק מול השרת – אם כבר הצבענו בקבוצה הזו, מציגים טוסט (רק אם לא הצבענו עכשיו)
+  useEffect(() => {
+    if (!groupId) return;
+    if (!hasCheckedForGroup) return;          // עדיין לא סיימנו בדיקה לקבוצה זו
+    if (!hasVoted) return;                    // השרת אמר שלא הצבענו – לא מציגים כלום
+    if (justVotedRef.current) return;         // 👈 הצבענו עכשיו – לא להציג "כבר הצבעת"
+    if (hasShownAlreadyVotedToast.current) return; // 👈 שלא יהיה פעמיים
+
+    toast(
+      t(
+        'voting.alreadyVotedThisGroup',
+        'כבר הצבעת לקבוצה זו, לא ניתן להצביע שוב.'
+      ),
+      { icon: 'ℹ️' }
+    );
+
+    hasShownAlreadyVotedToast.current = true; // שלא יוצג שוב לכניסות חוזרות בעמוד
+  }, [groupId, hasCheckedForGroup, hasVoted, t]);
 
   const confirmVote = (candidate) => {
     if (hasVoted) return;
@@ -233,14 +265,15 @@ export default function VotingDragPage() {
     voteForCandidateToBallot();
   };
 
-
-
   const voteForCandidateToBallot = async () => {
     if (!slipInEnvelope || !groupId) return;
 
     setIsSubmitting(true);
     setIsDraggingEnvelope(false);
     setEnvelopePosition({ x: 0, y: 0 });
+
+    // 👈 מסמנים שכבר "בהצבעה" לפני ש־hasVoted מתעדכן ב־Redux
+    justVotedRef.current = true;
 
     try {
       await dispatch(
@@ -250,11 +283,21 @@ export default function VotingDragPage() {
         })
       ).unwrap();
 
+      // ✅ טוסט הצבעה נקלטה
+      toast(t('voting.voteSuccessToast'), { icon: '🗳️' });
+
+      // 👇 דואגים שגם טוסט "כבר הצבעת" לא יקפוץ באותו סשן
+      hasShownAlreadyVotedToast.current = true;
+
       dispatch(fetchCandidatesByGroup(groupId));
       setSlipInEnvelope(null);
-
     } catch (err) {
       const msg = String(err || '');
+
+      // ❌ אם הייתה שגיאה – לא נחשיב את זה כהצבעה מוצלחת
+      justVotedRef.current = false;
+      hasShownAlreadyVotedToast.current = false;
+
       if (!msg.includes('already voted') && !msg.includes('כבר הצבעת')) {
         toast.error(t('voting.voteErrorPrefix') + msg);
       }
@@ -262,7 +305,6 @@ export default function VotingDragPage() {
       setIsSubmitting(false);
     }
   };
-
 
   const handleEnvelopeDragStart = (e) => {
     if (!slipInEnvelope || hasVoted) return;
