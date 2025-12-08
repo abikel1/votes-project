@@ -2188,3 +2188,11 @@
         transform: scale(1);
     }
 }
+
+.candidate-text p {
+  display: -webkit-box;        /* דרוש עבור line-clamp */
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;      /* מספר השורות המקסימלי */
+  overflow: hidden;
+  text-overflow: ellipsis;    /* מוסיף ... בסוף */
+}

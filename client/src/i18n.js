@@ -276,6 +276,7 @@ i18n
                     'home.hero.title': 'מערכת הצבעה דיגיטלית',
                     'home.hero.subtitle': 'קולך נשמע • ההחלטה שלנו',
                     'home.hero.cta': 'יצירת חדר הצבעות חדש',
+                    'home.hero.login': 'להתחברות',
                     'home.hero.scrollDown': 'גלול למטה',
 
                     'home.time.noEndDate': 'ללא מועד סיום',

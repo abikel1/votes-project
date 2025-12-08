@@ -143,6 +143,11 @@ const HomePage = () => {
     );
   }
 
+  const onLoginClick = () => {
+  navigate('/login'); // או הנתיב שבו נמצא עמוד ההתחברות
+};
+
+
   return (
     <div className="home-page">
       {/* Hero Section */}
@@ -155,6 +160,13 @@ const HomePage = () => {
             <HiPlus className="btn-icon" />
             {t('home.hero.cta')}
           </button>
+{/* כפתור התחברות אם לא מחוברת */}
+{(!authId && !authEmail) && (
+  <button className="hero-cta hero-login" onClick={onLoginClick}>
+    {t('home.hero.login')}
+  </button>
+)}
+
         </div>
         <div className="scroll-indicator">
           <span>{t('home.hero.scrollDown')}</span>
