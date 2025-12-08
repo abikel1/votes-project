@@ -1,132 +1,283 @@
 /* Footer.css */
 
-.site-footer,
-.site-footer * {
-  font-family: 'Segoe UI', Roboto, Arial, sans-serif;
-  color: #333;
-  box-sizing: border-box;
-}
-
 .site-footer {
-  background-color: #f9f9f9;
-  padding: 24px 20px;
-  font-size: calc(14px * var(--a11y-font-scale));
-  border-top: 1px solid #003366;
-  margin-top: 100px;
+  background: linear-gradient(135deg, #003366 0%, #002244 100%);
+  color: white;
+  padding: 3rem 2rem 0;
+  margin-top: auto;
+  box-shadow: 0 -2px 10px rgba(0, 51, 102, 0.3);
 }
 
-
-/* שלוש עמודות */
 .footer-inner {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 40px;
-  justify-content: space-between;
   max-width: 1200px;
-  margin: 0 auto 16px auto;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr;
+  gap: 3rem;
+  padding-bottom: 2rem;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.2);
 }
 
-.footer-col {
-  flex: 1 1 220px;
-  min-width: 200px;
+/* טור ראשי */
+.footer-col-main h4 {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+  color: white;
+  font-weight: 700;
 }
 
-/* טור טקסט רחב */
-.footer-col-main {
-  max-width: 420px;
-}
-
-.footer-col h4 {
-  margin-bottom: 12px;
-  font-weight: 600;
-  color: #111;
-}
-
-.footer-col p {
-  margin: 6px 0;
-  line-height: 1.5;
+.footer-col-main p {
+  line-height: 1.8;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 1rem;
 }
 
 .footer-tagline {
-  margin-top: 10px;
-  font-weight: 500;
+  margin-top: 1rem;
+  font-style: italic;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.95rem;
 }
 
-/* שתי עמודות לקישורים */
+/* כותרות עמודות */
+.footer-col h4 {
+  font-size: 1.2rem;
+  margin-bottom: 1.2rem;
+  color: white;
+  font-weight: 600;
+  position: relative;
+  padding-bottom: 0.5rem;
+}
+
+.footer-col h4::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 50px;
+  height: 2px;
+  background: white;
+}
+
+/* קישורים */
 .footer-links {
   list-style: none;
   padding: 0;
   margin: 0;
 }
 
-.footer-links-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 120px));
-  column-gap: 24px;
-  row-gap: 8px;
+.footer-links li {
+  margin-bottom: 0.8rem;
 }
 
 .footer-links a {
-  color: #333;
+  color: rgba(255, 255, 255, 0.85);
   text-decoration: none;
-  transition: color 0.2s, transform 0.15s;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  display: inline-block;
+  position: relative;
+}
+
+.footer-links a::before {
+  content: '◀';
+  margin-left: 8px;
+  opacity: 0;
+  transition: all 0.3s ease;
 }
 
 .footer-links a:hover {
-  color: #0077ff;
-  transform: translateY(-2px);
+  color: white;
+  transform: translateX(-5px);
 }
 
-/* טור רשתות חברתיות */
+.footer-links a:hover::before {
+  opacity: 1;
+  margin-left: 12px;
+}
+
+/* רשתות חברתיות */
 .footer-col-social {
-  min-width: 200px;
+  text-align: center;
 }
 
-.footer-col-social h4 {
-  margin-bottom: 14px;
+.footer-col-social h4::after {
+  right: 50%;
+  transform: translateX(50%);
+}
+
+.footer-social-icons {
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+  margin-top: 1rem;
 }
 
 .footer-social-icons a {
-  display: inline-flex;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  display: flex;
   align-items: center;
   justify-content: center;
-  margin-left: 12px;
-  font-size: calc(22px * var(--a11y-font-scale));
-  color: #333;
-  transition: color 0.2s, transform 0.15s;
+  color: white;
+  font-size: 1.5rem;
+  transition: all 0.3s ease;
+  text-decoration: none;
 }
 
 .footer-social-icons a:hover {
-  color: #0077ff;
-  transform: translateY(-2px);
+  background: white;
+  color: #003366;
+  transform: translateY(-5px) scale(1.1);
+  box-shadow: 0 5px 15px rgba(255, 255, 255, 0.3);
 }
 
+/* וואטסאפ */
+.footer-social-icons a:nth-child(1):hover {
+  background: #25D366;
+  border-color: #25D366;
+  color: white;
+}
+
+/* אינסטגרם */
+.footer-social-icons a:nth-child(2):hover {
+  background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+  border-color: #bc1888;
+  color: white;
+}
+
+/* טלגרם */
+.footer-social-icons a:nth-child(3):hover {
+  background: #0088cc;
+  border-color: #0088cc;
+  color: white;
+}
+
+/* שורה תחתונה */
 .footer-bottom {
-  border-top: 1px solid #e0e0e0;
-  padding-top: 12px;
   text-align: center;
-  font-size: calc(13px * var(--a11y-font-scale));
-  color: #666;
+  padding: 1.5rem 0;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.95rem;
 }
 
-/* רספונסיביות */
-@media (max-width: 768px) {
+/* RTL Support */
+[dir="rtl"] .footer-links a::before {
+  content: '▶';
+  margin-left: 0;
+  margin-right: 8px;
+}
+
+[dir="rtl"] .footer-links a:hover {
+  transform: translateX(5px);
+}
+
+[dir="rtl"] .footer-links a:hover::before {
+  margin-left: 0;
+  margin-right: 12px;
+}
+
+[dir="rtl"] .footer-col h4::after {
+  right: auto;
+  left: 0;
+}
+
+[dir="rtl"] .footer-col-social h4::after {
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+/* רספונסיבי - טאבלט */
+@media (max-width: 968px) {
   .footer-inner {
-    flex-direction: column;
-    gap: 30px;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+  }
+
+  .footer-col-main {
+    grid-column: 1 / -1;
+  }
+}
+
+/* רספונסיבי - מובייל */
+@media (max-width: 640px) {
+  .site-footer {
+    padding: 2rem 1rem 0;
+  }
+
+  .footer-inner {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+
+  .footer-col-main {
+    grid-column: 1;
+    text-align: center;
+  }
+
+  .footer-col-main h4 {
+    font-size: 1.3rem;
+  }
+
+  .footer-col-main p {
+    font-size: 0.95rem;
   }
 
   .footer-col {
-    min-width: 100%;
+    text-align: center;
   }
 
-  .footer-links-grid {
-    grid-template-columns: repeat(2, 1fr);
+  .footer-col h4::after {
+    right: 50%;
+    left: auto;
+    transform: translateX(50%);
+  }
+
+  .footer-links {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .footer-links a::before {
+    display: none;
+  }
+
+  .footer-links a:hover {
+    transform: scale(1.05);
+  }
+
+  .footer-social-icons {
+    gap: 1rem;
   }
 
   .footer-social-icons a {
-    font-size: calc(24px * var(--a11y-font-scale));
+    width: 45px;
+    height: 45px;
+    font-size: 1.3rem;
   }
 
+  .footer-bottom {
+    font-size: 0.85rem;
+    padding: 1rem 0;
+  }
+}
 
+@media (max-width: 380px) {
+  .footer-col-main h4 {
+    font-size: 1.1rem;
+  }
+
+  .footer-col h4 {
+    font-size: 1rem;
+  }
+
+  .footer-social-icons a {
+    width: 40px;
+    height: 40px;
+    font-size: 1.2rem;
+  }
 }
