@@ -16,7 +16,8 @@
 
 .gs-header h2 {
     margin: 0 0 4px;
-    font-size: calc(1.85em * var(--a11y-font-scale));;
+    font-size: calc(1.85em * var(--a11y-font-scale));
+    ;
 }
 
 .gs-subtitle {
@@ -44,50 +45,52 @@
 
 /* כרטיסים */
 .card {
-  border: 1px solid #e6e6e6;
-  padding: 20px;
-  background: #fff;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-  margin-bottom: 16px;
+    border: 1px solid #e6e6e6;
+    padding: 20px;
+    background: #fff;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    margin-bottom: 16px;
 }
 
 .card-head {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 12px;
-  font-weight: 600;
-  font-size: calc(18px * var(--a11y-font-scale));
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+    font-weight: 600;
+    font-size: calc(18px * var(--a11y-font-scale));
 }
 
 .read-grid {
-  display: grid;
-  gap: 12px;
-  grid-template-columns: 1fr 2fr; /* כותרת מצד שמאל, תוכן מצד ימין */
-  align-items: center;
+    display: grid;
+    gap: 12px;
+    grid-template-columns: 1fr 2fr;
+    /* כותרת מצד שמאל, תוכן מצד ימין */
+    align-items: center;
 }
 
 .read-grid small {
-  display: block;
-  color: #666;
-  font-size: calc(14px * var(--a11y-font-scale));;
+    display: block;
+    color: #666;
+    font-size: calc(14px * var(--a11y-font-scale));
+    ;
 }
 
 .card-field {
-  display: flex;
-  flex-direction: column;
+    display: flex;
+    flex-direction: column;
 }
 
 .card-field label {
-  font-weight: 500;
-  color: #333;
-  margin-bottom: 4px;
+    font-weight: 500;
+    color: #333;
+    margin-bottom: 4px;
 }
 
 .card-field span {
-  font-size: calc(15px * var(--a11y-font-scale));
-  color: #555;
+    font-size: calc(15px * var(--a11y-font-scale));
+    color: #555;
 }
 
 .grid-2 {
@@ -306,6 +309,7 @@ button.small.danger:hover {
 
 /* רספונסיביות */
 @media (max-width:600px) {
+
     .gs-btn,
     .gs-btn-outline {
         width: 100%;
@@ -416,6 +420,10 @@ button.small.danger:hover {
     height: 64px;
     object-fit: cover;
     border: 1px solid #eee;
+
+    /* 👇 הופך את התמונה לעיגול */
+    border-radius: 50%;
+    overflow: hidden;
 }
 
 .avatar {
@@ -424,6 +432,9 @@ button.small.danger:hover {
     object-fit: cover;
     margin-inline-start: 8px;
     vertical-align: -6px;
+
+    border-radius: 50%;
+    overflow: hidden;
 }
 
 /* Tabs bar */
@@ -1074,3 +1085,4 @@ button.small.danger:hover {
     width: 100%;
     box-sizing: border-box;
 }
+
