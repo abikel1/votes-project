@@ -1,566 +1,6 @@
-/* GroupSettingsPage.css */
-
-/* מבנה כללי */
-.gs-wrap {
-    direction: rtl;
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 20px;
-    color: #222;
-    font-family: "Assistant", "Segoe UI", sans-serif;
-}
-
-.gs-header {
-    margin-bottom: 16px;
-}
-
-.gs-header h2 {
-    margin: 0 0 4px;
-    font-size: calc(1.85em * var(--a11y-font-scale));
-    ;
-}
-
-.gs-subtitle {
-    color: #666;
-    margin-bottom: 10px;
-}
-
-.gs-actions {
-    display: flex;
-    gap: 10px;
-}
-
-/* רשת כללית */
-.layout {
-    display: grid;
-    grid-template-columns: 1fr 360px;
-    gap: 16px;
-}
-
-@media (max-width: 980px) {
-    .layout {
-        grid-template-columns: 1fr;
-    }
-}
-
-/* כרטיסים */
-.card {
-    border: 1px solid #e6e6e6;
-    padding: 20px;
-    background: #fff;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-    margin-bottom: 16px;
-}
-
-.card-head {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 12px;
-    margin-bottom: 12px;
-    font-weight: 600;
-    font-size: calc(18px * var(--a11y-font-scale));
-}
-
-.read-grid {
-    display: grid;
-    gap: 12px;
-    grid-template-columns: 1fr 2fr;
-    /* כותרת מצד שמאל, תוכן מצד ימין */
-    align-items: center;
-}
-
-.read-grid small {
-    display: block;
-    color: #666;
-    font-size: calc(14px * var(--a11y-font-scale));
-    ;
-}
-
-.card-field {
-    display: flex;
-    flex-direction: column;
-}
-
-.card-field label {
-    font-weight: 500;
-    color: #333;
-    margin-bottom: 4px;
-}
-
-.card-field span {
-    font-size: calc(15px * var(--a11y-font-scale));
-    color: #555;
-}
-
-.grid-2 {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 8px;
-}
-
-@media (max-width:560px) {
-    .grid-2 {
-        grid-template-columns: 1fr;
-    }
-}
-
-.actions-row {
-    display: flex;
-    gap: 8px;
-    margin-top: 10px;
-}
-
-/* סיידבר */
-.sidebar {
-    display: grid;
-    gap: 12px;
-}
-
-/* אקורדיון */
-.acc {
-    border: 1px solid #003366;
-    background: #fff;
-    /* box-shadow: 0 1px 6px rgba(0, 0, 0, .06); */
-    padding: 0;
-    margin-bottom: 5px;
-}
-
-.acc[open] .acc-sum {
-    border-bottom: 1px dashed #eee;
-}
-
-.acc-sum {
-    list-style: none;
-    cursor: pointer;
-    user-select: none;
-    padding: 12px 14px;
-    font-weight: 600;
-}
-
-.acc-body {
-    padding: 10px 14px 14px;
-}
-
-.acc-sum::-webkit-details-marker {
-    display: none;
-}
-
-/* טופס */
-.field label {
-    display: block;
-    margin-top: 10px;
-    margin-bottom: 4px;
-    font-weight: 600;
-    color: #333;
-}
-
-.input,
-textarea.input {
-    width: 100%;
-    padding: 10px 12px;
-    border: 1px solid #dcdcdc;
-    outline: none;
-    transition: border-color .2s, box-shadow .2s;
-    font-family: inherit;
-}
-
-.input:focus,
-textarea.input:focus {
-    border-color: #003366;
-    box-shadow: 0 0 0 3px rgba(11, 116, 218, .12);
-}
-
-textarea.input {
-    resize: vertical;
-}
-
-/* כפתורים */
-.gs-btn,
-.gs-btn-outline {
-    padding: 10px 14px;
-    cursor: pointer;
-    border: 1px solid transparent;
-    font-weight: 600;
-    transition: .15s ease-in-out;
-}
-
-.gs-btn {
-    background: #003366;
-    color: #fff;
-    border-color: #003366;
-}
-
-.gs-btn:hover:not(:disabled) {
-    background: #095eb5;
-}
-
-.gs-btn:disabled {
-    opacity: .6;
-    cursor: not-allowed;
-}
-
-.gs-btn-outline {
-    background: #fff;
-    color: #003366;
-    border-color: #003366;
-}
-
-.gs-btn-outline:hover:not(:disabled) {
-    background: #003366;
-    color: #fff;
-}
-
-.gs-btn-outline:disabled {
-    opacity: .6;
-    cursor: not-allowed;
-}
-
-/* רשימות */
-.list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    display: grid;
-    gap: 6px;
-}
-
-.row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: #fafafa;
-    border: 1px solid #eee;
-    padding: 8px 10px;
-}
-
-.row-main {
-    flex: 1;
-    overflow: hidden;
-}
-
-.title {
-    font-weight: 600;
-}
-
-.sub {
-    font-size: calc(0.9em * var(--a11y-font-scale));
-    color: #666;
-}
-
-.row-actions {
-    display: flex;
-    gap: 6px;
-}
-
-button.small {
-    background: #f0f0f0;
-    border: 1px solid #e4e4e4;
-    color: #333;
-    cursor: pointer;
-    font-size: calc(0.85em * var(--a11y-font-scale));
-    padding: 4px 8px;
-}
-
-button.small:hover {
-    background: #e9e9e9;
-}
-
-button.small.danger {
-    background: #d9534f;
-    border-color: #d9534f;
-    color: #fff;
-}
-
-button.small.danger:hover {
-    background: #b9423e;
-}
-
-/* הודעות */
-.err {
-    color: #b92c28;
-    background: #fdeaea;
-    border: 1px solid #f3c0c0;
-    padding: 6px 10px;
-    font-weight: 500;
-}
-
-.ok {
-    color: #1a7f37;
-    background: #e9f7ee;
-    border: 1px solid #c9e7d2;
-    padding: 6px 10px;
-    font-weight: 500;
-}
-
-.muted {
-    color: #999;
-}
-
-/* קישורים */
-.link {
-    color: #003366;
-    text-decoration: none;
-}
-
-.link:hover {
-    text-decoration: underline;
-}
-
-/* רספונסיביות */
-@media (max-width:600px) {
-
-    .gs-btn,
-    .gs-btn-outline {
-        width: 100%;
-    }
-
-    .actions-row {
-        flex-direction: column;
-    }
-}
-
-.acc-body h4 {
-    font-size: calc(1.05rem * var(--a11y-font-scale));
-}
-
-/* אזור מסוכן */
-.acc.danger .acc-sum {
-    color: #b80d0d;
-}
-
-.danger-text {
-    color: #b80d0d;
-}
-
-.btn-danger {
-    background: #b80d0d;
-    color: #fff;
-    border: none;
-    padding: 8px 12px;
-    cursor: pointer;
-}
-
-.btn-danger:disabled {
-    opacity: .4;
-    cursor: not-allowed;
-}
-
-/* Modal */
-.modal-backdrop {
-    position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, .5);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 9999;
-}
-
-.modal {
-    width: min(520px, 92vw);
-    background: #fff;
-    padding: 18px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, .25);
-}
-
-.modal h3 {
-    margin: 0;
-}
-
-/* Share row */
-.share-row {
-    display: grid;
-    grid-template-columns: 1fr auto;
-    gap: 8px;
-    align-items: center;
-    margin-top: 2px;
-}
-
-.share-input {
-    background: #fcfcfc;
-}
-
-.share-actions {
-    display: flex;
-    gap: 8px;
-}
-
-.share-hint {
-    margin-top: 6px;
-}
-
-@media (max-width:560px) {
-    .share-row {
-        grid-template-columns: 1fr;
-    }
-
-    .share-actions {
-        justify-content: flex-start;
-    }
-}
-
-/* העלאות + תצוגה מקדימה */
-.upload-row {
-    display: flex;
-    gap: 8px;
-    align-items: center;
-    margin: 6px 0;
-}
-
-.thumb-row {
-    display: flex;
-    gap: 10px;
-    align-items: center;
-    margin: 6px 0 10px;
-}
-
-.thumb {
-    width: 64px;
-    height: 64px;
-    object-fit: cover;
-    border: 1px solid #eee;
-
-    /* 👇 הופך את התמונה לעיגול */
-    border-radius: 50%;
-    overflow: hidden;
-}
-
-.avatar {
-    width: 28px;
-    height: 28px;
-    object-fit: cover;
-    margin-inline-start: 8px;
-    vertical-align: -6px;
-
-    border-radius: 50%;
-    overflow: hidden;
-}
-
-/* Tabs bar */
-.gs-tabs {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-    margin-top: 16px;
-    margin-bottom: 8px;
-    border-bottom: 1px solid #e6e6e6;
-    padding-bottom: 4px;
-    justify-content: flex-end;
-}
-
-.gs-tab-btn {
-    border: none;
-    background: transparent;
-    padding: 7px 14px;
-    font-size: calc(0.9rem * var(--a11y-font-scale));
-    font-weight: 600;
-    color: #555;
-    cursor: pointer;
-    transition: background 0.15s ease, color 0.15s ease, box-shadow 0.15s ease,
-        transform 0.05s ease;
-}
-
-.gs-tab-btn:hover {
-    background: #f3f7ff;
-}
-
-.gs-tab-btn:focus {
-    outline: none;
-    box-shadow: 0 0 0 2px rgba(11, 116, 218, 0.25);
-}
-
-.gs-tab-btn.active {
-    background: #003366;
-    color: #fff;
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
-}
-
-/* אזור התוכן של הטאב */
-.gs-tab-panel {
-    margin-top: 10px;
-}
-
-/* Sidebar Tabs */
-.gs-sidebar-tabs {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    width: 200px;
-    padding: 12px;
-    background: #fff;
-    border: 1px solid #eee;
-    height: fit-content;
-}
-
-.side-tab {
-    padding: 10px 14px;
-    text-align: right;
-    cursor: pointer;
-    background: #f7f7f7;
-    border: 1px solid #ddd;
-    font-weight: 600;
-    color: #333;
-    transition: .15s ease;
-}
-
-.side-tab:hover {
-    background: #eef4ff;
-    border-color: #c9dcff;
-}
-
-.side-tab.active {
-    background: #003366;
-    color: white;
-    border-color: #003366;
-}
-
-.side-tab.danger {
-    color: #b80d0d;
-    border-color: #ffcdcd;
-}
-
-.side-tab.danger.active {
-    background: #b80d0d;
-    color: #fff;
-}
-
-/* Layout: תוכן + סיידבר */
-.gs-main-layout {
-    display: flex;
-    flex-direction: row-reverse;
-    gap: 16px;
-    align-items: flex-start;
-    margin-top: 16px;
-}
-
-.gs-tab-panel {
-    flex: 1;
-}
-
-/* רספונסיבי */
-@media (max-width: 900px) {
-    .gs-main-layout {
-        flex-direction: column;
-    }
-
-    .gs-sidebar-tabs {
-        width: 100%;
-        flex-direction: row;
-        flex-wrap: wrap;
-        justify-content: flex-start;
-        gap: 8px;
-    }
-
-    .side-tab {
-        flex: 1 1 45%;
-        text-align: center;
-    }
-}
-
-
-
-/* --- משתנים גלובליים לשימוש חוזר --- */
+/* =========================================
+   משתנים גלובליים
+   ========================================= */
 :root {
   --gs-primary: #003366;
   --gs-primary-hover: #095eb5;
@@ -569,20 +9,29 @@ button.small.danger:hover {
   --gs-text: #222;
   --gs-text-muted: #666;
   --gs-danger: #b80d0d;
+  --a11y-font-scale: 1;
 }
 
-/* מבנה כללי */
-.gs-wrap {
-  direction: rtl;
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 20px;
-  color: var(--gs-text);
-  font-family: "Assistant", "Segoe UI", sans-serif;
+/* =========================================
+   מבנה כללי
+   ========================================= */
+* {
   box-sizing: border-box;
 }
 
-/* כותרת */
+.gs-wrap {
+  direction: rtl;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 24px;
+  color: var(--gs-text);
+  font-family: "Assistant", "Segoe UI", sans-serif;
+  width: 100%;
+}
+
+/* =========================================
+   כותרת
+   ========================================= */
 .gs-header {
   margin-bottom: 24px;
 }
@@ -590,23 +39,26 @@ button.small.danger:hover {
 .clean-header {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
-  gap: 12px;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
 }
 
 .header-title h2 {
   margin: 0 0 6px;
-  font-size: calc(1.85em * var(--a11y-font-scale, 1));
+  font-size: calc(1.85rem * var(--a11y-font-scale));
 }
 
 .header-title p {
   margin: 0;
   color: var(--gs-text-muted);
+  font-size: calc(1rem * var(--a11y-font-scale));
 }
 
 .gs-actions {
   display: flex;
   gap: 10px;
+  flex-wrap: wrap;
 }
 
 .icon-btn {
@@ -614,73 +66,82 @@ button.small.danger:hover {
   border: none;
   cursor: pointer;
   color: var(--gs-primary);
-  padding: 8px;
-  /* border-radius: 50%; */
+  padding: 10px;
   transition: background 0.2s;
+  border-radius: 4px;
 }
 
 .icon-btn:hover {
   background: #eef4ff;
 }
 
-/* --- Layout ראשי --- */
+/* =========================================
+   Layout ראשי - סיידבר + תוכן
+   ========================================= */
 .gs-main-layout {
   display: flex;
-  flex-direction: row-reverse; /* סיידבר בצד ימין ויזואלית בדסקטופ */
+  flex-direction: row-reverse;
   gap: 24px;
   align-items: flex-start;
   margin-top: 16px;
+  width: 100%;
 }
 
-/* אזור התוכן המרכזי */
 .gs-tab-panel {
   flex: 1;
-  min-width: 0; /* מונע גלישה של תוכן רחב בתוך הפלקס */
+  min-width: 0;
+  width: 100%;
 }
 
-/* --- סיידבר (דסקטופ) --- */
+/* =========================================
+   סיידבר (דסקטופ)
+   ========================================= */
 .gs-sidebar-tabs {
-  width: 240px;
+  width: 260px;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 6px;
   padding: 0;
   background: transparent;
   flex-shrink: 0;
   position: sticky;
-  top: 20px; /* נדבק למעלה בגלילה */
+  top: 20px;
 }
 
 .side-tab {
-  padding: 12px 16px;
+  padding: 14px 18px;
   text-align: right;
   cursor: pointer;
   background: #fff;
-  border: 1px solid transparent;
-  /* border-radius: 6px; */
+  border: 1px solid var(--gs-border);
+  border-radius: 6px;
   font-weight: 500;
   color: #444;
   transition: all 0.2s ease;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
+  white-space: nowrap;
 }
 
 .side-tab:hover {
-  background: #fff;
+  background: #f8fbff;
   color: var(--gs-primary);
-  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  transform: translateX(-2px);
 }
 
 .side-tab.active {
   background: var(--gs-primary);
   color: white;
   font-weight: 600;
-  box-shadow: 0 4px 12px rgba(0, 51, 102, 0.2);
+  border-color: var(--gs-primary);
+  box-shadow: 0 4px 12px rgba(0, 51, 102, 0.25);
 }
 
 .side-tab.danger {
   color: var(--gs-danger);
+  border-color: #fdd;
 }
 
 .side-tab.danger:hover {
@@ -690,16 +151,30 @@ button.small.danger:hover {
 .side-tab.danger.active {
   background: var(--gs-danger);
   color: #fff;
+  border-color: var(--gs-danger);
 }
 
-/* --- כרטיסים וגרידים --- */
+.join-requests-count {
+  background-color: #f00b0b;
+  color: white;
+  border-radius: 50%;
+  padding: 3px 8px;
+  font-size: calc(0.75rem * var(--a11y-font-scale));
+  margin-left: 8px;
+  font-weight: 600;
+}
+
+/* =========================================
+   כרטיסים
+   ========================================= */
 .card {
-  border: 1px solid var(--gs-border);
-  padding: 24px;
+  border: 2px solid var(--gs-primary);
+  padding: 28px;
   background: #fff;
-  /* border-radius: 8px; */
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
-  margin-bottom: 20px;
+  border-radius: 0;
+  box-shadow: 0 4px 12px rgba(0, 51, 102, 0.1);
+  margin-bottom: 24px;
+  width: 100%;
 }
 
 .card-head {
@@ -707,37 +182,41 @@ button.small.danger:hover {
   justify-content: space-between;
   align-items: center;
   gap: 12px;
-  margin-bottom: 16px;
+  margin-bottom: 20px;
   font-weight: 700;
-  font-size: calc(1.1rem * var(--a11y-font-scale, 1));
-  border-bottom: 1px solid #f0f0f0;
-  padding-bottom: 12px;
+  font-size: calc(1.25rem * var(--a11y-font-scale));
+  border-bottom: 3px solid var(--gs-primary);
+  padding-bottom: 14px;
+  flex-wrap: wrap;
+  color: var(--gs-primary);
 }
 
-/* טפסים */
+/* =========================================
+   טפסים
+   ========================================= */
 .field {
-  margin-bottom: 16px;
+  margin-bottom: 18px;
+  width: 100%;
 }
 
 .field label {
   display: block;
-  margin-bottom: 6px;
+  margin-bottom: 8px;
   font-weight: 600;
   color: #333;
-  font-size: 0.95rem;
+  font-size: calc(0.95rem * var(--a11y-font-scale));
 }
 
 .input,
 textarea.input {
   width: 100%;
-  padding: 10px 12px;
+  padding: 12px 14px;
   border: 1px solid #dcdcdc;
-  /* border-radius: 6px; */
+  border-radius: 6px;
   outline: none;
   transition: border-color 0.2s, box-shadow 0.2s;
   font-family: inherit;
-  font-size: 1rem; /* מונע זום באייפון */
-  box-sizing: border-box;
+  font-size: calc(1rem * var(--a11y-font-scale));
 }
 
 .input:focus,
@@ -748,36 +227,269 @@ textarea.input:focus {
 
 textarea.input {
   resize: vertical;
-  min-height: 80px;
+  min-height: 100px;
 }
 
-/* Grid Layouts */
-.grid-2 {
+/* =========================================
+   Grid Layouts
+   ========================================= */
+/* src/components/GroupSettings/GeneralTab.css */
+
+/* כרטיס הראשי */
+.card {
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+/* כותרת הכרטיס */
+.card-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.card-head h3 {
+  margin: 0;
+  font-size: 1.4rem;
+  color: #333;
+}
+
+.gs-btn-outline {
+  padding: 6px 12px;
+  border: 1px solid #007bff;
+  background: transparent;
+  color: #007bff;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+}
+
+.gs-btn-outline:hover {
+  background: #007bff;
+  color: #fff;
+}
+
+/* תצוגת קריאה */
+.read-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 16px;
 }
 
-.read-grid {
-  display: grid;
-  gap: 12px;
-  grid-template-columns: 120px 1fr; /* כותרת קבועה, תוכן גמיש */
-  align-items: baseline;
+.read-grid div {
+  display: flex;
+  flex-direction: column;
 }
 
 .read-grid small {
-  color: var(--gs-text-muted);
-  font-weight: 500;
+  color: #666;
+  margin-bottom: 4px;
 }
 
-/* רשימות */
+.read-grid b {
+  font-weight: 600;
+  color: #333;
+}
+
+.link {
+  color: #007bff;
+  text-decoration: underline;
+}
+
+.muted {
+  color: #999;
+  font-size: 0.9rem;
+}
+
+/* שורות השיתוף */
+.share-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.share-input {
+  flex: 1;
+  padding: 6px 8px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+.share-actions button.gs-btn {
+  padding: 6px 12px;
+  border: none;
+  border-radius: 6px;
+  background-color: #007bff;
+  color: #fff;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.share-actions button.gs-btn:hover {
+  background-color: #0056b3;
+}
+
+.share-hint {
+  font-size: 0.85rem;
+  color: #666;
+  margin-top: 4px;
+}
+
+/* שגיאות והודעות הצלחה */
+.err {
+  color: #c00;
+  font-size: 0.9rem;
+}
+
+.ok {
+  color: #0a0;
+  font-size: 0.9rem;
+}
+
+/* טפסים לעריכה */
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.field label {
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+
+.field .input {
+  padding: 8px 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 1rem;
+}
+
+.field textarea.input {
+  resize: vertical;
+}
+
+/* רשת לשדות כפולים */
+.grid-2 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 16px;
+}
+
+/* כפתורים בתחתית הטופס */
+.actions-row {
+  display: flex;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.gs-btn {
+  padding: 6px 14px;
+  border-radius: 6px;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  font-size: 0.95rem;
+}
+
+.gs-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.gs-btn-outline {
+  border: 1px solid #007bff;
+  color: #007bff;
+  background: transparent;
+}
+
+.gs-btn-outline:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* רספונסיביות */
+@media (max-width: 768px) {
+  .read-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .grid-2 {
+    grid-template-columns: 1fr;
+  }
+
+  .share-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+/* .grid-2 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+  width: 100%;
+}
+
+.read-grid {
+  display: grid;
+  gap: 20px;
+  grid-template-columns: 140px 1fr;
+  align-items: center;
+  width: 100%;
+  padding: 16px 0;
+  border-bottom: 2px solid #e8f0ff;
+}
+
+.read-grid:last-child {
+  border-bottom: none;
+}
+
+.read-grid small {
+  color: var(--gs-primary);
+  font-weight: 700;
+  font-size: calc(0.95rem * var(--a11y-font-scale));
+  text-align: right;
+}
+
+.card-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.card-field label {
+  font-weight: 700;
+  color: var(--gs-primary);
+  font-size: calc(0.95rem * var(--a11y-font-scale));
+  text-align: right;
+}
+
+.card-field span {
+  font-size: calc(1.05rem * var(--a11y-font-scale));
+  color: #222;
+  font-weight: 600;
+  padding: 0;
+} */
+
+/* =========================================
+   רשימות
+   ========================================= */
 .list {
   list-style: none;
   padding: 0;
   margin: 0;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
+  width: 100%;
 }
 
 .row {
@@ -786,79 +498,114 @@ textarea.input {
   align-items: center;
   background: #fff;
   border: 1px solid #eee;
-  padding: 12px;
-  /* border-radius: 6px; */
-  transition: background 0.15s;
+  padding: 14px;
+  border-radius: 8px;
+  transition: all 0.15s;
+  gap: 12px;
+  width: 100%;
 }
 
 .row:hover {
   background: #fafafa;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.06);
 }
 
 .row-main {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 14px;
   flex: 1;
   overflow: hidden;
+  min-width: 0;
 }
 
 .thumb {
-  width: 48px;
-  height: 48px;
-  /* border-radius: 6px; */
+  width: 56px;
+  height: 56px;
+  border-radius: 8px;
   object-fit: cover;
   background: #eee;
+  flex-shrink: 0;
+}
+
+.avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-inline-start: 8px;
+  vertical-align: middle;
   flex-shrink: 0;
 }
 
 .info {
   display: flex;
   flex-direction: column;
+  gap: 4px;
   overflow: hidden;
+  flex: 1;
+  min-width: 0;
 }
 
 .title {
   font-weight: 600;
+  font-size: calc(1rem * var(--a11y-font-scale));
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
 .sub {
-  font-size: 0.85em;
+  font-size: calc(0.85rem * var(--a11y-font-scale));
   color: var(--gs-text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .row-actions {
   display: flex;
   gap: 8px;
   flex-shrink: 0;
+  flex-wrap: wrap;
 }
 
-/* כפתורים */
-.gs-btn, .gs-btn-outline {
-  padding: 10px 18px;
-  /* border-radius: 6px; */
+/* =========================================
+   כפתורים
+   ========================================= */
+.gs-btn, 
+.gs-btn-outline,
+.btn-danger {
+  padding: 12px 20px;
+  border-radius: 6px;
   cursor: pointer;
   font-weight: 600;
-  font-size: 0.95rem;
+  font-size: calc(0.95rem * var(--a11y-font-scale));
   border: 1px solid transparent;
   transition: all 0.2s;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
+  gap: 8px;
+  text-align: center;
+  white-space: nowrap;
 }
 
 .gs-btn {
   background: var(--gs-primary);
   color: #fff;
+  border-color: var(--gs-primary);
 }
 
 .gs-btn:hover:not(:disabled) {
   background: var(--gs-primary-hover);
   transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 51, 102, 0.2);
+}
+
+.gs-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .gs-btn-outline {
@@ -869,49 +616,259 @@ textarea.input {
 
 .gs-btn-outline:hover:not(:disabled) {
   background: #f0f7ff;
+  border-color: var(--gs-primary-hover);
+}
+
+.gs-btn-outline:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-danger {
+  background: var(--gs-danger);
+  color: #fff;
+  border-color: var(--gs-danger);
+}
+
+.btn-danger:hover:not(:disabled) {
+  background: #950a0a;
+  box-shadow: 0 4px 12px rgba(184, 13, 13, 0.3);
+}
+
+.btn-danger:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
 }
 
 button.small {
-  padding: 6px 10px;
-  font-size: 0.85rem;
-  /* border-radius: 4px; */
+  padding: 7px 12px;
+  font-size: calc(0.85rem * var(--a11y-font-scale));
+  border-radius: 4px;
   border: 1px solid #ddd;
   background: #fff;
   cursor: pointer;
+  font-weight: 500;
+  transition: all 0.15s;
 }
 
 button.small:hover {
   background: #f5f5f5;
-  border-color: #ccc;
+  border-color: #bbb;
 }
 
 button.small.danger {
-  color: #c00;
+  color: var(--gs-danger);
   border-color: #fdd;
   background: #fff5f5;
 }
 
 button.small.danger:hover {
   background: #fee;
+  border-color: #fcc;
 }
 
-/* Share Section */
+.actions-row {
+  display: flex;
+  gap: 10px;
+  margin-top: 16px;
+  flex-wrap: wrap;
+}
+
+/* =========================================
+   Share Section
+   ========================================= */
 .share-row {
   display: flex;
-  gap: 8px;
-  margin-top: 8px;
+  gap: 10px;
+  margin-top: 10px;
+  align-items: center;
   flex-wrap: wrap;
+  width: 100%;
 }
 
 .share-input {
   flex: 1;
+  min-width: 200px;
   background: #f9f9f9;
-  font-family: monospace;
+  font-family: 'Courier New', monospace;
   direction: ltr;
   text-align: left;
+  font-size: calc(0.9rem * var(--a11y-font-scale));
 }
 
-/* --- Modal --- */
+.share-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.share-hint {
+  margin-top: 8px;
+  font-size: calc(0.85rem * var(--a11y-font-scale));
+  color: var(--gs-text-muted);
+}
+
+/* =========================================
+   Upload Section
+   ========================================= */
+.upload-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin: 8px 0;
+  flex-wrap: wrap;
+}
+
+.thumb-row {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin: 10px 0 14px;
+  flex-wrap: wrap;
+}
+
+/* =========================================
+   Tabs (אופקי)
+   ========================================= */
+.gs-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 16px;
+  margin-bottom: 12px;
+  border-bottom: 1px solid #e6e6e6;
+  padding-bottom: 6px;
+  justify-content: flex-end;
+}
+
+.gs-tab-btn {
+  border: none;
+  background: transparent;
+  padding: 10px 16px;
+  font-size: calc(0.9rem * var(--a11y-font-scale));
+  font-weight: 600;
+  color: #555;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  border-radius: 4px;
+  white-space: nowrap;
+}
+
+.gs-tab-btn:hover {
+  background: #f3f7ff;
+}
+
+.gs-tab-btn:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(11, 116, 218, 0.25);
+}
+
+.gs-tab-btn.active {
+  background: var(--gs-primary);
+  color: #fff;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+/* =========================================
+   Accordion
+   ========================================= */
+.acc {
+  border: 1px solid var(--gs-primary);
+  background: #fff;
+  border-radius: 6px;
+  margin-bottom: 8px;
+  overflow: hidden;
+}
+
+.acc[open] .acc-sum {
+  border-bottom: 1px solid #eee;
+}
+
+.acc-sum {
+  list-style: none;
+  cursor: pointer;
+  user-select: none;
+  padding: 14px 16px;
+  font-weight: 600;
+  font-size: calc(1rem * var(--a11y-font-scale));
+  background: #f8fbff;
+  transition: background 0.15s;
+}
+
+.acc-sum:hover {
+  background: #eef5ff;
+}
+
+.acc-sum::-webkit-details-marker {
+  display: none;
+}
+
+.acc-body {
+  padding: 16px;
+}
+
+.acc-body h4 {
+  font-size: calc(1.05rem * var(--a11y-font-scale));
+  margin: 0 0 12px;
+}
+
+.acc.danger .acc-sum {
+  color: var(--gs-danger);
+  background: #fff5f5;
+}
+
+.danger-text {
+  color: var(--gs-danger);
+  font-weight: 600;
+}
+
+/* =========================================
+   הודעות (Alerts)
+   ========================================= */
+.err {
+  color: #b92c28;
+  background: #fdeaea;
+  border: 1px solid #f3c0c0;
+  padding: 10px 14px;
+  font-weight: 500;
+  border-radius: 6px;
+  margin: 10px 0;
+}
+
+.ok {
+  color: #1a7f37;
+  background: #e9f7ee;
+  border: 1px solid #c9e7d2;
+  padding: 10px 14px;
+  font-weight: 500;
+  border-radius: 6px;
+  margin: 10px 0;
+}
+
+.muted {
+  color: #999;
+  font-size: calc(0.9rem * var(--a11y-font-scale));
+}
+
+.candidate-alert {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  border: 2px solid var(--gs-primary);
+  background: #f0f4ff;
+  color: var(--gs-primary);
+  padding: 16px 20px;
+  margin: 16px 0;
+  font-weight: 600;
+  font-size: calc(1rem * var(--a11y-font-scale));
+  border-radius: 8px;
+  width: 100%;
+}
+
+/* =========================================
+   Modal
+   ========================================= */
 .modal-backdrop {
   position: fixed;
   inset: 0;
@@ -921,177 +878,390 @@ button.small.danger:hover {
   justify-content: center;
   z-index: 9999;
   padding: 20px;
-  backdrop-filter: blur(2px);
+  backdrop-filter: blur(3px);
 }
 
 .modal {
   width: 100%;
-  max-width: 500px;
+  max-width: 540px;
   background: #fff;
-  padding: 24px;
-  /* border-radius: 12px; */
-  box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+  padding: 28px;
+  border-radius: 12px;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.25);
   max-height: 90vh;
   overflow-y: auto;
 }
 
-/* =========================================
-   Responsive / Mobile Styles
-   ========================================= */
+.modal h3 {
+  margin: 0 0 16px;
+  font-size: calc(1.3rem * var(--a11y-font-scale));
+}
 
+/* =========================================
+   קישורים
+   ========================================= */
+.link {
+  color: var(--gs-primary);
+  text-decoration: none;
+  transition: color 0.15s;
+}
+
+.link:hover {
+  text-decoration: underline;
+  color: var(--gs-primary-hover);
+}
+
+/* =========================================
+   RESPONSIVE - טאבלט (iPad)
+   ========================================= */
+@media (max-width: 1024px) {
+  .gs-wrap {
+    padding: 20px;
+  }
+
+  .gs-sidebar-tabs {
+    width: 220px;
+  }
+
+  .gs-main-layout {
+    gap: 20px;
+  }
+
+  .card {
+    padding: 20px;
+  }
+
+  .read-grid {
+    grid-template-columns: 120px 1fr;
+  }
+}
+
+/* =========================================
+   RESPONSIVE - טאבלט קטן / iPad אנכי
+   ========================================= */
 @media (max-width: 900px) {
   .gs-wrap {
-    padding: 12px;
+    padding: 16px;
   }
-  
-  /* שינוי כיוון ה-Layout: עמודה אחת */
+
+  /* שינוי Layout לעמודה */
   .gs-main-layout {
-    flex-direction: column; 
+    flex-direction: column;
     gap: 16px;
   }
-  
-  /* חשוב מאוד: מזיזים את הסיידבר למעלה ויזואלית
-     למרות שהוא מופיע אחרי התוכן ב-HTML 
-  */
+
+  /* סיידבר הופך לרצועה אופקית למעלה */
   .gs-sidebar-tabs {
-    order: -1; 
+    order: -1;
     width: 100%;
     position: sticky;
     top: 0;
     z-index: 100;
-    
-    /* הופך לסרגל גלילה אופקי */
     flex-direction: row;
     overflow-x: auto;
     white-space: nowrap;
     background: #fff;
-    padding: 8px 4px;
-    border-bottom: 1px solid #eee;
-    box-shadow: 0 4px 6px -4px rgba(0,0,0,0.1);
-    
-    /* הסתרת פס גלילה */
-    -ms-overflow-style: none;  /* IE and Edge */
-    scrollbar-width: none;  /* Firefox */
+    padding: 10px 8px;
+    border-bottom: 2px solid #eee;
+    box-shadow: 0 4px 8px -4px rgba(0,0,0,0.12);
+    gap: 8px;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
   }
-  
+
   .gs-sidebar-tabs::-webkit-scrollbar {
     display: none;
   }
 
   .side-tab {
-    flex: 0 0 auto; /* לא מתכווץ */
-    padding: 8px 14px;
-    font-size: 0.9rem;
-    /* border-radius: 20px; עיצוב כפתורי "Chips" */
+    flex: 0 0 auto;
+    padding: 10px 16px;
+    font-size: calc(0.9rem * var(--a11y-font-scale));
+    border-radius: 20px;
     background: #f5f5f5;
-    border: 1px solid #eee;
+    border: 1px solid #e5e5e5;
+    min-width: fit-content;
   }
-  
+
   .side-tab.active {
     background: var(--gs-primary);
     color: #fff;
     border-color: var(--gs-primary);
   }
 
-  /* כותרת קומפקטית יותר */
+  .side-tab:hover {
+    transform: none;
+  }
+
+  /* כותרת */
   .clean-header {
-    flex-direction: column;
-    gap: 8px;
-  }
-  
-  .gs-actions {
-    width: 100%;
-    justify-content: flex-end;
-    border-top: 1px solid #eee;
-    padding-top: 8px;
-  }
-
-  /* גריד שדות */
-  .grid-2 {
-    grid-template-columns: 1fr;
-  }
-  
-  .read-grid {
-    grid-template-columns: 1fr; /* תווית מעל תוכן */
-    gap: 4px;
-    margin-bottom: 12px;
-  }
-  
-  .read-grid small {
-    font-size: 0.85em;
-    color: #888;
-  }
-  
-  .card {
-    padding: 16px;
-  }
-
-  /* רשימות במובייל */
-  .row {
     flex-direction: column;
     align-items: flex-start;
     gap: 12px;
   }
-  
+
+  .header-title h2 {
+    font-size: calc(1.5rem * var(--a11y-font-scale));
+  }
+
+  .gs-actions {
+    width: 100%;
+    justify-content: flex-start;
+    border-top: 1px solid #eee;
+    padding-top: 12px;
+  }
+
+  /* גרידים */
+  .grid-2 {
+    grid-template-columns: 1fr;
+  }
+
+  .read-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+    margin-bottom: 16px;
+    padding: 14px;
+    background: #fff;
+    border: 2px solid var(--gs-primary);
+    border-right: 6px solid var(--gs-primary);
+  }
+
+  .read-grid small {
+    font-size: calc(0.9rem * var(--a11y-font-scale));
+    text-align: right;
+    font-weight: 700;
+    padding-bottom: 6px;
+    border-bottom: 1px solid #e8f0ff;
+  }
+
+  .card-field label {
+    font-size: calc(0.9rem * var(--a11y-font-scale));
+    text-align: right;
+    font-weight: 700;
+    padding-bottom: 6px;
+    border-bottom: 1px solid #e8f0ff;
+  }
+
+  .card-field span {
+    font-size: calc(1rem * var(--a11y-font-scale));
+    padding: 6px 0;
+  }
+
+  /* כרטיסים */
+  .card {
+    padding: 20px;
+    border-radius: 0;
+    border-width: 2px;
+  }
+
+  .card-head {
+    font-size: calc(1.15rem * var(--a11y-font-scale));
+    border-bottom-width: 2px;
+  }
+
+  /* רשימות */
+  .row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 14px;
+  }
+
   .row-main {
     width: 100%;
   }
-  
+
   .row-actions {
     width: 100%;
-    justify-content: flex-end;
+    justify-content: flex-start;
     border-top: 1px solid #f5f5f5;
-    padding-top: 8px;
+    padding-top: 10px;
   }
 
-  /* כפתורים רחבים במובייל */
-  .gs-btn, .gs-btn-outline {
+  /* כפתורים רחבים */
+  .gs-btn, 
+  .gs-btn-outline,
+  .btn-danger {
     width: 100%;
+    justify-content: center;
   }
 
   .actions-row {
     flex-direction: column;
+    width: 100%;
   }
-  
+
+  /* Share */
   .share-row {
     flex-direction: column;
+    align-items: stretch;
   }
-  
+
+  .share-input {
+    width: 100%;
+    min-width: unset;
+  }
+
   .share-actions {
     width: 100%;
-    display: flex;
   }
-  
+
   .share-actions button {
     flex: 1;
   }
+
+  /* Tabs */
+  .gs-tabs {
+    justify-content: flex-start;
+    gap: 6px;
+  }
+
+  .gs-tab-btn {
+    padding: 8px 14px;
+    font-size: calc(0.85rem * var(--a11y-font-scale));
+  }
 }
 
-/* הודעות מרכזיות עם מסגרת */
-.candidate-alert {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    border: 2px solid #003366; /* צבע המסגרת */
-    background: #f0f4ff; /* צבע רקע עדין */
-    color: #003366;
+/* =========================================
+   RESPONSIVE - מובייל
+   ========================================= */
+@media (max-width: 600px) {
+  .gs-wrap {
+    padding: 12px;
+  }
+
+  .header-title h2 {
+    font-size: calc(1.4rem * var(--a11y-font-scale));
+  }
+
+  .header-title p {
+    font-size: calc(0.9rem * var(--a11y-font-scale));
+  }
+
+  .card {
     padding: 16px;
-    margin: 12px 0;
-    font-weight: 600;
-    font-size: 1rem;
-    border-radius: 6px;
-    width: 100%;
-    box-sizing: border-box;
+    margin-bottom: 16px;
+    border-width: 2px;
+  }
+
+  .card-head {
+    font-size: calc(1.05rem * var(--a11y-font-scale));
+    padding-bottom: 12px;
+    border-bottom-width: 2px;
+  }
+
+  .side-tab {
+    padding: 8px 14px;
+    font-size: calc(0.85rem * var(--a11y-font-scale));
+  }
+
+  .thumb {
+    width: 48px;
+    height: 48px;
+  }
+
+  .avatar {
+    width: 28px;
+    height: 28px;
+  }
+
+  .title {
+    font-size: calc(0.95rem * var(--a11y-font-scale));
+  }
+
+  .sub {
+    font-size: calc(0.8rem * var(--a11y-font-scale));
+  }
+
+  .gs-btn,
+  .gs-btn-outline,
+  .btn-danger {
+    padding: 11px 16px;
+    font-size: calc(0.9rem * var(--a11y-font-scale));
+  }
+
+  button.small {
+    padding: 6px 10px;
+    font-size: calc(0.8rem * var(--a11y-font-scale));
+  }
+
+  .modal {
+    padding: 20px;
+    max-width: calc(100% - 24px);
+  }
+
+  .modal h3 {
+    font-size: calc(1.15rem * var(--a11y-font-scale));
+  }
+
+  .candidate-alert {
+    padding: 14px 16px;
+    font-size: calc(0.9rem * var(--a11y-font-scale));
+  }
+
+  .join-requests-count {
+    padding: 2px 6px;
+    font-size: calc(0.7rem * var(--a11y-font-scale));
+  }
 }
 
+/* =========================================
+   RESPONSIVE - מסכים קטנים מאוד
+   ========================================= */
+@media (max-width: 380px) {
+  .gs-wrap {
+    padding: 10px;
+  }
 
+  .header-title h2 {
+    font-size: calc(1.25rem * var(--a11y-font-scale));
+  }
 
-.join-requests-count {
-  background-color: #f00b0b; /* צהוב כתום */
-  color: white;
-  border-radius: 50%;
-  padding: 2px 6px;
-  font-size: 0.75rem;
-  margin-left: 6px;
+  .card {
+    padding: 14px;
+    border-width: 2px;
+  }
+
+  .side-tab {
+    padding: 7px 12px;
+    font-size: calc(0.8rem * var(--a11y-font-scale));
+  }
+
+  .input,
+  textarea.input {
+    padding: 10px 12px;
+    font-size: calc(0.95rem * var(--a11y-font-scale));
+  }
+
+  .row {
+    padding: 12px;
+  }
+
+  .thumb {
+    width: 44px;
+    height: 44px;
+  }
+}
+
+/* =========================================
+   הדפסה
+   ========================================= */
+@media print {
+  .gs-sidebar-tabs,
+  .gs-actions,
+  .icon-btn,
+  .row-actions,
+  button {
+    display: none !important;
+  }
+
+  .gs-main-layout {
+    flex-direction: column;
+  }
+
+  .card {
+    break-inside: avoid;
+    box-shadow: none;
+    border: 1px solid #ccc;
+  }
 }
