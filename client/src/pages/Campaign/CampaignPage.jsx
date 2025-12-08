@@ -37,6 +37,7 @@ import { useTranslation } from 'react-i18next';
 import ImageCropModal from '../../components/ImageCropModal';
 
 import toast from 'react-hot-toast';
+import ConfirmModal from '../../components/ConfirmModal/ConfirmModal';
 
 // ===== עוזר לניקוי תשובת ה-AI =====
 function normalizeAiSuggestion(suggestion, fallbackTitle = '') {
@@ -153,9 +154,70 @@ export default function CampaignPage() {
   const [updateCandidateError, setUpdateCandidateError] = useState('');
   const [uploadingEdit, setUploadingEdit] = useState(false);
   const editFileInputRef = useRef(null);
+const [deletePostModal, setDeletePostModal] = useState({
+  open: false,
+  postId: null,
+});
 
   // groupId "יעיל" – גם מהמיקום, גם מהקמפיין, וגם מהשגיאה אם נעול
   const effectiveGroupId = groupId || campaign?.groupId || lockedGroupId || null;
+
+
+const openDeletePostModal = (postId) => {
+  console.log('Opening delete modal for post:', postId);
+  setDeletePostModal({
+    open: true,
+    postId,
+    loading: false,
+    error: null,
+  });
+};
+
+
+
+const closeDeletePostModal = () => {
+  setDeletePostModal({
+    open: false,
+    postId: null,
+    loading: false,
+    error: null,
+  });
+};
+
+
+const confirmDeletePost = async () => {
+  const postId = deletePostModal.postId;
+  if (!postId) {
+    setDeletePostModal((s) => ({ ...s, error: 'Missing post id' }));
+    return;
+  }
+
+  try {
+    setDeletePostModal((s) => ({ ...s, loading: true, error: null }));
+
+    await dispatch(deletePost({ campaignId: campaign._id, postId })).unwrap();
+
+    // הצלחה — ריענון ותסגור מודאל
+    refetchCampaign();
+    closeDeletePostModal();
+    toast.success(t('campaign.posts.deletedSuccessfully') || 'הפוסט נמחק בהצלחה');
+    setIsEditMode(false);
+  } catch (err) {
+    console.error('שגיאה במחיקת פוסט:', err);
+    // הראה שגיאה למשתמש
+    const msg =
+      err?.response?.data?.message ||
+      err?.message ||
+      t('campaign.posts.deleteError') ||
+      'שגיאה במחיקה';
+    setDeletePostModal((s) => ({ ...s, error: msg, loading: false }));
+    toast.error(msg);
+  } finally {
+    setDeletePostModal((s) => ({ ...s, loading: false }));
+  }
+};
+
+
 
   // === פונקציה נוחה לריענון הקמפיין מהשרת אחרי פעולות עריכה ===
   const refetchCampaign = () => {
@@ -378,19 +440,27 @@ export default function CampaignPage() {
       });
   };
 
-  const handleDeletePost = (postId) => {
-    if (!window.confirm(t('campaign.posts.confirmDelete'))) return;
+  // const handleDeletePost = (postId) => {
 
-    dispatch(deletePost({ campaignId: campaign._id, postId }))
-      .unwrap()
-      .then(() => {
-        refetchCampaign();
-        setIsEditMode(false);
-      })
-      .catch((err) => {
-        console.error('שגיאה במחיקת פוסט:', err);
-      });
-  };
+  //   if (!window.confirm(t('campaign.posts.confirmDelete'))) return;
+
+  //   dispatch(deletePost({ campaignId: campaign._id, postId }))
+  //     .unwrap()
+  //     .then(() => {
+  //       refetchCampaign();
+  //       setIsEditMode(false);
+  //     })
+  //     .catch((err) => {
+  //       console.error('שגיאה במחיקת פוסט:', err);
+  //     });
+  // };
+
+// const handleDeletePost = (postId) => {
+//   console.log("פתיחת מודל למחיקת פוסט", postId); // ← את תראי את זה בקונסול
+//   setDeletePostModal({ open: true, postId });
+// };
+
+const handleDeletePost = (postId) => openDeletePostModal(postId);
 
   // תגובות
   const handleAddComment = async (campaignId, postId, content) => {
@@ -751,7 +821,7 @@ export default function CampaignPage() {
                     currentUserId={currentUserId}
                     isCandidateOwner={isCandidateOwner}
                     isEditMode={isEditMode}
-                    onDeletePost={handleDeletePost}
+  onDeletePost={() => openDeletePostModal(p._id)}
                     onAddComment={handleAddComment}
                     onDeleteComment={handleDeleteComment}
                   />
@@ -1131,6 +1201,18 @@ export default function CampaignPage() {
           </div>
         </div>
       )}
+
+
+{deletePostModal.open && (
+  <ConfirmModal
+    open={deletePostModal.open}
+    message={t('campaign.posts.confirmDelete')}
+    onConfirm={confirmDeletePost}
+    onCancel={closeDeletePostModal}
+  />
+)}
+
+
 
     </div>
   );
