@@ -1085,3 +1085,13 @@ button.small.danger:hover {
     box-sizing: border-box;
 }
 
+
+
+.join-requests-count {
+  background-color: #f00b0b; /* צהוב כתום */
+  color: white;
+  border-radius: 50%;
+  padding: 2px 6px;
+  font-size: 0.75rem;
+  margin-left: 6px;
+}
