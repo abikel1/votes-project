@@ -2,8 +2,10 @@
 
 .navbar {
   background: linear-gradient(135deg, #003366 0%, #004d99 100%);
-  padding: 0 2rem;
-  height: 70px;
+  padding: 0 1.5rem;
+  /* היה 2rem */
+  height: 60px;
+  /* היה 70px */
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -12,12 +14,14 @@
   top: 0;
   z-index: 1000;
   direction: rtl;
-  gap: 1.5rem;
+  gap: 1rem;
+  /* היה 1.5rem */
 }
 
 /* לוגו/שם האתר */
 .site-name {
-  font-size: 1.5rem;
+  font-size: 1.3rem;
+  /* קצת קטן יותר */
   font-weight: bold;
   color: white;
   letter-spacing: 1px;
@@ -26,14 +30,15 @@
 }
 
 .site-name:hover {
-  transform: scale(1.05);
-  text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+  transform: scale(1.03);
+  text-shadow: 0 0 8px rgba(255, 255, 255, 0.4);
 }
 
 /* תמונת פרופיל */
 .profile {
-  width: 45px;
-  height: 45px;
+  width: 40px;
+  /* היה 45px */
+  height: 40px;
   border-radius: 50%;
   background: white;
   color: #003366;
@@ -41,7 +46,7 @@
   align-items: center;
   justify-content: center;
   font-weight: bold;
-  font-size: 1.2rem;
+  font-size: 1rem;
   text-decoration: none;
   transition: all 0.3s ease;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
@@ -49,80 +54,64 @@
 }
 
 .profile:hover {
-  transform: scale(1.1);
-  box-shadow: 0 4px 12px rgba(255, 255, 255, 0.3);
+  transform: scale(1.05);
+  box-shadow: 0 3px 10px rgba(255, 255, 255, 0.25);
 }
 
-/* קישורים */
+/* קישורים – wrapper כללי */
 .links {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  flex: 1;
+}
+
+/* הקישורים עצמם – קצת ימינה */
+.nav-links-right {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-right: 1.5rem;
+  /* הזזה ימינה */
+}
+
+/* יציאה + שפה – שמאלה */
+.nav-links-left {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-left: auto;
+  /* דוחף אותם שמאלה */
 }
 
 .links a,
-.links .logout-btn {
+.links {
   color: white;
   text-decoration: none;
-  font-size: 1rem;
+  font-size: 0.95rem;
   font-weight: 500;
-  padding: 0.5rem 1rem;
-  /* border-radius: 6px; */
-  transition: all 0.3s ease;
-  position: relative;
+  padding: 0.35rem 0.75rem;
+  /* פחות padding */
+  transition: all 0.2s ease;
   white-space: nowrap;
+  border-radius: 4px;
 }
 
-.links a::after {
-  content: '';
-  position: absolute;
-  bottom: 3px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 0;
-  height: 2px;
-  background: white;
-  transition: width 0.3s ease;
-}
-
-.links a:hover::after {
-  width: 70%;
-}
-
+/* מצב hover – רק רקע עדין בלי קו תחתון */
 .links a:hover {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.12);
 }
 
+/* קישור פעיל – הדגשה עדינה */
 .active-link {
-  background: rgba(255, 255, 255, 0.2) !important;
+  background: rgba(255, 255, 255, 0.2);
   font-weight: 600;
-}
-
-.active-link::after {
-  width: 70% !important;
-}
-
-/* כפתור יציאה */
-.logout-btn {
-  background: transparent;
-  border: 2px solid white;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  /* border-radius: 6px; */
-}
-
-.logout-btn:hover {
-  background: white;
-  color: #003366;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 /* תפריט המבורגר */
 .hamburger {
   display: none;
   flex-direction: column;
-  gap: 5px;
+  gap: 4px;
   cursor: pointer;
   padding: 5px;
   z-index: 1001;
@@ -130,15 +119,14 @@
 }
 
 .hamburger span {
-  width: 28px;
+  width: 24px;
   height: 3px;
   background: white;
-  /* border-radius: 2px; */
   transition: all 0.3s ease;
 }
 
 .hamburger.active span:nth-child(1) {
-  transform: rotate(45deg) translate(8px, 8px);
+  transform: rotate(45deg) translate(6px, 6px);
 }
 
 .hamburger.active span:nth-child(2) {
@@ -146,36 +134,33 @@
 }
 
 .hamburger.active span:nth-child(3) {
-  transform: rotate(-45deg) translate(7px, -7px);
+  transform: rotate(-45deg) translate(6px, -6px);
 }
 
 /* רספונסיבי */
 @media (max-width: 968px) {
-  .links {
-    gap: 0.75rem;
-  }
 
   .links a,
-  .links .logout-btn {
-    font-size: 0.95rem;
-    padding: 0.4rem 0.8rem;
+  .links {
+    font-size: 0.9rem;
+    padding: 0.3rem 0.65rem;
   }
 }
 
 @media (max-width: 768px) {
   .navbar {
     padding: 0 1rem;
-    height: 60px;
+    height: 56px;
   }
 
   .site-name {
-    font-size: 1.2rem;
+    font-size: 1.1rem;
   }
 
   .profile {
-    width: 40px;
-    height: 40px;
-    font-size: 1rem;
+    width: 36px;
+    height: 36px;
+    font-size: 0.9rem;
   }
 
   .hamburger {
@@ -184,14 +169,14 @@
 
   .links {
     position: fixed;
-    top: 60px;
+    top: 56px;
     right: -100%;
     width: 100%;
-    max-width: 300px;
-    height: calc(100vh - 60px);
+    max-width: 280px;
+    height: calc(100vh - 56px);
     background: linear-gradient(180deg, #003366 0%, #002244 100%);
     flex-direction: column;
-    padding: 2rem 0;
+    padding: 1.5rem 0;
     gap: 0;
     transition: right 0.3s ease;
     box-shadow: -2px 0 10px rgba(0, 0, 0, 0.3);
@@ -202,30 +187,28 @@
     right: 0;
   }
 
-  .links a,
-  .links .logout-btn {
+  /* במובייל – שני ה־divs אחד מתחת לשני */
+  .nav-links-right,
+  .nav-links-left {
+    flex-direction: column;
+    align-items: center;
     width: 100%;
-    text-align: center;
-    padding: 1rem 2rem;
-    border-radius: 0;
-    font-size: 1.1rem;
+    margin: 0;
+    gap: 0;
   }
 
-  .links a::after {
-    display: none;
+  .links a,
+  .links {
+    width: 100%;
+    text-align: center;
+    padding: 0.9rem 2rem;
+    border-radius: 0;
+    font-size: 1rem;
   }
 
   .links a:hover,
   .active-link {
-    background: rgba(255, 255, 255, 0.15) !important;
-  }
-
-  .logout-btn {
-    margin-top: 1rem;
-    width: calc(100% - 4rem);
-    margin-left: 2rem;
-    margin-right: 2rem;
-    /* border-radius: 8px; */
+    background: rgba(255, 255, 255, 0.15);
   }
 }
 
@@ -239,8 +222,46 @@
   }
 
   .profile {
-    width: 35px;
-    height: 35px;
-    font-size: 0.9rem;
+    width: 32px;
+    height: 32px;
+    font-size: 0.85rem;
   }
+}
+
+/* בדסקטופ – מזיז את היציאה והשפות שמאלה */
+@media (min-width: 769px) {
+  .site-name {
+    font-size: 2rem;
+  }
+}
+
+
+/* כפתור יציאה כאייקון */
+.logout-icon-btn {
+  background: transparent;
+  border: 1px solid #003366;
+  cursor: pointer;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 1.3rem;
+  transition: all 0.25s ease;
+}
+
+.logout-icon-btn:hover {
+  background: white;
+  color: #003366;
+  transform: scale(1.1);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);
+}
+
+/* עטיפה לפרופיל + יציאה */
+.profile-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
 }

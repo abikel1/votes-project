@@ -5,6 +5,7 @@ import { logout } from '../../slices/authSlice';
 import './NavBar.css';
 import LanguageSwitcher from '../LanguageSwitcher.jsx';
 import { useTranslation } from 'react-i18next';
+import { FiLogOut } from 'react-icons/fi';
 
 const NavBar = () => {
   const dispatch = useDispatch();
@@ -39,7 +40,7 @@ const NavBar = () => {
   return (
     <nav className="navbar">
       {/* תפריט המבורגר */}
-      <div 
+      <div
         className={`hamburger ${mobileMenuOpen ? 'active' : ''}`}
         onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
       >
@@ -47,46 +48,6 @@ const NavBar = () => {
         <span></span>
         <span></span>
       </div>
-
-      {/* פרופיל */}
-      {isAuthed && (
-        <Link to="/profile" className="profile" onClick={handleLinkClick}>
-          {initial}
-        </Link>
-      )}
-
-      {/* קישורים */}
-      <div className={`links ${mobileMenuOpen ? 'mobile-active' : ''}`}>
-        {links.map(link => (
-          <Link
-            key={link.path}
-            to={link.path}
-            className={location.pathname === link.path ? 'active-link' : ''}
-            onClick={handleLinkClick}
-          >
-            {link.name}
-          </Link>
-        ))}
-
-        {isAuthed ? (
-          <button type="button" className="logout-btn" onClick={onLogout}>
-            {t('nav.logout')}
-          </button>
-        ) : (
-          <Link
-            to="/login"
-            className={location.pathname === '/login' ? 'active-link' : ''}
-            onClick={handleLinkClick}
-          >
-            {t('nav.login')}
-          </Link>
-        )}
-
-            {/* מתג שפות */}
-      <LanguageSwitcher />
-      </div>
-
-  
 
       {/* שם האתר */}
       <div
@@ -98,6 +59,55 @@ const NavBar = () => {
       >
         {t('app.title')}
       </div>
+
+      {/* קישורים */}
+      <div className={`links ${mobileMenuOpen ? 'mobile-active' : ''}`}>
+        <div className="nav-links-right">
+          {links.map((link) => (
+            <Link
+              key={link.path}
+              to={link.path}
+              className={location.pathname === link.path ? 'active-link' : ''}
+              onClick={handleLinkClick}
+            >
+              {link.name}
+            </Link>
+          ))}
+        </div>
+
+        <div className="nav-links-left">
+          {!isAuthed && (
+            <Link
+              to="/login"
+              className={location.pathname === '/login' ? 'active-link' : ''}
+              onClick={handleLinkClick}
+            >
+              {t('nav.login')}
+            </Link>
+          )}
+        </div>
+      </div>
+
+      {/* פרופיל + יציאה + שפה */}
+      {isAuthed && (
+        <div className="profile-wrapper">
+          <LanguageSwitcher />
+          <button
+            type="button"
+            className="logout-icon-btn"
+            onClick={onLogout}
+            title="יציאה"
+          >
+            <FiLogOut />
+          </button>
+
+
+          <Link to="/profile" className="profile" onClick={handleLinkClick}>
+            {initial}
+          </Link>
+
+        </div>
+      )}
     </nav>
   );
 };
