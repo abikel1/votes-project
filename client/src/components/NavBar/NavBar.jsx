@@ -81,10 +81,12 @@ const NavBar = () => {
             {t('nav.login')}
           </Link>
         )}
+
+            {/* מתג שפות */}
+      <LanguageSwitcher />
       </div>
 
-      {/* מתג שפות */}
-      <LanguageSwitcher />
+  
 
       {/* שם האתר */}
       <div

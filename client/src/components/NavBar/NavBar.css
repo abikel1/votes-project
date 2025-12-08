@@ -12,6 +12,7 @@
   top: 0;
   z-index: 1000;
   direction: rtl;
+  gap: 1.5rem;
 }
 
 /* לוגו/שם האתר */
@@ -21,6 +22,7 @@
   color: white;
   letter-spacing: 1px;
   transition: all 0.3s ease;
+  white-space: nowrap;
 }
 
 .site-name:hover {
@@ -43,6 +45,7 @@
   text-decoration: none;
   transition: all 0.3s ease;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  flex-shrink: 0;
 }
 
 .profile:hover {
@@ -54,27 +57,26 @@
 .links {
   display: flex;
   align-items: center;
-  gap: 2rem;
-  flex: 1;
-  justify-content: center;
+  gap: 1rem;
 }
 
 .links a,
 .links .logout-btn {
   color: white;
   text-decoration: none;
-  font-size: 1.05rem;
+  font-size: 1rem;
   font-weight: 500;
   padding: 0.5rem 1rem;
-  /* border-radius: 8px; */
+  /* border-radius: 6px; */
   transition: all 0.3s ease;
   position: relative;
+  white-space: nowrap;
 }
 
 .links a::after {
   content: '';
   position: absolute;
-  bottom: 0;
+  bottom: 3px;
   left: 50%;
   transform: translateX(-50%);
   width: 0;
@@ -84,7 +86,7 @@
 }
 
 .links a:hover::after {
-  width: 80%;
+  width: 70%;
 }
 
 .links a:hover {
@@ -97,7 +99,7 @@
 }
 
 .active-link::after {
-  width: 80% !important;
+  width: 70% !important;
 }
 
 /* כפתור יציאה */
@@ -106,6 +108,7 @@
   border: 2px solid white;
   cursor: pointer;
   transition: all 0.3s ease;
+  /* border-radius: 6px; */
 }
 
 .logout-btn:hover {
@@ -123,13 +126,14 @@
   cursor: pointer;
   padding: 5px;
   z-index: 1001;
+  flex-shrink: 0;
 }
 
 .hamburger span {
-  width: 30px;
+  width: 28px;
   height: 3px;
   background: white;
-  /* border-radius: 3px; */
+  /* border-radius: 2px; */
   transition: all 0.3s ease;
 }
 
@@ -146,6 +150,18 @@
 }
 
 /* רספונסיבי */
+@media (max-width: 968px) {
+  .links {
+    gap: 0.75rem;
+  }
+
+  .links a,
+  .links .logout-btn {
+    font-size: 0.95rem;
+    padding: 0.4rem 0.8rem;
+  }
+}
+
 @media (max-width: 768px) {
   .navbar {
     padding: 0 1rem;
@@ -209,7 +225,7 @@
     width: calc(100% - 4rem);
     margin-left: 2rem;
     margin-right: 2rem;
-    border-radius: 8px;
+    /* border-radius: 8px; */
   }
 }
 

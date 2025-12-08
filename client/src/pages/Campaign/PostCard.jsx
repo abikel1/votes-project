@@ -73,7 +73,9 @@ export default function PostCard({
         <h4>{post.title}</h4>
         {isCandidateOwner && isEditMode && (
           <button
-            onClick={() => onDeletePost(post._id)}
+    onClick={onDeletePost} // פשוט
+
+
             className="post-delete-btn"
             title={t('campaign.posts.deletePostTitle')}
           >
