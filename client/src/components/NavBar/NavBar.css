@@ -1,114 +1,230 @@
-/* מוודאים שכל המידות כוללות padding ו-border */
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-
-body {
-  padding-top: 60px;
-  /* דוחף את התוכן מתחת לסרגל */
-  overflow-x: hidden;
-  /* מונע חיתוך אופקי */
-}
+/* NavBar.css */
 
 .navbar {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  /* רוחב מלא של חלון הצפייה */
+  background: linear-gradient(135deg, #003366 0%, #004d99 100%);
+  padding: 0 2rem;
+  height: 70px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background-color: #003366;
-  padding: 0 20px;
-  height: 60px;
-  color: white;
-  font-family: Arial, sans-serif;
+  box-shadow: 0 2px 10px rgba(0, 51, 102, 0.3);
+  position: sticky;
+  top: 0;
   z-index: 1000;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-}
-
-
-/* דחיפת התוכן מתחת לסרגל */
-body {
-  padding-top: 60px;
-  /* בגובה הסרגל */
-}
-
-.site-name {
-  font-size: calc(24px * var(--a11y-font-scale));;
-  font-weight: bold;
-}
-
-.links {
   direction: rtl;
-  display: flex;
-  gap: 15px;
-  /* רווח בין הקישורים */
 }
 
-.links a {
-  color: white;
-  text-decoration: none;
-  font-size: calc(16px * var(--a11y-font-scale));
-  transition: color 0.3s;
-}
-
-.links a:hover {
-  color: #00ccff;
-  /* אפקט מעבר */
-}
-
-.profile {
-  background-color: #ffffff;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  cursor: pointer;
+/* לוגו/שם האתר */
+.site-name {
+  font-size: 1.5rem;
   font-weight: bold;
-  font-size: calc(18px * var(--a11y-font-scale));
-  transition: background-color 0.3s;
-    text-decoration: none;
-    color: #003366;
+  color: white;
+  letter-spacing: 1px;
+  transition: all 0.3s ease;
+}
 
+.site-name:hover {
+  transform: scale(1.05);
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+}
+
+/* תמונת פרופיל */
+.profile {
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  background: white;
+  color: #003366;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 1.2rem;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
 .profile:hover {
-  background-color: #bebebe;
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(255, 255, 255, 0.3);
 }
 
-
-.logout-btn {
-  border: 1px solid #fff;
-  background: transparent;
-  color: #fff;
-  padding: 6px 10px;
-  cursor: pointer;
-  font-size: calc(14px * var(--a11y-font-scale));
-}
-
-.logout-btn:hover {
-  background: rgba(255, 255, 255, 0.15);
-}
-
-.links a.active-link {
-  color: #c8f4ff;
-  font-weight: bold;
-  border-bottom: 2px solid #c8f4ff;
-}
-
-.site-logo {
+/* קישורים */
+.links {
   display: flex;
   align-items: center;
+  gap: 2rem;
+  flex: 1;
   justify-content: center;
 }
 
-.logo-img {
-  height: 44px;    /* גובה מומלץ */
-  width: auto;
+.links a,
+.links .logout-btn {
+  color: white;
+  text-decoration: none;
+  font-size: 1.05rem;
+  font-weight: 500;
+  padding: 0.5rem 1rem;
+  /* border-radius: 8px; */
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.links a::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 2px;
+  background: white;
+  transition: width 0.3s ease;
+}
+
+.links a:hover::after {
+  width: 80%;
+}
+
+.links a:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.active-link {
+  background: rgba(255, 255, 255, 0.2) !important;
+  font-weight: 600;
+}
+
+.active-link::after {
+  width: 80% !important;
+}
+
+/* כפתור יציאה */
+.logout-btn {
+  background: transparent;
+  border: 2px solid white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.logout-btn:hover {
+  background: white;
+  color: #003366;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* תפריט המבורגר */
+.hamburger {
+  display: none;
+  flex-direction: column;
+  gap: 5px;
+  cursor: pointer;
+  padding: 5px;
+  z-index: 1001;
+}
+
+.hamburger span {
+  width: 30px;
+  height: 3px;
+  background: white;
+  /* border-radius: 3px; */
+  transition: all 0.3s ease;
+}
+
+.hamburger.active span:nth-child(1) {
+  transform: rotate(45deg) translate(8px, 8px);
+}
+
+.hamburger.active span:nth-child(2) {
+  opacity: 0;
+}
+
+.hamburger.active span:nth-child(3) {
+  transform: rotate(-45deg) translate(7px, -7px);
+}
+
+/* רספונסיבי */
+@media (max-width: 768px) {
+  .navbar {
+    padding: 0 1rem;
+    height: 60px;
+  }
+
+  .site-name {
+    font-size: 1.2rem;
+  }
+
+  .profile {
+    width: 40px;
+    height: 40px;
+    font-size: 1rem;
+  }
+
+  .hamburger {
+    display: flex;
+  }
+
+  .links {
+    position: fixed;
+    top: 60px;
+    right: -100%;
+    width: 100%;
+    max-width: 300px;
+    height: calc(100vh - 60px);
+    background: linear-gradient(180deg, #003366 0%, #002244 100%);
+    flex-direction: column;
+    padding: 2rem 0;
+    gap: 0;
+    transition: right 0.3s ease;
+    box-shadow: -2px 0 10px rgba(0, 0, 0, 0.3);
+    justify-content: flex-start;
+  }
+
+  .links.mobile-active {
+    right: 0;
+  }
+
+  .links a,
+  .links .logout-btn {
+    width: 100%;
+    text-align: center;
+    padding: 1rem 2rem;
+    border-radius: 0;
+    font-size: 1.1rem;
+  }
+
+  .links a::after {
+    display: none;
+  }
+
+  .links a:hover,
+  .active-link {
+    background: rgba(255, 255, 255, 0.15) !important;
+  }
+
+  .logout-btn {
+    margin-top: 1rem;
+    width: calc(100% - 4rem);
+    margin-left: 2rem;
+    margin-right: 2rem;
+    border-radius: 8px;
+  }
+}
+
+@media (max-width: 480px) {
+  .navbar {
+    padding: 0 0.75rem;
+  }
+
+  .site-name {
+    font-size: 1rem;
+  }
+
+  .profile {
+    width: 35px;
+    height: 35px;
+    font-size: 0.9rem;
+  }
 }
