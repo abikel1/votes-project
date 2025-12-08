@@ -81,6 +81,8 @@ import {
 import http from '../../api/http';
 
 // ---------- קומפוננטה ראשית ----------
+import { selectCandidateRequestsForGroup } from '../../slices/candidateSlice';
+
 
 export default function GroupSettingsPage() {
   const { t } = useTranslation();
@@ -94,6 +96,8 @@ export default function GroupSettingsPage() {
   // state פנימי ל-id של הקבוצה
   const [groupId, setGroupId] = useState(navGroupId);
   const [slugResolved, setSlugResolved] = useState(!!navGroupId); // האם ניסינו לפתור slug ל-id
+const requests = useSelector((state) => selectCandidateRequestsForGroup(state, groupId));
+const pendingCount = requests.filter(r => r.status === 'pending').length;
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -838,52 +842,64 @@ export default function GroupSettingsPage() {
         {/* סיידבר הניווט מימין */}
         <aside className="gs-sidebar-tabs">
           <button
-            className={`side-tab ${activeTab === 'general' ? 'active' : ''}`}
-            onClick={() => setActiveTab('general')}
-          >
-            <FaInfoCircle style={{ marginInlineEnd: 6 }} />
-            {t('groupSettings.sidebar.general')}
-          </button>
+    className={`side-tab ${activeTab === 'general' ? 'active' : ''}`}
+    onClick={() => setActiveTab('general')}
+  >
+    <FaInfoCircle style={{ marginInlineEnd: 6 }} />
+    {t('groupSettings.sidebar.general')}
+  </button>
 
-          <button
-            className={`side-tab ${
-              activeTab === 'candidates' ? 'active' : ''
-            }`}
-            onClick={() => setActiveTab('candidates')}
-          >
-            <FaUserPlus style={{ marginInlineEnd: 6 }} />
-            {t('groupSettings.sidebar.candidates')}
-          </button>
+          {/* Candidates */}
+{/* Candidates */}
+{/* Candidates */}
+<button
+  className={`side-tab ${activeTab === 'candidates' ? 'active' : ''}`}
+  onClick={() => setActiveTab('candidates')}
+>
+  <FaUserPlus style={{ marginInlineEnd: 6 }} />
+  {t('groupSettings.sidebar.candidates')}
+ {pendingCount > 0 && (
+  <span className="join-requests-count">{pendingCount}</span>
+)}
 
-          <button
-            className={`side-tab ${activeTab === 'voters' ? 'active' : ''}`}
-            onClick={() => setActiveTab('voters')}
-          >
-            <FaUserCheck style={{ marginInlineEnd: 6 }} />
-            {t('groupSettings.sidebar.voters')}
-          </button>
+</button>
 
-          {group.isLocked && (
-            <button
-              className={`side-tab ${
-                activeTab === 'members' ? 'active' : ''
-              }`}
-              onClick={() => setActiveTab('members')}
-            >
-              <FaUsers style={{ marginInlineEnd: 6 }} />
-              {t('groupSettings.sidebar.members')}
-            </button>
-          )}
 
-          <button
-            className={`side-tab danger ${
-              activeTab === 'danger' ? 'active' : ''
-            }`}
-            onClick={() => setActiveTab('danger')}
-          >
-            <FaExclamationTriangle style={{ marginInlineEnd: 6 }} />
-            {t('groupSettings.sidebar.danger')}
-          </button>
+
+  {/* Voters */}
+  <button
+    className={`side-tab ${activeTab === 'voters' ? 'active' : ''}`}
+    onClick={() => setActiveTab('voters')}
+  >
+    <FaUserCheck style={{ marginInlineEnd: 6 }} />
+    {t('groupSettings.sidebar.voters')}
+    {voters.length > 0 && (
+      <span className="join-requests-count">{voters.length}</span>
+    )}
+  </button>
+
+  {/* Members */}
+  {group.isLocked && (
+    <button
+      className={`side-tab ${activeTab === 'members' ? 'active' : ''}`}
+      onClick={() => setActiveTab('members')}
+    >
+      <FaUsers style={{ marginInlineEnd: 6 }} />
+      {t('groupSettings.sidebar.members')}
+      {reqs.length > 0 && (
+        <span className="join-requests-count">{reqs.length}</span>
+      )}
+    </button>
+  )}
+
+  {/* Danger */}
+  <button
+    className={`side-tab danger ${activeTab === 'danger' ? 'active' : ''}`}
+    onClick={() => setActiveTab('danger')}
+  >
+    <FaExclamationTriangle style={{ marginInlineEnd: 6 }} />
+    {t('groupSettings.sidebar.danger')}
+  </button>
         </aside>
       </div>
 
