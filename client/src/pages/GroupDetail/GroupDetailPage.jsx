@@ -375,11 +375,13 @@ useEffect(() => {
   return (
     <div className="page-wrap dashboard">
       {/* כפתור הפעלת המדריך */}
-      {tourInitialized && (
-        <button onClick={openTour} className="tour-fab">
-          📖 הדרכה
-        </button>
-      )}
+ {/* כפתור הפעלת המדריך */}
+{tourInitialized && (
+  <button onClick={openTour} className="tour-fab">
+   ?
+  </button>
+)}
+
 
       <div id="group-detail-header" className="page-header clean-header">
         {/* כותרת מרכזית */}
