@@ -375,12 +375,6 @@
     /* box-shadow 0.1s ease; */
 }
 
-.chat-more-btn:hover:not(:disabled) {
-    /* background-color: #93c5fd; */
-    /* transform: translateY(-1px); */
-    /* box-shadow: 0 3px 8px rgba(37, 99, 235, 0.35); */
-}
-
 .chat-more-btn:disabled {
     opacity: 0.5;
     cursor: default;
