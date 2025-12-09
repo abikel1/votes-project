@@ -10,6 +10,7 @@ import {
 } from '../../slices/groupsSlice';
 import { toast } from 'react-hot-toast';
 import { HiOutlineDocumentText } from "react-icons/hi";
+import { TourProvider, useTour } from '@reactour/tour';
 
 import {
   requestJoinGroup,
@@ -23,6 +24,8 @@ import {
 import http from '../../api/http';
 import './GroupsPage.css';
 import { useTranslation } from 'react-i18next';
+import GlobalTour from '../../Tour/GlobalTour';
+import TourButton from '../../Tour/TourButton';
 
 function formatDate(d) {
   if (!d) return '-';
@@ -48,6 +51,8 @@ const makeSlug = (name = '') =>
   );
 
 export default function GroupsPage() {
+      const { setIsOpen } = useTour();
+  
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { t } = useTranslation();
@@ -80,6 +85,7 @@ export default function GroupsPage() {
   const removedMap = useSelector((s) => s.joinReq.removedNotice || {});
 
   const isAuthed = !!authId || !!authEmail;
+const [steps, setSteps] = useState([]);
 
   const onCreateGroupClick = () => {
     if (!isAuthed) {
@@ -88,6 +94,144 @@ export default function GroupsPage() {
     }
     navigate('/groups/create');
   };
+
+
+  // const steps = [
+  //   {
+  //     selector: '#groups-header',
+  //     content: 'כאן נמצאים הכלים של עמוד הקבוצות',
+  //   },
+  //   {
+  //     selector: '#groups-search',
+  //     content: 'כאן מחפשים קבוצות לפי שם',
+  //   },
+  //   {
+  //     selector: '#groups-filter',
+  //     content: 'כאן מסננים קבוצות לפי קטגוריות',
+  //   },
+  //   {
+  //     selector: '#groups-list',
+  //     content: 'כאן נמצאות כל הקבוצות המוצגות',
+  //   },
+  //    {
+  //   selector: `#groups-card-title-${gid}`,
+  //   content: 'כאן מוצג שם הקבוצה',
+  // },
+  // {
+  //   selector: `#groups-card-badges-${gid}`,
+  //   content: 'סמלים המציינים סטטוס כמו נעול או הגשת מועמדות פתוחה',
+  // },
+  // {
+  //   selector: `#groups-card-desc-${gid}`,
+  //   content: 'כאן מופיע תיאור קצר של הקבוצה',
+  // },
+  // {
+  //   selector: `#groups-card-owner-${gid}`,
+  //   content: 'כאן מופיע מי מנהל/ת את הקבוצה',
+  // },
+  // {
+  //   selector: `#groups-card-footer-${gid}`,
+  //   content: 'כאן מוצג תאריך סיום הקבוצה או שהיא פגה',
+  // },
+  // {
+  //   selector: `#groups-card-actions-${gid}`,
+  //   content: 'כאן נמצאים כפתורי הפעולה: בקשת הצטרפות, pending, rejected, או הגדרות',
+  // },
+  // ];
+  const filteredGroups = groups
+    .filter((g) => {
+      const gid = String(g._id);
+      const nameMatch = g.name?.toLowerCase().includes(searchTerm.toLowerCase());
+      if (!nameMatch) return false;
+
+      const isLocked = !!g.isLocked;
+      const isOwner = createdIdsSet.has(gid);
+      const isMember = joinedIdsSet.has(gid);
+      const now = new Date();
+      const candidateOpen = g.candidateEndDate && new Date(g.candidateEndDate) > now;
+
+      // הצבעה פתוחה: תאריך סיום הקבוצה בעתיד
+      // וגם או שאין תאריך הגשת מועמדות, או שהוא כבר עבר
+      const votingOpen =
+        g.endDate &&
+        new Date(g.endDate) > now &&
+        (!g.candidateEndDate || new Date(g.candidateEndDate) <= now);
+
+      switch (filter) {
+        case 'open':
+          return !isLocked;
+        case 'locked':
+          return isLocked;
+        case 'joined':
+          return isMember;
+        case 'owned':
+          return isOwner;
+        case 'expired':
+          return new Date(g.endDate) < now;
+        case 'candidateOpen':
+          return candidateOpen;
+        case 'votingOpen':
+          return votingOpen;
+        default:
+          return true;
+      }
+    })
+    .sort((a, b) => {
+      if (sortBy === 'creationDate')
+        return new Date(b.creationDate) - new Date(a.creationDate);
+      if (sortBy === 'endDate')
+        return new Date(a.endDate) - new Date(b.endDate);
+      if (sortBy === 'name') return a.name.localeCompare(b.name, 'he');
+      return 0;
+    });
+
+  const totalPages = Math.max(1, Math.ceil(filteredGroups.length / PAGE_SIZE));
+  const safePage = Math.min(currentPage, totalPages);
+  const startIndex = (safePage - 1) * PAGE_SIZE;
+  const pageGroups = filteredGroups.slice(startIndex, startIndex + PAGE_SIZE);
+
+// 🌟 העבר את pageGroups לכאן לפני ה-useEffect
+
+useEffect(() => {
+  if (pageGroups.length > 0) {
+    const firstGroupId = String(pageGroups[0]._id);
+
+    setSteps([
+      {
+        selector: '#groups-header',
+        content: 'כאן נמצאים הכלים של עמוד הקבוצות',
+      },
+      {
+        selector: `#groups-card-title-${firstGroupId}`,
+        content: 'כאן מוצג שם הקבוצה',
+      },
+      {
+        selector: `#groups-card-badges-${firstGroupId}`,
+        content: 'סמלים המציינים סטטוס כמו נעול או הגשת מועמדות פתוחה',
+      },
+      {
+        selector: `#groups-card-desc-${firstGroupId}`,
+        content: 'כאן מופיע תיאור קצר של הקבוצה',
+      },
+      {
+        selector: `#groups-card-owner-${firstGroupId}`,
+        content: 'כאן מופיע מי מנהל/ת את הקבוצה',
+      },
+      {
+        selector: `#groups-card-footer-${firstGroupId}`,
+        content: 'כאן מוצג תאריך סיום הקבוצה או שהיא פגה',
+      },
+      {
+        selector: `#groups-card-actions-${firstGroupId}`,
+        content: 'כאן נמצאים כפתורי הפעולה',
+      },
+    ]);
+
+    setIsOpen(true);
+  }
+}, []);
+
+
 
   useEffect(() => { dispatch(hydratePendingFromLocalStorage()); }, [dispatch]);
 
@@ -182,64 +326,20 @@ export default function GroupsPage() {
   const myEmail = lc(authEmail) || lc(localStorage.getItem('userEmail'));
   const myId = String(authId ?? localStorage.getItem('userId') ?? '');
 
-  const filteredGroups = groups
-    .filter((g) => {
-      const gid = String(g._id);
-      const nameMatch = g.name?.toLowerCase().includes(searchTerm.toLowerCase());
-      if (!nameMatch) return false;
-
-      const isLocked = !!g.isLocked;
-      const isOwner = createdIdsSet.has(gid);
-      const isMember = joinedIdsSet.has(gid);
-      const now = new Date();
-      const candidateOpen = g.candidateEndDate && new Date(g.candidateEndDate) > now;
-
-      // הצבעה פתוחה: תאריך סיום הקבוצה בעתיד
-      // וגם או שאין תאריך הגשת מועמדות, או שהוא כבר עבר
-      const votingOpen =
-        g.endDate &&
-        new Date(g.endDate) > now &&
-        (!g.candidateEndDate || new Date(g.candidateEndDate) <= now);
-
-      switch (filter) {
-        case 'open':
-          return !isLocked;
-        case 'locked':
-          return isLocked;
-        case 'joined':
-          return isMember;
-        case 'owned':
-          return isOwner;
-        case 'expired':
-          return new Date(g.endDate) < now;
-        case 'candidateOpen':
-          return candidateOpen;
-        case 'votingOpen':
-          return votingOpen;
-        default:
-          return true;
-      }
-    })
-    .sort((a, b) => {
-      if (sortBy === 'creationDate')
-        return new Date(b.creationDate) - new Date(a.creationDate);
-      if (sortBy === 'endDate')
-        return new Date(a.endDate) - new Date(b.endDate);
-      if (sortBy === 'name') return a.name.localeCompare(b.name, 'he');
-      return 0;
-    });
-
-  const totalPages = Math.max(1, Math.ceil(filteredGroups.length / PAGE_SIZE));
-  const safePage = Math.min(currentPage, totalPages);
-  const startIndex = (safePage - 1) * PAGE_SIZE;
-  const pageGroups = filteredGroups.slice(startIndex, startIndex + PAGE_SIZE);
 
   return (
+<TourProvider steps={steps} initialFocus={false}>
+  <GlobalTour steps={steps} />
     <div className="groups-page">
       {/* סרגל עליון */}
-      <div className="groups-toolbar">
+      
+    <TourButton />
+
+      <div id="groups-header" className="groups-toolbar">
         <div className="groups-toolbar-right">
           <input
+            id="groups-search"
+
             type="text"
             placeholder={t('groups.list.searchPlaceholder')}
             value={searchTerm}
@@ -249,6 +349,8 @@ export default function GroupsPage() {
 
           <div className="groups-controls">
             <button
+              id="groups-filter"
+
               className="groups-control-btn"
               onClick={() => {
                 setShowFilters((v) => !v);
@@ -392,7 +494,7 @@ export default function GroupsPage() {
       </div>
 
       {/* רשת קבוצות */}
-      <div className="groups-grid">
+      <div id="groups-list" className="groups-grid">
         {pageGroups.map((g) => {
           const gid = String(g._id);
           const slug = makeSlug(g.name || gid);
@@ -514,95 +616,91 @@ export default function GroupsPage() {
             ((isPending && !isMember) || (!isPending && !isMember));
 
           return (
-            <div
-              key={gid}
-              onClick={onCardClick}
-              className={`groups-card 
+          <div
+  key={gid}
+  id={`groups-card-${gid}`}          // 🌟 ID ייחודי לכל כרטיס
+  onClick={onCardClick}
+  className={`groups-card 
     ${cardDisabled ? 'groups-card-disabled' : ''} 
     ${isExpired ? 'groups-card-expired' : ''}`}
-            >
-              <div className="groups-card-header">
-                <h3 className="groups-card-title">{g.name}</h3>
-                <div className="groups-card-badges">
-                  {isLocked && (
-                    <div
-                      style={{
-                        position: 'relative',
-                        display: 'inline-block',
-                      }}
-                    >
-                      <img
-                        src="/icons/padlock.png"
-                        alt={t('groups.list.card.lockedAlt')}
-                        className="groups-badge-locked"
-                        title={t('groups.list.card.lockedTitle')}
-                      />
-                      <span
-                        className={`groups-lock-status ${isMember || isOwner ? 'member' : 'not-member'}`}
-                        title={
-                          isMember || isOwner
-                            ? t('groups.list.card.memberTooltip')
-                            : t('groups.list.card.notMemberTooltip')
-                        }
-                      />
-                    </div>
-                  )}
+>
+  <div className="groups-card-header" id={`groups-card-header-${gid}`}>
+    <h3 className="groups-card-title" id={`groups-card-title-${gid}`}>
+      {g.name}
+    </h3>
+    <div className="groups-card-badges" id={`groups-card-badges-${gid}`}>
+      {isLocked && (
+        <div style={{ position: 'relative', display: 'inline-block' }}>
+          <img
+            src="/icons/padlock.png"
+            alt={t('groups.list.card.lockedAlt')}
+            className="groups-badge-locked"
+            title={t('groups.list.card.lockedTitle')}
+            id={`groups-badge-locked-${gid}`}
+          />
+          <span
+            className={`groups-lock-status ${isMember || isOwner ? 'member' : 'not-member'}`}
+            title={
+              isMember || isOwner
+                ? t('groups.list.card.memberTooltip')
+                : t('groups.list.card.notMemberTooltip')
+            }
+            id={`groups-lock-status-${gid}`}
+          />
+        </div>
+      )}
+      {isOwner && (
+        <button
+          className="groups-settings-btn"
+          onClick={goSettings}
+          title={t('groups.list.card.settingsTitle')}
+          id={`groups-settings-btn-${gid}`}
+        >
+          <img src="/icons/settings.png" alt={t('groups.list.card.settingsAlt')} />
+        </button>
+      )}
+      {g.candidateEndDate && new Date() < new Date(g.candidateEndDate) && (
+        <HiOutlineDocumentText
+          size={20}
+          className="groups-badge-candidate"
+          title="הגשת מועמדות פתוחה"
+          id={`groups-badge-candidate-${gid}`}
+        />
+      )}
+    </div>
+  </div>
 
-                  {isOwner && (
-                    <button
-                      className="groups-settings-btn"
-                      onClick={goSettings}
-                      title={t('groups.list.card.settingsTitle')}
-                    >
-                      <img src="/icons/settings.png" alt={t('groups.list.card.settingsAlt')} />
-                    </button>
-                  )}
+  {g.description && (
+    <p className="groups-card-desc" id={`groups-card-desc-${gid}`}>
+      {g.description}
+    </p>
+  )}
 
-                  {g.candidateEndDate && new Date() < new Date(g.candidateEndDate) && (
-                    <HiOutlineDocumentText
-                      size={20}
-                      className="groups-badge-candidate"
-                      title="הגשת מועמדות פתוחה"
-                    />
-                  )}
+  <div className="groups-card-owner" id={`groups-card-owner-${gid}`}>
+    <span className="groups-card-owner-label">{t('groups.list.card.ownerLabel')}</span>
+    <span className="groups-card-owner-value">
+      {ownerName || t('groups.list.card.ownerUnknown')}
+    </span>
+  </div>
 
-                </div>
-              </div>
+  <div className="groups-card-footer" id={`groups-card-footer-${gid}`}>
+    {isExpired ? (
+      <div className="groups-card-date-expired-text">
+        {t('groups.list.card.expiredText')}
+      </div>
+    ) : (
+      <div className="groups-card-date">
+        <span className="groups-card-date-label">
+          {t('groups.list.card.endDateLabel')}
+        </span>
+        <span className="groups-card-date-value">{formatDate(g.endDate)}</span>
+      </div>
+    )}
+  </div>
 
-              {g.description && (
-                <p className="groups-card-desc">{g.description}</p>
-              )}
-
-              <div className="groups-card-owner">
-                <span className="groups-card-owner-label">
-                  {t('groups.list.card.ownerLabel')}
-                </span>
-                <span className="groups-card-owner-value">
-                  {ownerName || t('groups.list.card.ownerUnknown')}
-                </span>
-              </div>
-
-              <div className="groups-card-footer">
-                {isExpired ? (
-                  <div className="groups-card-date-expired-text">
-                    {t('groups.list.card.expiredText')}
-                  </div>
-                ) : (
-                  <div className="groups-card-date">
-                    <span className="groups-card-date-label">
-                      {t('groups.list.card.endDateLabel')}
-                    </span>
-                    <span className="groups-card-date-value">
-                      {formatDate(g.endDate)}
-                    </span>
-                  </div>
-                )}
-              </div>
-
-              {/* מצב נעולה ולא חברה */}
-              {!isOwner && isLocked && (
-                <div className="groups-card-actions">
-                  {isMember ? (
+  {(!isOwner && isLocked) && (
+    <div className="groups-card-actions" id={`groups-card-actions-${gid}`}>
+    {isMember ? (
                     <span className="groups-status groups-status-member">
                       {t('groups.list.card.status.member')}
                     </span>
@@ -640,10 +738,10 @@ export default function GroupsPage() {
                     <button className="groups-action-btn" onClick={onRequestJoin}>
                       {t('groups.list.card.requestJoin')}
                     </button>
-                  )}
-                </div>
-              )}
-            </div>
+                  )}    </div>
+  )}
+</div>
+
           );
         })}
       </div>
@@ -689,5 +787,8 @@ export default function GroupsPage() {
         +
       </button>
     </div>
+        </TourProvider>
+
+
   );
 }
