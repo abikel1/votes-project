@@ -25,6 +25,7 @@ import http from '../../api/http';
 import './GroupsPage.css';
 import { useTranslation } from 'react-i18next';
 import GlobalTour from '../../Tour/GlobalTour';
+import TourButton from '../../Tour/TourButton';
 
 function formatDate(d) {
   if (!d) return '-';
@@ -327,20 +328,13 @@ useEffect(() => {
 
 
   return (
-<TourProvider steps={steps}>
-
-    <GlobalTour page="groups" steps={steps} />
-
+<TourProvider steps={steps} initialFocus={false}>
+  <GlobalTour steps={steps} />
     <div className="groups-page">
       {/* סרגל עליון */}
       
-     <>
-      <button onClick={() => setIsOpen(true)}>
-        הפעל הדרכה
-      </button>
+    <TourButton />
 
-      {/* כל ה-HTML / JSX של הדף */}
-    </>
       <div id="groups-header" className="groups-toolbar">
         <div className="groups-toolbar-right">
           <input
