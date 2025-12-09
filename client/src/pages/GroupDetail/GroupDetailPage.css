@@ -1,104 +1,60 @@
-.page-wrap {
-    padding: 12px;
-    max-width: 100%;
-    height: 100vh;
-    margin: 0;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    /* background: #ffffff; */
+.candidate-text p {
+    display: -webkit-box;
+    /* דרוש עבור line-clamp */
+    -webkit-box-orient: vertical;
     overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* ===== כפתור צ'אט צף ===== */
+.chat-fab {
+    position: fixed !important;
+    bottom: 24px !important;
+    right: 24px !important;
+    width: 48px;
+    height: 48px;
+    border-radius: 999px;
+    border: none;
+    background-color: #1e3a8a;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 8px 20px rgba(15, 23, 42, 0.25);
+    cursor: pointer;
+    z-index: 1000;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.chat-fab:hover {
+    transform: scale(1.08);
+    box-shadow: 0 10px 26px rgba(15, 23, 42, 0.35);
+}
+
+.chat-fab:active {
+    transform: scale(0.96);
+}
+
+/* ===== חלון הצ'אט – תמיד יותר גבוה מהכפתור ===== */
+.chat-panel {
+    position: fixed !important;
+    /* right: 24px !important; */
+    bottom: 6vw !important;
+    width: 380px;
+    /* max-height: 70vh; */
+    /* background-color: #ffffff; */
+    border-radius: 16px;
+    /* box-shadow: 0 10px 30px rgba(15, 23, 42, 0.3); */
+    padding: 0.75rem;
+    z-index: 100000;
     display: flex;
     flex-direction: column;
-    box-sizing: border-box;
+    /* margin-left: 20px; */
+    /* background-color: #003366; */
+
 }
 
-.page-header {
-    text-align: center;
-    margin-bottom: 12px;
-    background: white;
-    padding: 12px;
-    border: 1px solid #e2e8f0;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-}
 
-.page-title {
-    font-size: calc(24px * var(--a11y-font-scale));
-    margin: 0 0 6px 0;
-    color: #1e293b;
-    font-weight: 700;
-}
-
-.group-description {
-    margin: 0;
-    color: #64748b;
-    font-size: calc(13px * var(--a11y-font-scale));
-    line-height: 1.4;
-}
-
-.meta-and-button {
-    display: flex;
-    justify-content: center;
-    align-items: stretch;
-    gap: 12px;
-    margin-bottom: 12px;
-}
-
-.group-meta {
-    background: white;
-    padding: 12px 16px;
-    border: 1px solid #e2e8f0;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    display: flex;
-    flex-direction: row;
-    gap: 20px;
-    flex-wrap: wrap;
-    align-items: center;
-}
-
-.back-btn {
-    background: #f2f2f2;
-    border: 1px solid #ccc;
-    padding: 6px 12px;
-    cursor: pointer;
-    font-size: calc(14px * var(--a11y-font-scale));
-    margin-bottom: 10px;
-    transition: 0.2s;
-}
-
-.back-btn:hover {
-    background: #e6e6e6;
-}
-
-.group-meta > div {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-size: calc(13px * var(--a11y-font-scale));
-}
-
-.meta-label {
-    font-weight: 600;
-    color: #475569;
-}
-
-.meta-value {
-    color: #003366;
-    font-weight: 700;
-    font-size: calc(14px * var(--a11y-font-scale));
-}
-
-.vote-btn {
-    background: #003366;
-    color: white;
-    border: none;
-    padding: 12px 24px;
-    cursor: pointer;
-    font-size: calc(14px * var(--a11y-font-scale));
-    font-weight: 600;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    transition: all 0.2s ease;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
 
 .vote-btn:hover {
     background: #2563eb;
@@ -380,6 +336,14 @@
         height: 300px;
         min-height: 280px;
     }
+
+    .chat-panel {
+
+        bottom: 9vh !important;
+    width:480px;
+
+    }
+
 }
 
 /* מובייל */
@@ -417,7 +381,7 @@
         justify-content: center;
     }
 
-    .group-meta > div {
+    .group-meta>div {
         font-size: calc(12px * var(--a11y-font-scale));
         gap: 4px;
     }
@@ -545,6 +509,13 @@
         padding: 30px 20px;
         font-size: calc(14px * var(--a11y-font-scale));
     }
+
+
+    .chat-panel {
+
+        bottom: 11vh !important;
+
+    }
 }
 
 .page-wrap {
@@ -616,7 +587,7 @@
     background: #e6e6e6;
 }
 
-.group-meta > div {
+.group-meta>div {
     display: flex;
     align-items: center;
     gap: 6px;
@@ -1045,25 +1016,6 @@
     font-size: calc(1.1rem * var(--a11y-font-scale));
 }
 
-.chat-fab {
-    position: fixed;
-    bottom: 24px;
-    right: 24px;
-    width: 48px;
-    height: 48px;
-    border-radius: 999px;
-    border: none;
-    background-color: #1e3a8a;
-    color: #ffffff;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 8px 20px rgba(15, 23, 42, 0.25);
-    cursor: pointer;
-    z-index: 1000;
-    transition: transform 0.15s ease, box-shadow 0.15s ease;
-}
-
 .chat-fab:hover {
     transform: scale(1.08);
     box-shadow: 0 10px 26px rgba(15, 23, 42, 0.35);
@@ -1071,21 +1023,6 @@
 
 .chat-fab:active {
     transform: scale(0.96);
-}
-
-.chat-panel {
-    position: fixed;
-    bottom: 110px;
-    right: 24px;
-    width: 380px;
-    max-height: 70vh;
-    background-color: #ffffff;
-    border-radius: 16px;
-    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.3);
-    padding: 0.75rem;
-    z-index: 1000;
-    display: flex;
-    flex-direction: column;
 }
 
 .chat-panel-header {
@@ -1121,18 +1058,22 @@
         box-shadow: 0 0 0 rgba(255, 255, 200, 0);
         transform: scale(1);
     }
+
     20% {
         box-shadow: 0 0 25px 5px rgba(255, 255, 200, 0.8);
         transform: scale(1.1);
     }
+
     40% {
         box-shadow: 0 0 0 rgba(255, 255, 200, 0);
         transform: scale(1);
     }
+
     60% {
         box-shadow: 0 0 18px 3px rgba(255, 255, 200, 0.6);
         transform: scale(1.1);
     }
+
     100% {
         box-shadow: 0 0 0 rgba(255, 255, 200, 0);
         transform: scale(1);
@@ -1309,7 +1250,7 @@
         justify-content: center;
     }
 
-    .group-meta > div {
+    .group-meta>div {
         font-size: calc(12px * var(--a11y-font-scale));
         gap: 4px;
     }
@@ -1450,12 +1391,6 @@
         width: 16px;
         height: 16px;
     }
-
-    .chat-panel {
-        width: calc(100vw - 32px);
-        right: 16px;
-        bottom: 90px;
-    }
 }
 
 /* מכשירים קטנים מאוד */
@@ -1482,7 +1417,7 @@
         gap: 10px;
     }
 
-    .group-meta > div {
+    .group-meta>div {
         font-size: calc(11px * var(--a11y-font-scale));
     }
 
@@ -1586,153 +1521,6 @@
         padding-bottom: 5px;
     }
 
-}
-
-
-
-
-
-/* מכשירים קטנים מאוד */
-@media (max-width: 480px) {
-    .page-wrap {
-        padding: 6px;
-    }
-
-    .page-header {
-        padding: 8px;
-        margin-bottom: 8px;
-    }
-
-    .page-title {
-        font-size: calc(18px * var(--a11y-font-scale));
-    }
-
-    .group-description {
-        font-size: calc(11px * var(--a11y-font-scale));
-    }
-
-    .group-meta {
-        padding: 8px 10px;
-        gap: 10px;
-    }
-
-    .group-meta > div {
-        font-size: calc(11px * var(--a11y-font-scale));
-    }
-
-    .meta-label {
-        font-size: calc(11px * var(--a11y-font-scale));
-    }
-
-    .meta-value {
-        font-size: calc(12px * var(--a11y-font-scale));
-    }
-
-    .vote-btn {
-        padding: 10px;
-        font-size: calc(12px * var(--a11y-font-scale));
-    }
-
-    .dashboard .candidates-grid {
-        grid-template-columns: repeat(auto-fill, minmax(95px, 1fr));
-        gap: 6px;
-    }
-
-    .candidate-card {
-        padding: 8px;
-    }
-
-    .candidate-photo {
-        width: 45px;
-        height: 45px;
-        margin-bottom: 6px;
-    }
-
-    .candidate-card h4 {
-        font-size: calc(12px * var(--a11y-font-scale));
-        margin: 3px 0;
-    }
-
-    .candidate-symbol {
-        font-size: calc(9px * var(--a11y-font-scale));
-        padding: 2px 5px;
-        margin: 2px 0;
-    }
-
-    .candidate-card p {
-        font-size: calc(9px * var(--a11y-font-scale));
-        margin: 3px 0;
-        line-height: 1.2;
-    }
-
-    .votes-count {
-        font-size: calc(11px * var(--a11y-font-scale));
-        padding: 2px 6px;
-        margin-top: 4px;
-    }
-
-    .current-leader {
-        width: 24px;
-        height: 24px;
-        font-size: calc(14px * var(--a11y-font-scale));
-        top: -6px;
-        left: -6px;
-    }
-
-    .left-section {
-        max-height: 55vh;
-    }
-
-    .candidates-container {
-        padding: 6px;
-    }
-
-    .right-section {
-        padding: 8px;
-    }
-
-    .charts {
-        gap: 10px;
-    }
-
-    .pie-chart-container,
-    .bar-chart-container {
-        padding: 8px;
-        height: 250px;
-        min-height: 220px;
-    }
-
-    .pie-chart-container h3,
-    .bar-chart-container h3 {
-        font-size: calc(13px * var(--a11y-font-scale));
-        margin-bottom: 6px;
-        padding-bottom: 5px;
-    }
-
-    .chart-wrapper {
-        height: 210px;
-    }
-
-    .section-title {
-        font-size: calc(14px * var(--a11y-font-scale));
-        margin-bottom: 6px;
-        padding-bottom: 5px;
-    }
-
-    .loading-wrap {
-        padding: 15px 10px;
-        font-size: calc(13px * var(--a11y-font-scale));
-    }
-
-    .err {
-        padding: 6px 10px;
-        font-size: calc(11px * var(--a11y-font-scale));
-    }
-
-    .no-votes-message {
-        padding: 25px 15px;
-        font-size: calc(13px * var(--a11y-font-scale));
-    }
 }
 
 /* נוף (landscape) במובייל */
@@ -2047,42 +1835,6 @@
     font-size: calc(1.1rem * var(--a11y-font-scale));
 }
 
-/* כפתור צ'אט צף */
-.chat-fab {
-    position: fixed;
-    bottom: 24px;
-    right: 24px;
-    width: 48px;
-    height: 48px;
-    border-radius: 999px;
-    border: none;
-    background-color: #1e3a8a;
-    color: #ffffff;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 8px 20px rgba(15, 23, 42, 0.25);
-    cursor: pointer;
-    z-index: 1000;
-}
-
-/* חלון הצ'אט */
-.chat-panel {
-    position: fixed;
-    bottom: 88px;
-    /* קצת מעל הכפתור */
-    right: 24px;
-    width: 380px;
-    max-height: 70vh;
-    background-color: #ffffff;
-    border-radius: 16px;
-    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.3);
-    padding: 0.75rem;
-    z-index: 1000;
-    display: flex;
-    flex-direction: column;
-}
-
 /* כותרת החלון */
 .chat-panel-header {
     display: flex;
@@ -2091,27 +1843,6 @@
     margin-bottom: 0.5rem;
     font-weight: 600;
 }
-
-.chat-fab {
-    position: fixed;
-    bottom: 24px;
-    right: 24px;
-    width: 48px;
-    height: 48px;
-    border-radius: 999px;
-    border: none;
-    background-color: #1e3a8a;
-    color: #ffffff;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 8px 20px rgba(15, 23, 42, 0.25);
-    cursor: pointer;
-    z-index: 1000;
-    /* אנימציה חלקה על גודל וצל */
-    transition: transform 0.15s ease, box-shadow 0.15s ease;
-}
-
 
 .chat-fab:hover {
     transform: scale(1.08);
@@ -2123,27 +1854,6 @@
     transform: scale(0.96);
     /* קליק – טיפה מצטמצם */
 }
-
-.chat-panel {
-    position: fixed;
-    bottom: 110px;
-    /* היה 88px – עכשיו גבוה יותר */
-    right: 24px;
-    width: 380px;
-    max-height: 70vh;
-    background-color: #ffffff;
-    border-radius: 16px;
-    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.3);
-    padding: 0.75rem;
-    z-index: 1000;
-    display: flex;
-    flex-direction: column;
-}
-
-
-
-
-
 
 .campaign-btn {
     border: none;
@@ -2171,28 +1881,24 @@
         box-shadow: 0 0 0 rgba(255, 255, 200, 0);
         transform: scale(1);
     }
+
     20% {
         box-shadow: 0 0 25px 5px rgba(255, 255, 200, 0.8);
         transform: scale(1.1);
     }
+
     40% {
         box-shadow: 0 0 0 rgba(255, 255, 200, 0);
         transform: scale(1);
     }
+
     60% {
         box-shadow: 0 0 18px 3px rgba(255, 255, 200, 0.6);
         transform: scale(1.1);
     }
+
     100% {
         box-shadow: 0 0 0 rgba(255, 255, 200, 0);
         transform: scale(1);
     }
-}
-
-.candidate-text p {
-  display: -webkit-box;        /* דרוש עבור line-clamp */
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 3;      /* מספר השורות המקסימלי */
-  overflow: hidden;
-  text-overflow: ellipsis;    /* מוסיף ... בסוף */
 }
