@@ -1,0 +1,282 @@
+/* ===============================
+   Overlay
+   =============================== */
+
+.modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.55);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    padding: 20px;
+}
+
+/* ===============================
+   Modal – Desktop Default
+   =============================== */
+
+.modal.delete-modal {
+    width: 100%;
+    max-width: 520px;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 20px 45px rgba(0, 0, 0, 0.35);
+    padding: 32px 28px 30px;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    text-align: center;
+}
+
+/* ===============================
+   Title
+   =============================== */
+
+.delete-title {
+    margin: 0 0 24px;
+    font-size: 1.7rem;
+    font-weight: 700;
+    color: #b80d0d;
+}
+
+/* ===============================
+   Instruction + Group Name
+   =============================== */
+
+.delete-instruction {
+    font-size: 1.05rem;
+    margin-bottom: 18px;
+    color: #444;
+    line-height: 1.6;
+}
+
+.delete-repo {
+    margin-top: 10px;
+    display: inline-block;
+    font-family: 'Courier New', monospace;
+    font-size: 0.95rem;
+    padding: 10px 16px;
+    border: 1px solid #ddd;
+    background: #fafafa;
+    border-radius: 8px;
+    direction: ltr;
+    color: #333;
+}
+
+/* ===============================
+   Input
+   =============================== */
+
+.delete-confirm-input {
+    width: 100%;
+    border: 2px solid #b80d0d;
+    border-radius: 10px;
+    padding: 15px;
+    font-size: 1rem;
+    margin-bottom: 26px;
+    background: #fff;
+    color: #222;
+}
+
+.delete-confirm-input::placeholder {
+    color: #999;
+}
+
+.delete-confirm-input:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(184, 13, 13, 0.15);
+}
+
+/* ===============================
+   Buttons – Desktop
+   =============================== */
+
+.delete-actions {
+    display: flex;
+    gap: 16px;
+    width: 100%;
+}
+
+.delete-main-btn {
+    flex: 1;
+    background: #b80d0d;
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    height: 52px;
+    font-weight: 700;
+    font-size: 1.05rem;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.delete-main-btn:hover:not(:disabled) {
+    background: #950a0a;
+}
+
+.delete-main-btn:disabled {
+    background: #f2bcbc;
+    cursor: not-allowed;
+}
+
+.delete-cancel-btn {
+    flex: 1;
+    background: #fff;
+    border: 2px solid #003366;
+    color: #003366;
+    border-radius: 10px;
+    height: 52px;
+    font-weight: 600;
+    font-size: 1.05rem;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.delete-cancel-btn:hover {
+    background: #f0f7ff;
+}
+
+/* =========================================================
+   ✅ Tablet (עד 900px)
+   ========================================================= */
+
+@media (max-width: 900px) {
+    .modal.delete-modal {
+        max-width: 460px;
+        padding: 28px 22px 26px;
+    }
+
+    .delete-title {
+        font-size: 1.5rem;
+    }
+
+    .delete-instruction {
+        font-size: 1rem;
+    }
+
+    .delete-confirm-input {
+        font-size: 0.95rem;
+        padding: 14px;
+    }
+
+    .delete-main-btn,
+    .delete-cancel-btn {
+        height: 48px;
+        font-size: 1rem;
+    }
+}
+
+/* =========================================================
+   ✅ Mobile (עד 600px)
+   ========================================================= */
+
+@media (max-width: 600px) {
+    .modal-backdrop {
+        padding: 12px;
+    }
+
+    .modal.delete-modal {
+        max-width: 100%;
+        border-radius: 10px;
+        padding: 24px 18px 22px;
+    }
+
+    .delete-title {
+        font-size: 1.35rem;
+        margin-bottom: 18px;
+    }
+
+    .delete-instruction {
+        font-size: 0.95rem;
+    }
+
+    .delete-repo {
+        font-size: 0.85rem;
+        padding: 8px 12px;
+    }
+
+    .delete-confirm-input {
+        font-size: 0.95rem;
+        padding: 13px;
+        margin-bottom: 22px;
+    }
+
+    .delete-actions {
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .delete-main-btn,
+    .delete-cancel-btn {
+        width: 100%;
+        height: 48px;
+        font-size: 1rem;
+    }
+}
+
+/* ===============================
+   ✅ Mobile Buttons – Fix Final (עד 480px)
+   =============================== */
+
+@media (max-width: 480px) {
+
+    .modal-backdrop {
+        padding: 8px;
+    }
+
+    .modal.delete-modal {
+        max-width: 94vw;
+        padding: 18px 14px 20px;
+        border-radius: 12px;
+    }
+
+    .delete-title {
+        font-size: 1.2rem;
+        margin-bottom: 16px;
+    }
+
+    .delete-instruction {
+        font-size: 0.9rem;
+        margin-bottom: 14px;
+        line-height: 1.4;
+    }
+
+    .delete-repo {
+        font-size: 0.8rem;
+        padding: 7px 12px;
+        margin-top: 8px;
+        border-radius: 8px;
+    }
+
+    .delete-confirm-input {
+        font-size: 0.9rem;
+        padding: 12px;
+        margin-bottom: 20px;
+        border-radius: 10px;
+    }
+
+    /* ✅ כפתורים – מסודר יפה במובייל */
+    .delete-actions {
+        display: flex;
+        flex-direction: row;
+        gap: 10px;
+    }
+
+    .delete-main-btn {
+        flex: 1;
+        height: 44px;
+        font-size: 0.9rem;
+        border-radius: 10px;
+    }
+
+    .delete-cancel-btn {
+        flex: 1;
+        height: 44px;
+        font-size: 0.9rem;
+        border-radius: 10px;
+        background: #fff;
+        border: 1.5px solid #003366;
+    }
+}

@@ -88,26 +88,28 @@ const NavBar = () => {
         </div>
       </div>
 
-      {/* פרופיל + יציאה + שפה */}
-      {isAuthed && (
-        <div className="profile-wrapper">
-          <LanguageSwitcher />
-          <button
-            type="button"
-            className="logout-icon-btn"
-            onClick={onLogout}
-            title="יציאה"
-          >
-            <FiLogOut />
-          </button>
+      {/* שפה + (אם מחובר) יציאה + פרופיל */}
+      <div className="profile-wrapper">
+        {/* תמיד מוצג */}
+        <LanguageSwitcher />
 
+        {isAuthed && (
+          <>
+            <button
+              type="button"
+              className="logout-icon-btn"
+              onClick={onLogout}
+              title="יציאה"
+            >
+              <FiLogOut />
+            </button>
 
-          <Link to="/profile" className="profile" onClick={handleLinkClick}>
-            {initial}
-          </Link>
-
-        </div>
-      )}
+            <Link to="/profile" className="profile" onClick={handleLinkClick}>
+              {initial}
+            </Link>
+          </>
+        )}
+      </div>
     </nav>
   );
 };
