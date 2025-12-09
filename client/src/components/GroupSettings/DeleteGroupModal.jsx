@@ -1,5 +1,6 @@
 // src/pages/GroupSettingsPage/DeleteGroupModal.jsx
 import { useTranslation } from 'react-i18next';
+import './DeleteGroupModal.css';
 
 export default function DeleteGroupModal({
   open,
@@ -15,40 +16,45 @@ export default function DeleteGroupModal({
 
   return (
     <div className="modal-backdrop" onClick={onClose}>
-      <div className="modal" onClick={(e) => e.stopPropagation()}>
-        <h3>{t('groupSettings.deleteModal.title')}</h3>
+      <div className="modal delete-modal" onClick={(e) => e.stopPropagation()}>
 
-        <p className="muted" style={{ marginTop: 6 }}>
-          {t('groupSettings.deleteModal.typeToConfirm')}{' '}
-          <b>{confirmSlug}</b>
-        </p>
+        {/* כותרת */}
+        <h2 className="delete-title">מחיקת קבוצה</h2>
 
+        {/* הוראה + שם הקבוצה */}
+        <div className="delete-instruction">
+          כדי לאשר, הקלידי:
+          <div className="delete-repo">{confirmSlug}</div>
+        </div>
+
+        {/* שדה קלט */}
         <input
-          className="input"
+          className="delete-confirm-input"
           placeholder={confirmSlug}
           value={typedSlug}
           onChange={(e) => setTypedSlug(e.target.value)}
           style={{ direction: 'ltr' }}
         />
 
-        <div className="actions-row" style={{ marginTop: 12 }}>
-          <button className="gs-btn-outline" onClick={onClose}>
-            {t('common.cancel')}
-          </button>
+        {/* כפתורים */}
+        <div className="delete-actions">
+
 
           <button
-            className="btn-danger"
+            className="delete-main-btn"
             disabled={typedSlug.trim() !== confirmSlug}
             onClick={onDelete}
-            title={
-              typedSlug.trim() !== confirmSlug
-                ? t('groupSettings.deleteModal.mustMatch')
-                : undefined
-            }
           >
-            {t('groupSettings.deleteModal.deleteForever')}
+            מחיקת הקבוצה לצמיתות
+          </button>
+          <button
+            className="delete-cancel-btn"
+            onClick={onClose}
+          >
+            ביטול
           </button>
         </div>
+
       </div>
     </div>
   );
