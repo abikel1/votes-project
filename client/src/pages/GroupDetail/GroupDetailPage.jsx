@@ -7,9 +7,11 @@ import toast from 'react-hot-toast';
 import { FiSettings, FiMessageSquare, FiX } from 'react-icons/fi';
 import { BiArrowBack } from 'react-icons/bi';
 import { FiZap } from 'react-icons/fi';
+import { TourProvider } from '@reactour/tour';
 
 import CountdownTimer from '../../components/CountdownTimer/CountdownTimer';
 import GroupChat from '../../components/GroupChat/GroupChat';
+import { useGroupDetailTour } from '../../Tour/useGroupDetailTour';
 
 import {
   fetchMyGroups,
@@ -63,7 +65,7 @@ const makeSlug = (name = '') =>
       .replace(/\s+/g, '-'),
   );
 
-export default function GroupDetailPage() {
+function GroupDetailPageContent() {
   const { groupSlug } = useParams();
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -147,6 +149,15 @@ export default function GroupDetailPage() {
 
   const canChat = !isLocked || isOwner || isMember;
 
+  // מדריך המשתמש
+  const { tourInitialized, openTour } = useGroupDetailTour({ 
+    group, 
+    candidates, 
+    isOwner, 
+    isAuthed, 
+    isMobile 
+  });
+
   // ===== פתרון groupId לפי slug (אם נכנסו ישירות לכתובת) =====
   useEffect(() => {
     if (navGroupId) {
@@ -166,16 +177,21 @@ export default function GroupDetailPage() {
     })();
   }, [navGroupId, groupSlug]);
 
-  // ===== טעינת נתוני קבוצה, מועמדים, הקבוצות שלי =====
-  useEffect(() => {
-    if (groupId) {
-      dispatch(fetchGroupWithMembers(groupId));
-      dispatch(fetchCandidatesByGroup(groupId));
-    }
-    if (isAuthed) {
-      dispatch(fetchMyGroups());
-    }
-  }, [dispatch, groupId, isAuthed]);
+  // ===== טעינת נתוני קבוצה, מועמדים =====
+// ===== טעינת נתוני קבוצה, מועמדים =====
+useEffect(() => {
+  if (groupId) {
+    dispatch(fetchGroupWithMembers(groupId));
+    dispatch(fetchCandidatesByGroup(groupId));
+  }
+}, [dispatch, groupId]); // <-- סוגר את ה-useEffect הראשון
+
+useEffect(() => {
+  if (isAuthed) {
+    dispatch(fetchMyGroups());
+  }
+}, [dispatch, groupId, isAuthed]); // <-- useEffect השני
+
 
   // ===== Resize bar =====
   useEffect(() => {
@@ -358,7 +374,14 @@ export default function GroupDetailPage() {
 
   return (
     <div className="page-wrap dashboard">
-      <div className="page-header clean-header">
+      {/* כפתור הפעלת המדריך */}
+      {tourInitialized && (
+        <button onClick={openTour} className="tour-fab">
+          📖 הדרכה
+        </button>
+      )}
+
+      <div id="group-detail-header" className="page-header clean-header">
         {/* כותרת מרכזית */}
         <div className="header-title">
           <h2>{group.name}</h2>
@@ -367,6 +390,7 @@ export default function GroupDetailPage() {
 
         {isOwner && (
           <button
+            id="settings-button"
             className="icon-btn"
             onClick={goSettings}
             title={t('groups.detail.buttons.settings')}
@@ -385,7 +409,7 @@ export default function GroupDetailPage() {
         </button>
       </div>
 
-      <div className="meta-and-button">
+      <div id="group-detail-meta" className="meta-and-button">
         <div className="group-meta">
           <div>
             <span className="meta-label">
@@ -409,6 +433,7 @@ export default function GroupDetailPage() {
 
         {isVotingPhase && (
           <button
+            id="vote-button"
             className="vote-btn"
             onClick={() => {
               if (!isAuthed) {
@@ -428,13 +453,13 @@ export default function GroupDetailPage() {
 
       {errorCandidates && (
         <p className="err">
-          ❌ {t('groups.detail.error.candidatesFailed')}: {errorCandidates}
+          ⌛ {t('groups.detail.error.candidatesFailed')}: {errorCandidates}
         </p>
       )}
 
       {/* במובייל: טאבים למטה */}
       {isMobile && (
-        <div className="mobile-tabs">
+        <div id="mobile-tabs" className="mobile-tabs">
           <button
             className={`mobile-tab ${activeTab === 'candidates' ? 'active' : ''}`}
             onClick={() => setActiveTab('candidates')}
@@ -456,7 +481,7 @@ export default function GroupDetailPage() {
           className={`left-section ${isMobile && activeTab !== 'candidates' ? 'hidden' : ''}`}
           style={!isMobile ? { width: `${leftWidth}%` } : {}}
         >
-          <div className="candidates-container">
+          <div id="candidates-section" className="candidates-container">
             <h3 className="section-title">
               {t('groups.detail.candidates.title')}
             </h3>
@@ -473,8 +498,8 @@ export default function GroupDetailPage() {
                   return (
                     <div
                       key={c._id}
-                      className={`candidate-card ${winnerIndex !== -1 ? 'winner' : ''
-                        }`}
+                      id={`candidate-card-${c._id}`}
+                      className={`candidate-card ${winnerIndex !== -1 ? 'winner' : ''}`}
                     >
                       {c.photoUrl && (
                         <img
@@ -655,6 +680,7 @@ export default function GroupDetailPage() {
       {isAuthed && (
         <>
           <button
+            id="chat-fab"
             type="button"
             className="chat-fab"
             onClick={() => setIsChatOpen((prev) => !prev)}
@@ -675,5 +701,22 @@ export default function GroupDetailPage() {
         </>
       )}
     </div>
+  );
+
+
+  }
+    export default function GroupDetailPage() {
+  return (
+    <TourProvider 
+      steps={[]}
+      styles={{
+        popover: (base) => ({
+          ...base,
+          borderRadius: 10,
+        }),
+      }}
+    >
+      <GroupDetailPageContent />
+    </TourProvider>
   );
 }
