@@ -23,17 +23,18 @@ export default function Footer() {
                     </p>
                 </div>
 
-                {/* טור קישורים */}
                 <div className="footer-col">
                     <h4>{t('footer.usefulLinksTitle')}</h4>
-                    <ul className="footer-links footer-links-grid">
-                        <li><a href="/">{t('footer.link.home')}</a></li>
-                        <li><a href="/groups">{t('footer.link.groups')}</a></li>
-                        <li><a href="/user-guide">{t('footer.link.guide')}</a></li>
-                        <li><a href="/about">{t('footer.link.about')}</a></li>
-                        <li><a href="/contact">{t('footer.link.contact')}</a></li>
-                    </ul>
+
+                    <div className="footer-links-two-rows">
+                        <p><a href="/">{t('footer.link.home')}</a></p>
+                        <p><a href="/groups">{t('footer.link.groups')}</a></p>
+                        <p><a href="/user-guide">{t('footer.link.guide')}</a></p>
+                        <p><a href="/about">{t('footer.link.about')}</a></p>
+                        <p><a href="/contact">{t('footer.link.contact')}</a></p>
+                    </div>
                 </div>
+
 
                 {/* טור רשתות חברתיות */}
                 <div className="footer-col footer-col-social">

@@ -973,3 +973,35 @@
 .share-actions .vote-btn {
   min-width: 120px;
 }
+
+/* רספונסיביות למודאל שיתוף במובייל */
+@media (max-width: 480px) {
+  .share-modal-card {
+    padding: 16px;
+    max-width: 100%;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .share-input-row {
+    flex-direction: row-reverse;
+    /* נשארים בשורה כמו בתמונה */
+    gap: 6px;
+  }
+
+  .share-copy-btn {
+    flex: 0 0 70px;   /* עוד טיפה קטן בפלאפון */
+    font-size: 0.8rem;
+  }
+
+  .share-input {
+    flex: 1 1 auto;
+    min-width: 0;
+    /* הכי חשוב – מאפשר לשדה להתכווץ */
+    font-size: 0.85rem;
+  }
+
+  .share-actions .vote-btn {
+    width: 100%;
+  }
+}
