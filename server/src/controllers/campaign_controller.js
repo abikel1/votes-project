@@ -2,6 +2,16 @@
 const campaignService = require('../services/campaign_service');
 const { generateCampaignPostForCandidate } = require('../services/ai_service');
 const Group = require('../models/group_model'); // 👈 לוודא שיש כזה
+const Candidate = require('../models/candidate_model');
+
+function makeCandidateSlugFromName(name = '') {
+  return String(name)
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, '-');
+}
+
+
 
 async function getCampaign(req, res) {
   try {
@@ -28,6 +38,14 @@ async function getCampaign(req, res) {
     if (!group) {
       return res.status(404).json({ message: 'קבוצה לא נמצאה' });
     }
+
+    const groupSlug =
+      group.slug ||
+      group.slugName ||
+      (group.name
+        ? String(group.name).trim().toLowerCase().replace(/\s+/g, '-')
+        : '');
+
 
     // 🔒 האם הקבוצה נעולה
     const isLocked = !!group.isLocked;
@@ -86,12 +104,157 @@ async function getCampaign(req, res) {
       campaign,
       candidate: campaign.candidate,
       campaignId: campaign._id,
+      groupSlug, // 👈 חדש
+
     });
   } catch (err) {
     console.error('getCampaign error:', err);
     res.status(500).json({ message: err.message });
   }
 }
+
+async function getCampaignBySlug(req, res) {
+  try {
+    const currentUserId = req.user?._id;
+    const { groupSlug, candidateSlug } = req.params;
+
+    // נורמליזציה
+    const rawGroupSlug = String(groupSlug || '').trim().toLowerCase();
+    const encGroupSlug = encodeURIComponent(rawGroupSlug);
+
+    // 1) מוצאים קבוצה לפי slug (גם מקודד וגם לא מקודד) או לפי slugName
+    let group = await Group.findOne({
+      $or: [
+        { slug: rawGroupSlug },
+        { slug: encGroupSlug },
+        { slugName: rawGroupSlug },
+        { slugName: encGroupSlug },
+      ],
+    }).lean();
+
+    if (!group) {
+      // ניסיון שני – לפי name שהפך ל-slug
+      const allGroups = await Group.find({}).lean();
+      group = allGroups.find((g) => {
+        const fromName =
+          g.name
+            ? String(g.name).trim().toLowerCase().replace(/\s+/g, '-')
+            : '';
+
+        return (
+          fromName === rawGroupSlug ||
+          fromName === encGroupSlug
+        );
+      });
+    }
+
+    if (!group) {
+      return res.status(404).json({ message: 'קבוצה לא נמצאה' });
+    }
+
+    const groupId = group._id;
+
+    // 2) מוצאים מועמד לפי group + slug (גם פה מקודד/לא-מקודד)
+    const rawCandidateSlug = String(candidateSlug || '')
+      .trim()
+      .toLowerCase();
+    const encCandidateSlug = encodeURIComponent(rawCandidateSlug);
+
+    // 2) מוצאים מועמד לפי group + slug
+    let candidate = await Candidate.findOne({
+      groupId: group._id,
+      slug: candidateSlug,
+    }).lean();
+
+    // 👇 אם לא מצאנו לפי השדה slug – ננסה לפי השם (כמו בצד לקוח)
+    if (!candidate) {
+      const candidates = await Candidate.find({ groupId: group._id }).lean();
+
+      candidate = candidates.find((c) => {
+        const cSlug =
+          c.slug ||
+          makeCandidateSlugFromName(c.name || '');
+        return cSlug === candidateSlug;
+      });
+    }
+
+    if (!candidate) {
+      return res
+        .status(404)
+        .json({ message: 'מועמד/ת לא נמצא/ה' });
+    }
+
+
+    // 3) מוצאים את הקמפיין לפי candidateId (שירות קיים)
+    const campaign =
+      await campaignService.getCampaignByCandidate(
+        candidate._id,
+        currentUserId
+      );
+
+    // 🔒 האם הקבוצה נעולה
+    const isLocked = !!group.isLocked;
+
+    // 👥 האם המשתמש/ת חברה בקבוצה
+    const isMember =
+      Array.isArray(group.members) &&
+      group.members.some((m) =>
+        m.user
+          ? String(m.user) === String(currentUserId)
+          : String(m) === String(currentUserId)
+      );
+
+    // 👤 פרטי המשתמש/ת הנוכחית
+    const myEmail = (req.user?.email || '').trim().toLowerCase();
+    const myId = String(currentUserId || '');
+
+    // 👑 פרטי בעלת הקבוצה
+    const createdByEmail = (
+      group.createdBy ??
+      group.created_by ??
+      group.createdByEmail ??
+      group.ownerEmail ??
+      group.owner ??
+      ''
+    )
+      .trim()
+      .toLowerCase();
+
+    const createdById = String(group.createdById || '');
+
+    const isAdmin = req.user?.role === 'admin' || req.user?.isAdmin;
+
+    const isOwner =
+      isAdmin ||
+      !!group.isOwner ||
+      (!!myEmail && !!createdByEmail && myEmail === createdByEmail) ||
+      (!!myId && !!createdById && myId === createdById);
+
+    if (isLocked && !isMember && !isOwner) {
+      return res.status(403).json({
+        ok: false,
+        code: 'GROUP_LOCKED',
+        message:
+          'הקבוצה נעולה. כדי לצפות בקמפיין עליך לבקש להצטרף לקבוצה.',
+        groupId: String(groupId),
+      });
+    }
+
+    // ✅ מותר לצפות בקמפיין
+    return res.json({
+      success: true,
+      campaign,
+      candidate,
+      campaignId: campaign._id,
+    });
+  } catch (err) {
+    console.error('getCampaignBySlug error:', err);
+    res.status(500).json({ message: err.message });
+  }
+}
+
+
+
 
 
 async function createCampaign(req, res) {
@@ -262,6 +425,7 @@ async function unlikeCampaign(req, res) {
 
 module.exports = {
   getCampaign,
+  getCampaignBySlug,
   createCampaign,
   updateCampaign,
   addPost,

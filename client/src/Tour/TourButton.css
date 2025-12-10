@@ -1,6 +1,6 @@
 .tour-btn-small {
   position: fixed;
-  bottom: 20px;
+  bottom: 28px;
   left: 100px;
   width: 40px;
   height: 40px;
@@ -26,3 +26,11 @@
   height: 20px;
   color: #facc15; /* צהוב בולט */
 }
+/* מיקום מותאם לטלפונים */
+@media (max-width: 768px) {
+  .tour-btn-small {
+    bottom: 18px;   /* יותר למטה */
+    left: 95px;    /* טיפה מהשול */
+  }
+}
+

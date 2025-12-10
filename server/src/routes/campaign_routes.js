@@ -3,6 +3,7 @@ const express = require('express');
 const router = express.Router();
 const {
   getCampaign,
+  getCampaignBySlug,
   createCampaign,
   updateCampaign,
   addPost,
@@ -23,6 +24,13 @@ const auth = require('../middlewares/auth_middleware');
 
 // קמפיין של מועמד
 router.get('/candidate/:candidateId', auth, getCampaign);
+
+router.get(
+  '/by-slug/:groupSlug/:candidateSlug',
+  auth,
+  getCampaignBySlug
+);
+
 
 // יצירת קמפיין למועמד
 router.post('/candidate/:candidateId', createCampaign);

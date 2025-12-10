@@ -232,6 +232,28 @@ export const toggleLike = createAsyncThunk(
     }
   }
 );
+
+// שליפת קמפיין לפי groupSlug + candidateSlug
+export const fetchCampaignBySlug = createAsyncThunk(
+  'campaign/fetchCampaignBySlug',
+  async ({ groupSlug, candidateSlug }, thunkAPI) => {
+    try {
+      const { data } = await http.get(
+        `/campaigns/by-slug/${groupSlug}/${candidateSlug}`
+      );
+      return data; // { success, campaign, candidate, campaignId, ... }
+    } catch (err) {
+      const status = err.response?.status;
+      const code = err.response?.data?.code;
+      const message =
+        err.response?.data?.message || 'שגיאה בטעינת הקמפיין';
+      const groupId = err.response?.data?.groupId;
+
+      return thunkAPI.rejectWithValue({ status, code, message, groupId });
+    }
+  }
+);
+
 // ===== Slice =====
 
 const initialState = {
@@ -252,10 +274,58 @@ const initialState = {
 const campaignSlice = createSlice({
   name: 'campaign',
   initialState,
-  reducers: {},
+  reducers: {
+    clearCampaign(state) {
+      state.loading = false;
+      state.data = null;
+      state.candidate = null;
+      state.error = null;
+      state.locked = false;
+      state.lockedGroupId = null;
+
+      // אופציונלי – לנקות גם מצב ה-AI
+      state.aiLoading = false;
+      state.aiError = null;
+      state.aiSuggestion = null;
+    },
+  },
   extraReducers: (builder) => {
     builder
-      // ----- Fetch campaign -----
+      // ----- Fetch campaign BY SLUG -----
+      .addCase(fetchCampaignBySlug.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+        state.locked = false;
+        state.lockedGroupId = null;
+      })
+      .addCase(fetchCampaignBySlug.fulfilled, (state, action) => {
+        state.loading = false;
+        state.data = action.payload.campaign;
+        state.candidate = action.payload.candidate;
+        state.locked = false;
+        state.lockedGroupId = null;
+      })
+      .addCase(fetchCampaignBySlug.rejected, (state, action) => {
+        state.loading = false;
+
+        if (action.payload && typeof action.payload === 'object') {
+          state.error =
+            action.payload.message || 'שגיאה בטעינת הקמפיין';
+
+          state.locked =
+            action.payload.code === 'GROUP_LOCKED' ||
+            action.payload.status === 403;
+          state.lockedGroupId = state.locked
+            ? action.payload.groupId || null
+            : null;
+        } else {
+          state.error = action.payload || 'שגיאה בטעינת הקמפיין';
+          state.locked = false;
+          state.lockedGroupId = null;
+        }
+      })
+
+      // ----- Fetch campaign BY CANDIDATE ID -----
       .addCase(fetchCampaign.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -264,15 +334,17 @@ const campaignSlice = createSlice({
       })
       .addCase(fetchCampaign.fulfilled, (state, action) => {
         state.loading = false;
-        state.data = action.payload.campaign;
-        state.candidate = action.payload.candidate;
+
+        const payload = action.payload || {};
+        // ה־controller מחזיר { success, campaign, candidate, campaignId, groupSlug }
+        state.data = payload.campaign || null;
+        state.candidate = payload.candidate || null;
         state.locked = false;
         state.lockedGroupId = null;
       })
       .addCase(fetchCampaign.rejected, (state, action) => {
         state.loading = false;
 
-        // אם החזרנו אובייקט עשיר מ-rejectWithValue
         if (action.payload && typeof action.payload === 'object') {
           state.error =
             action.payload.message || 'שגיאה בטעינת הקמפיין';
@@ -280,7 +352,6 @@ const campaignSlice = createSlice({
           state.locked =
             action.payload.code === 'GROUP_LOCKED' ||
             action.payload.status === 403;
-
           state.lockedGroupId = state.locked
             ? action.payload.groupId || null
             : null;
@@ -377,6 +448,8 @@ const campaignSlice = createSlice({
       });
   },
 });
+
+export const { clearCampaign } = campaignSlice.actions;
 
 export default campaignSlice.reducer;
 
