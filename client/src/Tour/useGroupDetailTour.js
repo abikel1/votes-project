@@ -40,10 +40,10 @@ useEffect(() => {
   setTourInitialized(true);
 
   // 🔹 פותח רק אם המשתמש עדיין לא ראה את המדריך
-  const tourSeen = localStorage.getItem(`groupTourSeen_${group._id}`);
+  const tourSeen = localStorage.getItem(`groupTourSeen`);
   if (!tourSeen) {
     setTimeout(() => setIsOpen(true), 500);
-    localStorage.setItem(`groupTourSeen_${group._id}`, 'true');
+    localStorage.setItem(`groupTourSeen`, 'true');
   }
 }, [group, candidates, isOwner, isAuthed, isMobile, setSteps, setIsOpen, tourInitialized]);
 
