@@ -129,34 +129,4 @@ body.highlight-links .btn,
 body.highlight-links .groups-action-btn {
   box-shadow: 0 0 0 2px #ff00ff !important;
 }
-/* כפתור נגישות – שמאל למטה */
-.accessibility-btn {
-  position: fixed !important;
-  left: 16px !important;
-  bottom: 16px !important;
-  z-index: 999999 !important;
-
-  width: 52px;
-  height: 52px;
-  border-radius: 50%;
-  background: #003366;
-  color: white;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
-  cursor: pointer;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.accessibility-btn:hover {
-  transform: scale(1.1);
-  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.4);
-}
-
-.accessibility-btn:active {
-  transform: scale(0.95);
-}
 
