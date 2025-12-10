@@ -38,7 +38,7 @@ export default function MemberRow({ m, onRemove, isOwner }) {
       </div>
       {isOwner && onRemove && (
         <div className="row-actions">
-          <button className="small danger" onClick={onRemove}>
+          <button className="clean-btn clean-btn-cancel" onClick={onRemove}>
             {t('members.remove')}
           </button>
         </div>

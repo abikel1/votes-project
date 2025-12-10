@@ -57,13 +57,13 @@ export default function CandidateRequestsTab({ groupId, onApprove, onReject }) {
 
                     <div className="row-actions">
                       <button
-                        className="small"
+                        className="clean-btn clean-btn-save"
                         onClick={() => onApprove(r)}
                       >
                         {t('candidates.requests.approve')}
                       </button>
                       <button
-                        className="small danger"
+                        className="clean-btn clean-btn-cancel"
                         onClick={() => onReject(r)}
                       >
                         {t('candidates.requests.reject')}

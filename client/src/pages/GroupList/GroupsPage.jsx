@@ -26,6 +26,8 @@ import './GroupsPage.css';
 import { useTranslation } from 'react-i18next';
 import GlobalTour from '../../Tour/GlobalTour';
 import TourButton from '../../Tour/TourButton';
+import { FaRegCheckSquare } from "react-icons/fa";
+import { LuSquareCheck } from "react-icons/lu";
 
 function formatDate(d) {
   if (!d) return '-';
@@ -614,6 +616,11 @@ useEffect(() => {
             !isOwner &&
             isLocked &&
             ((isPending && !isMember) || (!isPending && !isMember));
+const now = new Date();
+const votingOpen =
+  g.endDate &&
+  new Date(g.endDate) > now &&
+  (!g.candidateEndDate || new Date(g.candidateEndDate) <= now);
 
           return (
           <div
@@ -667,6 +674,19 @@ useEffect(() => {
           id={`groups-badge-candidate-${gid}`}
         />
       )}
+{/* אייקון הצבעה פתוחה */}
+{votingOpen && (
+  <LuSquareCheck
+    size={20}
+    className="groups-badge-vote"
+    title="הצבעה פתוחה"
+    id={`groups-badge-vote-${gid}`}
+  />
+)}
+
+
+
+  
     </div>
   </div>
 
