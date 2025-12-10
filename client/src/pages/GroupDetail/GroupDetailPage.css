@@ -305,8 +305,6 @@
 }
 
 /* ========== רספונסיביות למובייל ========== */
-
-/* טאבלטים */
 /* טאבלטים */
 @media (max-width: 1024px) {
     .main-content-resizable {
@@ -1833,4 +1831,11 @@
 .tour-fab:hover {
     transform: scale(1.1);
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+/* 4 כרטיסים בשורה אחת בטאבלט בלבד */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .group-info-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 16px; /* אם תרצי רווחים ביניהם */
+  }
 }
