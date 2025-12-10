@@ -1862,7 +1862,7 @@
 
 .header-title {
   flex: 1 1 auto;
-  min-width: 0; /* חשוב ל-truncate */
+  min-width: 30%; /* חשוב ל-ellipsis */
   overflow: hidden;
 }
 

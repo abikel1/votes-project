@@ -377,12 +377,11 @@ useEffect(() => {
   }));
 
   const winners = sortedCandidates.slice(0, group.maxWinners);
-function truncateWords(text, numWords) {
+function truncateText(text, maxLength) {
   if (!text) return '';
-  const words = text.split(' ');
-  if (words.length <= numWords) return text;
-  return words.slice(0, numWords).join(' ') + '…';
+  return text.length > maxLength ? text.slice(0, maxLength) + '…' : text;
 }
+
 
   return (
     <div className="page-wrap dashboard">
@@ -401,14 +400,18 @@ function truncateWords(text, numWords) {
       {group.name}
     </h2>
     {group.description && (
-      <p className="group-description" title={group.description}>
-        {truncateWords(group.description, 2)}
-      </p>
+   <p
+  className="group-description"
+  title={group.description} // טוליפ שמראה את כל הטקסט
+>
+  {truncateText(group.description, 20)}
+</p>
+
     )}
   </div>
 
   <div className="icon-btn-container">
-     {isOwner && (
+    {isOwner && (
       <button
         id="settings-button"
         className="icon-btn"
@@ -427,6 +430,7 @@ function truncateWords(text, numWords) {
     </button>
   </div>
 </div>
+
 
 
 
