@@ -28,7 +28,7 @@ export default function GeneralTab({
       <div className="card-head">
         <h3>{t('groupSettings.general.title')}</h3>
         {!editMode && (
-          <button className="gs-btn-outline" onClick={onEditClick}>
+          <button className="clean-btn clean-btn-edit" onClick={onEditClick}>
             {t('common.edit')}
           </button>
         )}
@@ -245,14 +245,14 @@ export default function GeneralTab({
 
           <div className="actions-row">
             <button
-              className="gs-btn"
+              className="clean-btn clean-btn-save"
               type="submit"
               disabled={updateLoading}
             >
               {t('common.save')}
             </button>
             <button
-              className="gs-btn-outline"
+              className="clean-btn clean-btn-cancel"
               type="button"
               onClick={onCancelEdit}
               disabled={updateLoading}

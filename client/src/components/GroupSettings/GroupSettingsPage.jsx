@@ -381,7 +381,7 @@ const pendingCount = requests.filter(r => r.status === 'pending').length;
       <div className="gs-wrap">
         <h2>{t('groupSettings.pageTitle')}</h2>
         <div className="err">{t('groupSettings.notFound')}</div>
-        <button className="gs-btn" onClick={() => navigate('/groups')}>
+        <button className="clean-btn clean-btn-cancel" onClick={() => navigate('/groups')}>
           {t('groupSettings.backToGroups')}
         </button>
       </div>
@@ -402,7 +402,7 @@ const pendingCount = requests.filter(r => r.status === 'pending').length;
       <div className="gs-wrap">
         <h2>{t('groupSettings.pageTitle')}</h2>
         <div className="err">{t(groupError)}</div>
-        <button className="gs-btn" onClick={() => navigate('/groups')}>
+        <button className="clean-btn clean-btn-cancel" onClick={() => navigate('/groups')}>
           {t('groupSettings.backToGroups')}
         </button>
       </div>
@@ -414,7 +414,7 @@ const pendingCount = requests.filter(r => r.status === 'pending').length;
       <div className="gs-wrap">
         <h2>{t('groupSettings.pageTitle')}</h2>
         <div>{t('groupSettings.noGroup')}</div>
-        <button className="gs-btn" onClick={() => navigate('/groups')}>
+        <button className="clean-btn clean-btn-cancel" onClick={() => navigate('/groups')}>
           {t('groupSettings.backToGroups')}
         </button>
       </div>
@@ -429,7 +429,7 @@ const pendingCount = requests.filter(r => r.status === 'pending').length;
         <div className="err">
           {t('groupSettings.noPermissionText')}
         </div>
-        <button className="gs-btn" onClick={() => navigate('/groups')}>
+        <button className="clean-btn clean-btn-cancel" onClick={() => navigate('/groups')}>
           {t('groupSettings.backToGroups')}
         </button>
       </div>
@@ -850,8 +850,7 @@ const pendingCount = requests.filter(r => r.status === 'pending').length;
   </button>
 
           {/* Candidates */}
-{/* Candidates */}
-{/* Candidates */}
+
 <button
   className={`side-tab ${activeTab === 'candidates' ? 'active' : ''}`}
   onClick={() => setActiveTab('candidates')}

@@ -41,14 +41,14 @@ export default function DeleteGroupModal({
 
 
           <button
-            className="delete-main-btn"
+            className="clean-btn clean-btn-delete"
             disabled={typedSlug.trim() !== confirmSlug}
             onClick={onDelete}
           >
             מחיקת הקבוצה לצמיתות
           </button>
           <button
-            className="delete-cancel-btn"
+            className="clean-btn clean-btn-cancel"
             onClick={onClose}
           >
             ביטול

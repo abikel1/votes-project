@@ -138,7 +138,7 @@ export default function EditCandidateModal({
               <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
                 <button
                   type="button"
-                  className="gs-btn"
+                  className="clean-btn clean-btn-edit"
                   onClick={() => editFileInputRef.current?.click()}
                   disabled={disabled || uploadingEdit}
                 >
@@ -147,7 +147,7 @@ export default function EditCandidateModal({
 
                 <button
                   type="button"
-                  className="gs-btn-outline"
+                  className="clean-btn clean-btn-cancel"
                   onClick={clearEditPhoto}
                   disabled={disabled}
                 >
@@ -172,7 +172,7 @@ export default function EditCandidateModal({
 
           <div className="actions-row">
             <button
-              className="gs-btn"
+              className="clean-btn clean-btn-save"
               type="submit"
               disabled={disabled}
             >
@@ -182,7 +182,7 @@ export default function EditCandidateModal({
             </button>
 
             <button
-              className="gs-btn-outline"
+              className="clean-btn clean-btn-cancel"
               type="button"
               onClick={onCancelEditCandidate}
               disabled={disabled}

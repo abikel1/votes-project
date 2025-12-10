@@ -258,21 +258,6 @@ textarea.input {
   color: #333;
 }
 
-.gs-btn-outline {
-  padding: 6px 12px;
-  border: 1px solid #007bff;
-  background: transparent;
-  color: #007bff;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 0.9rem;
-  transition: all 0.2s ease;
-}
-
-.gs-btn-outline:hover {
-  background: #007bff;
-  color: #fff;
-}
 
 /* תצוגת קריאה */
 .read-grid {
@@ -321,19 +306,7 @@ textarea.input {
   border-radius: 6px;
 }
 
-.share-actions button.gs-btn {
-  padding: 6px 12px;
-  border: none;
-  border-radius: 6px;
-  background-color: #007bff;
-  color: #fff;
-  cursor: pointer;
-  font-size: 0.9rem;
-}
 
-.share-actions button.gs-btn:hover {
-  background-color: #0056b3;
-}
 
 .share-hint {
   font-size: 0.85rem;
@@ -389,31 +362,6 @@ textarea.input {
   margin-top: 12px;
 }
 
-.gs-btn {
-  padding: 6px 14px;
-    border-radius: 6px;
-      background-color: #007bff;
-  color: #fff;
-  border: none;
-  cursor: pointer;
-  font-size: 0.95rem;
-}
-
-.gs-btn:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-.gs-btn-outline {
-  border: 1px solid #007bff;
-  color: #007bff;
-  background: transparent;
-}
-
-.gs-btn-outline:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
 
 /* רספונסיביות */
 @media (max-width: 768px) {
@@ -570,108 +518,6 @@ textarea.input {
   flex-wrap: wrap;
 }
 
-/* =========================================
-   כפתורים
-   ========================================= */
-.gs-btn, 
-.gs-btn-outline,
-.btn-danger {
-  padding: 12px 20px;
-    border-radius: 6px;
-      cursor: pointer;
-  font-weight: 600;
-  font-size: calc(0.95rem * var(--a11y-font-scale));
-  border: 1px solid transparent;
-  transition: all 0.2s;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  text-align: center;
-  white-space: nowrap;
-}
-
-.gs-btn {
-      border-radius: 6px;
-  background: var(--gs-primary);
-  color: #fff;
-  border-color: var(--gs-primary);
-}
-
-.gs-btn:hover:not(:disabled) {
-      border-radius: 6px;
-  background: var(--gs-primary-hover);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 51, 102, 0.2);
-}
-
-.gs-btn:disabled {
-      border-radius: 6px;
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.gs-btn-outline {
-      border-radius: 6px;
-  background: #fff;
-  color: var(--gs-primary);
-  border-color: var(--gs-primary);
-}
-
-.gs-btn-outline:hover:not(:disabled) {
-      border-radius: 6px;
-  background: #f0f7ff;
-  border-color: var(--gs-primary-hover);
-}
-
-.gs-btn-outline:disabled {
-      border-radius: 6px;
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.btn-danger {
-  background: var(--gs-danger);
-  color: #fff;
-  border-color: var(--gs-danger);
-}
-
-.btn-danger:hover:not(:disabled) {
-  background: #950a0a;
-  box-shadow: 0 4px 12px rgba(184, 13, 13, 0.3);
-}
-
-.btn-danger:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-}
-
-button.small {
-  padding: 7px 12px;
-  font-size: calc(0.85rem * var(--a11y-font-scale));
-  border-radius: 4px;
-  border: 1px solid #ddd;
-  background: #fff;
-  cursor: pointer;
-  font-weight: 500;
-  transition: all 0.15s;
-}
-
-button.small:hover {
-  background: #f5f5f5;
-  border-color: #bbb;
-}
-
-button.small.danger {
-  color: var(--gs-danger);
-  border-color: #fdd;
-  background: #fff5f5;
-}
-
-button.small.danger:hover {
-  background: #fee;
-  border-color: #fcc;
-}
 
 .actions-row {
   display: flex;
@@ -1053,14 +899,6 @@ button.small.danger:hover {
     padding-top: 10px;
   }
 
-  /* כפתורים רחבים */
-  .gs-btn, 
-  .gs-btn-outline,
-  .btn-danger {
-        border-radius: 6px;
-    width: 100%;
-    justify-content: center;
-  }
 
   .actions-row {
     flex-direction: column;
@@ -1149,13 +987,7 @@ button.small.danger:hover {
     font-size: calc(0.8rem * var(--a11y-font-scale));
   }
 
-  .gs-btn,
-  .gs-btn-outline,
-  .btn-danger {
-        border-radius: 6px;
-    padding: 11px 16px;
-    font-size: calc(0.9rem * var(--a11y-font-scale));
-  }
+
 
   button.small {
     padding: 6px 10px;
@@ -1255,4 +1087,91 @@ button.small.danger:hover {
 
 .copy-icon:hover {
   color: #4a4e55;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* בסיס אחיד לכל הכפתורים */
+.clean-btn {
+  padding: 6px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: calc(0.85rem * var(--a11y-font-scale));
+  border: 1px solid transparent;
+  transition: all 0.15s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: auto;
+  white-space: nowrap;
+}
+
+/* כפתור שמירה - כחול כהה #003366 */
+.clean-btn-save {
+  background: #003366;
+  color: #fff;
+  border-color: #003366;
+}
+
+.clean-btn-save:hover:not(:disabled) {
+  background: #095eb5;
+  border-color: #095eb5;
+}
+
+/* כפתור ביטול - לבן עם מסגרת כחולה */
+.clean-btn-cancel {
+  background: #fff;
+  color: #003366;
+  border: 1px solid #003366;
+}
+
+.clean-btn-cancel:hover:not(:disabled) {
+  background: #eef4ff;
+}
+
+/* כפתור עריכה - אפור */
+.clean-btn-edit {
+  background: #6c757d;
+  color: #fff;
+  border-color: #6c757d;
+}
+
+.clean-btn-edit:hover:not(:disabled) {
+  background: #5a6268;
+  border-color: #5a6268;
+}
+
+/* כפתור מחיקה - אדום */
+.clean-btn-delete {
+  background: #dc3545;
+  color: #fff;
+  border-color: #dc3545;
+}
+
+.clean-btn-delete:hover:not(:disabled) {
+  background: #a71d2a;
+  border-color: #a71d2a;
+}
+
+/* כפתור Disabled */
+.clean-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
