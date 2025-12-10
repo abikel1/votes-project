@@ -376,10 +376,10 @@
         overflow: auto;
     }
 
-    .page-header {
+    /* .page-header {
         padding: 10px;
         margin-bottom: 10px;
-    }
+    } */
 
     .page-title {
         font-size: calc(20px * var(--a11y-font-scale));
@@ -550,14 +550,14 @@
     box-sizing: border-box;
 }
 
-.page-header {
+/* .page-header {
     text-align: center;
     margin-bottom: 12px;
     background: white;
     padding: 12px;
     border: 1px solid #e2e8f0;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-}
+} */
 
 .page-title {
     font-size: calc(24px * var(--a11y-font-scale));
@@ -895,9 +895,9 @@
     margin: auto;
 }
 
-.page-header {
+/* .page-header {
     position: relative;
-}
+} */
 
 .current-leader {
     position: absolute;
@@ -1244,10 +1244,10 @@
         overflow: auto;
     }
 
-    .page-header {
+    /* .page-header {
         padding: 10px;
         margin-bottom: 10px;
-    }
+    } */
 
     .page-title {
         font-size: calc(20px * var(--a11y-font-scale));
@@ -1565,9 +1565,9 @@
 
 
 /* כדי שאפשר יהיה למקם את כפתור ההגדרות באופן מוחלט בתוך ההדר */
-.page-header {
+/* .page-header {
     position: relative;
-}
+} */
 
 .current-leader {
     position: absolute;
@@ -1632,23 +1632,23 @@
     border-bottom: 1px solid #e2e8f0;
 }
 
-.header-title {
+/* .header-title {
     flex: 1;
     text-align: center;
-}
-
+} */
+/* 
 .header-title h2 {
     font-size: calc(24px * var(--a11y-font-scale));
     margin: 0;
     font-weight: 700;
     color: #1e293b;
-}
+} */
 
-.header-title p {
+/* .header-title p {
     font-size: calc(13px * var(--a11y-font-scale));
     color: #64748b;
     margin: 2px 0 0 0;
-}
+} */
 
 .icon-btn {
     background: transparent;
@@ -1847,4 +1847,81 @@
         left: 17px;
         /* להזזה עדינה */
     }
+}
+
+
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 16px;
+  background-color: #fff;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+  flex-wrap: nowrap;
+}
+
+.header-title {
+  flex: 1 1 auto;
+  min-width: 0; /* חשוב ל-truncate */
+  overflow: hidden;
+}
+
+.group-name {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.group-description {
+  margin: 0;
+  font-size: 0.9rem;
+  color: #666;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.icon-btn-container {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+  align-items: center;
+}
+
+.icon-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #333;
+}
+
+.icon-btn:hover {
+  color: #007bff;
+}
+
+/* רספונסיבי טאבלט */
+@media (max-width: 1024px) {
+  .group-name {
+    font-size: 1.1rem;
+  }
+  .group-description {
+    font-size: 0.85rem;
+  }
+}
+
+/* רספונסיבי מובייל */
+@media (max-width: 600px) {
+  .group-name {
+    font-size: 1rem;
+  }
+  .group-description {
+    font-size: 0.8rem;
+  }
 }
