@@ -873,7 +873,7 @@ const pendingCount = requests.filter(r => r.status === 'pending').length;
     <FaUserCheck style={{ marginInlineEnd: 6 }} />
     {t('groupSettings.sidebar.voters')}
     {voters.length > 0 && (
-      <span className="join-requests-count">{voters.length}</span>
+      <span className="join-requests-count1">{voters.length}</span>
     )}
   </button>
 

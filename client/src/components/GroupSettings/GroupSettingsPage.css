@@ -164,6 +164,15 @@
   font-weight: 600;
 }
 
+.join-requests-count1{
+  background-color: #003366;
+  color: rgb(255, 255, 255);
+  border-radius: 50%;
+  padding: 3px 8px;
+  font-size: calc(0.75rem * var(--a11y-font-scale));
+  margin-left: 8px;
+  font-weight: 600;
+}
 /* =========================================
    כרטיסים
    ========================================= */
@@ -379,53 +388,6 @@ textarea.input {
   }
 }
 
-/* .grid-2 {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 16px;
-  width: 100%;
-}
-
-.read-grid {
-  display: grid;
-  gap: 20px;
-  grid-template-columns: 140px 1fr;
-  align-items: center;
-  width: 100%;
-  padding: 16px 0;
-  border-bottom: 2px solid #e8f0ff;
-}
-
-.read-grid:last-child {
-  border-bottom: none;
-}
-
-.read-grid small {
-  color: var(--gs-primary);
-  font-weight: 700;
-  font-size: calc(0.95rem * var(--a11y-font-scale));
-  text-align: right;
-}
-
-.card-field {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.card-field label {
-  font-weight: 700;
-  color: var(--gs-primary);
-  font-size: calc(0.95rem * var(--a11y-font-scale));
-  text-align: right;
-}
-
-.card-field span {
-  font-size: calc(1.05rem * var(--a11y-font-scale));
-  color: #222;
-  font-weight: 600;
-  padding: 0;
-} */
 
 /* =========================================
    רשימות
@@ -1014,67 +976,6 @@ textarea.input {
   }
 }
 
-/* =========================================
-   RESPONSIVE - מסכים קטנים מאוד
-   ========================================= */
-@media (max-width: 380px) {
-  .gs-wrap {
-    padding: 10px;
-  }
-
-  .header-title h2 {
-    font-size: calc(1.25rem * var(--a11y-font-scale));
-  }
-
-  .card {
-    padding: 14px;
-    border-width: 2px;
-  }
-
-  .side-tab {
-    padding: 7px 12px;
-    font-size: calc(0.8rem * var(--a11y-font-scale));
-  }
-
-  .input,
-  textarea.input {
-    padding: 10px 12px;
-    font-size: calc(0.95rem * var(--a11y-font-scale));
-  }
-
-  .row {
-    padding: 12px;
-  }
-
-  .thumb {
-    width: 44px;
-    height: 44px;
-  }
-}
-
-/* =========================================
-   הדפסה
-   ========================================= */
-@media print {
-  .gs-sidebar-tabs,
-  .gs-actions,
-  .icon-btn,
-  .row-actions,
-  button {
-    display: none !important;
-  }
-
-  .gs-main-layout {
-    flex-direction: column;
-  }
-
-  .card {
-    break-inside: avoid;
-    box-shadow: none;
-    border: 1px solid #ccc;
-  }
-}
-
 .copy-icon {
   position: absolute;
   right: 10px;
@@ -1175,3 +1076,10 @@ textarea.input {
   opacity: 0.5;
   cursor: not-allowed;
 }
+
+
+
+
+
+
+

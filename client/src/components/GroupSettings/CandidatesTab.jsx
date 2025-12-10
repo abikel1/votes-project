@@ -54,13 +54,13 @@ const onUploadNew = async (file) => {
     <section className="card">
 
 
-<div className="actions-row">
+{/* <div className="actions-row">
   <button className="clean-btn clean-btn-save">שמירה</button>
   <button className="clean-btn clean-btn-cancel">ביטול</button>
   <button className="clean-btn clean-btn-edit">עריכה</button>
   <button className="clean-btn clean-btn-delete">מחיקה</button>
 </div>
-
+ */}
 
 
       {/* רשימת מועמדים קיימים */}
