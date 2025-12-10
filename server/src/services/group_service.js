@@ -449,13 +449,19 @@ async function getAppliedGroupsService(user) {
   if (!user || !user._id) throw new Error('User required');
 
   const groups = await Group.find({
-    'candidateRequests.userId': user._id
+    candidateRequests: {
+      $elemMatch: {
+        userId: user._id,
+        status: { $in: ['approved'] }, // רק בקשות פעילות
+      },
+    },
   })
     .lean()
     .populate({ path: 'createdById', select: 'firstName lastName' });
 
   return groups;
 }
+
 
 /* ===== AI תיאור קבוצה ===== */
 
