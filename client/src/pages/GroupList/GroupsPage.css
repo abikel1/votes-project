@@ -558,3 +558,8 @@
   margin-left: 6px;
   color: #727880; /* אפור נחמד (Tailwind gray-400 style) */
 }
+.groups-badge-vote {
+   margin-left: 6px;
+  color: #727880; 
+
+}
