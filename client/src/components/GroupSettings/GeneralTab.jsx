@@ -104,39 +104,39 @@ export default function GeneralTab({
             <b>{group.createdBy || '-'}</b>
           </div>
 
-        <div>
-  <small>{t('groupSettings.general.shareLinkLabel')}</small>
+          <div>
+            <small>{t('groupSettings.general.shareLinkLabel')}</small>
 
-  {shareUrl ? (
-    <div className="share-row" style={{ position: "relative" }}>
-      
-      <input
-        className="input share-input"
-        value={prettyShareUrl}
-        readOnly
-        style={{ direction: 'ltr', paddingRight: "34px" }} 
-        onFocus={(e) => e.target.select()}
-        aria-label={t('groupSettings.general.shareInputAria')}
-      />
+            {shareUrl ? (
+              <div className="share-row" style={{ position: "relative" }}>
 
-      {/* אייקון העתקה במקום הכפתור */}
-      <LuCopy
-        size={20}
-        className="copy-icon"
-        onClick={copyShareUrl}
-        title={t('groupSettings.general.shareCopy')}
-      />
+                <input
+                  className="input share-input"
+                  value={prettyShareUrl}
+                  readOnly
+                  style={{ direction: 'ltr', paddingRight: "34px" }}
+                  onFocus={(e) => e.target.select()}
+                  aria-label={t('groupSettings.general.shareInputAria')}
+                />
 
-      <div className="muted share-hint">
-        {group.isLocked
-          ? t('groupSettings.general.shareHintLocked')
-          : t('groupSettings.general.shareHintOpen')}
-      </div>
-    </div>
-  ) : (
-    <div className="muted">—</div>
-  )}
-</div>
+                {/* אייקון העתקה במקום הכפתור */}
+                <LuCopy
+                  size={20}
+                  className="copy-icon"
+                  onClick={copyShareUrl}
+                  title={t('groupSettings.general.shareCopy')}
+                />
+
+                <div className="muted share-hint">
+                  {group.isLocked
+                    ? t('groupSettings.general.shareHintLocked')
+                    : t('groupSettings.general.shareHintOpen')}
+                </div>
+              </div>
+            ) : (
+              <div className="muted">—</div>
+            )}
+          </div>
 
 
           {updateError && (
@@ -189,12 +189,13 @@ export default function GeneralTab({
             <div>
               <label>{t('groups.create.labels.candidateEndDate')}</label>
               <input
+                min={todayStr}
                 className="input"
                 name="candidateEndDate"
                 type="date"
                 value={form.candidateEndDate}
                 onChange={onGroupChange}
-                // min={todayStr}
+              // min={todayStr}
               />
             </div>
 
