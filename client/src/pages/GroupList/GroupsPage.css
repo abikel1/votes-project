@@ -514,6 +514,12 @@
   margin-left: 6px;
   color: #727880; /* אפור נחמד (Tailwind gray-400 style) */
 }
+/* <<<<<<< HEAD */
+.groups-badge-vote {
+   margin-left: 6px;
+  color: #727880; 
+}
+/* ======= */
 @media (max-width: 768px) {
   .groups-page {
     padding: 12px;
@@ -566,4 +572,5 @@
     height: 50px;
     font-size: calc(26px * var(--a11y-font-scale));
   }
+/* >>>>>>> 8/c860ab9d0070123a713ec5bc757fb1adce96db2 */
 }

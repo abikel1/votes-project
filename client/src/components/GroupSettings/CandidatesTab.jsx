@@ -52,6 +52,17 @@ const onUploadNew = async (file) => {
 
   return (
     <section className="card">
+
+
+{/* <div className="actions-row">
+  <button className="clean-btn clean-btn-save">שמירה</button>
+  <button className="clean-btn clean-btn-cancel">ביטול</button>
+  <button className="clean-btn clean-btn-edit">עריכה</button>
+  <button className="clean-btn clean-btn-delete">מחיקה</button>
+</div>
+ */}
+
+
       {/* רשימת מועמדים קיימים */}
       <details open className="acc">
         <summary className="acc-sum">
@@ -101,13 +112,13 @@ const onUploadNew = async (file) => {
 
                   <div className="row-actions">
                     <button
-                      className="small"
+                      className="clean-btn clean-btn-edit"
                       onClick={() => onOpenEditCandidate(c)}
                     >
                       {t('candidates.list.edit')}
                     </button>
                     <button
-                      className="small danger"
+                      className="clean-btn clean-btn-cancel"
                       onClick={() => onDeleteCandidate(c)}
                     >
                       {t('candidates.list.remove')}

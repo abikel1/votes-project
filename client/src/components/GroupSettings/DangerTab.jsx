@@ -15,7 +15,7 @@ export default function DangerTab({ onOpenDelete }) {
             {t('groupSettings.danger.warning')}
           </p>
           <button
-            className="btn-danger"
+            className="clean-btn clean-btn-delete"
             onClick={onOpenDelete}
           >
             {t('groupSettings.danger.deleteButton')}
