@@ -254,9 +254,6 @@ async function getCampaignBySlug(req, res) {
 }
 
 
-
-
-
 async function createCampaign(req, res) {
   try {
     const campaign = await campaignService.createCampaign(req.params.candidateId, req.body);
