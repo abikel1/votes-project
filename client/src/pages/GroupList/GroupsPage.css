@@ -406,40 +406,6 @@
   margin-top: 10px;
 }
 
-/* Responsive */
-@media (max-width: 768px) {
-  .groups-page {
-    padding: 16px;
-  }
-
-  .groups-toolbar {
-    flex-direction: column;
-    align-items: stretch;
-    padding: 12px;
-  }
-
-  .groups-toolbar-right {
-    flex-direction: column;
-  }
-
-  .groups-search {
-    max-width: 100%;
-  }
-
-  .groups-controls {
-    justify-content: center;
-  }
-
-  .groups-grid {
-    grid-template-columns: 1fr;
-    gap: 12px;
-  }
-
-  .groups-card {
-    padding: 16px;
-  }
-}
-
 .groups-lock-status {
   position: absolute;
   top: 8px;
@@ -524,16 +490,6 @@
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.35);
 }
 
-@media (max-width: 768px) {
-  .groups-fab {
-    bottom: 16px;
-    left: 16px;
-    width: 50px;
-    height: 50px;
-    font-size: calc(26px * var(--a11y-font-scale));
-  }
-}
-
 .groups-card-owner {
   display: flex;
   justify-content: first baseline;
@@ -557,4 +513,64 @@
 .groups-badge-candidate {
   margin-left: 6px;
   color: #727880; /* אפור נחמד (Tailwind gray-400 style) */
+}
+/* <<<<<<< HEAD */
+.groups-badge-vote {
+   margin-left: 6px;
+  color: #727880; 
+}
+/* ======= */
+@media (max-width: 768px) {
+  .groups-page {
+    padding: 12px;
+  }
+
+  /* סרגל עליון – בשורה אחת במובייל */
+  .groups-toolbar {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 10px;
+    gap: 6px;
+  }
+
+  .groups-toolbar-right {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 6px;
+    flex: 1;
+  }
+
+  .groups-search {
+    flex: 1 1 auto;
+    max-width: none;
+    min-width: 0;
+  }
+
+  .groups-controls {
+    flex-shrink: 0;
+    justify-content: center;
+  }
+
+  /* כרטיסים ורשת */
+  .groups-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .groups-card {
+    padding: 16px;
+  }
+
+  /* כפתור צף */
+  .groups-fab {
+    bottom: 16px;
+    left: 16px;
+    width: 50px;
+    height: 50px;
+    font-size: calc(26px * var(--a11y-font-scale));
+  }
+/* >>>>>>> 8/c860ab9d0070123a713ec5bc757fb1adce96db2 */
 }

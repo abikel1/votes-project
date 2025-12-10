@@ -125,7 +125,7 @@ export default function CandidateForm({
             {fileInputRef && (
               <button
                 type="button"
-                className="gs-btn"
+                className="clean-btn clean-btn-save"
                 onClick={() => fileInputRef.current?.click()}
                 disabled={uploading}
               >
@@ -135,7 +135,7 @@ export default function CandidateForm({
             {clearPhoto && (
               <button
                 type="button"
-                className="gs-btn-outline"
+                className="clean-btn clean-btn-cancel"
                 onClick={clearPhoto}
                 disabled={uploading}
               >
@@ -153,7 +153,7 @@ export default function CandidateForm({
 
       <div style={{ marginTop: 8 }}>
         <button
-          className="gs-btn"
+          className="clean-btn clean-btn-save"
           type="submit"
           disabled={submitDisabled}
         >

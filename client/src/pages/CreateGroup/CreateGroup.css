@@ -250,12 +250,9 @@ input:checked + .slider:before {
   color: #fff;
   border: none;
   cursor: pointer;
-  border-radius: 0;
 }
 
-.gs-btn:hover {
-  background: #002952;
-}
+
 
 /* ===== Mobile ===== */
 @media (max-width: 480px) {

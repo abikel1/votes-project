@@ -4,6 +4,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Routes, Route } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { fetchMe, loginSuccess } from './slices/authSlice';
+import GlobalTour from '../src/Tour/GlobalTour.jsx';
+import { TourProvider } from '@reactour/tour';
 
 import GroupsPage from './pages/GroupList/GroupsPage.jsx';
 import GroupSettingsPage from './components/GroupSettings/GroupSettingsPage.jsx';
@@ -67,6 +69,12 @@ export default function App() {
   }, [dispatch]);
 
   return (
+
+ <TourProvider>
+
+
+
+
     <div className="app-root">
       <Toaster
         position="top-center"
@@ -149,5 +157,7 @@ export default function App() {
       <Footer />
       <AccessibilityWidget />
     </div>
+      </TourProvider>
+
   );
 }

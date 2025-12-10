@@ -1,5 +1,6 @@
 // src/pages/GroupSettingsPage/GeneralTab.jsx
 import { useTranslation } from 'react-i18next';
+import { LuCopy } from "react-icons/lu";
 
 export default function GeneralTab({
   group,
@@ -27,7 +28,7 @@ export default function GeneralTab({
       <div className="card-head">
         <h3>{t('groupSettings.general.title')}</h3>
         {!editMode && (
-          <button className="gs-btn-outline" onClick={onEditClick}>
+          <button className="clean-btn clean-btn-edit" onClick={onEditClick}>
             {t('common.edit')}
           </button>
         )}
@@ -103,40 +104,40 @@ export default function GeneralTab({
             <b>{group.createdBy || '-'}</b>
           </div>
 
-          <div>
-            <small>{t('groupSettings.general.shareLinkLabel')}</small>
-            {shareUrl ? (
-              <div className="share-row">
-                <input
-                  className="input share-input"
-                  value={prettyShareUrl}
-                  readOnly
-                  style={{ direction: 'ltr' }}
-                  onFocus={(e) => e.target.select()}
-                  aria-label={t('groupSettings.general.shareInputAria')}
-                />
-                <div className="share-actions">
-                  <button
-                    className="gs-btn"
-                    type="button"
-                    onClick={copyShareUrl}
-                  >
-                    {copied
-                      ? t('groupSettings.general.shareCopied')
-                      : t('groupSettings.general.shareCopy')}
-                  </button>
-                </div>
+        <div>
+  <small>{t('groupSettings.general.shareLinkLabel')}</small>
 
-                <div className="muted share-hint">
-                  {group.isLocked
-                    ? t('groupSettings.general.shareHintLocked')
-                    : t('groupSettings.general.shareHintOpen')}
-                </div>
-              </div>
-            ) : (
-              <div className="muted">—</div>
-            )}
-          </div>
+  {shareUrl ? (
+    <div className="share-row" style={{ position: "relative" }}>
+      
+      <input
+        className="input share-input"
+        value={prettyShareUrl}
+        readOnly
+        style={{ direction: 'ltr', paddingRight: "34px" }} 
+        onFocus={(e) => e.target.select()}
+        aria-label={t('groupSettings.general.shareInputAria')}
+      />
+
+      {/* אייקון העתקה במקום הכפתור */}
+      <LuCopy
+        size={20}
+        className="copy-icon"
+        onClick={copyShareUrl}
+        title={t('groupSettings.general.shareCopy')}
+      />
+
+      <div className="muted share-hint">
+        {group.isLocked
+          ? t('groupSettings.general.shareHintLocked')
+          : t('groupSettings.general.shareHintOpen')}
+      </div>
+    </div>
+  ) : (
+    <div className="muted">—</div>
+  )}
+</div>
+
 
           {updateError && (
             <div className="err" style={{ marginTop: 6 }}>
@@ -244,14 +245,14 @@ export default function GeneralTab({
 
           <div className="actions-row">
             <button
-              className="gs-btn"
+              className="clean-btn clean-btn-save"
               type="submit"
               disabled={updateLoading}
             >
               {t('common.save')}
             </button>
             <button
-              className="gs-btn-outline"
+              className="clean-btn clean-btn-cancel"
               type="button"
               onClick={onCancelEdit}
               disabled={updateLoading}
