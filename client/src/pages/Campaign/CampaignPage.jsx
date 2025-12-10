@@ -3,6 +3,7 @@ import { useEffect, useState, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   fetchCampaign,
+  fetchCampaignBySlug,
   addPost,
   deletePost,
   addImage,
@@ -10,7 +11,6 @@ import {
   updateCampaign,
   incrementView,
   selectCampaign,
-  selectCandidate,
   generatePostSuggestion,
   selectAiSuggestion,
   selectAiLoading,
@@ -20,6 +20,7 @@ import {
   toggleLike,
   selectCampaignLocked,
   selectCampaignLockedGroupId,
+  clearCampaign,
 } from '../../slices/campaignSlice';
 import { updateCandidate } from '../../slices/candidateSlice';
 
@@ -89,12 +90,24 @@ function normalizeAiSuggestion(suggestion, fallbackTitle = '') {
   };
 }
 
+// slug לשם המועמד לקישור שיתוף – בלי encodeURIComponent
+function makeCandidateSlug(name = '') {
+  return String(name)
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, '-');   // רווחים ל־-
+}
+
+
+
 export default function CampaignPage() {
-  const { candidateId } = useParams();
+  const { candidateId, groupSlug, candidateSlug } = useParams();
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
   const { t } = useTranslation();
+
+  const [copiedShare, setCopiedShare] = useState(false);
 
   const [galleryFileToCrop, setGalleryFileToCrop] = useState(null);
 
@@ -102,7 +115,7 @@ export default function CampaignPage() {
 
   // Redux state
   const campaign = useSelector(selectCampaign);
-  const candidate = useSelector(selectCandidate);
+  const candidate = campaign?.candidate || null;
   const campaignLoading = useSelector((state) => state.campaign.loading);
   const campaignError = useSelector((state) => state.campaign.error);
   const isLocked = useSelector(selectCampaignLocked);               // 🔒
@@ -110,6 +123,8 @@ export default function CampaignPage() {
 
   const currentUserId = useSelector((state) => state.auth.userId);
   const userLoading = useSelector((state) => state.auth.loading);
+
+  const token = useSelector((state) => state.auth.token);
 
   const aiSuggestion = useSelector(selectAiSuggestion);
   const aiLoading = useSelector(selectAiLoading);
@@ -154,75 +169,80 @@ export default function CampaignPage() {
   const [updateCandidateError, setUpdateCandidateError] = useState('');
   const [uploadingEdit, setUploadingEdit] = useState(false);
   const editFileInputRef = useRef(null);
-const [deletePostModal, setDeletePostModal] = useState({
-  open: false,
-  postId: null,
-});
+  const [deletePostModal, setDeletePostModal] = useState({
+    open: false,
+    postId: null,
+  });
 
   // groupId "יעיל" – גם מהמיקום, גם מהקמפיין, וגם מהשגיאה אם נעול
   const effectiveGroupId = groupId || campaign?.groupId || lockedGroupId || null;
 
 
-const openDeletePostModal = (postId) => {
-  console.log('Opening delete modal for post:', postId);
-  setDeletePostModal({
-    open: true,
-    postId,
-    loading: false,
-    error: null,
-  });
-};
+  const openDeletePostModal = (postId) => {
+    console.log('Opening delete modal for post:', postId);
+    setDeletePostModal({
+      open: true,
+      postId,
+      loading: false,
+      error: null,
+    });
+  };
 
 
 
-const closeDeletePostModal = () => {
-  setDeletePostModal({
-    open: false,
-    postId: null,
-    loading: false,
-    error: null,
-  });
-};
+  const closeDeletePostModal = () => {
+    setDeletePostModal({
+      open: false,
+      postId: null,
+      loading: false,
+      error: null,
+    });
+  };
 
 
-const confirmDeletePost = async () => {
-  const postId = deletePostModal.postId;
-  if (!postId) {
-    setDeletePostModal((s) => ({ ...s, error: 'Missing post id' }));
-    return;
-  }
+  const confirmDeletePost = async () => {
+    const postId = deletePostModal.postId;
+    if (!postId) {
+      setDeletePostModal((s) => ({ ...s, error: 'Missing post id' }));
+      return;
+    }
 
-  try {
-    setDeletePostModal((s) => ({ ...s, loading: true, error: null }));
+    try {
+      setDeletePostModal((s) => ({ ...s, loading: true, error: null }));
 
-    await dispatch(deletePost({ campaignId: campaign._id, postId })).unwrap();
+      await dispatch(deletePost({ campaignId: campaign._id, postId })).unwrap();
 
-    // הצלחה — ריענון ותסגור מודאל
-    refetchCampaign();
-    closeDeletePostModal();
-    toast.success(t('campaign.posts.deletedSuccessfully') || 'הפוסט נמחק בהצלחה');
-    setIsEditMode(false);
-  } catch (err) {
-    console.error('שגיאה במחיקת פוסט:', err);
-    // הראה שגיאה למשתמש
-    const msg =
-      err?.response?.data?.message ||
-      err?.message ||
-      t('campaign.posts.deleteError') ||
-      'שגיאה במחיקה';
-    setDeletePostModal((s) => ({ ...s, error: msg, loading: false }));
-    toast.error(msg);
-  } finally {
-    setDeletePostModal((s) => ({ ...s, loading: false }));
-  }
-};
+      // הצלחה — ריענון ותסגור מודאל
+      refetchCampaign();
+      closeDeletePostModal();
+      toast.success(t('campaign.posts.deletedSuccessfully') || 'הפוסט נמחק בהצלחה');
+      setIsEditMode(false);
+    } catch (err) {
+      console.error('שגיאה במחיקת פוסט:', err);
+      // הראה שגיאה למשתמש
+      const msg =
+        err?.response?.data?.message ||
+        err?.message ||
+        t('campaign.posts.deleteError') ||
+        'שגיאה במחיקה';
+      setDeletePostModal((s) => ({ ...s, error: msg, loading: false }));
+      toast.error(msg);
+    } finally {
+      setDeletePostModal((s) => ({ ...s, loading: false }));
+    }
+  };
 
 
 
   // === פונקציה נוחה לריענון הקמפיין מהשרת אחרי פעולות עריכה ===
   const refetchCampaign = () => {
-    if (!candidateId) return;
-    dispatch(fetchCampaign(candidateId));
+    if (groupSlug && candidateSlug) {
+      // URL יפה – לפי slug
+      dispatch(fetchCampaignBySlug({ groupSlug, candidateSlug }));
+    } else if (candidateId) {
+      // URL ישן – לפי id
+      dispatch(fetchCampaign(candidateId));
+    }
   };
 
   const handleToggleLike = async () => {
@@ -237,34 +257,88 @@ const confirmDeletePost = async () => {
   const { userId, userEmail, isAdmin } = useSelector((s) => s.auth);
   const { selectedGroup: group, loading: groupLoading } = useSelector((s) => s.groups);
 
-  // טעינת קמפיין + incrementView
   useEffect(() => {
-    if (!candidateId) return;
-
-    hasIncrementedViewRef.current = false;
-
-    dispatch(fetchCampaign(candidateId))
-      .unwrap()
-      .then((res) => {
-        const campaignId = res?.campaign?._id || res?._id;
-
-        if (campaignId && !hasIncrementedViewRef.current) {
-          hasIncrementedViewRef.current = true;
-
-          dispatch(incrementView(campaignId)).catch((err) => {
-            console.error('שגיאה בעדכון צפיות:', err);
-          });
-        }
-      })
-      .catch((err) => {
-        console.error('שגיאה בטעינת קמפיין:', err);
-      });
-  }, [candidateId, dispatch]);
+    // פונקציית ה-return רצה רק ב־unmount (כשעוזבים את העמוד)
+    return () => {
+      dispatch(clearCampaign());
+    };
+  }, [dispatch]);
+  // טעינת קמפיין + incrementView + redirect מ-ID ל-URL יפה
   useEffect(() => {
+
+    // dispatch(clearCampaign());
+    if (!token) return;
+    // ----- מקרה 1: כבר בתוך URL יפה (/campaign/:groupSlug/:candidateSlug) -----
+    if (groupSlug && candidateSlug) {
+      hasIncrementedViewRef.current = false;
+
+      dispatch(fetchCampaignBySlug({ groupSlug, candidateSlug }))
+        .unwrap()
+        .then((res) => {
+          const campaignId =
+            res?.campaignId || res?.campaign?._id || res?._id;
+
+          if (campaignId && !hasIncrementedViewRef.current) {
+            hasIncrementedViewRef.current = true;
+            dispatch(incrementView(campaignId)).catch((err) =>
+              console.error('שגיאה בעדכון צפיות:', err)
+            );
+          }
+        })
+        .catch((err) => {
+          console.error('שגיאה בטעינת קמפיין (slug):', err);
+        });
+
+      return; // 👈 לא ממשיכים למקרה של ID
+    }
+
+    // ----- מקרה 2: נכנסו עם URL ישן (/campaign/:candidateId) -----
+    if (candidateId) {
+      hasIncrementedViewRef.current = false;
+
+      dispatch(fetchCampaign(candidateId))
+        .unwrap()
+        .then((res) => {
+          const campaignId =
+            res?.campaignId || res?.campaign?._id || res?._id;
+
+          // לבנות slugים לפי הנתונים שחזרו מהשרת
+          const candidateName = res?.candidate?.name || '';
+          const candidateSlugFromName = makeCandidateSlug(candidateName);
+
+          // groupSlug הגיע מהשרת (הוספנו ב-controller בצד השרת)
+          const groupSlugFromServer = res?.groupSlug || '';
+
+          // אם יש לנו שני slugים – נעשה redirect ל-URL היפה
+          if (groupSlugFromServer && candidateSlugFromName) {
+            navigate(
+              `/campaign/${groupSlugFromServer}/${candidateSlugFromName}`,
+              { replace: true }
+            );
+          }
+
+          // צפיות
+          if (campaignId && !hasIncrementedViewRef.current) {
+            hasIncrementedViewRef.current = true;
+            dispatch(incrementView(campaignId)).catch((err) =>
+              console.error('שגיאה בעדכון צפיות:', err)
+            );
+          }
+        })
+        .catch((err) => {
+          console.error('שגיאה בטעינת קמפיין (id):', err);
+        });
+    }
+  }, [groupSlug, candidateSlug, candidateId, dispatch, navigate, token]);
+
+
+  useEffect(() => {
+    if (!token) return;
     if (isLocked && effectiveGroupId) {
       dispatch(fetchGroupOnly(effectiveGroupId));
     }
-  }, [isLocked, effectiveGroupId, dispatch]);
+  }, [isLocked, effectiveGroupId, dispatch, token]);
+
 
   // סנכרון לייקים
   useEffect(() => {
@@ -288,6 +362,56 @@ const confirmDeletePost = async () => {
     return (
       <div className="loading-wrap">
         {t('campaign.loadingUser')}
+      </div>
+    );
+  }
+
+  // 👇 חדש – לא מחוברים
+  if (!token) {
+    return (
+      <div className="page-wrap dashboard">
+        <div className="page-header">
+          <button
+            className="icon-btn"
+            onClick={() => navigate('/')}
+            title={t('common.back', 'חזרה')}
+          >
+            <BiArrowBack size={20} />
+          </button>
+
+          <h2>
+            {t(
+              'campaign.loginRequired.title',
+              'לא ניתן לצפות בקמפיין'
+            )}
+          </h2>
+        </div>
+
+        <div
+          className="info-card"
+          style={{ maxWidth: 480, margin: '24px auto' }}
+        >
+          <p style={{ marginBottom: 16 }}>
+            {t(
+              'campaign.loginRequired.message',
+              'כדי לצפות בדף הקמפיין עליך להתחבר למערכת.'
+            )}
+          </p>
+
+          <button
+            className="vote-btn"
+            onClick={() =>
+              navigate('/login', {
+                state: { from: location.pathname },
+              })
+            }
+          >
+            {t(
+              'campaign.loginRequired.goToLogin',
+              'לעמוד התחברות'
+            )}
+          </button>
+        </div>
       </div>
     );
   }
@@ -380,31 +504,45 @@ const confirmDeletePost = async () => {
   }
 
 
-  if (campaignLoading || !campaign) {
+  if (campaignError) {
+    return (
+      <div className="err">
+        {t('campaign.errorPrefix')}
+        {campaignError}
+      </div>
+    );
+  }
+
+  // 👇 הכי חשוב – אם עדיין אין קמפיין, אל תגעי בו בכלל
+  if (!campaign) {
     return (
       <div className="loading-wrap">
         {t('campaign.loading')}
       </div>
     );
   }
-
-  if (campaignError) {
-    return (
-      <div className="err">
-        {t('campaign.errorPrefix')}{campaignError}
-      </div>
-    );
-  }
-
   const candidateUserId = candidate?.userId;
+  const candidateDbId = candidate?._id; // 👈 מזהה ה־Mongo של המועמד
   const isCandidateOwner =
     currentUserId &&
     candidateUserId &&
     currentUserId.toString() === candidateUserId.toString();
 
-  const viewCount = campaign.viewCount || 0;
+  const viewCount = campaign?.viewCount || 0;
+
+  // הקישור האמיתי שיועתק ללוח – לפי ה־URL הנוכחי (groupSlug + candidateSlug)
   const shareUrl =
-    typeof window !== 'undefined' ? window.location.href : '';
+    typeof window !== 'undefined' &&
+      groupSlug &&
+      candidateSlug
+      ? `${window.location.origin}/campaign/${groupSlug}/${candidateSlug}`
+      : '';
+
+  // מה שמציגים באינפוט (בלי https://)
+  const prettyShareUrl = shareUrl
+    ? shareUrl.replace(/^https?:\/\//, '')
+    : '';
+
 
   // Handlers
   const handleUpdateCampaign = () => {
@@ -455,12 +593,12 @@ const confirmDeletePost = async () => {
   //     });
   // };
 
-// const handleDeletePost = (postId) => {
-//   console.log("פתיחת מודל למחיקת פוסט", postId); // ← את תראי את זה בקונסול
-//   setDeletePostModal({ open: true, postId });
-// };
+  // const handleDeletePost = (postId) => {
+  //   console.log("פתיחת מודל למחיקת פוסט", postId); // ← את תראי את זה בקונסול
+  //   setDeletePostModal({ open: true, postId });
+  // };
 
-const handleDeletePost = (postId) => openDeletePostModal(postId);
+  const handleDeletePost = (postId) => openDeletePostModal(postId);
 
   // תגובות
   const handleAddComment = async (campaignId, postId, content) => {
@@ -544,19 +682,25 @@ const handleDeletePost = (postId) => openDeletePostModal(postId);
 
   const handleCopyShareLink = () => {
     if (!shareUrl) return;
+
     if (navigator.clipboard?.writeText) {
       navigator.clipboard
         .writeText(shareUrl)
         .then(() => {
+          setCopiedShare(true);
           toast.success(t('groups.create.toast.linkCopied'));
+
+          // אחרי זמן קצר מחזירים את הכפתור למצב רגיל
+          setTimeout(() => setCopiedShare(false), 1500);
         })
         .catch(console.error);
     }
   };
 
+
   // AI
   const handleAskAiForPost = () => {
-    if (!candidateId) return;
+    if (!candidateDbId) return;
     setNewPost({ title: '', content: '', youtubeUrl: '' });
     setAiNote('');
     setAiGenerated(false);
@@ -564,11 +708,11 @@ const handleDeletePost = (postId) => openDeletePostModal(postId);
   };
 
   const handleGenerateWithAi = () => {
-    if (!candidateId) return;
+    if (!candidateDbId) return;
 
     dispatch(
       generatePostSuggestion({
-        candidateId,
+        candidateId: candidateDbId,
         titleHint: newPost.title,
         note: aiNote,
       })
@@ -601,6 +745,7 @@ const handleDeletePost = (postId) => openDeletePostModal(postId);
       symbol: candidate.symbol || '',
       photoUrl: candidate.photoUrl || '',
     });
+
     setEditCandErrors({});
     setUpdateCandidateError('');
     setEditCandidateOpen(true);
@@ -640,7 +785,7 @@ const handleDeletePost = (postId) => openDeletePostModal(postId);
   const handleSaveEditedCandidate = (e) => {
     e.preventDefault();
 
-    if (!effectiveGroupId || !candidateId) {
+    if (!effectiveGroupId || !candidateDbId) {
       setUpdateCandidateError(t('campaign.editCandidate.missingIds'));
       return;
     }
@@ -670,7 +815,7 @@ const handleDeletePost = (postId) => openDeletePostModal(postId);
 
     dispatch(
       updateCandidate({
-        candidateId,              // מזהה המועמד מה־URL
+        candidateId: candidateDbId, // מזהה המועמד מה־DB
         groupId: effectiveGroupId,
         patch,
       })
@@ -821,7 +966,7 @@ const handleDeletePost = (postId) => openDeletePostModal(postId);
                     currentUserId={currentUserId}
                     isCandidateOwner={isCandidateOwner}
                     isEditMode={isEditMode}
-  onDeletePost={() => openDeletePostModal(p._id)}
+                    onDeletePost={() => openDeletePostModal(p._id)}
                     onAddComment={handleAddComment}
                     onDeleteComment={handleDeleteComment}
                   />
@@ -1178,16 +1323,21 @@ const handleDeletePost = (postId) => openDeletePostModal(postId);
                 className="vote-btn share-copy-btn"
                 onClick={handleCopyShareLink}
               >
-                {t('campaign.share.copy', 'העתק')}
+                {copiedShare
+                  ? t('campaign.share.copied', 'הועתק!')
+                  : t('campaign.share.copy', 'העתק')}
               </button>
 
               <input
                 type="text"
                 readOnly
-                value={shareUrl}
+                value={prettyShareUrl}
                 className="share-input"
+                style={{ direction: 'ltr' }}
+                onFocus={(e) => e.target.select()}
               />
             </div>
+
 
             <div className="share-actions">
               <button
@@ -1203,14 +1353,14 @@ const handleDeletePost = (postId) => openDeletePostModal(postId);
       )}
 
 
-{deletePostModal.open && (
-  <ConfirmModal
-    open={deletePostModal.open}
-    message={t('campaign.posts.confirmDelete')}
-    onConfirm={confirmDeletePost}
-    onCancel={closeDeletePostModal}
-  />
-)}
+      {deletePostModal.open && (
+        <ConfirmModal
+          open={deletePostModal.open}
+          message={t('campaign.posts.confirmDelete')}
+          onConfirm={confirmDeletePost}
+          onCancel={closeDeletePostModal}
+        />
+      )}
 
 
 
