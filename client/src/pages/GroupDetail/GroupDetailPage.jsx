@@ -377,6 +377,11 @@ useEffect(() => {
   }));
 
   const winners = sortedCandidates.slice(0, group.maxWinners);
+function truncateText(text, maxLength) {
+  if (!text) return '';
+  return text.length > maxLength ? text.slice(0, maxLength) + '…' : text;
+}
+
 
   return (
     <div className="page-wrap dashboard">
@@ -389,33 +394,45 @@ useEffect(() => {
 )}
 
 
-      <div id="group-detail-header" className="page-header clean-header">
-        {/* כותרת מרכזית */}
-        <div className="header-title">
-          <h2>{group.name}</h2>
-          <p>{group.description}</p>
-        </div>
+<div id="group-detail-header" className="page-header clean-header">
+  <div className="header-title">
+    <h2 className="group-name" title={group.name}>
+      {group.name}
+    </h2>
+    {group.description && (
+   <p
+  className="group-description"
+  title={group.description} // טוליפ שמראה את כל הטקסט
+>
+  {truncateText(group.description, 20)}
+</p>
 
-        {isOwner && (
-          <button
-            id="settings-button"
-            className="icon-btn"
-            onClick={goSettings}
-            title={t('groups.detail.buttons.settings')}
-          >
-            <FiSettings size={20} />
-          </button>
-        )}
+    )}
+  </div>
 
-        {/* כפתור חזרה ימין */}
-        <button
-          className="icon-btn"
-          onClick={() => navigate('/groups')}
-          title={t('groups.detail.buttons.backToGroups')}
-        >
-          <BiArrowBack size={20} />
-        </button>
-      </div>
+  <div className="icon-btn-container">
+    {isOwner && (
+      <button
+        id="settings-button"
+        className="icon-btn"
+        onClick={goSettings}
+        title={t('groups.detail.buttons.settings')}
+      >
+        <FiSettings size={20} />
+      </button>
+    )}
+    <button
+      className="icon-btn"
+      onClick={() => navigate('/groups')}
+      title={t('groups.detail.buttons.backToGroups')}
+    >
+      <BiArrowBack size={20} />
+    </button>
+  </div>
+</div>
+
+
+
 
       <div id="group-detail-meta" className="meta-and-button">
         <div className="group-meta">

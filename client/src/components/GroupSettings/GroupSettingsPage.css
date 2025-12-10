@@ -782,7 +782,7 @@ textarea.input {
     flex: 0 0 auto;
     padding: 10px 16px;
     font-size: calc(0.9rem * var(--a11y-font-scale));
-    border-radius: 20px;
+    border-radius: 6px;
     background: #f5f5f5;
     border: 1px solid #e5e5e5;
     min-width: fit-content;
