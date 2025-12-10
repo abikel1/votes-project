@@ -1,5 +1,6 @@
 // src/pages/GroupSettingsPage/GeneralTab.jsx
 import { useTranslation } from 'react-i18next';
+import { LuCopy } from "react-icons/lu";
 
 export default function GeneralTab({
   group,
@@ -103,40 +104,40 @@ export default function GeneralTab({
             <b>{group.createdBy || '-'}</b>
           </div>
 
-          <div>
-            <small>{t('groupSettings.general.shareLinkLabel')}</small>
-            {shareUrl ? (
-              <div className="share-row">
-                <input
-                  className="input share-input"
-                  value={prettyShareUrl}
-                  readOnly
-                  style={{ direction: 'ltr' }}
-                  onFocus={(e) => e.target.select()}
-                  aria-label={t('groupSettings.general.shareInputAria')}
-                />
-                <div className="share-actions">
-                  <button
-                    className="gs-btn"
-                    type="button"
-                    onClick={copyShareUrl}
-                  >
-                    {copied
-                      ? t('groupSettings.general.shareCopied')
-                      : t('groupSettings.general.shareCopy')}
-                  </button>
-                </div>
+        <div>
+  <small>{t('groupSettings.general.shareLinkLabel')}</small>
 
-                <div className="muted share-hint">
-                  {group.isLocked
-                    ? t('groupSettings.general.shareHintLocked')
-                    : t('groupSettings.general.shareHintOpen')}
-                </div>
-              </div>
-            ) : (
-              <div className="muted">—</div>
-            )}
-          </div>
+  {shareUrl ? (
+    <div className="share-row" style={{ position: "relative" }}>
+      
+      <input
+        className="input share-input"
+        value={prettyShareUrl}
+        readOnly
+        style={{ direction: 'ltr', paddingRight: "34px" }} 
+        onFocus={(e) => e.target.select()}
+        aria-label={t('groupSettings.general.shareInputAria')}
+      />
+
+      {/* אייקון העתקה במקום הכפתור */}
+      <LuCopy
+        size={20}
+        className="copy-icon"
+        onClick={copyShareUrl}
+        title={t('groupSettings.general.shareCopy')}
+      />
+
+      <div className="muted share-hint">
+        {group.isLocked
+          ? t('groupSettings.general.shareHintLocked')
+          : t('groupSettings.general.shareHintOpen')}
+      </div>
+    </div>
+  ) : (
+    <div className="muted">—</div>
+  )}
+</div>
+
 
           {updateError && (
             <div className="err" style={{ marginTop: 6 }}>

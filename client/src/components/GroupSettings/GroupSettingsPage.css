@@ -1242,3 +1242,17 @@ button.small.danger:hover {
     border: 1px solid #ccc;
   }
 }
+
+.copy-icon {
+  position: absolute;
+  right: 10px;
+  top: 10%;
+  /* transform: translateY(-50%); */
+  cursor: pointer;
+  color: #727880;
+  transition: 0.2s;
+}
+
+.copy-icon:hover {
+  color: #4a4e55;
+}
