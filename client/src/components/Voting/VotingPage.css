@@ -289,40 +289,7 @@
   z-index: 1;
 }
 
-.vd-modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.6);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-  backdrop-filter: blur(4px);
-}
-
-.vd-modal {
-  position: relative;
-  background: var(--card);
-  /* border-radius: 16px; אם את רוצה עיגולים רכים */
-  padding: 32px;
-  width: 300px;
-  /* רוחב קבוע יחסית לכרטיס קלפי */
-  max-width: 90%;
-  height: 500px;
-  /* גובה מותאם לכרטיס קלפי */
-  max-height: 80vh;
-  /* לא יחרוג מגובה חלון */
-  overflow-y: auto;
-  /* מאפשר גלילה אם התוכן גדול */
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
-  animation: slideIn 0.3s ease;
-  display: flex;
-  flex-direction: column;
-  /* אפשר לסדר תוכן מלמעלה למטה */
-}
+/*  */
 
 
 @keyframes slideIn {
@@ -354,66 +321,7 @@
   transition: all 0.2s ease;
 }
 
-.vd-modal-close:hover {
-  background: var(--bg);
-  color: var(--text);
-}
 
-.vd-modal-header {
-  text-align: center;
-  margin-bottom: 24px;
-}
-
-.vd-modal-symbol {
-  font-size: calc(72px * var(--a11y-font-scale));
-  font-weight: 700;
-  color: var(--brand);
-  margin-bottom: 12px;
-  letter-spacing: 2px;
-}
-
-.vd-modal-header h3 {
-  margin: 0;
-  font-size: calc(28px * var(--a11y-font-scale));
-  font-weight: 700;
-  color: var(--text);
-}
-
-.vd-modal-desc {
-  font-size: calc(16px * var(--a11y-font-scale));
-  line-height: 1.6;
-  color: var(--text);
-  margin-bottom: 20px;
-  padding: 16px;
-  background: var(--bg);
-  /* border-radius: 12px; */
-}
-
-.vd-modal-photo {
-  margin: 20px 0;
-  text-align: center;
-}
-
-.vd-modal-photo img {
-  max-width: 100%;
-  max-height: 300px;
-  /* border-radius: 12px; */
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
-
-.vd-modal-votes {
-  font-size: calc(18px * var(--a11y-font-scale));
-  color: var(--muted);
-  text-align: center;
-  padding: 12px;
-  background: var(--bg);
-  /* border-radius: 12px; */
-}
-
-.vd-modal-votes strong {
-  color: var(--brand);
-  font-size: calc(24px * var(--a11y-font-scale));
-}
 
 .vd-select-button {
   background: var(--brand);
@@ -706,23 +614,6 @@
     padding: 3px 8px;
   }
 
-  .vd-modal {
-    padding: 24px;
-    width: 95%;
-  }
-
-  .vd-modal-symbol {
-    font-size: calc(56px * var(--a11y-font-scale));
-  }
-
-  .vd-modal-header h3 {
-    font-size: calc(22px * var(--a11y-font-scale));
-  }
-
-  .vd-modal-desc {
-    font-size: calc(14px * var(--a11y-font-scale));
-    padding: 12px;
-  }
 
   .vd-select-button {
     padding: 10px 20px;
@@ -794,13 +685,6 @@
     font-size: calc(28px * var(--a11y-font-scale));
   }
 
-  .vd-modal-symbol {
-    font-size: calc(48px * var(--a11y-font-scale));
-  }
-
-  .vd-modal-header h3 {
-    font-size: calc(20px * var(--a11y-font-scale));
-  }
 }
 
 /* תמיכה בנוף (landscape) במובייל */
@@ -925,5 +809,137 @@
 
 
 
+/* הרקע הכהה מאחורי המודל - עם אפקט טשטוש מודרני */
+.vd-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px); /* אפקט זכוכית */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  padding: 20px; /* רווח מהצדדים במובייל */
+}
 
+/* המודל עצמו - מעוצב כמו פתק נייר */
+.vd-modal {
+  background: #ffffff;
+  width: 100%;
+    height: auto;
 
+  max-width: 340px; /* רוחב של פתק הצבעה סטנדרטי */
+  border-radius: 4px; /* פינות מעט עגולות אבל לא יותר מדי - לשמור על רשמיות */
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  animation: slideUp 0.3s ease-out;
+  border: 1px solid #e0e0e0;
+}
+
+/* כפתור הסגירה */
+.vd-modal-close {
+  position: absolute;
+  top: 10px;
+  right: 15px; /* או שמאל, תלוי בכיוון האפליקציה */
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: #888;
+  cursor: pointer;
+  z-index: 10;
+}
+
+.vd-modal-header {
+  padding: 30px 20px 10px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* עיצוב הסמל (האותיות) - החלק הכי חשוב בפתק */
+.vd-modal-symbol {
+  font-size: 80px; /* ענק! */
+  font-weight: 800;
+  line-height: 1;
+  color: #003366; /* כחול בחירות, או שחור למראה קלאסי */
+  border: 4px solid #003366;
+  padding: 10px 20px;
+  margin-bottom: 15px;
+  min-width: 120px;
+  text-align: center;
+  border-radius: 8px;
+  background-color: #fff;
+  letter-spacing: -2px;
+}
+
+/* שם המועמד/מפלגה */
+.vd-modal-header h3 {
+  font-size: 22px;
+  font-weight: 700;
+  margin: 10px 0;
+  color: #333;
+}
+
+/* תיאור */
+.vd-modal-desc {
+  padding: 0 25px 15px;
+  text-align: center;
+  font-size: 16px;
+  color: #666;
+  line-height: 1.5;
+}
+
+/* תמונה (אם יש) */
+.vd-modal-photo {
+  width: 100%;
+  height: 200px;
+  overflow: hidden;
+  margin-bottom: 15px;
+}
+
+.vd-modal-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* כפתור ההצבעה - "שלשל למעטפה" */
+.vd-select-button {
+  background-color: #003366; /* כחול בולט */
+  color: white;
+  border: none;
+  padding: 15px;
+  width: 90%;
+  font-size: 18px;
+  font-weight: bold;
+  border-radius: 15px; /* כפתור עגול ומודרני */
+  cursor: pointer;
+  margin: 20px auto 30px; /* רווח מלמעלה ומלמטה */
+  transition: transform 0.2s, background-color 0.2s;
+  box-shadow: 0 4px 10px rgba(0, 123, 255, 0.3);
+  display: block; /* כדי שה-margin auto יעבוד */
+}
+
+.vd-select-button:active {
+  transform: scale(0.98);
+}
+
+/* אנימציית כניסה */
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* התאמה למובייל (למרות שהעיצוב כבר רספונסיבי) */
+@media (max-width: 480px) {
+  .vd-modal-symbol {
+    font-size: 60px;
+  }
+}

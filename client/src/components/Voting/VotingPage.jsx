@@ -605,53 +605,57 @@ export default function VotingDragPage() {
         </div>
       )}
 
-      {showModal && selectedCandidate && (
-        <div className="vd-modal-overlay" onClick={closeModal}>
-          <div
-            className="vd-modal"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <button
-              className="vd-modal-close"
-              onClick={closeModal}
-            >
-              ×
-            </button>
-            <div className="vd-modal-header">
-              <button
-                className="vd-select-button"
-                onClick={() => {
-                  setSlipInEnvelope(selectedCandidate);
-                  closeModal();
-                }}
-              >
-
-                {t('voting.selectForVote')}
-              </button>
-
-              <div className="vd-modal-symbol">
-                {selectedCandidate.symbol ||
-                  selectedCandidate.name?.substring(0, 2) ||
-                  '??'}
-              </div>
-              <h3>{selectedCandidate.name || t('voting.noName')}</h3>
-            </div>
-            {selectedCandidate.description && (
-              <div className="vd-modal-desc">
-                {selectedCandidate.description}
-              </div>
-            )}
-            {selectedCandidate.photoUrl && (
-              <div className="vd-modal-photo">
-                <img
-                  src={selectedCandidate.photoUrl}
-                  alt={selectedCandidate.name}
-                />
-              </div>
-            )}
-          </div>
+   {showModal && selectedCandidate && (
+  <div className="vd-modal-overlay" onClick={closeModal}>
+    <div
+      className="vd-modal"
+      onClick={(e) => e.stopPropagation()}
+    >
+      <button className="vd-modal-close" onClick={closeModal}>
+        ×
+      </button>
+      
+      {/* תמונה אופציונלית בראש הפתק */}
+      {selectedCandidate.photoUrl && (
+        <div className="vd-modal-photo">
+          <img
+            src={selectedCandidate.photoUrl}
+            alt={selectedCandidate.name}
+          />
         </div>
       )}
+
+      <div className="vd-modal-header">
+        {/* הסמל הגדול - לב הפתק */}
+        <div className="vd-modal-symbol">
+          {selectedCandidate.symbol ||
+            selectedCandidate.name?.substring(0, 2) ||
+            '??'}
+        </div>
+        
+        {/* שם המועמד */}
+        <h3>{selectedCandidate.name || t('voting.noName')}</h3>
+      </div>
+
+      {selectedCandidate.description && (
+        <div className="vd-modal-desc">
+          {selectedCandidate.description}
+        </div>
+      )}
+
+      {/* כפתור הפעולה הראשי - למטה */}
+      <button
+        className="vd-select-button"
+        onClick={() => {
+          setSlipInEnvelope(selectedCandidate);
+          closeModal();
+        }}
+      >
+        {t('voting.selectForVote')}
+      </button>
+    </div>
+  </div>
+)}
 
       <ConfirmModal
         open={showConfirmModal}
