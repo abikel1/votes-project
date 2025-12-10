@@ -75,7 +75,7 @@ export default function App() {
 
 
 
-    <div className="app-root">
+    <div className="page-wrapper">
       <Toaster
         position="top-center"
         reverseOrder={false}
