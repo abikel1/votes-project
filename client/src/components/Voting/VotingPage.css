@@ -45,7 +45,7 @@
   grid-template-columns: 1fr 350px;
   gap: 20px;
   align-items: start;
-  max-height: calc(100vh - 200px);
+  /* max-height: calc(100vh - 200px); */
 }
 
 .vd-slips-area {
@@ -600,11 +600,12 @@
 
   .vd-voting-area {
     position: static;
-    order: -1;
     margin-bottom: 20px;
   }
 
   .vd-slips-grid {
+        order: -1;
+
     max-height: 600px;
   }
 }
@@ -878,3 +879,51 @@
 .vd-link:hover {
   color: #1e3a8a;
 }
+
+.vd-insert-button {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px; /* רווח בין הטקסט לחץ */
+  padding: 10px 20px;
+  /* background: linear-gradient(135deg, #4f46e5, #6366f1); כחול מודרני */
+  color: #003366;
+  font-weight: 600;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+  transition: all 0.2s ease;
+}
+
+.vd-insert-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 14px rgba(0,0,0,0.2);
+}
+
+.vd-insert-button:disabled {
+  background: #cbd5e1; /* אפור בהיר */
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.vd-arrow {
+  font-size: 16px;
+  display: inline-block;
+  transition: transform 0.2s ease;
+}
+
+.vd-insert-button:hover .vd-arrow {
+  transform: translateY(3px); /* אנימציה קטנה של החץ */
+}
+
+
+
+
+
+
+
+
+
+
+

@@ -558,17 +558,15 @@ export default function VotingDragPage() {
               </div>
             )}
           </div>
-          <button
-            className="vd-insert-button"
-            disabled={!slipInEnvelope || hasVoted}
-            // 🔵 תמיד מצביעים עבור slipInEnvelope
-            onClick={() => attemptVote(slipInEnvelope)}
-          >
-            {t('voting.insertEnvelope')}
-          </button>
+        <button
+  className="vd-insert-button"
+  disabled={!slipInEnvelope || hasVoted}
+  onClick={() => attemptVote(slipInEnvelope)}
+>
+  {t('voting.insertEnvelope')}
+  <span className="vd-arrow">↓</span>
+</button>
 
-
-          <div className="vd-arrow">↓</div>
 
           <div
             className={`vd-ballot ${hasVoted ? 'vd-ballot-voted' : ''
