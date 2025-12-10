@@ -55,6 +55,12 @@ const COLORS = [
   '#84cc16',
 ];
 
+const makeCandidateSlug = (name = '') =>
+  String(name)
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, '-');
+
 const makeSlug = (name = '') =>
   encodeURIComponent(
     String(name)
@@ -96,7 +102,7 @@ export default function GroupDetailPage() {
   const containerRef = useRef(null);
 
   const [isChatOpen, setIsChatOpen] = useState(false);
-  
+
   // טאב פעיל במובייל: 'candidates' או 'info'
   const [activeTab, setActiveTab] = useState('candidates');
 
@@ -452,7 +458,7 @@ export default function GroupDetailPage() {
 
       <div className="main-content-resizable" ref={containerRef}>
         {/* צד שמאל – מועמדים */}
-        <div 
+        <div
           className={`left-section ${isMobile && activeTab !== 'candidates' ? 'hidden' : ''}`}
           style={!isMobile ? { width: `${leftWidth}%` } : {}}
         >
@@ -498,16 +504,19 @@ export default function GroupDetailPage() {
                       {c.userId && (
                         <button
                           className="campaign-btn"
-                          onClick={() =>
-                            navigate(`/campaign/${c._id}`, {
+                          onClick={() => {
+                            const candidateSlug = makeCandidateSlug(c.name || '');
+                            // slug כבר מוגדר למעלה כ־slug של הקבוצה
+                            navigate(`/campaign/${slug}/${candidateSlug}`, {
                               state: { groupId },
-                            })
-                          }
+                            });
+                          }}
                           title={t('groups.detail.candidates.myCampaignTitle')}
                         >
                           <FiZap size={16} />
                         </button>
                       )}
+
 
                       <div className="candidate-text">
                         <h4>{c.name}</h4>

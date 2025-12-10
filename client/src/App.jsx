@@ -122,6 +122,10 @@ export default function App() {
         {/* דף פרטי קבוצה – פתוח לכולם */}
         <Route path="/groups/:groupSlug" element={<GroupDetailPage />} />
 
+        {/* 👇 קמפיין – גם פתוח לכולם */}
+        <Route path="/campaign/:groupSlug/:candidateSlug" element={<CampaignPage />} />
+        <Route path="/campaign/:candidateId" element={<CampaignPage />} />
+
         {/* ראוטים שדורשים התחברות */}
         <Route element={<RequireAuth />}>
           <Route path="/groups/create" element={<CreateGroupPage />} />
@@ -134,7 +138,8 @@ export default function App() {
             element={<VotingPage />}
           />
 
-          <Route path="/campaign/:candidateId" element={<CampaignPage />} />
+          {/* <Route path="/campaign/:groupSlug/:candidateSlug" element={<CampaignPage />} />
+          <Route path="/campaign/:candidateId" element={<CampaignPage />} /> */}
 
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/tools/send-email" element={<SendEmailPage />} />
