@@ -545,53 +545,6 @@
     padding: 40px 16px;
   }
 }
-
-@media (max-width: 640px) {
-  .hero-section {
-    height: 60vh;
-    min-height: 400px;
-  }
-  
-  .hero-title {
-    font-size: calc(2rem * var(--a11y-font-scale));
-  }
-  
-  .hero-subtitle {
-    font-size: calc(1rem * var(--a11y-font-scale));
-  }
-  
-  .hero-cta {
-    padding: 12px 32px;
-    font-size: calc(1rem * var(--a11y-font-scale));
-  }
-  
-  .groups-column {
-    padding: 16px;
-  }
-  
-  .column-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 10px;
-  }
-  
-  .quick-actions {
-    flex-direction: column;
-    padding: 20px;
-  }
-  
-  .action-btn {
-    width: 100%;
-    justify-content: center;
-  }
-  
-  .card-meta {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 8px;
-  }
-}
-
 /* בתוך HomePage.css או קובץ CSS מתאים */
 .hero-content {
   display: flex;
@@ -600,4 +553,76 @@
   gap: 16px;              /* רווח בין הכפתורים והטקסט */
 /* margin-bottom: 20px; */
 }
+/* ===== התאמת גובה Hero לטאבלטים ===== */
+@media (max-width: 1024px) and (min-width: 641px) {
+  .hero-section {
+    height: 55vh;        /* קטן יותר מטלפון ודסקטופ */
+    min-height: 360px;   /* מבטל את ה-500px המוגזם */
+  }
 
+  .hero-title {
+    font-size: calc(2.2rem * var(--a11y-font-scale));
+  }
+
+  .hero-subtitle {
+    font-size: calc(1.1rem * var(--a11y-font-scale));
+  }
+
+  .hero-cta {
+    padding: 12px 30px;
+    font-size: calc(1rem * var(--a11y-font-scale));
+  }
+}
+@media (max-width: 640px) {
+  .hero-section {
+    height: 60vh;
+    min-height: 400px;
+  }
+
+  .hero-title {
+    font-size: calc(2rem * var(--a11y-font-scale));
+  }
+
+  .hero-subtitle {
+    font-size: calc(1rem * var(--a11y-font-scale));
+  }
+
+  .hero-cta {
+    padding: 12px 32px;
+    font-size: calc(1rem * var(--a11y-font-scale));
+  }
+
+  /* 👇 זה החלק החדש שיזיז את "גלול למטה" למעלה קצת */
+  .scroll-indicator {
+    bottom: 70px;  /* במקום 30px ברגיל */
+  }
+
+  .groups-column {
+    padding: 16px;
+  }
+
+  .column-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .quick-actions {
+    flex-direction: column;
+    padding: 20px;
+  }
+
+  .action-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .card-meta {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+    .scroll-indicator {
+    bottom: 10px;   /* היה 30px או 70px – עכשיו יורד למטה */
+  }
+}

@@ -305,11 +305,12 @@
 }
 
 /* ========== רספונסיביות למובייל ========== */
-
 /* טאבלטים */
 @media (max-width: 1024px) {
     .main-content-resizable {
         flex-direction: column;
+        align-items: center;
+        /* מרכז את שתי העמודות */
     }
 
     .resize-handle {
@@ -320,15 +321,38 @@
         border-left: none;
         border-bottom: 1px solid #e2e8f0;
         max-height: 50vh;
+        width: 100%;
+        max-width: 800px;
+        margin: 0 auto 16px;
+        /* ממורכזת */
     }
 
     .right-section {
         flex: 1;
         overflow-y: auto;
+        width: 100%;
+        max-width: 800px;
+        margin: 0 auto;
+        /* ממורכזת */
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        /* מרכז את התוכן שבתוך הצד הימני */
+    }
+
+    /* כאן הטופס עצמו */
+    .candidate-form-card {
+        width: 100%;
+        max-width: 520px;
+        /* רוחב נוח לטופס */
+        margin: 0 auto 24px;
+        /* מרכז ונותן רווח מלמטה */
     }
 
     .charts {
         gap: 16px;
+        width: 100%;
+        max-width: 800px;
     }
 
     .pie-chart-container,
@@ -338,12 +362,9 @@
     }
 
     .chat-panel {
-
         bottom: 9vh !important;
-    width:480px;
-
+        width: 480px;
     }
-
 }
 
 /* מובייל */
@@ -1393,136 +1414,6 @@
     }
 }
 
-/* מכשירים קטנים מאוד */
-@media (max-width: 480px) {
-    .page-wrap {
-        padding: 6px;
-    }
-
-    .page-header {
-        padding: 8px;
-        margin-bottom: 8px;
-    }
-
-    .page-title {
-        font-size: calc(18px * var(--a11y-font-scale));
-    }
-
-    .group-description {
-        font-size: calc(11px * var(--a11y-font-scale));
-    }
-
-    .group-meta {
-        padding: 8px 10px;
-        gap: 10px;
-    }
-
-    .group-meta>div {
-        font-size: calc(11px * var(--a11y-font-scale));
-    }
-
-    .meta-label {
-        font-size: calc(11px * var(--a11y-font-scale));
-    }
-
-    .meta-value {
-        font-size: calc(12px * var(--a11y-font-scale));
-    }
-
-    .vote-btn {
-        padding: 10px;
-        font-size: calc(12px * var(--a11y-font-scale));
-    }
-
-    .mobile-tab {
-        padding: 10px;
-        font-size: calc(13px * var(--a11y-font-scale));
-    }
-
-    .dashboard .candidates-grid {
-        grid-template-columns: repeat(auto-fill, minmax(95px, 1fr));
-        gap: 6px;
-    }
-
-    .candidate-card {
-        padding: 8px;
-    }
-
-    .candidate-photo {
-        width: 45px;
-        height: 45px;
-        margin-bottom: 6px;
-    }
-
-    .candidate-card h4 {
-        font-size: calc(12px * var(--a11y-font-scale));
-        margin: 3px 0;
-    }
-
-    .candidate-symbol {
-        font-size: calc(9px * var(--a11y-font-scale));
-        padding: 2px 5px;
-        margin: 2px 0;
-    }
-
-    .candidate-card p {
-        font-size: calc(9px * var(--a11y-font-scale));
-        margin: 3px 0;
-        line-height: 1.2;
-    }
-
-    .votes-count {
-        font-size: calc(11px * var(--a11y-font-scale));
-        padding: 2px 6px;
-        margin-top: 4px;
-    }
-
-    .current-leader {
-        width: 24px;
-        height: 24px;
-        font-size: calc(14px * var(--a11y-font-scale));
-        top: -6px;
-        left: -6px;
-    }
-
-    .candidates-container {
-        padding: 6px;
-    }
-
-    .right-section {
-        padding: 8px;
-    }
-
-    .charts {
-        gap: 10px;
-    }
-
-    .pie-chart-container,
-    .bar-chart-container {
-        padding: 8px;
-        height: 250px;
-        min-height: 220px;
-    }
-
-    .pie-chart-container h3,
-    .bar-chart-container h3 {
-        font-size: calc(13px * var(--a11y-font-scale));
-        margin-bottom: 6px;
-        padding-bottom: 5px;
-    }
-
-    .chart-wrapper {
-        height: 210px;
-    }
-
-    .section-title {
-        font-size: calc(14px * var(--a11y-font-scale));
-        margin-bottom: 6px;
-        padding-bottom: 5px;
-    }
-
-}
-
 /* נוף (landscape) במובייל */
 @media (max-width: 768px) and (orientation: landscape) {
     .page-wrap {
@@ -1905,35 +1796,46 @@
 }
 
 .candidate-text p {
-  display: -webkit-box;        /* דרוש עבור line-clamp */
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 3;     
-  overflow: hidden;
-  text-overflow: ellipsis;    /* מוסיף ... בסוף */
+    display: -webkit-box;
+    /* דרוש עבור line-clamp */
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    /* מוסיף ... בסוף */
 }
 
 
 .tour-fab {
-  position: fixed;
-  bottom: 20px;
-  left: 20px; /* אפשר לשנות ל-right כדי להצמיד לצד ימין */
-  width: 50px;
-  height: 50px;
-  background-color: #1e3a8a; /* כחול */
-  color: #fff;
-  border: none;
-  border-radius: 50%;
-  font-size: 24px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 5px 20px rgba(0,0,0,0.2);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-  z-index: 1000;
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    /* אפשר לשנות ל-right כדי להצמיד לצד ימין */
+    width: 50px;
+    height: 50px;
+    background-color: #1e3a8a;
+    /* כחול */
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    font-size: 24px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    z-index: 1000;
 }
 
 .tour-fab:hover {
-  transform: scale(1.1);
-  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    transform: scale(1.1);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+/* 4 כרטיסים בשורה אחת בטאבלט בלבד */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .group-info-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 16px; /* אם תרצי רווחים ביניהם */
+  }
 }
