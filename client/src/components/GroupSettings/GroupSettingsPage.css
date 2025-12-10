@@ -32,8 +32,30 @@
 /* =========================================
    כותרת
    ========================================= */
-.gs-header {
-  margin-bottom: 24px;
+  .gs-header {
+    flex-direction: column; /* כל השאר עמודה */
+    align-items: flex-start;
+  }
+
+  .gs-header .icon-btn-container {
+    display: flex;           /* הכפתורים בשורה */
+    gap: 8px;                /* רווח בין הכפתורים */
+    margin-top: 8px;
+  }
+/* מובייל - הצג את שני הכפתורים בשורה אחת */
+@media (max-width: 767px) {
+  .gs-header {
+    flex-direction: column; /* כל השאר עמודה */
+    align-items: flex-start;
+  }
+
+  .gs-header .icon-btn-container {
+    display: flex;           /* הכפתורים בשורה */
+    gap: 8px;                /* רווח בין הכפתורים */
+    margin-top: 8px;
+  }
+
+
 }
 
 .clean-header {
@@ -46,7 +68,7 @@
 
 .header-title h2 {
   margin: 0 0 6px;
-  font-size: calc(1.85rem * var(--a11y-font-scale));
+  font-size: calc(1.55rem * var(--a11y-font-scale));
 }
 
 .header-title p {
@@ -907,7 +929,7 @@ textarea.input {
   }
 
   .header-title h2 {
-    font-size: calc(1.4rem * var(--a11y-font-scale));
+    font-size: calc(1rem * var(--a11y-font-scale));
   }
 
   .header-title p {

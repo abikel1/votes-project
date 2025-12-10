@@ -531,7 +531,6 @@
         font-size: calc(14px * var(--a11y-font-scale));
     }
 
-
     .chat-panel {
 
         bottom: 11vh !important;
@@ -1621,19 +1620,7 @@
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
-/* במובייל – קצת להתקרב לקצה כדי שלא יתנגש עם הטקסט */
-@media (max-width: 768px) {
-    .group-settings-btn-left {
-        left: 8px;
-        top: 8px;
-        padding: 4px 6px;
-    }
 
-    .group-settings-btn-left img {
-        width: 16px;
-        height: 16px;
-    }
-}
 
 
 .clean-header {
@@ -1809,7 +1796,7 @@
 .tour-fab {
     position: fixed;
     bottom: 20px;
-    left: 20px;
+    left: 26px;
     /* אפשר לשנות ל-right כדי להצמיד לצד ימין */
     width: 50px;
     height: 50px;
@@ -1832,10 +1819,32 @@
     transform: scale(1.1);
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
 }
+
 /* 4 כרטיסים בשורה אחת בטאבלט בלבד */
 @media (min-width: 769px) and (max-width: 1024px) {
-  .group-info-grid {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 16px; /* אם תרצי רווחים ביניהם */
-  }
+    .group-info-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 16px;
+        /* אם תרצי רווחים ביניהם */
+    }
+}
+/* במובייל – קצת להתקרב לקצה כדי שלא יתנגש עם הטקסט */
+@media (max-width: 768px) {
+    .group-settings-btn-left {
+        left: 8px;
+        top: 8px;
+        padding: 4px 6px;
+    }
+
+    .group-settings-btn-left img {
+        width: 16px;
+        height: 16px;
+    }
+
+    .tour-fab {
+        bottom: 16px;
+        /* יותר קרוב לתחתית במסך קטן */
+        left: 17px;
+        /* להזזה עדינה */
+    }
 }

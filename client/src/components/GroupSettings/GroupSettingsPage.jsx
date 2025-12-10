@@ -720,35 +720,41 @@ const pendingCount = requests.filter(r => r.status === 'pending').length;
 
   return (
     <div className="gs-wrap">
-      <div className="gs-header clean-header">
-        {/* כותרת מרכזית */}
-        <div className="header-title">
-          <h2>{group.name}</h2>
-          <p>{group.description}</p>
-        </div>
+    <div className="gs-header clean-header">
+  {/* כותרת מרכזית */}
+  <div className="header-title">
+    <h2>{group.name}</h2>
+    {/* <p>{group.description}</p> */}
+  </div>
 
-        {/* כפתור פרטי הקבוצה */}
-        <button
-          className="icon-btn"
-          onClick={() =>
-            navigate(`/groups/${slug}`, {
-              state: { groupId },
-            })
-          }
-          title={t('groupSettings.header.detailsTooltip')}
-        >
-          <FaInfoCircle size={24} />
-        </button>
+  {/* כפתורים */}
+  <div className="icon-btn-container">
+    <p className="group-description" title={group.description}>
+  {group.description}
+</p>
 
-        {/* כפתור חזרה */}
-        <button
-          className="icon-btn"
-          onClick={() => navigate('/groups')}
-          title={t('groupSettings.header.backTooltip')}
-        >
-          <BiArrowBack size={24} />
-        </button>
-      </div>
+    <button
+      className="icon-btn"
+      onClick={() =>
+        navigate(`/groups/${slug}`, {
+          state: { groupId },
+        })
+      }
+      title={t('groupSettings.header.detailsTooltip')}
+    >
+      <FaInfoCircle size={24} />
+    </button>
+
+    <button
+      className="icon-btn"
+      onClick={() => navigate('/groups')}
+      title={t('groupSettings.header.backTooltip')}
+    >
+      <BiArrowBack size={24} />
+    </button>
+  </div>
+</div>
+
 
       {/* layout: תוכן משמאל + סיידבר מימין */}
       <div className="gs-main-layout">
