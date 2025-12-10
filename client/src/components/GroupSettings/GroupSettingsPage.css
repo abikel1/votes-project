@@ -171,7 +171,7 @@
   border: 2px solid var(--gs-primary);
   padding: 28px;
   background: #fff;
-  border-radius: 0;
+  /* border-radius: 0; */
   box-shadow: 0 4px 12px rgba(0, 51, 102, 0.1);
   margin-bottom: 24px;
   width: 100%;
@@ -391,8 +391,8 @@ textarea.input {
 
 .gs-btn {
   padding: 6px 14px;
-  border-radius: 6px;
-  background-color: #007bff;
+    border-radius: 6px;
+      background-color: #007bff;
   color: #fff;
   border: none;
   cursor: pointer;
@@ -577,8 +577,8 @@ textarea.input {
 .gs-btn-outline,
 .btn-danger {
   padding: 12px 20px;
-  border-radius: 6px;
-  cursor: pointer;
+    border-radius: 6px;
+      cursor: pointer;
   font-weight: 600;
   font-size: calc(0.95rem * var(--a11y-font-scale));
   border: 1px solid transparent;
@@ -592,34 +592,40 @@ textarea.input {
 }
 
 .gs-btn {
+      border-radius: 6px;
   background: var(--gs-primary);
   color: #fff;
   border-color: var(--gs-primary);
 }
 
 .gs-btn:hover:not(:disabled) {
+      border-radius: 6px;
   background: var(--gs-primary-hover);
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(0, 51, 102, 0.2);
 }
 
 .gs-btn:disabled {
+      border-radius: 6px;
   opacity: 0.5;
   cursor: not-allowed;
 }
 
 .gs-btn-outline {
+      border-radius: 6px;
   background: #fff;
   color: var(--gs-primary);
   border-color: var(--gs-primary);
 }
 
 .gs-btn-outline:hover:not(:disabled) {
+      border-radius: 6px;
   background: #f0f7ff;
   border-color: var(--gs-primary-hover);
 }
 
 .gs-btn-outline:disabled {
+      border-radius: 6px;
   opacity: 0.5;
   cursor: not-allowed;
 }
@@ -1019,8 +1025,8 @@ button.small.danger:hover {
   /* כרטיסים */
   .card {
     padding: 20px;
-    border-radius: 0;
-    border-width: 2px;
+    border-radius: 6px;
+        border-width: 2px;
   }
 
   .card-head {
@@ -1051,6 +1057,7 @@ button.small.danger:hover {
   .gs-btn, 
   .gs-btn-outline,
   .btn-danger {
+        border-radius: 6px;
     width: 100%;
     justify-content: center;
   }
@@ -1145,6 +1152,7 @@ button.small.danger:hover {
   .gs-btn,
   .gs-btn-outline,
   .btn-danger {
+        border-radius: 6px;
     padding: 11px 16px;
     font-size: calc(0.9rem * var(--a11y-font-scale));
   }
