@@ -1005,3 +1005,23 @@
     width: 100%;
   }
 }
+@media (max-width: 1024px) {
+    .right-section .info-card {
+    width: 100%;
+    max-width: 100%;
+    margin-left: 0;
+    margin-right: 0;
+    box-sizing: border-box;
+  }
+  /* התיאור + הסטטיסטיקות יקבלו רוחב מלא */
+  .stats-cards {
+    width: 100%;
+    margin-top: 20px;   /* קצת מרווח מה"אודות" */
+    gap: 12px;
+  }
+
+  .stat-box {
+    flex: 1 1 1;     /* כל כרטיס תופס שורה שלמה */
+    width: 100%;
+  }
+}
