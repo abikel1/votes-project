@@ -13,6 +13,7 @@ import CountdownTimer from '../../components/CountdownTimer/CountdownTimer';
 import GroupChat from '../../components/GroupChat/GroupChat';
 import { useGroupDetailTour } from '../../Tour/useGroupDetailTour';
 import { fetchCampaign } from '../../slices/campaignSlice';
+import { BiChevronDown, BiChevronUp } from 'react-icons/bi';
 
 import {
   fetchMyGroups,
@@ -481,49 +482,54 @@ const toggleDesc = () => setDescExpanded(prev => !prev);
         </button>
       )}
 
+<div id="group-detail-header" className="page-header clean-header">
+  <div className="header-title">
+    {/* שם הקבוצה תמיד מלא */}
+    <h2 className="group-name" title={group.name}>
+      {group.name}
+    </h2>
 
-      <div id="group-detail-header" className="page-header clean-header">
-        <div className="header-title">
-          <h2 className="group-name" title={group.name}>
-            {group.name}
-          </h2>
-{group.description && (
-  <div className={`group-description-container ${descExpanded ? 'expanded' : ''}`}>
-  <p className="group-description">{group.description}</p>
-  {group.description.length > 50 && (
-    <button className="read-more-btn" onClick={toggleDesc}>
-      {descExpanded ? '⬆️ פחות' : '⬇️ עוד'}
+    {/* תיאור עם 'קרא עוד/קרא פחות' */}
+    {group.description && (
+      <div className={`group-description-container ${descExpanded ? 'expanded' : ''}`}>
+        <p className="group-description">{group.description}</p>
+        {group.description.length > 50 && (
+          <button className="read-more-btn" onClick={toggleDesc}>
+  {descExpanded ? (
+        <>
+          פחות <BiChevronUp size={18} style={{ verticalAlign: 'middle' }} />
+        </>
+      ) : (
+        <>
+          עוד <BiChevronDown size={18} style={{ verticalAlign: 'middle' }} />
+        </>
+      )}          </button>
+        )}
+      </div>
+    )}
+  </div>
+
+  <div className="icon-btn-container">
+    {isOwner && (
+      <button
+        id="settings-button"
+        className="icon-btn"
+        onClick={goSettings}
+        title={t('groups.detail.buttons.settings')}
+      >
+        <FiSettings size={20} />
+      </button>
+    )}
+    <button
+      className="icon-btn"
+      onClick={() => navigate('/groups')}
+      title={t('groups.detail.buttons.backToGroups')}
+    >
+      <BiArrowBack size={20} />
     </button>
-  )}
+  </div>
 </div>
 
-)}
-
-
-
-
-        </div>
-
-        <div className="icon-btn-container">
-          {isOwner && (
-            <button
-              id="settings-button"
-              className="icon-btn"
-              onClick={goSettings}
-              title={t('groups.detail.buttons.settings')}
-            >
-              <FiSettings size={20} />
-            </button>
-          )}
-          <button
-            className="icon-btn"
-            onClick={() => navigate('/groups')}
-            title={t('groups.detail.buttons.backToGroups')}
-          >
-            <BiArrowBack size={20} />
-          </button>
-        </div>
-      </div>
 
 
 
