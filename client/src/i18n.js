@@ -837,6 +837,7 @@ i18n
                     'campaign.description.editButton': 'ערוך תיאור',
 
                     'campaign.stats.views': 'צפיות',
+                    'campaign.stats.supp': 'תומכים',
                     'campaign.stats.share': 'שתף',
                     'campaign.share.text': 'בואו להכיר את {{name}}',
 

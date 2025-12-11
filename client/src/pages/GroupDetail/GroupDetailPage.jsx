@@ -12,6 +12,8 @@ import { TourProvider } from '@reactour/tour';
 import CountdownTimer from '../../components/CountdownTimer/CountdownTimer';
 import GroupChat from '../../components/GroupChat/GroupChat';
 import { useGroupDetailTour } from '../../Tour/useGroupDetailTour';
+import { fetchCampaign } from '../../slices/campaignSlice';
+import { BiChevronDown, BiChevronUp } from 'react-icons/bi';
 
 import {
   fetchMyGroups,
@@ -80,6 +82,7 @@ function GroupDetailPageContent() {
 
   const navGroupId = location.state?.groupId || null;
   const [groupId, setGroupId] = useState(navGroupId);
+const [descExpanded, setDescExpanded] = useState(false);
 
   const {
     selectedGroup: group,
@@ -90,6 +93,7 @@ function GroupDetailPageContent() {
   const candidates = useSelector(selectCandidatesForGroup(groupId || '')) || [];
   const loadingCandidates = useSelector(selectCandidatesLoadingForGroup(groupId || ''));
   const errorCandidates = useSelector(selectCandidatesErrorForGroup(groupId || ''));
+const toggleDesc = () => setDescExpanded(prev => !prev);
 
   const joinedIdsSet = useSelector(selectMyJoinedIds);
 
@@ -104,6 +108,7 @@ function GroupDetailPageContent() {
   const containerRef = useRef(null);
 
   const [isChatOpen, setIsChatOpen] = useState(false);
+
 
   // טאב פעיל במובייל: 'candidates' או 'info'
   const [activeTab, setActiveTab] = useState('candidates');
@@ -154,14 +159,15 @@ function GroupDetailPageContent() {
     joinedIdsSet.has(gidStr);
 
   const canChat = !isLocked || isOwner || isMember;
+  const [candidatesWithCampaign, setCandidatesWithCampaign] = useState([]);
 
   // מדריך המשתמש
-  const { tourInitialized, openTour } = useGroupDetailTour({ 
-    group, 
-    candidates, 
-    isOwner, 
-    isAuthed, 
-    isMobile 
+  const { tourInitialized, openTour } = useGroupDetailTour({
+    group,
+    candidates,
+    isOwner,
+    isAuthed,
+    isMobile
   });
 
   // ===== פתרון groupId לפי slug (אם נכנסו ישירות לכתובת) =====
@@ -184,20 +190,108 @@ function GroupDetailPageContent() {
   }, [navGroupId, groupSlug]);
 
   // ===== טעינת נתוני קבוצה, מועמדים =====
-// ===== טעינת נתוני קבוצה, מועמדים =====
-useEffect(() => {
-  if (groupId) {
-    dispatch(fetchGroupWithMembers(groupId));
-    dispatch(fetchCandidatesByGroup(groupId));
-  }
-}, [dispatch, groupId]); // <-- סוגר את ה-useEffect הראשון
+  // ===== טעינת נתוני קבוצה, מועמדים =====
 
-useEffect(() => {
-  if (isAuthed) {
-    dispatch(fetchMyGroups());
-  }
-}, [dispatch, groupId, isAuthed]); // <-- useEffect השני
+  const [barData, setBarData] = useState([]);
+  const [pieData, setPieData] = useState([]);
 
+  useEffect(() => {
+    if (!candidatesWithCampaign || candidatesWithCampaign.length === 0) return;
+
+    const bar = candidatesWithCampaign.map(c => ({
+      name: c.name ? (c.name.length > 12 ? c.name.slice(0, 12) + '...' : c.name) : 'לא ידוע',
+      likeCount: Number(c.campaign?.likeCount || 0),
+    }));
+
+    const pie = candidatesWithCampaign
+      .filter(c => Number(c.campaign?.likeCount || 0) > 0)
+      .map(c => ({
+        name: c.name,
+        value: Number(c.campaign.likeCount),
+      }));
+
+    console.log('Updated Bar Data:', bar);
+    console.log('Updated Pie Data:', pie);
+
+    setBarData(bar);
+    setPieData(pie);
+  }, [candidatesWithCampaign]);
+
+  // ===== לאחר טעינת הקבוצה =====
+  useEffect(() => {
+    console.log('Loaded group:', group);
+  }, [group]);
+
+  // ===== לאחר טעינת המועמדים =====
+  useEffect(() => {
+    console.log('Loaded candidates:', candidates);
+  }, [candidates]);
+
+  // ===== לאחר טעינת הקמפיינים לכל מועמד =====
+  // ===== State לגרפים =====
+
+
+  // ===== עדכון גרפים לאחר טעינת קמפיינים =====
+  useEffect(() => {
+    if (!candidatesWithCampaign || candidatesWithCampaign.length === 0) return;
+
+    // Bar chart – כל המועמדים
+    const bar = candidatesWithCampaign.map(c => ({
+      name: c.name ? (c.name.length > 12 ? c.name.slice(0, 12) + '...' : c.name) : 'לא ידוע',
+      likeCount: Number(c.campaign?.campaign?.likeCount || 0),
+    }));
+
+    // Pie chart – רק מועמדים עם לייקים
+    const pie = candidatesWithCampaign
+      .filter(c => Number(c.campaign?.campaign?.likeCount || 0) > 0)
+      .map(c => ({
+        name: c.name,
+        value: Number(c.campaign.campaign.likeCount),
+      }));
+
+    setBarData(bar);
+    setPieData(pie);
+
+    console.log('Bar Data:', bar);
+    console.log('Pie Data:', pie);
+  }, [candidatesWithCampaign]);
+
+
+
+  useEffect(() => {
+    if (groupId) {
+      dispatch(fetchGroupWithMembers(groupId));
+      dispatch(fetchCandidatesByGroup(groupId));
+    }
+  }, [dispatch, groupId]); // <-- סוגר את ה-useEffect הראשון
+
+  useEffect(() => {
+    if (isAuthed) {
+      dispatch(fetchMyGroups());
+    }
+  }, [dispatch, groupId, isAuthed]); // <-- useEffect השני
+
+  useEffect(() => {
+    async function loadCampaigns() {
+      if (!candidates || candidates.length === 0) return;
+
+      const updatedCandidates = await Promise.all(
+        candidates.map(async (c) => {
+          try {
+            const result = await dispatch(fetchCampaign(c._id)).unwrap();
+            return { ...c, campaign: result }; // מחזיר את הקמפיין לכל מועמד
+          } catch (err) {
+            console.error('Error fetching campaign for candidate', c._id, err);
+            return { ...c, campaign: null };
+          }
+        })
+      );
+
+      setCandidatesWithCampaign(updatedCandidates);
+    }
+
+    loadCampaigns();
+  }, [candidates, dispatch]);
 
   // ===== Resize bar =====
   useEffect(() => {
@@ -365,48 +459,53 @@ useEffect(() => {
     (a, b) => (b.votesCount || 0) - (a.votesCount || 0),
   );
 
-  const pieData = candidates
-    .filter((c) => c.votesCount > 0)
-    .map((c) => ({ name: c.name, value: c.votesCount || 0 }));
 
-  const barData = (sortedCandidates || []).map((c) => ({
-    name: c.name
-      ? (c.name.length > 12 ? c.name.substring(0, 12) + '...' : c.name)
-      : t('groups.detail.candidates.unknownName'),
-    votesCount: c.votesCount || 0,
-  }));
+
+  console.log('Bar Data:', barData);
+  console.log('Pie Data:', pieData);
+
 
   const winners = sortedCandidates.slice(0, group.maxWinners);
-function truncateText(text, maxLength) {
-  if (!text) return '';
-  return text.length > maxLength ? text.slice(0, maxLength) + '…' : text;
-}
+  function truncateText(text, maxLength) {
+    if (!text) return '';
+    return text.length > maxLength ? text.slice(0, maxLength) + '…' : text;
+  }
 
 
   return (
     <div className="page-wrap dashboard">
       {/* כפתור הפעלת המדריך */}
- {/* כפתור הפעלת המדריך */}
-{tourInitialized && (
-  <button onClick={openTour} className="tour-fab">
-   ?
-  </button>
-)}
-
+      {/* כפתור הפעלת המדריך */}
+      {tourInitialized && (
+        <button onClick={openTour} className="tour-fab">
+          ?
+        </button>
+      )}
 
 <div id="group-detail-header" className="page-header clean-header">
   <div className="header-title">
+    {/* שם הקבוצה תמיד מלא */}
     <h2 className="group-name" title={group.name}>
       {group.name}
     </h2>
-    {group.description && (
-   <p
-  className="group-description"
-  title={group.description} // טוליפ שמראה את כל הטקסט
->
-  {truncateText(group.description, 20)}
-</p>
 
+    {/* תיאור עם 'קרא עוד/קרא פחות' */}
+    {group.description && (
+      <div className={`group-description-container ${descExpanded ? 'expanded' : ''}`}>
+        <p className="group-description">{group.description}</p>
+        {group.description.length > 50 && (
+          <button className="read-more-btn" onClick={toggleDesc}>
+  {descExpanded ? (
+        <>
+          פחות <BiChevronUp size={18} style={{ verticalAlign: 'middle' }} />
+        </>
+      ) : (
+        <>
+          עוד <BiChevronDown size={18} style={{ verticalAlign: 'middle' }} />
+        </>
+      )}          </button>
+        )}
+      </div>
     )}
   </div>
 
@@ -430,6 +529,7 @@ function truncateText(text, maxLength) {
     </button>
   </div>
 </div>
+
 
 
 
@@ -612,12 +712,12 @@ function truncateText(text, maxLength) {
           {isVotingPhase && (
             <div className="group-details-card">
               <div className="group-info-grid">
+                {/* Info cards */}
                 <div className="info-card">
                   <HiClock size={28} color="#1e3a8a" />
                   <p>{t('groups.detail.infoCards.timeLeft')}</p>
                   <CountdownTimer endDate={group.endDate} />
                 </div>
-
                 <div className="info-card">
                   <HiUserGroup size={28} color="#1e3a8a" />
                   <p>{t('groups.detail.infoCards.totalVotes')}</p>
@@ -634,8 +734,64 @@ function truncateText(text, maxLength) {
                   <h4>{group.maxWinners}</h4>
                 </div>
               </div>
+
+              {/* גרפים – מחוץ ל-grid */}
+{/* גרפים – מחוץ ל-grid */}
+{candidatesWithCampaign &&
+ candidatesWithCampaign.length > 0 &&
+ barData.some((c) => c.likeCount > 0) && (
+  <div className="survey-card">
+    <h3>סקר תמיכה (לא תוצאות רשמיות)</h3>
+    <p className="survey-note">
+      נתוני הסקר מתבססים על תמיכה בקמפיין. רק מועמד עם קמפיין פעיל יכול לקבל תמיכה.
+    </p>
+
+    <div className="survey-charts-container">
+      {/* Bar Chart */}
+      <div className="survey-chart chart-bar">
+        <ResponsiveContainer width="100%" height={300}>
+          <BarChart data={barData}>
+            <XAxis dataKey="name" angle={-45} textAnchor="end" height={50} />
+            <YAxis />
+            <Tooltip formatter={(v) => `${v} תמיכה`} labelFormatter={() => ''} />
+            <Bar dataKey="likeCount">
+              {barData.map((entry, index) => (
+                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+              ))}
+            </Bar>
+          </BarChart>
+        </ResponsiveContainer>
+      </div>
+
+      {/* Pie Chart */}
+      <div className="survey-chart chart-pie">
+        <ResponsiveContainer width="100%" height={300}>
+          <PieChart>
+            <Pie
+              data={pieData}
+              cx="50%"
+              cy="50%"
+              outerRadius={90}
+              dataKey="value"
+              label
+            >
+              {pieData.map((entry, index) => (
+                <Cell key={index} fill={COLORS[index % COLORS.length]} />
+              ))}
+            </Pie>
+            <Tooltip formatter={(v) => `${v} תמיכה`} labelFormatter={() => ''} />
+            <Legend />
+          </PieChart>
+        </ResponsiveContainer>
+      </div>
+    </div>
+  </div>
+)}
+
+
             </div>
           )}
+
 
           {isGroupExpired && totalVotes > 0 && (
             <div className="charts">
@@ -732,10 +888,10 @@ function truncateText(text, maxLength) {
   );
 
 
-  }
-    export default function GroupDetailPage() {
+}
+export default function GroupDetailPage() {
   return (
-    <TourProvider 
+    <TourProvider
       steps={[]}
       styles={{
         popover: (base) => ({

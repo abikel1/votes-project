@@ -1,10 +1,4 @@
-.candidate-text p {
-    display: -webkit-box;
-    /* דרוש עבור line-clamp */
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
+
 
 /* ===== כפתור צ'אט צף ===== */
 .chat-fab {
@@ -564,13 +558,6 @@
     margin: 0 0 6px 0;
     color: #1e293b;
     font-weight: 700;
-}
-
-.group-description {
-    margin: 0;
-    color: #64748b;
-    font-size: calc(13px * var(--a11y-font-scale));
-    line-height: 1.4;
 }
 
 .meta-and-button {
@@ -1782,15 +1769,7 @@
 
 }
 
-.candidate-text p {
-    display: -webkit-box;
-    /* דרוש עבור line-clamp */
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 3;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    /* מוסיף ... בסוף */
-}
+
 
 
 .tour-fab {
@@ -1862,27 +1841,18 @@
 
 .header-title {
   flex: 1 1 auto;
-  min-width: 30%; /* חשוב ל-ellipsis */
-  overflow: hidden;
+  min-width: 0;  /* חשוב! מאפשר לשורות להתרחב בתוך flex */
 }
 
 .group-name {
   margin: 0;
   font-size: 1.2rem;
   font-weight: 600;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  white-space: normal; /* מאפשר שבירה לשורות רבות */
+  overflow: visible;   /* חובה! אחרת הטקסט עלול להיחתך */
+  word-break: break-word; /* שוברת מילים ארוכות במקום לקפוץ */
 }
 
-.group-description {
-  margin: 0;
-  font-size: 0.9rem;
-  color: #666;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
 
 .icon-btn-container {
   display: flex;
@@ -1924,4 +1894,120 @@
   .group-description {
     font-size: 0.8rem;
   }
+}
+
+
+
+
+
+
+
+
+.survey-charts-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px; /* רווח בין הגרפים */
+}
+
+.survey-chart {
+  flex: 1 1 45%; /* כל גרף 45% מרוחב הקונטיינר, נשאר מקום לרווח */
+  min-width: 300px; /* לשמור על קריאות במובייל */
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+#group-detail-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: center; /* מרכז את הכותרת והכפתורים לאורך הציר האנכי */
+  flex-wrap: wrap; /* מאפשר לשורות לעבור שורה אם הצרכים גדולים */
+}
+
+.header-title {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column; /* שם מעל תיאור */
+  gap: 0.5rem;
+  align-items: center; /* מרכז את השם והתיאור */
+  text-align: center; /* גם למקרה של מספר שורות */
+  max-width: 100%;
+}
+
+@media screen and (min-width: 1024px) {
+  /* מחשב גדול */
+  .header-title {
+    flex-direction: row; /* שם לצד תיאור */
+    align-items: center;
+    text-align: left;
+    gap: 1rem;
+    max-width: 70%; /* מותאם לצד כפתורים */
+  }
+
+  .group-description-container {
+    flex: 1;
+  }
+
+  .group-description {
+    -webkit-line-clamp: 2;
+  }
+}
+
+/* שאר סגנונות נשארים כפי שהיו */
+.group-name {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+  white-space: normal;
+  word-break: break-word;
+}
+
+.group-description-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.group-description {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  -webkit-line-clamp: 2;
+  margin: 0;
+  line-height: 1.5em;
+}
+
+.group-description-container.expanded .group-description {
+  display: block;
+  -webkit-line-clamp: unset;
+  overflow: visible;
+}
+
+.read-more-btn {
+  display: inline-block;
+  margin-top: 0.25rem;
+  cursor: pointer;
+  color: #3b82f6;
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: 0.9em;
+  user-select: none;
+}
+
+.icon-btn-container {
+  display: flex;
+  align-items: center; /* מרכז את הכפתורים אנכית */
+  gap: 0.5rem;
 }

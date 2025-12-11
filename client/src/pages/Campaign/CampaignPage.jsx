@@ -27,6 +27,7 @@ import { updateCandidate } from '../../slices/candidateSlice';
 import { BiArrowBack } from 'react-icons/bi';
 import { FiEdit3, FiEye, FiHeart, FiShare2, FiX } from 'react-icons/fi';
 import { fetchGroupOnly } from '../../slices/groupsSlice';
+import { FaHandHoldingHeart } from "react-icons/fa";
 
 import './CampaignPage.css';
 import { uploadImage } from '../../components/GroupSettings/uploadImage';
@@ -1070,16 +1071,15 @@ export default function CampaignPage() {
               </span>
             </div>
 
-            <div className="stat-box clickable">
-              <button className="icon-btn" onClick={handleToggleLike}>
-                <FiHeart
-                  size={24}
-                  color={hasLiked ? 'red' : 'gray'}
-                  style={{ fill: hasLiked ? 'red' : 'none' }}
-                />
-                <span>{likeCount}</span>
-              </button>
-            </div>
+<div className="stat-box clickable" onClick={handleToggleLike}>
+  <FaHandHoldingHeart
+    size={24}
+    color={hasLiked ? 'green' : 'gray'}
+  />
+
+  <span style={{ marginTop: '4px' }}>{likeCount}  {t('campaign.stats.supp')}</span>
+</div>
+
 
             {/* כפתור שתף פותח מודאל */}
             <div className="stat-box clickable" onClick={handleOpenShare}>

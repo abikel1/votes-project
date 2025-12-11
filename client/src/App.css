@@ -1,1 +1,15 @@
-/* 
+/* /* ב־App.css או style גלובלי */
+body, html, #root {
+  height: 100%;
+  margin: 0;
+}
+
+.page-wrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh; /* מלא את כל חלון הדפדפן */
+}
+
+main {
+  flex: 1; /* התוכן מתרחב למילוי החלל */
+}
