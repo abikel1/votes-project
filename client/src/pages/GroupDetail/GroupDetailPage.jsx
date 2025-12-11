@@ -81,6 +81,7 @@ function GroupDetailPageContent() {
 
   const navGroupId = location.state?.groupId || null;
   const [groupId, setGroupId] = useState(navGroupId);
+const [descExpanded, setDescExpanded] = useState(false);
 
   const {
     selectedGroup: group,
@@ -91,6 +92,7 @@ function GroupDetailPageContent() {
   const candidates = useSelector(selectCandidatesForGroup(groupId || '')) || [];
   const loadingCandidates = useSelector(selectCandidatesLoadingForGroup(groupId || ''));
   const errorCandidates = useSelector(selectCandidatesErrorForGroup(groupId || ''));
+const toggleDesc = () => setDescExpanded(prev => !prev);
 
   const joinedIdsSet = useSelector(selectMyJoinedIds);
 
@@ -105,6 +107,7 @@ function GroupDetailPageContent() {
   const containerRef = useRef(null);
 
   const [isChatOpen, setIsChatOpen] = useState(false);
+
 
   // טאב פעיל במובייל: 'candidates' או 'info'
   const [activeTab, setActiveTab] = useState('candidates');
@@ -484,15 +487,21 @@ function GroupDetailPageContent() {
           <h2 className="group-name" title={group.name}>
             {group.name}
           </h2>
-          {group.description && (
-            <p
-              className="group-description"
-              title={group.description} // טוליפ שמראה את כל הטקסט
-            >
-              {truncateText(group.description, 20)}
-            </p>
+{group.description && (
+  <div className={`group-description-container ${descExpanded ? 'expanded' : ''}`}>
+  <p className="group-description">{group.description}</p>
+  {group.description.length > 50 && (
+    <button className="read-more-btn" onClick={toggleDesc}>
+      {descExpanded ? '⬆️ פחות' : '⬇️ עוד'}
+    </button>
+  )}
+</div>
 
-          )}
+)}
+
+
+
+
         </div>
 
         <div className="icon-btn-container">

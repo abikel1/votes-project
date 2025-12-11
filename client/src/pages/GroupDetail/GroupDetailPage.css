@@ -1,10 +1,4 @@
-.candidate-text p {
-    display: -webkit-box;
-    /* דרוש עבור line-clamp */
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
+
 
 /* ===== כפתור צ'אט צף ===== */
 .chat-fab {
@@ -564,13 +558,6 @@
     margin: 0 0 6px 0;
     color: #1e293b;
     font-weight: 700;
-}
-
-.group-description {
-    margin: 0;
-    color: #64748b;
-    font-size: calc(13px * var(--a11y-font-scale));
-    line-height: 1.4;
 }
 
 .meta-and-button {
@@ -1782,15 +1769,7 @@
 
 }
 
-.candidate-text p {
-    display: -webkit-box;
-    /* דרוש עבור line-clamp */
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 3;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    /* מוסיף ... בסוף */
-}
+
 
 
 .tour-fab {
@@ -1872,17 +1851,10 @@
   font-weight: 600;
   white-space: nowrap;
   overflow: hidden;
-  text-overflow: ellipsis;
+  /* text-overflow: ellipsis; */
 }
 
-.group-description {
-  margin: 0;
-  font-size: 0.9rem;
-  color: #666;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
+
 
 .icon-btn-container {
   display: flex;
@@ -1942,4 +1914,36 @@
 .survey-chart {
   flex: 1 1 45%; /* כל גרף 45% מרוחב הקונטיינר, נשאר מקום לרווח */
   min-width: 300px; /* לשמור על קריאות במובייל */
+}
+
+
+
+
+
+.group-description {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  -webkit-line-clamp: 1;
+  margin: 0;
+  line-height: 1.5em;
+}
+
+.group-description-container.expanded .group-description {
+  display: block;
+  -webkit-line-clamp: unset;
+  overflow: visible;
+}
+
+.read-more-btn {
+  display: inline-block;
+  margin-top: 0.5em;
+  cursor: pointer;
+  color: #3b82f6;
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: 0.9em;
+  user-select: none;
 }
