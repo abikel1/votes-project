@@ -204,7 +204,7 @@ i18n
                     'groups.create.modal.shareCopied': 'הועתק ✓',
                     'groups.create.modal.finish': 'סיום',
                     // === groups list page ===
-                    'groups.list.loading': 'טוען קבוצות...',
+                    'groups.list.loading': 'טוען...',
 
                     'groups.list.empty.noGroups': 'אין קבוצות עדיין.',
                     'groups.list.empty.createButton': '+ יצירת קבוצה חדשה',
@@ -268,7 +268,7 @@ i18n
                     'groups.list.toasts.rejected':
                         'בקשתך נדחתה על ידי מנהל/ת הקבוצה. ניתן לשלוח בקשה חדשה.',
                     // === home page ===
-                    'home.loading': 'טוען קבוצות...',
+                    'home.loading': 'טוען...',
 
                     'home.error.title': 'שגיאה',
                     'home.error.retry': 'נסה שוב',

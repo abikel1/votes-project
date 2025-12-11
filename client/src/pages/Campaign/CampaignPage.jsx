@@ -116,6 +116,7 @@ export default function CampaignPage() {
 
   // Redux state
   const campaign = useSelector(selectCampaign);
+
   const candidate = campaign?.candidate || null;
   const campaignLoading = useSelector((state) => state.campaign.loading);
   const campaignError = useSelector((state) => state.campaign.error);
@@ -140,6 +141,13 @@ export default function CampaignPage() {
   const [newImageUrl, setNewImageUrl] = useState('');
   const [editDescription, setEditDescription] = useState('');
   const [isEditingDescription, setIsEditingDescription] = useState(false);
+
+  useEffect(() => {
+    if (campaign && !isEditingDescription) {
+      setEditDescription(campaign.description || '');
+    }
+  }, [campaign, isEditingDescription]);
+
   const [isEditMode, setIsEditMode] = useState(false);
   const [uploadingImage, setUploadingImage] = useState(false);
 
@@ -993,13 +1001,15 @@ export default function CampaignPage() {
           </h3>
 
           <div className="info-card">
-            {isEditingDescription ? (
+            {isCandidateOwner && isEditMode && isEditingDescription ? (
+              // מצב עריכה – יש טקסטאריאה + שמור/ביטול
               <div>
                 <textarea
                   value={editDescription}
                   onChange={(e) => setEditDescription(e.target.value)}
                   placeholder={t('campaign.description.placeholder')}
                 />
+
                 <div
                   style={{
                     display: 'flex',
@@ -1007,14 +1017,21 @@ export default function CampaignPage() {
                     marginTop: '10px',
                   }}
                 >
-                  <button className="vote-btn" onClick={handleUpdateCampaign}>
+                  <button
+                    className="vote-btn"
+                    type="button"
+                    onClick={handleUpdateCampaign}
+                  >
                     {t('common.save')}
                   </button>
+
                   <button
                     className="delete-btn"
+                    type="button"
                     onClick={() => {
+                      // מחזירים את הערך הישן ומבטלים עריכה
+                      setEditDescription(campaign.description || '');
                       setIsEditingDescription(false);
-                      setIsEditMode(false);
                     }}
                   >
                     {t('common.cancel')}
@@ -1022,13 +1039,19 @@ export default function CampaignPage() {
                 </div>
               </div>
             ) : (
+              // מצב צפייה (או שאין הרשאה לערוך)
               <div>
                 <p>
-                  {editDescription || t('campaign.description.empty')}
+                  {(campaign?.description && campaign.description.trim()) ||
+                    t('campaign.description.empty')}
                 </p>
+
                 {isCandidateOwner && isEditMode && (
                   <button
-                    onClick={() => setIsEditingDescription(true)}
+                    onClick={() => {
+                      setEditDescription(campaign.description || '');
+                      setIsEditingDescription(true);
+                    }}
                     className="vote-btn"
                   >
                     {t('campaign.description.editButton')}
@@ -1037,6 +1060,7 @@ export default function CampaignPage() {
               </div>
             )}
           </div>
+
 
           {/* סטטיסטיקות */}
           <div className="stats-cards">
