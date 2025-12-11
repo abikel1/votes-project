@@ -1925,3 +1925,21 @@
     font-size: 0.8rem;
   }
 }
+
+
+
+
+
+
+
+
+.survey-charts-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px; /* רווח בין הגרפים */
+}
+
+.survey-chart {
+  flex: 1 1 45%; /* כל גרף 45% מרוחב הקונטיינר, נשאר מקום לרווח */
+  min-width: 300px; /* לשמור על קריאות במובייל */
+}
