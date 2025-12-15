@@ -275,7 +275,7 @@ export default function CampaignPage() {
   // טעינת קמפיין + incrementView + redirect מ-ID ל-URL יפה
   useEffect(() => {
 
-    // dispatch(clearCampaign());
+    dispatch(clearCampaign());
     if (!token) return;
     // ----- מקרה 1: כבר בתוך URL יפה (/campaign/:groupSlug/:candidateSlug) -----
     if (groupSlug && candidateSlug) {
@@ -522,8 +522,14 @@ export default function CampaignPage() {
     );
   }
 
+  // בדיקת התאמה בין הקמפיין שבסטור לבין ה־URL (כדי לא להציג "קמפיין קודם" לשנייה)
+  const matchesRoute =
+    !candidateSlug ||
+    makeCandidateSlug(campaign?.candidate?.name || '') === candidateSlug;
+
+
   // 👇 הכי חשוב – אם עדיין אין קמפיין, אל תגעי בו בכלל
-  if (!campaign) {
+  if (!campaign || (candidateSlug && !matchesRoute)) {
     return (
       <div className="loading-wrap">
         {t('campaign.loading')}
@@ -1071,14 +1077,14 @@ export default function CampaignPage() {
               </span>
             </div>
 
-<div className="stat-box clickable" onClick={handleToggleLike}>
-  <FaHandHoldingHeart
-    size={24}
-    color={hasLiked ? 'green' : 'gray'}
-  />
+            <div className="stat-box clickable" onClick={handleToggleLike}>
+              <FaHandHoldingHeart
+                size={24}
+                color={hasLiked ? 'green' : 'gray'}
+              />
 
-  <span style={{ marginTop: '4px' }}>{likeCount}  {t('campaign.stats.supp')}</span>
-</div>
+              <span style={{ marginTop: '4px' }}>{likeCount}  {t('campaign.stats.supp')}</span>
+            </div>
 
 
             {/* כפתור שתף פותח מודאל */}
