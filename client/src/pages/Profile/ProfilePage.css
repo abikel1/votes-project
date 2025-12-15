@@ -1,14 +1,17 @@
-/* ═══════════════════════════════════════════════════════════════
-   ProfilePage.css - עיצוב דף פרופיל
-   סגנון: מרובע, נקי, כחול כהה, גבולות מודגשים
-   ═══════════════════════════════════════════════════════════════ */
-
 .profile-container {
-  max-width: 900px;
+  width: 100% !important;        /* שיתפוס את כל הרוחב הזמין */
+  max-width: 800px !important;  /* תשני ל־1300/1400 אם בא לך עוד */
   margin: 40px auto;
-  padding: 0 20px;
+  padding: 0 40px;               /* קצת פחות שוליים מהצדדים */
   direction: rtl;
+  box-sizing: border-box;
 }
+
+.profile-top,
+.profile-groups {
+  width: 100% !important;        /* שימשך לרוחב כל ה-container */
+}
+
 
 .profile-container h1 {
   font-size: calc(28px * var(--a11y-font-scale));;
@@ -18,7 +21,6 @@
   text-align: center;
 }
 
-/* ═══ הודעות הצלחה/שגיאה עליונות ═══ */
 .top-msg {
   padding: 14px 20px;
   border-radius: 0;
