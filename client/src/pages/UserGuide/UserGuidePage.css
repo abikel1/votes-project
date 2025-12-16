@@ -16,7 +16,6 @@ body {
   padding: 80px 20px;
   background: #1e3a8a;
   color: white;
-  border-radius: 20px;
   margin-bottom: 40px;
 }
 .hero-title {
@@ -32,7 +31,6 @@ body {
 .hero-buttons button {
   margin: 0 10px;
   padding: 12px 32px;
-  border-radius: 30px;
   font-weight: bold;
   cursor: pointer;
   transition: 0.3s;
@@ -75,13 +73,13 @@ body {
 .flow-box {
   width: 80px;
   height: 80px;
-  border-radius: 20px;
   display: flex;
   align-items: center;
   justify-content: center;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
   transition: 0.3s;
   background: #1e3a8a; /* כחול כהה */
+  color: #f0f4ff;
 }
 .flow-box:hover {
   transform: translateY(-5px) scale(1.1);
@@ -99,21 +97,51 @@ body {
   color: #1e3a8a;
 }
 
-/* Steps */
+/* Video layout */
+.video-row {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 30px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.video-main {
+  flex: 1 1 300px;
+  max-width: 300px;
+  border: 3px solid #1e3a8a;
+  border-radius: 15px;
+  overflow: hidden;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+}
+
+.video-small {
+  flex: 1 1 140px;
+  max-width: 140px;
+  border: 2px solid #1e3a8a;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 3px 15px rgba(0,0,0,0.2);
+}
+
+/* Steps stacked vertically */
 .steps-section {
   display: flex;
   flex-direction: column;
-  gap: 20px;
-  margin-bottom: 40px;
+  gap: 15px;
+  margin-bottom: 30px;
 }
+
 .step-card {
   background: white;
-  border-radius: 20px;
-  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 5px 20px rgba(0,0,0,0.1);
   cursor: pointer;
   overflow: hidden;
   transition: 0.3s;
+  padding: 15px;
 }
+
+
 .step-card:hover {
   transform: scale(1.02);
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
@@ -128,7 +156,6 @@ body {
   width: 60px;
   height: 60px;
   background: rgba(30, 58, 138, 0.2); /* כחול בהיר */
-  border-radius: 15px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -157,7 +184,6 @@ body {
   height: 24px;
   background: #1e3a8a;
   color: white;
-  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -172,7 +198,6 @@ body {
 }
 .tip-card {
   background: white;
-  border-radius: 20px;
   padding: 20px;
   box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
   text-align: center;
@@ -185,7 +210,6 @@ body {
 .tip-icon {
   width: 60px;
   height: 60px;
-  border-radius: 15px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -196,7 +220,6 @@ body {
 
 /* Video card */
 .video-card video {
-  border-radius: 20px;
   box-shadow: 0 5px 20px rgba(0,0,0,0.1);
 }
 

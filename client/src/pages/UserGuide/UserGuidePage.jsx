@@ -51,10 +51,7 @@ export default function EnhancedUserGuide() {
       <header className="hero">
         <h1 className="hero-title">מדריך למשתמש</h1>
         <p className="hero-subtitle">כל מה שצריך לדעת על המערכת במקום אחד</p>
-        <div className="hero-buttons">
-          <button className="btn-primary">התחל עכשיו</button>
-          <button className="btn-secondary">צפה בווידאו</button>
-        </div>
+   
       </header>
 
       <section className="flow-section">
@@ -81,14 +78,29 @@ export default function EnhancedUserGuide() {
           </div>
         ))}
       </section>
+{/* <div className="video-row">
+    <div className="video-main">
+      <video controls>
+        <source src="phone-video.mp4" type="video/mp4" />
+      </video>
+    </div>
+  </div> */}
 
-      <section className="video-card">
-        <video controls width="100%">
-          <source src="EX.mp4" type="video/mp4" />
-        </video>
-      </section>
 
-      <section className="tips-section">
+      {/* <div className="video-row">
+    <div className="video-small">
+      <video controls>
+        <source src="small1.mp4" type="video/mp4" />
+      </video>
+    </div>
+    <div className="video-small">
+      <video controls>
+        <source src="small2.mp4" type="video/mp4" />
+      </video>
+    </div>
+  </div> */}
+
+      {/* <section className="tips-section">
         <h2 className="section-title">טיפים ותכונות נוספות</h2>
         <div className="tips-grid">
           {tips.map((tip,i)=>(
@@ -99,7 +111,7 @@ export default function EnhancedUserGuide() {
             </div>
           ))}
         </div>
-      </section>
+      </section> */}
     </div>
   );
 }

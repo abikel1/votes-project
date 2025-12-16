@@ -27,7 +27,7 @@ useEffect(() => {
   tourSteps.push(
     // { selector: '#candidates-section', content: 'כאן מוצגים כל המועמדים בקבוצה' },
     { selector: `#candidate-card-${firstCandidateId}`, content: 'כל כרטיס מציג מועמד עם תמונה, שם ותיאור' },
-    { selector: `#candidate-card-${firstCandidateId} .campaign-btn`,  content: 'לחץ כאן כדי לראות או ליצור קמפיין עבור המועמד' }
+    // { selector: `#candidate-card-${firstCandidateId} .campaign-btn`,  content: 'לחץ כאן כדי לראות או ליצור קמפיין עבור המועמד' }
   );
 
   // tourSteps.push({ selector: '#chat-fab', content: 'לחץ כאן לפתיחת הצ\'אט של הקבוצה' });
