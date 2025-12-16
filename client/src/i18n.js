@@ -589,7 +589,7 @@ i18n
                     // === group settings – danger zone ===
                     'groupSettings.danger.title': 'מחיקת קבוצה',
                     'groupSettings.danger.warning': 'מחיקה היא פעולה בלתי הפיכה. כל נתוני הקבוצה יימחקו לכולם.',
-                    'groupSettings.danger.deleteButton': 'מחיקת הקבוצה…',
+                    'groupSettings.danger.deleteButton': 'מחיקת הקבוצה ',
                     // === group settings – delete modal ===
                     'groupSettings.deleteModal.title': 'מחק/י את הקבוצה',
                     'groupSettings.deleteModal.typeToConfirm': 'כדי לאשר, הקלד/י בתיבה את',
