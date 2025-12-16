@@ -61,8 +61,10 @@ export default function LoginPage() {
   };
 
   const googleHref = (() => {
-    const base = 'http://localhost:3000/api/users/google';
-    return redirect ? `${base}?redirect=${redirect}` : base;
+    const base = 'https://votes-project.onrender.com/api/users/google';
+    return redirect
+      ? `${base}?redirect=${encodeURIComponent(redirect)}`
+      : base;
   })();
 
   return (

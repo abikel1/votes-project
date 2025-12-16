@@ -7,7 +7,8 @@ const auth = require('../middlewares/auth_middleware');
 const { validate, schemas } = require('../middlewares/validate_middleware');
 
 const router = express.Router();
-const FRONT = process.env.FRONT_BASE || 'http://localhost:5173';
+const FRONT =
+  process.env.CLIENT_BASE_URL || process.env.FRONT_BASE || 'http://localhost:5173';
 
 router.get('/google', (req, res, next) => {
   const state = req.query.redirect ? encodeURIComponent(req.query.redirect) : '';
@@ -61,8 +62,8 @@ router.post(
   ctrl.changePassword
 );
 
-router.get('/',      ctrl.listUsers);
+router.get('/', ctrl.listUsers);
 router.get('/batch', ctrl.getUsersBatch);
-router.get('/:id',   ctrl.getUserById);
+router.get('/:id', ctrl.getUserById);
 
 module.exports = router;
