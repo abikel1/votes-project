@@ -1,90 +1,376 @@
 /* src/pages/About/AboutPage.css */
+
+:root {
+  --primary-blue: #003d79;
+  --primary-blue-light: #0052a3;
+  --accent-color: #3b82f6;
+  --text-dark: #0f172a;
+  --text-muted: #475569;
+  --border-light: rgba(15, 23, 42, 0.08);
+  --bg-light: #f8fafc;
+}
+
 .about-page {
-  padding: 2rem;
-  font-family: 'Arial', sans-serif;
-  color: #333;
-  max-width: 1100px;
+  padding: 2rem 1.5rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  color: var(--text-dark);
+}
+
+/* HERO SECTION */
+.about-hero {
+  border-radius: 24px;
+  padding: 3rem 2rem;
+  margin-bottom: 3rem;
+  background: linear-gradient(135deg, var(--primary-blue), var(--primary-blue-light), var(--primary-blue));
+  color: #fff;
+  overflow: hidden;
+  box-shadow: 0 20px 50px rgba(0, 61, 121, 0.3);
+  position: relative;
+}
+
+.about-hero::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(circle at 20% 50%, rgba(59, 130, 246, 0.15), transparent 50%);
+  pointer-events: none;
+}
+
+.about-hero-inner {
+  max-width: 800px;
+  margin: 0 auto;
+  text-align: center;
+  position: relative;
+  z-index: 1;
+}
+
+.about-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 20px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+  margin-bottom: 1.5rem;
+  font-size: calc(0.95rem * var(--a11y-font-scale, 1));
+  font-weight: 600;
+}
+
+.about-title {
+  margin: 0;
+  font-size: calc(3rem * var(--a11y-font-scale, 1));
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  line-height: 1.2;
+  margin-bottom: 1rem;
+}
+
+.about-subtitle {
+  margin: 0 auto 2rem auto;
+  max-width: 700px;
+  color: rgba(255, 255, 255, 0.95);
+  font-size: calc(1.25rem * var(--a11y-font-scale, 1));
+  line-height: 1.7;
+}
+
+/* CTA BUTTONS */
+.about-cta {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+
+.about-btn {
+  border: none;
+  border-radius: 14px;
+  padding: 1rem 2rem;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: calc(1.05rem * var(--a11y-font-scale, 1));
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.about-btn.primary {
+  background: #ffffff;
+  color: var(--primary-blue);
+}
+
+.about-btn.secondary {
+  background: transparent;
+  color: #ffffff;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  box-shadow: none;
+}
+
+.about-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+}
+
+.about-btn.secondary:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+/* SECTIONS */
+.about-section {
+  margin: 4rem 0;
+}
+
+.section-title {
+  font-size: calc(2.2rem * var(--a11y-font-scale, 1));
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  color: var(--text-dark);
+}
+
+.section-title.centered {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+/* MISSION SECTION */
+.mission-section {
+  background: var(--bg-light);
+  border-radius: 20px;
+  padding: 3rem 2rem;
+  border: 1px solid var(--border-light);
+}
+
+.mission-content {
+  max-width: 900px;
   margin: 0 auto;
   text-align: center;
 }
 
-/* כותרת משנה */
-.about-subtitle {
-  /* 1.2rem → סקייל נגישות */
-  font-size: calc(1.2rem * var(--a11y-font-scale));
-  color: #555;
-  margin-bottom: 2rem;
+.mission-text {
+  font-size: calc(1.2rem * var(--a11y-font-scale, 1));
+  line-height: 1.8;
+  color: var(--text-muted);
+  margin: 0;
 }
 
-/* כרטיסים ראשיים */
-.cards-container {
+/* FEATURES GRID */
+.features-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 1.5rem;
-  margin-bottom: 2rem;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
 }
 
-.card {
-  border: 1px solid #ccc;
-  padding: 1.5rem;
+.feature-card {
   background: #fff;
-}
-
-.card h3 {
-  /* 1.2rem → סקייל נגישות */
-  font-size: calc(1.2rem * var(--a11y-font-scale));
-  margin-bottom: 0.5rem;
-}
-
-.card p {
-  /* 1rem → סקייל נגישות */
-  font-size: calc(1rem * var(--a11y-font-scale));
-  color: #555;
-}
-
-/* ריבוע מודגש */
-.highlight-card {
-  background-color: #003366;
-  color: #fff;
+  border-radius: 20px;
+  border: 1px solid var(--border-light);
   padding: 2rem;
-  margin: 3rem 0 2rem 0;
-  text-align: center;
+  box-shadow: 0 10px 30px rgba(0, 61, 121, 0.08);
+  transition: all 0.3s ease;
 }
 
-.highlight-card h2 {
-  /* אם תרצי שגם זה יוגדל/יקטן בצורה ברורה */
-  font-size: calc(1.6rem * var(--a11y-font-scale));
-  margin-bottom: 1rem;
+.feature-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 40px rgba(0, 61, 121, 0.15);
 }
 
-.highlight-card p {
-  /* 1.1rem → סקייל נגישות */
-  font-size: calc(1.1rem * var(--a11y-font-scale));
-  line-height: 1.6;
-}
-
-/* כרטיסים קטנים למידע נוסף */
-.mini-cards-container {
+.feature-icon {
+  width: 60px;
+  height: 60px;
+  border-radius: 16px;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 1rem;
-  margin-bottom: 2rem;
+  place-items: center;
+  background: linear-gradient(135deg, var(--primary-blue), var(--primary-blue-light));
+  color: #fff;
+  margin-bottom: 1.5rem;
+  font-size: 24px;
+  box-shadow: 0 8px 20px rgba(0, 61, 121, 0.2);
 }
 
-.mini-card {
-  border: 1px solid #ccc;
-  padding: 1rem;
+.feature-card h3 {
+  margin: 0 0 1rem 0;
+  font-size: calc(1.4rem * var(--a11y-font-scale, 1));
+  font-weight: 700;
+  color: var(--text-dark);
+}
+
+.feature-card p {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: calc(1.05rem * var(--a11y-font-scale, 1));
+  line-height: 1.7;
+}
+
+/* USE CASES */
+.use-cases-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 2rem;
+}
+
+.use-case-card {
   background: #fff;
+  border-radius: 16px;
+  border: 1px solid var(--border-light);
+  padding: 2rem;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
+  transition: all 0.3s ease;
 }
 
-.mini-card h4 {
-  /* אפשר גם פה לתת גודל ברור שמגיב לסקייל */
-  font-size: calc(1.1rem * var(--a11y-font-scale));
-  margin-bottom: 0.5rem;
+.use-case-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+  border-color: var(--accent-color);
 }
 
-.mini-card p {
-  /* 0.95rem → סקייל נגישות */
-  font-size: calc(0.95rem * var(--a11y-font-scale));
-  color: #555;
+.use-case-card h3 {
+  margin: 0 0 1rem 0;
+  font-size: calc(1.35rem * var(--a11y-font-scale, 1));
+  font-weight: 700;
+  color: var(--text-dark);
+}
+
+.use-case-card p {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: calc(1.05rem * var(--a11y-font-scale, 1));
+  line-height: 1.7;
+}
+
+/* HIGHLIGHT CTA */
+.highlight-card {
+  border-radius: 24px;
+  padding: 3rem 2rem;
+  margin: 4rem 0 2rem 0;
+  background: linear-gradient(135deg, var(--primary-blue), var(--primary-blue-light));
+  color: #fff;
+  box-shadow: 0 20px 50px rgba(0, 61, 121, 0.25);
+  position: relative;
+  overflow: hidden;
+}
+
+.highlight-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(circle at 80% 20%, rgba(59, 130, 246, 0.2), transparent 60%);
+  pointer-events: none;
+}
+
+.highlight-inner {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 2rem;
+  align-items: center;
+  max-width: 900px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 1;
+}
+
+.highlight-icon {
+  width: 80px;
+  height: 80px;
+  border-radius: 20px;
+  display: grid;
+  place-items: center;
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+  font-size: 32px;
+}
+
+.highlight-content h2 {
+  margin: 0 0 1rem 0;
+  font-size: calc(2rem * var(--a11y-font-scale, 1));
+  font-weight: 700;
+}
+
+.highlight-content p {
+  margin: 0 0 1.5rem 0;
+  color: rgba(255, 255, 255, 0.95);
+  font-size: calc(1.15rem * var(--a11y-font-scale, 1));
+  line-height: 1.7;
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+  .about-page {
+    padding: 1.5rem 1rem;
+  }
+
+  .about-hero {
+    padding: 2rem 1.5rem;
+    margin-bottom: 2rem;
+  }
+
+  .about-title {
+    font-size: calc(2rem * var(--a11y-font-scale, 1));
+  }
+
+  .about-subtitle {
+    font-size: calc(1.1rem * var(--a11y-font-scale, 1));
+  }
+
+  .section-title {
+    font-size: calc(1.8rem * var(--a11y-font-scale, 1));
+  }
+
+  .features-grid,
+  .use-cases-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .steps-container {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .highlight-inner {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    text-align: center;
+  }
+
+  .highlight-icon {
+    margin: 0 auto;
+  }
+
+  .mission-section {
+    padding: 2rem 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .about-title {
+    font-size: calc(1.75rem * var(--a11y-font-scale, 1));
+  }
+
+  .about-cta {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .about-btn {
+    width: 100%;
+  }
+}
+
+/* RTL SUPPORT */
+[dir="rtl"] .about-page {
+  direction: rtl;
+}
+
+[dir="rtl"] .about-badge,
+[dir="rtl"] .about-cta {
+  flex-direction: row-reverse;
 }

@@ -96,8 +96,8 @@ export default function GroupSettingsPage() {
   // state פנימי ל-id של הקבוצה
   const [groupId, setGroupId] = useState(navGroupId);
   const [slugResolved, setSlugResolved] = useState(!!navGroupId); // האם ניסינו לפתור slug ל-id
-const requests = useSelector((state) => selectCandidateRequestsForGroup(state, groupId));
-const pendingCount = requests.filter(r => r.status === 'pending').length;
+  const requests = useSelector((state) => selectCandidateRequestsForGroup(state, groupId));
+  const pendingCount = requests.filter(r => r.status === 'pending').length;
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -272,7 +272,7 @@ const pendingCount = requests.filter(r => r.status === 'pending').length;
       group?.createdBy &&
       userEmail &&
       String(group.createdBy).trim().toLowerCase() ===
-        String(userEmail).trim().toLowerCase();
+      String(userEmail).trim().toLowerCase();
 
     const byId =
       group?.createdById &&
@@ -285,7 +285,7 @@ const pendingCount = requests.filter(r => r.status === 'pending').length;
       lastName &&
       !String(group.createdBy).includes('@') &&
       String(group.createdBy).trim().toLowerCase() ===
-        `${firstName} ${lastName}`.trim().toLowerCase();
+      `${firstName} ${lastName}`.trim().toLowerCase();
 
     return !!(byEmail || byId || byFullName);
   }, [group, userEmail, userId, firstName, lastName]);
@@ -463,44 +463,88 @@ const pendingCount = requests.filter(r => r.status === 'pending').length;
         name === 'maxWinners'
           ? Number(value)
           : type === 'checkbox'
-          ? checked
-          : value,
+            ? checked
+            : value,
     }));
   };
+
+  const toIsoFromDateInput = (s) => {
+    if (!s) return null;
+    // תאריך מקומי כדי שלא יזוז בגלל UTC
+    return new Date(`${s}T00:00:00`).toISOString();
+  };
+
 
   const onSaveGroup = async (e) => {
     e.preventDefault();
 
-    const groupEnd = form.endDate ? new Date(form.endDate) : null;
+    // ערכי מקור להשוואה (כדי שלא נשלח תאריכים אם לא נגעת בהם)
+    const orig = {
+      name: (group?.name || '').trim(),
+      description: (group?.description || '').trim(),
+      symbol: (group?.symbol || '').trim(),
+      maxWinners: Number(group?.maxWinners ?? 1),
+      isLocked: !!group?.isLocked,
+      endDate: toLocalDateInputValue(group?.endDate), // YYYY-MM-DD או ''
+      candidateEndDate: toLocalDateInputValue(group?.candidateEndDate),
+    };
+
+    // בדיקה: candidateEndDate לא אחרי endDate (רק אם שניהם קיימים בפורם)
+    const groupEnd = form.endDate ? new Date(`${form.endDate}T00:00:00`) : null;
     const candEnd = form.candidateEndDate
-      ? new Date(form.candidateEndDate)
+      ? new Date(`${form.candidateEndDate}T00:00:00`)
       : null;
 
     if (groupEnd && candEnd && candEnd > groupEnd) {
       toast.error(t('groups.create.errors.candidateAfterGroup'));
-      return; // מונע שליחת הבקשה לשרת
+      return;
     }
 
-    const patch = {
-      name: form.name.trim(),
-      description: form.description.trim(),
-      symbol: (form.symbol || '').trim(),
-      maxWinners: Number(form.maxWinners) || 1,
-      isLocked: !!form.isLocked,
-      ...(form.endDate
-        ? { endDate: new Date(form.endDate).toISOString() }
-        : {}),
-      ...(form.candidateEndDate
-        ? { candidateEndDate: new Date(form.candidateEndDate).toISOString() }
-        : {}),
-    };
+    // ✅ שולחים רק מה שהשתנה
+    const patch = {};
 
-    await dispatch(updateGroup({ groupId, patch })).unwrap();
-    setEditMode(false);
-    if (patch.isLocked) dispatch(fetchJoinRequests(groupId));
-    dispatch(fetchGroupWithMembers(groupId));
-    dispatch(fetchVotersByGroup(groupId));
+    const nextName = (form.name || '').trim();
+    const nextDesc = (form.description || '').trim();
+    const nextSymbol = (form.symbol || '').trim();
+    const nextMax = Number(form.maxWinners) || 1;
+    const nextLocked = !!form.isLocked;
+
+    if (nextName !== orig.name) patch.name = nextName;
+    if (nextDesc !== orig.description) patch.description = nextDesc;
+    if (nextSymbol !== orig.symbol) patch.symbol = nextSymbol;
+    if (nextMax !== orig.maxWinners) patch.maxWinners = nextMax;
+    if (nextLocked !== orig.isLocked) patch.isLocked = nextLocked;
+
+    // תאריכים: רק אם השתנו בפועל
+    if ((form.endDate || '') !== (orig.endDate || '')) {
+      patch.endDate = form.endDate ? toIsoFromDateInput(form.endDate) : null;
+    }
+
+    if ((form.candidateEndDate || '') !== (orig.candidateEndDate || '')) {
+      patch.candidateEndDate = form.candidateEndDate
+        ? toIsoFromDateInput(form.candidateEndDate)
+        : null;
+    }
+
+    // אם אין מה לשמור
+    if (Object.keys(patch).length === 0) {
+      toast(t('common.nothingToSave'));
+      setEditMode(false);
+      return;
+    }
+
+    try {
+      await dispatch(updateGroup({ groupId, patch })).unwrap();
+      setEditMode(false);
+
+      if (patch.isLocked) dispatch(fetchJoinRequests(groupId));
+      dispatch(fetchGroupWithMembers(groupId));
+      dispatch(fetchVotersByGroup(groupId));
+    } catch (err) {
+      console.error('updateGroup failed:', err);
+    }
   };
+
 
   const onCancelEdit = () => {
     setEditMode(false);
@@ -720,40 +764,40 @@ const pendingCount = requests.filter(r => r.status === 'pending').length;
 
   return (
     <div className="gs-wrap">
-    <div className="gs-header clean-header">
-  {/* כותרת מרכזית */}
-  <div className="header-title">
-    <h2>{group.name}</h2>
-    {/* <p>{group.description}</p> */}
-  </div>
+      <div className="gs-header clean-header">
+        {/* כותרת מרכזית */}
+        <div className="header-title">
+          <h2>{group.name}</h2>
+          {/* <p>{group.description}</p> */}
+        </div>
 
-  {/* כפתורים */}
-  <div className="icon-btn-container">
-    <p className="group-description" title={group.description}>
-  {group.description}
-</p>
+        {/* כפתורים */}
+        <div className="icon-btn-container">
+          <p className="group-description" title={group.description}>
+            {group.description}
+          </p>
 
-    <button
-      className="icon-btn"
-      onClick={() =>
-        navigate(`/groups/${slug}`, {
-          state: { groupId },
-        })
-      }
-      title={t('groupSettings.header.detailsTooltip')}
-    >
-      <FaInfoCircle size={24} />
-    </button>
+          <button
+            className="icon-btn"
+            onClick={() =>
+              navigate(`/groups/${slug}`, {
+                state: { groupId },
+              })
+            }
+            title={t('groupSettings.header.detailsTooltip')}
+          >
+            <FaInfoCircle size={24} />
+          </button>
 
-    <button
-      className="icon-btn"
-      onClick={() => navigate('/groups')}
-      title={t('groupSettings.header.backTooltip')}
-    >
-      <BiArrowBack size={24} />
-    </button>
-  </div>
-</div>
+          <button
+            className="icon-btn"
+            onClick={() => navigate('/groups')}
+            title={t('groupSettings.header.backTooltip')}
+          >
+            <BiArrowBack size={24} />
+          </button>
+        </div>
+      </div>
 
 
       {/* layout: תוכן משמאל + סיידבר מימין */}
@@ -848,63 +892,63 @@ const pendingCount = requests.filter(r => r.status === 'pending').length;
         {/* סיידבר הניווט מימין */}
         <aside className="gs-sidebar-tabs">
           <button
-    className={`side-tab ${activeTab === 'general' ? 'active' : ''}`}
-    onClick={() => setActiveTab('general')}
-  >
-    <FaInfoCircle style={{ marginInlineEnd: 6 }} />
-    {t('groupSettings.sidebar.general')}
-  </button>
+            className={`side-tab ${activeTab === 'general' ? 'active' : ''}`}
+            onClick={() => setActiveTab('general')}
+          >
+            <FaInfoCircle style={{ marginInlineEnd: 6 }} />
+            {t('groupSettings.sidebar.general')}
+          </button>
 
           {/* Candidates */}
 
-<button
-  className={`side-tab ${activeTab === 'candidates' ? 'active' : ''}`}
-  onClick={() => setActiveTab('candidates')}
->
-  <FaUserPlus style={{ marginInlineEnd: 6 }} />
-  {t('groupSettings.sidebar.candidates')}
- {pendingCount > 0 && (
-  <span className="join-requests-count">{pendingCount}</span>
-)}
+          <button
+            className={`side-tab ${activeTab === 'candidates' ? 'active' : ''}`}
+            onClick={() => setActiveTab('candidates')}
+          >
+            <FaUserPlus style={{ marginInlineEnd: 6 }} />
+            {t('groupSettings.sidebar.candidates')}
+            {pendingCount > 0 && (
+              <span className="join-requests-count">{pendingCount}</span>
+            )}
 
-</button>
+          </button>
 
 
 
-  {/* Voters */}
-  <button
-    className={`side-tab ${activeTab === 'voters' ? 'active' : ''}`}
-    onClick={() => setActiveTab('voters')}
-  >
-    <FaUserCheck style={{ marginInlineEnd: 6 }} />
-    {t('groupSettings.sidebar.voters')}
-    {voters.length > 0 && (
-      <span className="join-requests-count1">{voters.length}</span>
-    )}
-  </button>
+          {/* Voters */}
+          <button
+            className={`side-tab ${activeTab === 'voters' ? 'active' : ''}`}
+            onClick={() => setActiveTab('voters')}
+          >
+            <FaUserCheck style={{ marginInlineEnd: 6 }} />
+            {t('groupSettings.sidebar.voters')}
+            {voters.length > 0 && (
+              <span className="join-requests-count1">{voters.length}</span>
+            )}
+          </button>
 
-  {/* Members */}
-  {group.isLocked && (
-    <button
-      className={`side-tab ${activeTab === 'members' ? 'active' : ''}`}
-      onClick={() => setActiveTab('members')}
-    >
-      <FaUsers style={{ marginInlineEnd: 6 }} />
-      {t('groupSettings.sidebar.members')}
-      {reqs.length > 0 && (
-        <span className="join-requests-count">{reqs.length}</span>
-      )}
-    </button>
-  )}
+          {/* Members */}
+          {group.isLocked && (
+            <button
+              className={`side-tab ${activeTab === 'members' ? 'active' : ''}`}
+              onClick={() => setActiveTab('members')}
+            >
+              <FaUsers style={{ marginInlineEnd: 6 }} />
+              {t('groupSettings.sidebar.members')}
+              {reqs.length > 0 && (
+                <span className="join-requests-count">{reqs.length}</span>
+              )}
+            </button>
+          )}
 
-  {/* Danger */}
-  <button
-    className={`side-tab danger ${activeTab === 'danger' ? 'active' : ''}`}
-    onClick={() => setActiveTab('danger')}
-  >
-    <FaExclamationTriangle style={{ marginInlineEnd: 6 }} />
-    {t('groupSettings.sidebar.danger')}
-  </button>
+          {/* Danger */}
+          <button
+            className={`side-tab danger ${activeTab === 'danger' ? 'active' : ''}`}
+            onClick={() => setActiveTab('danger')}
+          >
+            <FaExclamationTriangle style={{ marginInlineEnd: 6 }} />
+            {t('groupSettings.sidebar.danger')}
+          </button>
         </aside>
       </div>
 
@@ -940,11 +984,11 @@ const pendingCount = requests.filter(r => r.status === 'pending').length;
         message={
           selectedMember
             ? t('groupSettings.removeMemberConfirm', {
-                name:
-                  selectedMember.member.name ||
-                  selectedMember.member.email ||
-                  selectedMember.memberId,
-              })
+              name:
+                selectedMember.member.name ||
+                selectedMember.member.email ||
+                selectedMember.memberId,
+            })
             : ''
         }
         onConfirm={confirmDelete}
@@ -957,11 +1001,11 @@ const pendingCount = requests.filter(r => r.status === 'pending').length;
         message={
           selectedCandidate
             ? t('groupSettings.deleteCandidateConfirm', {
-                name:
-                  selectedCandidate.name ||
-                  selectedCandidate.symbol ||
-                  t('common.noName'),
-              })
+              name:
+                selectedCandidate.name ||
+                selectedCandidate.symbol ||
+                t('common.noName'),
+            })
             : ''
         }
         onConfirm={confirmDeleteCandidate}

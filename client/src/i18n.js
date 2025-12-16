@@ -881,7 +881,72 @@ i18n
                     'campaign.comments.anonymousUser': 'משתמש',
                     'campaign.comments.deleteButtonTitle': 'מחק תגובה',
 
+                    'common.nothingToSave': 'אין שינויים לשמירה',
 
+                    "about": {
+                        "hero": {
+                            "badge": "פלטפורמת בחירות דיגיטלית",
+                            "title": "בחירות דמוקרטיות, פשוטות ונגישות לכולם",
+                            "subtitle": "פלטפורמה מקיפה לניהול בחירות אונליין - מנציגות כיתה ועד ועדי עובדים. כל מה שצריך למען תהליך בחירות שקוף, מאובטח ודמוקרטי.",
+                            "ctaPrimary": "התחל עכשיו",
+                            "ctaSecondary": "צור קבוצת בחירות"
+                        },
+                        "mission": {
+                            "title": "המשימה שלנו",
+                            "text": "אנחנו מאמינים שכל בחירות, בין אם זה נציגות כיתה או ועד עובדים, ראויה לתהליך דמוקרטי, שקוף ומאובטח. הפלטפורמה שלנו מאפשרת לכל ארגון, קהילה או קבוצה לנהל בחירות באופן מקצועי וידידותי, תוך שמירה על פרטיות המצביעים והגינות התהליך. בנוסף, אנחנו תורמים לסביבה ירוקה יותר על ידי הפחתת השימוש בנייר ובמשאבים פיזיים."
+                        },
+                        "features": {
+                            "sectionTitle": "למה לבחור בנו?",
+                            "democratic": {
+                                "title": "דמוקרטיה אמיתית",
+                                "desc": "כל אחד יכול להצביע במי שהוא רוצה, בחשאיות מלאה. התוצאות מוצגות רק בסיום הבחירות כדי למנוע השפעה על המצביעים."
+                            },
+                            "privacy": {
+                                "title": "פרטיות מלאה",
+                                "desc": "אף אחד לא יודע מי בחר במי. גם כמות הקולות לא מוצגת במהלך הבחירות, רק בסיום - כדי לשמור על הגינות ולמנוע שכנוע."
+                            },
+                            "groups": {
+                                "title": "קבוצות סגורות ופתוחות",
+                                "desc": "אפשרות ליצור קבוצות סגורות עם בקשות הצטרפות מאושרות על ידי המנהל, או קבוצות פתוחות לכולם. אתם בשליטה מלאה."
+                            },
+                            "campaigns": {
+                                "title": "קמפיינים דיגיטליים",
+                                "desc": "כל מועמד יכול ליצור קמפיין משלו, להעלות תוכן, לשכנע ולהציג את עצמו בצורה הטובה ביותר."
+                            },
+                            "secure": {
+                                "title": "מאובטח ואמין",
+                                "desc": "מערכת מאובטחת ואמינה שמבטיחה שכל קול נספר ושהתוצאות אמיתיות. אפשרות להגדיר מספר מקומות של מנצחים (ראשון, שני, שלישי וכו')."
+                            },
+                            "green": {
+                                "title": "ידידותי לסביבה",
+                                "desc": "בחירות אונליין פירושן פחות נייר, פחות הדפסות ופחות פסולת. תרומה קטנה אך חשובה לסביבה הירוקה שלנו."
+                            }
+                        },
+                        "useCases": {
+                            "sectionTitle": "למי זה מתאים?",
+                            "student": {
+                                "title": "בתי ספר וכיתות",
+                                "desc": "נציגות כיתה, מועצת תלמידים, או כל בחירות בבית הספר - בצורה פשוטה ומהנה."
+                            },
+                            "workplace": {
+                                "title": "ועדי עובדים",
+                                "desc": "בחירות לועד עובדים, נציגי עובדים, או כל תפקיד ארגוני - בצורה מקצועית ומאובטחת."
+                            },
+                            "community": {
+                                "title": "קהילות וארגונים",
+                                "desc": "ועדי בתים, ארגונים התנדבותיים, קבוצות חברתיות - כל קהילה יכולה לנהל בחירות דמוקרטיות."
+                            },
+                            "organization": {
+                                "title": "כל סוג בחירות",
+                                "desc": "מבחירות רציניות ועד בחירות קטנות ופרטיות - הפלטפורמה שלנו מתאימה לכולם."
+                            }
+                        },
+                        "cta": {
+                            "title": "מוכנים להתחיל?",
+                            "desc": "הצטרפו אלינו והפכו את הבחירות הבאות שלכם לחוויה דיגיטלית, דמוקרטית ומקצועית.",
+                            "button": "צור קבוצת בחירות עכשיו"
+                        }
+                    }
                 },
             },
             en: {
@@ -1741,8 +1806,71 @@ i18n
                     'campaign.comments.anonymousUser': 'User',
                     'campaign.comments.deleteButtonTitle': 'Delete comment',
 
-
-
+                    'common.nothingToSave': 'No changes to save',
+                    "about": {
+                        "hero": {
+                            "badge": "Digital Election Platform",
+                            "title": "Democratic, Simple, and Accessible Elections for Everyone",
+                            "subtitle": "A comprehensive platform for managing online elections - from class representatives to employee committees. Everything you need for a transparent, secure, and democratic election process.",
+                            "ctaPrimary": "Get Started",
+                            "ctaSecondary": "Create Election Group"
+                        },
+                        "mission": {
+                            "title": "Our Mission",
+                            "text": "We believe that every election, whether it's a class representative or an employee committee, deserves a democratic, transparent, and secure process. Our platform enables any organization, community, or group to manage elections professionally and user-friendly, while maintaining voter privacy and process integrity. Additionally, we contribute to a greener environment by reducing the use of paper and physical resources."
+                        },
+                        "features": {
+                            "sectionTitle": "Why Choose Us?",
+                            "democratic": {
+                                "title": "True Democracy",
+                                "desc": "Everyone can vote for whoever they want, with complete confidentiality. Results are displayed only after the election ends to prevent influencing voters."
+                            },
+                            "privacy": {
+                                "title": "Complete Privacy",
+                                "desc": "No one knows who voted for whom. Vote counts aren't displayed during the election, only at the end - to maintain fairness and prevent persuasion."
+                            },
+                            "groups": {
+                                "title": "Private & Public Groups",
+                                "desc": "Option to create private groups with admin-approved join requests, or public groups open to everyone. You're in full control."
+                            },
+                            "campaigns": {
+                                "title": "Digital Campaigns",
+                                "desc": "Each candidate can create their own campaign, upload content, persuade, and present themselves in the best way possible."
+                            },
+                            "secure": {
+                                "title": "Secure & Reliable",
+                                "desc": "A secure and reliable system that ensures every vote counts and results are genuine. Option to define multiple winner positions (first, second, third, etc.)."
+                            },
+                            "green": {
+                                "title": "Environmentally Friendly",
+                                "desc": "Online elections mean less paper, fewer printouts, and less waste. A small but important contribution to our green environment."
+                            }
+                        },
+                        "useCases": {
+                            "sectionTitle": "Who Is This For?",
+                            "student": {
+                                "title": "Schools & Classes",
+                                "desc": "Class representatives, student council, or any school elections - in a simple and fun way."
+                            },
+                            "workplace": {
+                                "title": "Employee Committees",
+                                "desc": "Elections for employee committees, employee representatives, or any organizational role - professionally and securely."
+                            },
+                            "community": {
+                                "title": "Communities & Organizations",
+                                "desc": "Building committees, volunteer organizations, social groups - any community can manage democratic elections."
+                            },
+                            "organization": {
+                                "title": "Any Type of Election",
+                                "desc": "From serious elections to small private ones - our platform fits everyone."
+                            }
+                        },
+                        "cta": {
+                            "title": "Ready to Start?",
+                            "desc": "Join us and turn your next elections into a digital, democratic, and professional experience.",
+                            "button": "Create Election Group Now"
+                        }
+                    }
                 },
             },
         },

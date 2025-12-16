@@ -21,7 +21,22 @@ export default function GeneralTab({
   const { t } = useTranslation();
 
   // תאריך של היום בפורמט YYYY-MM-DD כדי להשתמש בו ב-min
-  const todayStr = new Date().toISOString().slice(0, 10);
+  // const todayStr = new Date().toISOString().slice(0, 10);
+
+  // היום בפורמט YYYY-MM-DD לפי אזור זמן מקומי
+  const todayStr = (() => {
+    const d = new Date();
+    d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
+    return d.toISOString().slice(0, 10);
+  })();
+
+  const minCandidateEnd = (form.candidateEndDate && form.candidateEndDate < todayStr)
+    ? form.candidateEndDate
+    : todayStr;
+
+  const minGroupEnd = (form.endDate && form.endDate < todayStr)
+    ? form.endDate
+    : todayStr;
 
   return (
     <section className="card">
@@ -189,7 +204,7 @@ export default function GeneralTab({
             <div>
               <label>{t('groups.create.labels.candidateEndDate')}</label>
               <input
-                min={todayStr}
+                min={minCandidateEnd}
                 className="input"
                 name="candidateEndDate"
                 type="date"
@@ -207,7 +222,7 @@ export default function GeneralTab({
                 type="date"
                 value={form.endDate}
                 onChange={onGroupChange}
-                min={todayStr}
+                min={minGroupEnd}
               />
             </div>
           </div>
