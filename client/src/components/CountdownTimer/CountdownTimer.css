@@ -1,35 +1,85 @@
+/* =======================
+   Countdown – בסיס (Mobile first)
+======================= */
 .countdown-row {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;              /* היה 14 — צומצם משמעותית */
+  gap: 4px;
   font-family: 'Rubik', sans-serif;
   direction: rtl;
+  flex-wrap: nowrap; /* שלא ישבר שורה */
 }
 
 .countdown-item {
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin: 0 2px;         /* חדש — מקטין עוד רווח פנימי */
+  margin: 0 1px;
 }
 
 .count-number {
-  font-size: calc(15px * var(--a11y-font-scale));
+  font-size: calc(14px * var(--a11y-font-scale));
   font-weight: 700;
   color: #023466;
-  margin: 0;             /* שלא יתווסף רווח דיפולטי */
+  line-height: 1;
+  margin: 0;
 }
 
 .count-label {
-  font-size: calc(11px * var(--a11y-font-scale));
+  font-size: calc(10px * var(--a11y-font-scale));
   color: #023466;
-  margin-top: 0px;       /* היה 2 — עכשיו צמוד יותר */
+  line-height: 1;
+  margin-top: 1px;
 }
 
 .count-sep {
-  font-size: calc(15px * var(--a11y-font-scale));
+  font-size: calc(14px * var(--a11y-font-scale));
   font-weight: 700;
   color: #023466;
-  margin: 0 2px;         /* היה 6 — צמוד הרבה יותר */
+  margin: 0 2px;
+}
+
+
+/* =======================
+   טאבלט
+======================= */
+@media (min-width: 600px) {
+
+
+  .count-number {
+    font-size: calc(16px * var(--a11y-font-scale));
+  }
+
+  .count-label {
+    font-size: calc(11px * var(--a11y-font-scale));
+  }
+
+  .count-sep {
+    font-size: calc(16px * var(--a11y-font-scale));
+    margin: 0 4px;
+  }
+}
+
+
+/* =======================
+   מחשב
+======================= */
+@media (min-width: 1024px) {
+  .countdown-row {
+    gap: 12px;
+  }
+
+  .count-number {
+    font-size: calc(18px * var(--a11y-font-scale));
+  }
+
+  .count-label {
+    font-size: calc(12px * var(--a11y-font-scale));
+  }
+
+  .count-sep {
+    font-size: calc(18px * var(--a11y-font-scale));
+    margin: 0 6px;
+  }
 }
