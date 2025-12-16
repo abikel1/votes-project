@@ -6,7 +6,11 @@ export default function TourButton() {
   const { setIsOpen } = useTour();
 
   return (
-    <button className="tour-btn-small" onClick={() => setIsOpen(true)}>
+    <button
+      className="tour-btn-small"
+      onClick={() => setIsOpen(true)}
+      title="מדריך למשתמש" // כאן הטולטיפ
+    >
       <HelpCircle className="tour-icon" />
     </button>
   );

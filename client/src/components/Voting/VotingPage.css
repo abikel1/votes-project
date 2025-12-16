@@ -1,3 +1,6 @@
+/* =======================
+   משתני בסיס
+======================= */
 :root {
   --brand: #0d47a1;
   --brand-700: #0b3b88;
@@ -9,17 +12,25 @@
   --slip-bg: #f8fafc;
   --envelope-bg: #87ceeb;
   --ballot-bg: #4a5568;
+  --a11y-font-scale: 1;
 }
 
+/* =======================
+   מעטפת עמוד
+======================= */
 .vd-wrap {
   direction: rtl;
   max-width: 1400px;
-  margin: 0 auto;
-  padding: 24px 16px 32px;
+  margin: 0 ;
+  padding: 24px clamp(16px, 4vw, 50px) 32px;
   color: var(--text);
   min-height: 100vh;
 }
 
+
+/* =======================
+   כותרת
+======================= */
 .vd-header {
   text-align: center;
   margin-bottom: 32px;
@@ -29,7 +40,7 @@
 
 .vd-header h2 {
   margin: 0 0 8px;
-  font-size: calc(32px * var(--a11y-font-scale));;
+  font-size: calc(32px * var(--a11y-font-scale));
   font-weight: 700;
   color: var(--brand);
 }
@@ -40,14 +51,19 @@
   font-weight: 500;
 }
 
+/* =======================
+   פריסת תוכן ראשית
+======================= */
 .vd-container {
   display: grid;
   grid-template-columns: 1fr 350px;
   gap: 20px;
   align-items: start;
-  /* max-height: calc(100vh - 200px); */
 }
 
+/* =======================
+   אזור פתקים
+======================= */
 .vd-slips-area {
   display: flex;
   flex-direction: column;
@@ -62,332 +78,23 @@
   color: var(--text);
 }
 
-@keyframes pulseRing {
-
-  0%,
-  100% {
-    transform: scale(1);
-    opacity: 0.6;
-  }
-
-  50% {
-    transform: scale(1.1);
-    opacity: 0.8;
-  }
-}
-
-.vd-voting-area {
-  position: sticky;
-  top: 24px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 16px;
-  padding: 24px;
-  background: var(--card);
-  /* border-radius: 4px; */
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
-}
-
-.vd-envelope {
-  position: relative;
-  width: 240px;
-  height: 150px;
-  background: linear-gradient(135deg, #b8dce8 0%, #87ceeb 100%);
-  /* border-radius: 0; */
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.3s ease;
-  box-shadow:
-    0 8px 20px rgba(0, 0, 0, 0.25),
-    inset 0 -2px 4px rgba(0, 0, 0, 0.1),
-    inset 0 2px 4px rgba(255, 255, 255, 0.3);
-  cursor: grab;
-  border: 1px solid #6eb4d1;
-}
-
-.vd-envelope::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background: linear-gradient(90deg, transparent, rgba(0, 0, 0, 0.15) 50%, transparent);
-}
-
-.vd-envelope:active {
-  cursor: grabbing;
-}
-
-.vd-envelope-flap {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 50%;
-  background: linear-gradient(180deg, #6eb4d1 0%, var(--envelope-bg) 100%);
-  clip-path: polygon(0 0, 50% 60%, 100% 0);
-  /* border-radius: 2px 2px 0 0; */
-  transition: transform 0.3s ease;
-  z-index: 2;
-}
-
-.vd-envelope-full .vd-envelope-flap {
-  transform: rotateX(-20deg);
-  transform-origin: top;
-}
-
-.vd-envelope-voted {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-.vd-envelope-label {
-  font-size: calc(16px * var(--a11y-font-scale));
-  font-weight: 600;
-  color: #fff;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
-  z-index: 1;
-}
-
-.vd-slip-in-envelope {
-  position: relative;
-  width: 100px;
-  height: 70px;
-  background: #fff;
-  border: 2px solid var(--line);
-  /* border-radius: 2px; */
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  z-index: 1;
-}
-
-.vd-slip-symbol-small {
-  font-size: calc(24px * var(--a11y-font-scale));
-  font-weight: 700;
-  color: var(--brand);
-}
-
-.vd-arrow {
-  font-size: calc(40px * var(--a11y-font-scale));
-  color: var(--brand);
-  animation: bounce 2s infinite;
-}
-
-@keyframes bounce {
-
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-
-  50% {
-    transform: translateY(8px);
-  }
-}
-
-.vd-ballot {
-  position: relative;
-  width: 240px;
-  height: 200px;
-  /* border-radius: 0; */
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  background: linear-gradient(160deg, #1e3a8a 0%, #0d47a1 50%, #0a2e73 100%);
-  box-shadow:
-    0 12px 30px rgba(0, 0, 0, 0.4),
-    inset 0 -3px 8px rgba(0, 0, 0, 0.3),
-    inset 0 3px 8px rgba(255, 255, 255, 0.1);
-  /* border-radius: 2px; */
-  transition: all 0.3s ease;
-  transform-style: preserve-3d;
-  perspective: 1000px;
-}
-
-.vd-ballot-slot {
-  width: 180px;
-  height: 14px;
-  background: linear-gradient(180deg, #0a0f14 0%, #1a202c 100%);
-  /* border-radius: 2px; */
-  box-shadow:
-    inset 0 3px 6px rgba(0, 0, 0, 0.6),
-    inset 0 -1px 2px rgba(255, 255, 255, 0.05);
-  border: 1px solid #0a0f14;
-  position: relative;
-}
-
-.vd-ballot-slot::before {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 4px;
-  right: 4px;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1) 50%, transparent);
-}
-
-.vd-ballot-label {
-  font-size: calc(14px * var(--a11y-font-scale));
-  font-weight: 600;
-  color: #fff;
-  text-align: center;
-}
-
-.vd-ballot-voted {
-  background: linear-gradient(180deg, #1b5e20 0%, #2e7d32 100%);
-  cursor: not-allowed;
-}
-
-.vd-envelope-dragging {
-  position: fixed;
-  width: 240px;
-  height: 150px;
-  background: linear-gradient(135deg, var(--envelope-bg) 0%, #6eb4d1 100%);
-  /* border-radius: 2px; */
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
-  z-index: 9999;
-  opacity: 0.95;
-  pointer-events: none;
-  transform: rotate(-2deg);
-}
-
-.vd-envelope-dragging .vd-envelope-flap {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 50%;
-  background: linear-gradient(180deg, #6eb4d1 0%, var(--envelope-bg) 100%);
-  clip-path: polygon(0 0, 50% 60%, 100% 0);
-  /* border-radius: 2px 2px 0 0; */
-  transform: rotateX(-20deg);
-  transform-origin: top;
-  z-index: 2;
-}
-
-.vd-envelope-dragging .vd-slip-in-envelope {
-  position: relative;
-  width: 100px;
-  height: 70px;
-  background: #fff;
-  border: 2px solid var(--line);
-  /* border-radius: 2px; */
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  z-index: 1;
-}
-
-/*  */
-
-
-@keyframes slideIn {
-  from {
-    opacity: 0;
-    transform: translateY(-20px) scale(0.95);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-
-.vd-modal-close {
-  position: absolute;
-  top: 16px;
-  left: 16px;
-  background: transparent;
-  border: none;
-  font-size: calc(28px * var(--a11y-font-scale));
-  color: var(--muted);
-  cursor: pointer;
-  width: 36px;
-  height: 36px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s ease;
-}
-
-
-
-.vd-select-button {
-  background: var(--brand);
-  color: white;
-  border: none;
-  padding: 12px 24px;
-  font-size: calc(16px * var(--a11y-font-scale));
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  margin-bottom: 16px;
-}
-
-.vd-select-button:hover {
-  background: var(--brand-700);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(13, 71, 161, 0.3);
-}
-
-.vd-error {
-  color: #c62828;
-  background: #fde8e8;
-  border: 1px solid #f8c7c7;
-  padding: 16px;
-  /* border-radius: 12px; */
-  text-align: center;
-}
-
-.vd-empty {
-  color: var(--muted);
-  background: var(--bg);
-  border: 2px dashed var(--line);
-  padding: 32px;
-  /* border-radius: 12px; */
-  text-align: center;
-  font-size: calc(18px * var(--a11y-font-scale));
-}
-
-.vd-back-button {
-  background: none;
-  border: none;
-  color: #007bff;
-  font-size: calc(14px * var(--a11y-font-scale));
-  cursor: pointer;
-  margin-bottom: 8px;
-  padding: 0;
-}
-
-.vd-back-button:hover {
-  text-decoration: underline;
-}
-
 .vd-slips-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
   gap: 12px;
   width: 100%;
+  /* margin: 0 auto; */
   background: #003366;
   overflow-y: auto;
-  max-height: 100%;
+  /* max-height: calc(100vh - 100px); */
   padding: 12px;
 }
 
+/* =======================
+   פתק בודד
+======================= */
 .vd-slip,
 .vd-slip-empty {
-  aspect-ratio: 3 / 4;
   background: #fff;
   border: 1px solid #ccc;
   display: flex;
@@ -399,6 +106,8 @@
   position: relative;
   transition: all 0.2s ease;
   cursor: grab;
+  min-height: 200px;
+  height: auto;
 }
 
 .vd-slip:hover {
@@ -449,14 +158,11 @@
   display: inline-block;
   background: #dbeafe;
   color: #1e40af;
-  padding: 3px 8px;
+  padding: 2px 6px;
   margin: 4px 0;
   font-weight: 600;
-  font-size: calc(1px * var(--a11y-font-scale));
-  border: 1px solid #93c5fd;
-
   font-size: calc(25px * var(--a11y-font-scale));
-  padding: 2px 6px;
+  border: 1px solid #93c5fd;
 }
 
 .vd-slip-desc {
@@ -497,28 +203,479 @@
   pointer-events: none;
 }
 
-/* ========== רספונסיביות למובייל ========== */
+/* =======================
+   אזור קלפי
+======================= */
+.vd-voting-area {
+  position: sticky;
+  top: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 24px;
+  background: var(--card);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+}
 
-/* טאבלטים */
+/* מעטפה */
+.vd-envelope {
+  position: relative;
+  width: 240px;
+  height: 150px;
+  background: linear-gradient(135deg, #b8dce8 0%, #87ceeb 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  box-shadow:
+    0 8px 20px rgba(0, 0, 0, 0.25),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.1),
+    inset 0 2px 4px rgba(255, 255, 255, 0.3);
+  cursor: grab;
+  border: 1px solid #6eb4d1;
+}
+
+.vd-envelope::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(0, 0, 0, 0.15) 50%, transparent);
+}
+
+.vd-envelope:active {
+  cursor: grabbing;
+}
+
+.vd-envelope-flap {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 50%;
+  background: linear-gradient(180deg, #6eb4d1 0%, var(--envelope-bg) 100%);
+  clip-path: polygon(0 0, 50% 60%, 100% 0);
+  transition: transform 0.3s ease;
+  z-index: 2;
+}
+
+.vd-envelope-full .vd-envelope-flap {
+  transform: rotateX(-20deg);
+  transform-origin: top;
+}
+
+.vd-envelope-voted {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.vd-envelope-label {
+  font-size: calc(16px * var(--a11y-font-scale));
+  font-weight: 600;
+  color: #fff;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  z-index: 1;
+}
+
+.vd-slip-in-envelope {
+  position: relative;
+  width: 100px;
+  height: 70px;
+  background: #fff;
+  border: 2px solid var(--line);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  z-index: 1;
+}
+
+.vd-slip-symbol-small {
+  font-size: calc(24px * var(--a11y-font-scale));
+  font-weight: 700;
+  color: var(--brand);
+}
+
+/* כפתור שלשול למעטפה */
+.vd-insert-button {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  /* padding: 10px 20px; */
+  color: #003366;
+  font-weight: 600;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+  transition: all 0.2s ease;
+  width: 100%;
+  max-width: 240px;
+  background: #fff;
+}
+
+.vd-insert-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.2);
+}
+
+.vd-insert-button:disabled {
+  background: #cbd5e1;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.vd-arrow {
+  font-size: calc(40px * var(--a11y-font-scale));
+  color: var(--brand);
+  animation: bounce 2s infinite;
+  display: inline-block;
+  transition: transform 0.2s ease;
+}
+
+.vd-insert-button:hover .vd-arrow {
+  transform: translateY(3px);
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(8px);
+  }
+}
+
+/* קלפי */
+.vd-ballot {
+  position: relative;
+  width: 240px;
+  height: 200px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  background: linear-gradient(160deg, #1e3a8a 0%, #0d47a1 50%, #0a2e73 100%);
+  box-shadow:
+    0 12px 30px rgba(0, 0, 0, 0.4),
+    inset 0 -3px 8px rgba(0, 0, 0, 0.3),
+    inset 0 3px 8px rgba(255, 255, 255, 0.1);
+  transition: all 0.3s ease;
+  transform-style: preserve-3d;
+  perspective: 1000px;
+}
+
+.vd-ballot-slot {
+  width: 180px;
+  height: 14px;
+  background: linear-gradient(180deg, #0a0f14 0%, #1a202c 100%);
+  box-shadow:
+    inset 0 3px 6px rgba(0, 0, 0, 0.6),
+    inset 0 -1px 2px rgba(255, 255, 255, 0.05);
+  border: 1px solid #0a0f14;
+  position: relative;
+}
+
+.vd-ballot-slot::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 4px;
+  right: 4px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1) 50%, transparent);
+}
+
+.vd-ballot-label {
+  font-size: calc(14px * var(--a11y-font-scale));
+  font-weight: 600;
+  color: #fff;
+  text-align: center;
+}
+
+.vd-ballot-voted {
+  background: linear-gradient(180deg, #1b5e20 0%, #2e7d32 100%);
+  cursor: not-allowed;
+}
+
+/* מעטפה בזמן גרירה */
+.vd-envelope-dragging {
+  position: fixed;
+  width: 240px;
+  height: 150px;
+  background: linear-gradient(135deg, var(--envelope-bg) 0%, #6eb4d1 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
+  z-index: 9999;
+  opacity: 0.95;
+  pointer-events: none;
+  transform: rotate(-2deg);
+}
+
+.vd-envelope-dragging .vd-envelope-flap {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 50%;
+  background: linear-gradient(180deg, #6eb4d1 0%, var(--envelope-bg) 100%);
+  clip-path: polygon(0 0, 50% 60%, 100% 0);
+  transform: rotateX(-20deg);
+  transform-origin: top;
+  z-index: 2;
+}
+
+.vd-envelope-dragging .vd-slip-in-envelope {
+  position: relative;
+  width: 100px;
+  height: 70px;
+  background: #fff;
+  border: 2px solid var(--line);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  z-index: 1;
+}
+
+/* =======================
+   מודל פרטי מועמד
+======================= */
+.vd-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.vd-modal {
+  background: #ffffff;
+  width: 100%;
+  height: auto;
+  max-width: 340px;
+  border-radius: 4px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  animation: slideUp 0.3s ease-out;
+  border: 1px solid #e0e0e0;
+}
+
+.vd-modal-close {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  background: none;
+  border: none;
+  font-size: calc(24px * var(--a11y-font-scale));
+  color: #888;
+  cursor: pointer;
+  z-index: 10;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.vd-modal-header {
+  padding: 30px 20px 10px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.vd-modal-symbol {
+  font-size: calc(80px * var(--a11y-font-scale));
+  font-weight: 800;
+  line-height: 1;
+  color: #003366;
+  border: 4px solid #003366;
+  padding: 10px 20px;
+  margin-bottom: 15px;
+  min-width: 120px;
+  text-align: center;
+  border-radius: 8px;
+  background-color: #fff;
+  letter-spacing: -2px;
+}
+
+.vd-modal-header h3 {
+  font-size: calc(22px * var(--a11y-font-scale));
+  font-weight: 700;
+  margin: 10px 0;
+  color: #333;
+}
+
+.vd-modal-desc {
+  padding: 0 25px 15px;
+  text-align: center;
+  font-size: calc(16px * var(--a11y-font-scale));
+  color: #666;
+  line-height: 1.5;
+}
+
+.vd-modal-photo {
+  width: 100%;
+  height: 200px;
+  overflow: hidden;
+  margin-bottom: 15px;
+}
+
+.vd-modal-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.vd-select-button {
+  background-color: #003366;
+  color: white;
+  border: none;
+  padding: 15px;
+  width: 90%;
+  font-size: calc(18px * var(--a11y-font-scale));
+  font-weight: bold;
+  border-radius: 15px;
+  cursor: pointer;
+  margin: 20px auto 30px;
+  transition: transform 0.2s, background-color 0.2s;
+  box-shadow: 0 4px 10px rgba(0, 123, 255, 0.3);
+  display: block;
+}
+
+.vd-select-button:hover {
+  background: var(--brand-700);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(13, 71, 161, 0.3);
+}
+
+.vd-select-button:active {
+  transform: scale(0.98);
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* =======================
+   הודעות שגיאה וריקות
+======================= */
+.vd-error {
+  color: #c62828;
+  background: #fde8e8;
+  border: 1px solid #f8c7c7;
+  padding: 16px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.vd-empty {
+  color: var(--muted);
+  background: var(--bg);
+  border: 2px dashed var(--line);
+  padding: 32px;
+  text-align: center;
+  font-size: calc(18px * var(--a11y-font-scale));
+}
+
+/* כפתורי פעולה */
+.vd-actions {
+  display: flex;
+  justify-content: center;
+  gap: 18px;
+  margin-top: 22px;
+}
+
+.vd-back-button {
+  background: #1e3a8a;
+  color: #ffffff;
+  padding: 10px 22px;
+  font-size: calc(16px * var(--a11y-font-scale));
+  border: none;
+  cursor: pointer;
+  transition: 0.2s ease;
+  font-weight: 500;
+  border-radius: 4px;
+}
+
+.vd-back-button:hover {
+  background: #233b96;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+.vd-back-button:active {
+  transform: translateY(0);
+  box-shadow: none;
+}
+
+.vd-link {
+  color: #1e40af;
+  text-decoration: underline;
+  font-weight: 500;
+}
+
+.vd-link:hover {
+  color: #1e3a8a;
+}
+
+/* =======================
+   רספונסיביות - טאבלט
+======================= */
 @media (max-width: 1024px) {
   .vd-container {
     grid-template-columns: 1fr;
-    max-height: none;
+    gap: 24px;
   }
 
   .vd-voting-area {
     position: static;
-    margin-bottom: 20px;
+    order: 1;
+    margin-bottom: 0;
+  }
+
+  .vd-slips-area {
+    order: 0;
   }
 
   .vd-slips-grid {
-        order: -1;
-
-    max-height: 600px;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    max-height: none;
+    overflow-y: visible;
   }
 }
 
-/* מובייל */
+/* =======================
+   רספונסיביות - מובייל
+======================= */
 @media (max-width: 768px) {
   .vd-wrap {
     padding: 16px 12px 24px;
@@ -533,16 +690,24 @@
   }
 
   .vd-container {
-    gap: 16px;
+    grid-template-columns: 1fr;
+    gap: 20px;
   }
 
+  /* אזור הקלפי - מתרחב על כל הרוחב - מופיע אחרי המועמדים */
   .vd-voting-area {
-    padding: 16px;
+    position: static;
+    order: 1;
+    padding: 20px 16px;
+    width: 100%;
+    max-width: 100%;
   }
 
+  /* מעטפה וקלפי - מתרחבים למובייל */
   .vd-envelope {
-    width: 200px;
-    height: 125px;
+    width: 100%;
+    max-width: 280px;
+    height: 140px;
   }
 
   .vd-envelope-label {
@@ -563,29 +728,44 @@
   }
 
   .vd-ballot {
-    width: 200px;
-    height: 170px;
+    width: 100%;
+    max-width: 280px;
+    height: 180px;
   }
 
   .vd-ballot-slot {
-    width: 150px;
+    width: 70%;
     height: 12px;
   }
 
   .vd-ballot-label {
     font-size: calc(13px * var(--a11y-font-scale));
-    padding: 0 8px;
+    padding: 0 12px;
+  }
+
+  .vd-insert-button {
+    width: 100%;
+    max-width: 280px;
+    padding: 12px 16px;
+    font-size: calc(16px * var(--a11y-font-scale));
+  }
+
+  /* מגש הפתקים - ללא גלילה פנימית במובייל - מועמדים לפני הקלפי */
+  .vd-slips-area {
+    order: 0;
   }
 
   .vd-slips-grid {
-    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-    gap: 8px;
-    padding: 8px;
-    max-height: 500px;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 10px;
+    padding: 12px;
+    max-height: none;
+    overflow-y: visible;
   }
 
   .vd-slip {
     padding: 10px;
+    min-height: 180px;
   }
 
   .vd-slip-photo,
@@ -593,17 +773,18 @@
     width: 50px;
     height: 50px;
     font-size: calc(24px * var(--a11y-font-scale));
+    margin-bottom: 8px;
   }
 
   .vd-slip-name {
     font-size: calc(13px * var(--a11y-font-scale));
+    margin: 4px 0;
   }
 
-  /* 
   .vd-slip-symbol {
-    font-size: 10px;
+    font-size: calc(22px * var(--a11y-font-scale));
     padding: 2px 6px;
-  } */
+  }
 
   .vd-slip-desc {
     font-size: calc(10px * var(--a11y-font-scale));
@@ -614,14 +795,19 @@
     padding: 3px 8px;
   }
 
-
   .vd-select-button {
-    padding: 10px 20px;
-    font-size: calc(14px * var(--a11y-font-scale));
+    padding: 12px 20px;
+    font-size: calc(16px * var(--a11y-font-scale));
+  }
+
+  .vd-modal-symbol {
+    font-size: calc(70px * var(--a11y-font-scale));
   }
 }
 
-/* מכשירים קטנים מאוד */
+/* =======================
+   מכשירים קטנים מאוד
+======================= */
 @media (max-width: 480px) {
   .vd-header h2 {
     font-size: calc(20px * var(--a11y-font-scale));
@@ -632,37 +818,41 @@
   }
 
   .vd-envelope {
-    width: 180px;
-    height: 110px;
+    max-width: 240px;
+    height: 120px;
   }
 
   .vd-ballot {
-    width: 180px;
-    height: 150px;
+    max-width: 240px;
+    height: 160px;
+  }
+
+  .vd-insert-button {
+    max-width: 240px;
   }
 
   .vd-slips-grid {
-    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
-    gap: 6px;
-    padding: 6px;
-    max-height: 450px;
+    grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+    gap: 8px;
+    padding: 10px;
   }
 
   .vd-slip {
     padding: 8px;
+    min-height: 160px;
   }
 
   .vd-slip-photo,
   .vd-slip-photo-placeholder {
-    width: 30px;
-    height: 30px;
+    width: 45px;
+    height: 45px;
     font-size: calc(20px * var(--a11y-font-scale));
     margin-bottom: 6px;
   }
 
   .vd-slip-name {
     font-size: calc(12px * var(--a11y-font-scale));
-    margin: 4px 0;
+    margin: 3px 0;
   }
 
   .vd-slip-symbol {
@@ -672,7 +862,7 @@
 
   .vd-slip-desc {
     font-size: calc(9px * var(--a11y-font-scale));
-    margin: 4px 0;
+    margin: 3px 0;
   }
 
   .vd-slip-votes {
@@ -685,261 +875,67 @@
     font-size: calc(28px * var(--a11y-font-scale));
   }
 
+  .vd-modal-symbol {
+    font-size: calc(60px * var(--a11y-font-scale));
+    padding: 8px 16px;
+    min-width: 100px;
+  }
+
+  .vd-modal-header h3 {
+    font-size: calc(18px * var(--a11y-font-scale));
+  }
+
+  .vd-modal-desc {
+    font-size: calc(14px * var(--a11y-font-scale));
+  }
 }
 
-/* תמיכה בנוף (landscape) במובייל */
+/* =======================
+   תמיכה בנוף (landscape) במובייל
+======================= */
 @media (max-width: 768px) and (orientation: landscape) {
   .vd-container {
-    grid-template-columns: 1fr 280px;
-    max-height: calc(100vh - 150px);
+    grid-template-columns: 1fr 300px;
   }
 
   .vd-voting-area {
-    order: 0;
+    order: 1;
     position: sticky;
     top: 16px;
   }
 
+  .vd-slips-area {
+    order: 0;
+  }
+
   .vd-slips-grid {
-    max-height: 100%;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    max-height: calc(100vh - 180px);
+    overflow-y: auto;
   }
 }
 
-/* תיבת הודעה – אדומה ועדינה */
-.vd-error {
-  background: #fde8e8;
-  border: 1px solid #f5b5b5;
-  color: #b91c1c;
-  padding: 22px;
-  /* border-radius: 12px; */
-  font-size: calc(18px * var(--a11y-font-scale));
-  line-height: 1.7;
-  margin: 30px auto;
-  text-align: center;
-  max-width: 900px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+/* =======================
+   אנימציות
+======================= */
+@keyframes pulseRing {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.6;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 0.8;
+  }
 }
 
-/* עטיפת כפתורים */
-.vd-actions {
-  display: flex;
-  justify-content: center;
-  gap: 18px;
-  margin-top: 22px;
-}
-
-/* כפתורי פעולה */
-.vd-back-button {
-  background: #1e3a8a;
-  /* כחול כהה */
-  color: #ffffff;
-  padding: 10px 22px;
-  font-size: calc(16px * var(--a11y-font-scale));
-  /* border-radius: 50px; */
-  border: none;
-  cursor: pointer;
-  transition: 0.2s ease;
-  font-weight: 500;
-}
-
-.vd-back-button:hover {
-  background: #233b96;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
-}
-
-.vd-back-button:active {
-  transform: translateY(0);
-  box-shadow: none;
-}
-
-/* לינק כחול */
-.vd-link {
-  color: #1e40af;
-  text-decoration: underline;
-  font-weight: 500;
-}
-
-.vd-link:hover {
-  color: #1e3a8a;
-}
-
-.vd-insert-button {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px; /* רווח בין הטקסט לחץ */
-  padding: 10px 20px;
-  /* background: linear-gradient(135deg, #4f46e5, #6366f1); כחול מודרני */
-  color: #003366;
-  font-weight: 600;
-  border: none;
-  border-radius: 12px;
-  cursor: pointer;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-  transition: all 0.2s ease;
-}
-
-.vd-insert-button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 14px rgba(0,0,0,0.2);
-}
-
-.vd-insert-button:disabled {
-  background: #cbd5e1; /* אפור בהיר */
-  cursor: not-allowed;
-  box-shadow: none;
-}
-
-.vd-arrow {
-  font-size: 16px;
-  display: inline-block;
-  transition: transform 0.2s ease;
-}
-
-.vd-insert-button:hover .vd-arrow {
-  transform: translateY(3px); /* אנימציה קטנה של החץ */
-}
-
-
-
-
-
-
-
-
-
-/* הרקע הכהה מאחורי המודל - עם אפקט טשטוש מודרני */
-.vd-modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.6);
-  backdrop-filter: blur(4px); /* אפקט זכוכית */
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-  padding: 20px; /* רווח מהצדדים במובייל */
-}
-
-/* המודל עצמו - מעוצב כמו פתק נייר */
-.vd-modal {
-  background: #ffffff;
-  width: 100%;
-    height: auto;
-
-  max-width: 340px; /* רוחב של פתק הצבעה סטנדרטי */
-  border-radius: 4px; /* פינות מעט עגולות אבל לא יותר מדי - לשמור על רשמיות */
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-  position: relative;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  animation: slideUp 0.3s ease-out;
-  border: 1px solid #e0e0e0;
-}
-
-/* כפתור הסגירה */
-.vd-modal-close {
-  position: absolute;
-  top: 10px;
-  right: 15px; /* או שמאל, תלוי בכיוון האפליקציה */
-  background: none;
-  border: none;
-  font-size: 24px;
-  color: #888;
-  cursor: pointer;
-  z-index: 10;
-}
-
-.vd-modal-header {
-  padding: 30px 20px 10px;
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-/* עיצוב הסמל (האותיות) - החלק הכי חשוב בפתק */
-.vd-modal-symbol {
-  font-size: 80px; /* ענק! */
-  font-weight: 800;
-  line-height: 1;
-  color: #003366; /* כחול בחירות, או שחור למראה קלאסי */
-  border: 4px solid #003366;
-  padding: 10px 20px;
-  margin-bottom: 15px;
-  min-width: 120px;
-  text-align: center;
-  border-radius: 8px;
-  background-color: #fff;
-  letter-spacing: -2px;
-}
-
-/* שם המועמד/מפלגה */
-.vd-modal-header h3 {
-  font-size: 22px;
-  font-weight: 700;
-  margin: 10px 0;
-  color: #333;
-}
-
-/* תיאור */
-.vd-modal-desc {
-  padding: 0 25px 15px;
-  text-align: center;
-  font-size: 16px;
-  color: #666;
-  line-height: 1.5;
-}
-
-/* תמונה (אם יש) */
-.vd-modal-photo {
-  width: 100%;
-  height: 200px;
-  overflow: hidden;
-  margin-bottom: 15px;
-}
-
-.vd-modal-photo img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-/* כפתור ההצבעה - "שלשל למעטפה" */
-.vd-select-button {
-  background-color: #003366; /* כחול בולט */
-  color: white;
-  border: none;
-  padding: 15px;
-  width: 90%;
-  font-size: 18px;
-  font-weight: bold;
-  border-radius: 15px; /* כפתור עגול ומודרני */
-  cursor: pointer;
-  margin: 20px auto 30px; /* רווח מלמעלה ומלמטה */
-  transition: transform 0.2s, background-color 0.2s;
-  box-shadow: 0 4px 10px rgba(0, 123, 255, 0.3);
-  display: block; /* כדי שה-margin auto יעבוד */
-}
-
-.vd-select-button:active {
-  transform: scale(0.98);
-}
-
-/* אנימציית כניסה */
-@keyframes slideUp {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-/* התאמה למובייל (למרות שהעיצוב כבר רספונסיבי) */
-@media (max-width: 480px) {
-  .vd-modal-symbol {
-    font-size: 60px;
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
   }
 }

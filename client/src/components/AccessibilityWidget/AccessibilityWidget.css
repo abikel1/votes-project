@@ -1,39 +1,44 @@
-/* ===== כפתור נגישות ===== */
 .accessibility-btn {
   position: fixed !important;
-  bottom: 90px !important;   /* ✅ גובה הכפתור מהתחתית */
-  left: 25px !important;     /* ✅ צד שמאל */
-  right: auto !important;    /* ✅ ביטול ימין */
-
+  bottom: 90px !important;
+  left: 25px !important;
   width: 56px;
   height: 56px;
-
-  background-color: #122b40;
+  background-color: #003366; /* כחול אחיד כמו הכפתור מדריך */
   border: 3px solid #ffffff;
   border-radius: 50%;
-
   display: flex;
   justify-content: center;
   align-items: center;
-
-  color: #ffffff;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.25);
   cursor: pointer;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
   z-index: 9999;
 }
 
-.accessibility-btn svg {
-  font-size: 28px;
-}
-
 .accessibility-btn:hover {
   transform: scale(1.1);
+  box-shadow: 0 8px 25px rgba(0,0,0,0.35);
 }
 
 .accessibility-btn:active {
   transform: scale(0.95);
 }
+
+.accessibility-btn svg {
+  width: 28px;
+  height: 28px;
+  color: #ffffff; /* צהוב אחיד */
+}
+
+/* מובייל */
+@media (max-width: 768px) {
+  .accessibility-btn {
+    bottom: 90px !important;
+    left: 16px !important;
+  }
+}
+
 
 /* ===== פאנל נגישות – נפתח מעל הכפתור ===== */
 .accessibility-panel {
