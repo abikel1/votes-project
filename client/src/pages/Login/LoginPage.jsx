@@ -67,7 +67,6 @@ export default function LoginPage() {
       : base;
   })();
 
-
   return (
     <div className="auth-container">
       <div className="auth-card">
