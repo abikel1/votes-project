@@ -871,17 +871,18 @@ const toggleDesc = () => setDescExpanded(prev => !prev);
           >
             {isChatOpen ? <FiX size={20} /> : <FiMessageSquare size={20} />}
           </button>
-          {isChatOpen && (
-            <div className="chat-panel">
-              <div className="chat-panel-header" />
-              <GroupChat
-                groupId={groupId}
-                canChat={canChat}
-                currentUserId={myId}
-                isOwner={isOwner}
-              />
-            </div>
-          )}
+       {isChatOpen && (
+  <div className="chat-panel" id="group-chat-panel">
+    <div className="chat-panel-header" />
+    <GroupChat
+      groupId={groupId}
+      canChat={canChat}
+      currentUserId={myId}
+      isOwner={isOwner}
+    />
+  </div>
+)}
+
         </>
       )}
     </div>

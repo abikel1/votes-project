@@ -5,7 +5,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 4px;
+  /* gap: 4px; */
   font-family: 'Rubik', sans-serif;
   direction: rtl;
   flex-wrap: nowrap; /* שלא ישבר שורה */
@@ -66,9 +66,7 @@
    מחשב
 ======================= */
 @media (min-width: 1024px) {
-  .countdown-row {
-    gap: 12px;
-  }
+ 
 
   .count-number {
     font-size: calc(18px * var(--a11y-font-scale));
