@@ -220,6 +220,7 @@ const authSlice = createSlice({
     userEmail: initialUserEmail,
     isAdmin: initialIsAdmin,
     loading: false,
+    forgotLoading: false,
     error: null,
     user: null,
     message: '',
@@ -378,20 +379,35 @@ const authSlice = createSlice({
         s.updateErrors = { form: i18n.t('auth.profile.updateFailed') };
       })
 
-      /** password reset request */
+      // /** password reset request */
+      // .addCase(requestPasswordReset.pending, (s) => {
+      //   s.loading = true;
+      //   s.error = null;
+      // })
+      // .addCase(requestPasswordReset.fulfilled, (s, a) => {
+      //   s.loading = false;
+      //   s.error = null;
+      //   s.message = a.payload;
+      // })
+      // .addCase(requestPasswordReset.rejected, (s, a) => {
+      //   s.loading = false;
+      //   s.error = a.payload;
+      // })
+
       .addCase(requestPasswordReset.pending, (s) => {
-        s.loading = true;
+        s.forgotLoading = true;   // ✅
         s.error = null;
       })
       .addCase(requestPasswordReset.fulfilled, (s, a) => {
-        s.loading = false;
+        s.forgotLoading = false;  // ✅
         s.error = null;
         s.message = a.payload;
       })
       .addCase(requestPasswordReset.rejected, (s, a) => {
-        s.loading = false;
+        s.forgotLoading = false;  // ✅
         s.error = a.payload;
       })
+
 
       /** resetPassword */
       .addCase(resetPassword.pending, (s) => {
