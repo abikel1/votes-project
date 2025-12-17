@@ -21,7 +21,7 @@
 .vd-wrap {
   direction: rtl;
   max-width: 1400px;
-  margin: 0 ;
+  /* margin: 0 ; */
   padding: 24px clamp(16px, 4vw, 50px) 32px;
   color: var(--text);
   min-height: 100vh;

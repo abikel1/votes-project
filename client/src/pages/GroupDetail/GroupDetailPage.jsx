@@ -195,27 +195,53 @@ const toggleDesc = () => setDescExpanded(prev => !prev);
   const [barData, setBarData] = useState([]);
   const [pieData, setPieData] = useState([]);
 
-  useEffect(() => {
-    if (!candidatesWithCampaign || candidatesWithCampaign.length === 0) return;
+// גרפים נפרדים לתוצאות הסופיות (votes)
+const [voteBarData, setVoteBarData] = useState([]);
+const [votePieData, setVotePieData] = useState([]);
 
-    const bar = candidatesWithCampaign.map(c => ({
-      name: c.name ? (c.name.length > 12 ? c.name.slice(0, 12) + '...' : c.name) : 'לא ידוע',
-      likeCount: Number(c.campaign?.likeCount || 0),
+
+
+// ב-2 useEffect נפרדים:
+
+// 1. גרפים של לייקים (סקר תמיכה)
+useEffect(() => {
+  if (!candidatesWithCampaign || candidatesWithCampaign.length === 0) return;
+
+  const bar = candidatesWithCampaign.map(c => ({
+    name: c.name ? (c.name.length > 12 ? c.name.slice(0, 12) + '...' : c.name) : 'לא ידוע',
+    likeCount: Number(c.campaign?.likeCount || 0),
+  }));
+
+  const pie = candidatesWithCampaign
+    .filter(c => Number(c.campaign?.likeCount || 0) > 0)
+    .map(c => ({
+      name: c.name,
+      value: Number(c.campaign.likeCount),
     }));
 
-    const pie = candidatesWithCampaign
-      .filter(c => Number(c.campaign?.likeCount || 0) > 0)
-      .map(c => ({
-        name: c.name,
-        value: Number(c.campaign.likeCount),
-      }));
+  setBarData(bar);
+  setPieData(pie);
+}, [candidatesWithCampaign]);
 
-    console.log('Updated Bar Data:', bar);
-    console.log('Updated Pie Data:', pie);
+// 2. גרפים של הצבעות (תוצאות סופיות)
+useEffect(() => {
+  if (!candidates || candidates.length === 0) return;
 
-    setBarData(bar);
-    setPieData(pie);
-  }, [candidatesWithCampaign]);
+  const bar = candidates.map(c => ({
+    name: c.name ? (c.name.length > 12 ? c.name.slice(0, 12) + '...' : c.name) : 'לא ידוע',
+    votesCount: Number(c.votesCount || 0),
+  }));
+
+  const pie = candidates
+    .filter(c => Number(c.votesCount || 0) > 0)
+    .map(c => ({
+      name: c.name,
+      value: Number(c.votesCount),
+    }));
+
+  setVoteBarData(bar);
+  setVotePieData(pie);
+}, [candidates]);
 
   // ===== לאחר טעינת הקבוצה =====
   useEffect(() => {
@@ -793,64 +819,62 @@ const toggleDesc = () => setDescExpanded(prev => !prev);
           )}
 
 
-          {isGroupExpired && totalVotes > 0 && (
-            <div className="charts">
-              <div className="pie-chart-container">
-                <h3>{t('groups.detail.charts.pieTitle')}</h3>
-                <ResponsiveContainer width="100%" height={250}>
-                  <PieChart>
-                    <Pie
-                      data={pieData}
-                      dataKey="value"
-                      nameKey="name"
-                      cx="50%"
-                      cy="50%"
-                      outerRadius="80%"
-                    >
-                      {pieData.map((_, i) => (
-                        <Cell
-                          key={i}
-                          fill={COLORS[i % COLORS.length]}
-                        />
-                      ))}
-                    </Pie>
-                    <Tooltip
-                      formatter={(v) =>
-                        `${v} ${t(
-                          'groups.detail.charts.tooltipVotesSuffix',
-                        )}`
-                      }
-                    />
-                    <Legend verticalAlign="bottom" height={25} />
-                  </PieChart>
-                </ResponsiveContainer>
-              </div>
+        
 
-              <div className="bar-chart-container">
-                <h3>{t('groups.detail.charts.barTitle')}</h3>
-                <ResponsiveContainer width="100%" height={250}>
-                  <BarChart data={barData}>
-                    <XAxis
-                      dataKey="name"
-                      angle={-45}
-                      textAnchor="end"
-                      height={50}
-                      interval={0}
-                    />
-                    <YAxis />
-                    <Tooltip
-                      formatter={(v) =>
-                        `${v} ${t(
-                          'groups.detail.charts.tooltipVotesSuffix',
-                        )}`
-                      }
-                    />
-                    <Bar dataKey="votesCount" fill="#003366" />
-                  </BarChart>
-                </ResponsiveContainer>
-              </div>
-            </div>
-          )}
+{isGroupExpired && totalVotes > 0 && (
+  <div className="charts">
+    <div className="pie-chart-container">
+      <h3>{t('groups.detail.charts.pieTitle')}</h3>
+      <ResponsiveContainer width="100%" height={250}>
+        <PieChart>
+          <Pie
+            data={votePieData}  // 👈 שינוי כאן
+            dataKey="value"
+            nameKey="name"
+            cx="50%"
+            cy="50%"
+            outerRadius="80%"
+          >
+            {votePieData.map((_, i) => (  // 👈 שינוי כאן
+              <Cell
+                key={i}
+                fill={COLORS[i % COLORS.length]}
+              />
+            ))}
+          </Pie>
+          <Tooltip
+            formatter={(v) =>
+              `${v} ${t('groups.detail.charts.tooltipVotesSuffix')}`
+            }
+          />
+          <Legend verticalAlign="bottom" height={25} />
+        </PieChart>
+      </ResponsiveContainer>
+    </div>
+
+    <div className="bar-chart-container">
+      <h3>{t('groups.detail.charts.barTitle')}</h3>
+      <ResponsiveContainer width="100%" height={250}>
+        <BarChart data={voteBarData}>  {/* 👈 שינוי כאן */}
+          <XAxis
+            dataKey="name"
+            angle={-45}
+            textAnchor="end"
+            height={50}
+            interval={0}
+          />
+          <YAxis />
+          <Tooltip
+            formatter={(v) =>
+              `${v} ${t('groups.detail.charts.tooltipVotesSuffix')}`
+            }
+          />
+          <Bar dataKey="votesCount" fill="#003366" />
+        </BarChart>
+      </ResponsiveContainer>
+    </div>
+  </div>
+)}
 
           {isGroupExpired && totalVotes === 0 && (
             <div className="no-votes-message">
