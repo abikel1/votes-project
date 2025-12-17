@@ -1,6 +1,7 @@
 // server/server.js
 require('dotenv').config();
 const app = require('./app');
+app.set('etag', false);
 const http = require('http');
 const { Server } = require('socket.io');
 
