@@ -641,69 +641,79 @@ useEffect(() => {
               <p>{t('groups.detail.candidates.loading')}</p>
             )}
 
-            {!loadingCandidates && candidates.length > 0 && (
-              <div className="candidates-grid">
-                {sortedCandidates.map((c, index) => {
-                  const winnerIndex = winners.findIndex((w) => w._id === c._id);
 
-                  return (
-                    <div
-                      key={c._id}
-                      id={`candidate-card-${c._id}`}
-                      className={`candidate-card ${winnerIndex !== -1 ? 'winner' : ''}`}
-                    >
-                      {c.photoUrl && (
-                        <img
-                          src={c.photoUrl || '/h.jpg'}
-                          alt={t('groups.detail.candidates.imageAlt')}
-                          className="candidate-avatar"
-                          onError={(e) => {
-                            e.currentTarget.onerror = null;
-                            e.currentTarget.src = '/h.jpg';
-                          }}
-                        />
-                      )}
+{!loadingCandidates && candidates.length > 0 && (
+  <div className="candidates-grid">
+    {sortedCandidates.map((c, index) => {
+      const winnerIndex = winners.findIndex((w) => w._id === c._id);
+      const hasCampaign = !!c.userId; // בדיקה אם יש קמפיין
 
-                      {/* אם הקבוצה נגמרה והמועמד מנצח – הצג מקום */}
-                      {isGroupExpired && winnerIndex !== -1 && (
-                        <div className="winner-badge">
-                          {winnerIndex + 1}
-                        </div>
-                      )}
+      return (
+        <div
+          key={c._id}
+          id={`candidate-card-${c._id}`}
+          className={`candidate-card ${winnerIndex !== -1 ? 'winner' : ''} ${hasCampaign ? 'clickable' : ''}`}
+          onClick={() => {
+            if (hasCampaign) {
+              const candidateSlug = makeCandidateSlug(c.name || '');
+              navigate(`/campaign/${slug}/${candidateSlug}`, {
+                state: { groupId },
+              });
+            }
+          }}
+          style={hasCampaign ? { cursor: 'pointer' } : {}}
+        >
+          {c.photoUrl && (
+            <img
+              src={c.photoUrl || '/h.jpg'}
+              alt={t('groups.detail.candidates.imageAlt')}
+              className="candidate-avatar"
+              onError={(e) => {
+                e.currentTarget.onerror = null;
+                e.currentTarget.src = '/h.jpg';
+              }}
+            />
+          )}
 
-                      {c.userId && (
-                        <button
-                          className="campaign-btn"
-                          onClick={() => {
-                            const candidateSlug = makeCandidateSlug(c.name || '');
-                            // slug כבר מוגדר למעלה כ־slug של הקבוצה
-                            navigate(`/campaign/${slug}/${candidateSlug}`, {
-                              state: { groupId },
-                            });
-                          }}
-                          title={t('groups.detail.candidates.myCampaignTitle')}
-                        >
-                          <FiZap size={16} />
-                        </button>
-                      )}
+          {/* אם הקבוצה נגמרה והמועמד מנצח – הצג מקום */}
+          {isGroupExpired && winnerIndex !== -1 && (
+            <div className="winner-badge">
+              {winnerIndex + 1}
+            </div>
+          )}
 
+          {c.userId && (
+            <button
+              className="campaign-btn"
+              onClick={(e) => {
+                e.stopPropagation(); // מונע את הלחיצה על הכרטיס
+                const candidateSlug = makeCandidateSlug(c.name || '');
+                navigate(`/campaign/${slug}/${candidateSlug}`, {
+                  state: { groupId },
+                });
+              }}
+              title={t('groups.detail.candidates.myCampaignTitle')}
+            >
+              <FiZap size={16} />
+            </button>
+          )}
 
-                      <div className="candidate-text">
-                        <h4>{c.name}</h4>
-                        {c.description && <p>{c.description}</p>}
-                      </div>
+          <div className="candidate-text">
+            <h4>{c.name}</h4>
+            {c.description && <p>{c.description}</p>}
+          </div>
 
-                      {isGroupExpired && (
-                        <div className="votes-count">
-                          {c.votesCount || 0}{' '}
-                          {t('groups.detail.candidates.cardVotesSuffix')}
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-            )}
+          {isGroupExpired && (
+            <div className="votes-count">
+              {c.votesCount || 0}{' '}
+              {t('groups.detail.candidates.cardVotesSuffix')}
+            </div>
+          )}
+        </div>
+      );
+    })}
+  </div>
+)}
 
             {!loadingCandidates && candidates.length === 0 && (
               <p>{t('groups.detail.candidates.none')}</p>
