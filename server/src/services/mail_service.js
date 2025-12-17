@@ -1,32 +1,37 @@
-const { getTransporter } = require('../../config/mail');
+// server/src/services/mail_service.js
+const { getResend } = require('../../config/resend');
 
 async function sendMail({ to, subject, text, html, cc, bcc, attachments }) {
   if (!to || !subject) throw new Error('Missing to/subject');
-  const transporter = await getTransporter();
-  const info = await transporter.sendMail({
-    from: process.env.MAIL_FROM || 'no-reply@example.com',
-    to, cc, bcc, subject, text, html, attachments
-  });
 
-  // אם עובדים עם Ethereal – נחזיר גם preview URL לנוחות
-  let previewUrl = null;
-  try {
-    const nodemailer = require('nodemailer');
-    if (transporter.options?.host?.includes('ethereal')) {
-      previewUrl = nodemailer.getTestMessageUrl(info);
-    }
-  } catch (_) { }
-  // 🔎 להדפסה במסוף כדי שתראי את הקישור למייל
-  if (previewUrl) {
-    console.log('Ethereal preview URL:', previewUrl);
+  const resend = getResend();
+
+  const payload = {
+    from: process.env.MAIL_FROM || 'onboarding@resend.dev',
+    to: Array.isArray(to) ? to : [to],
+    subject,
+    text,
+    html,
+    replyTo: process.env.MAIL_REPLY_TO,
+  };
+
+  if (cc) payload.cc = Array.isArray(cc) ? cc : [cc];
+  if (bcc) payload.bcc = Array.isArray(bcc) ? bcc : [bcc];
+
+  // Attachments (אופציונלי): Resend רוצה base64 + filename
+  // if (attachments?.length) payload.attachments = ...
+
+  const { data, error } = await resend.emails.send(payload);
+
+  if (error) {
+    throw new Error(error.message || 'Resend send failed');
   }
 
-  return { messageId: info.messageId, previewUrl };
+  return { messageId: data?.id, previewUrl: null };
 }
 
-/** עוזר: בניית HTML פשוט מתבנית */
+/** תבנית HTML – נשאר כמו אצלך */
 function renderTemplate(templateName, vars = {}) {
-  // אפשר להחליף ל-handlebars/ejs בהמשך; בינתיים מינימלי:
   if (templateName === 'resetPassword') {
     const { link, userName = '' } = vars;
     return `
@@ -37,7 +42,6 @@ function renderTemplate(templateName, vars = {}) {
         <p>הקישור תקף לזמן מוגבל.</p>
       </div>`;
   }
-  // ברירת מחדל
   return vars.html || '';
 }
 
