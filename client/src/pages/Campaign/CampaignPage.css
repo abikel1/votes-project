@@ -595,6 +595,58 @@
   }
 }
 
+/* ========== רספונסיביות - ביניים (581-768) ========== */
+@media (min-width: 581px) and (max-width: 768px) {
+  .page-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  .stats-row {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
+  }
+
+  .vote-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  /* שמירה על חלוקה נוחה בין רשימת מועמדים לתוכן */
+  .main-content-resizable {
+    flex-direction: column;
+    height: auto;
+    overflow: visible;
+  }
+
+  .left-section {
+    width: 100% !important;
+    max-height: 45vh;
+    /* פחות חונק מ-60vh */
+    overflow-y: auto;
+  }
+
+  .right-section {
+    width: 100% !important;
+    height: auto;
+    overflow: visible;
+  }
+
+  /* הגריד במידות האלה—עדיף 2-3 עמודות קבועות */
+  .gallery-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  /* אם הפוסטים “נמרחים”/נחתכים */
+  .posts-list {
+    max-height: 520px;
+  }
+}
+
+
 /* ========== רספונסיביות - מכשירים קטנים מאוד ========== */
 @media (max-width: 480px) {
   .page-wrap.dashboard {
@@ -990,7 +1042,8 @@
   }
 
   .share-copy-btn {
-    flex: 0 0 70px;   /* עוד טיפה קטן בפלאפון */
+    flex: 0 0 70px;
+    /* עוד טיפה קטן בפלאפון */
     font-size: 0.8rem;
   }
 
@@ -1005,23 +1058,27 @@
     width: 100%;
   }
 }
+
 @media (max-width: 1024px) {
-    .right-section .info-card {
+  .right-section .info-card {
     width: 100%;
     max-width: 100%;
     margin-left: 0;
     margin-right: 0;
     box-sizing: border-box;
   }
+
   /* התיאור + הסטטיסטיקות יקבלו רוחב מלא */
   .stats-cards {
     width: 100%;
-    margin-top: 20px;   /* קצת מרווח מה"אודות" */
+    margin-top: 20px;
+    /* קצת מרווח מה"אודות" */
     gap: 12px;
   }
 
   .stat-box {
-    flex: 1 1 1;     /* כל כרטיס תופס שורה שלמה */
+    flex: 1 1 1;
+    /* כל כרטיס תופס שורה שלמה */
     width: 100%;
   }
 }
