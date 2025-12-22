@@ -464,28 +464,31 @@
   position: fixed;
   bottom: 20px;
   left: 24px;
+
   width: 56px;
   height: 56px;
   border-radius: 50%;
-  border: none;
-    width: 56px;
-    height: 56px;
-    background-color: #003366;
-    border: 3px solid #ffffff;  color: #fff;
-  font-size: calc(32px * var(--a11y-font-scale));
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
-    cursor: pointer;
-  line-height: 0;
+  border: 3px solid #ffffff;
+
+  background-color: #003366;
+  color: #fff;
+
   display: flex;
   align-items: center;
   justify-content: center;
-  cursor: pointer;
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
-  z-index: 1000;
-  /* 👇 חשוב כדי שהגודל ישתנה חלק */
-  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
-}
 
+  font-size: calc(28px * var(--a11y-font-scale));
+  line-height: 1; /* 👈 חשוב! */
+
+  cursor: pointer;
+  z-index: 1000;
+
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.groups-fab svg {
+  display: block;
+}
 .groups-fab:hover {
   background: #000;
   transform: scale(1.12);
