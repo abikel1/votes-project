@@ -61,7 +61,7 @@ export default function LoginPage() {
   };
 
   const googleHref = (() => {
-    const base = 'https://votes-project.onrender.com/api/users/google';
+    const base = 'https://api.voteapp.online/api/users/google';
     return redirect
       ? `${base}?redirect=${encodeURIComponent(redirect)}`
       : base;
