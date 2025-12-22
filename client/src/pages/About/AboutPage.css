@@ -298,9 +298,7 @@ body {
   flex-direction: row-reverse;
 }
 
-[dir="rtl"] .feature-header {
-  flex-direction: row-reverse;
-}
+
 
 [dir="rtl"] .expand-icon {
   margin-right: 0;
