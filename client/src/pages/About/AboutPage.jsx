@@ -1,13 +1,18 @@
 // src/pages/About/AboutPage.jsx
-import React from 'react';
+import React, { useState } from 'react';
 import './AboutPage.css';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { FaVoteYea, FaUsers, FaShieldAlt, FaChartLine, FaLeaf, FaLock } from 'react-icons/fa';
+import { FaVoteYea, FaUsers, FaShieldAlt, FaChartLine, FaLeaf, FaLock, FaChevronDown, FaChevronUp } from 'react-icons/fa';
 
 export default function AboutPage() {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
+  const [expandedFeature, setExpandedFeature] = useState(null);
+
+  const toggleFeature = (index) => {
+    setExpandedFeature(expandedFeature === index ? null : index);
+  };
 
   const features = [
     { 
@@ -71,29 +76,42 @@ export default function AboutPage() {
       </header>
 
       {/* MISSION STATEMENT */}
-      <section className="about-section mission-section">
+      <section className="mission-section">
         <div className="mission-content">
           <h2 className="section-title">{t('about.mission.title')}</h2>
           <p className="mission-text">{t('about.mission.text')}</p>
         </div>
       </section>
 
-      {/* FEATURES GRID */}
+      {/* FEATURES - במבנה של Steps */}
       <section className="about-section">
         <h2 className="section-title centered">{t('about.features.sectionTitle')}</h2>
-        <div className="features-grid">
+        <div className="features-section">
           {features.map((feature, idx) => (
-            <div key={idx} className="feature-card">
-              <div className="feature-icon" aria-hidden="true">{feature.icon}</div>
-              <h3>{t(feature.titleKey)}</h3>
-              <p>{t(feature.descKey)}</p>
+            <div 
+              key={idx} 
+              className="feature-card"
+              onClick={() => toggleFeature(idx)}
+            >
+              <div className="feature-header">
+                <div className="feature-icon" aria-hidden="true">
+                  {feature.icon}
+                </div>
+                <div className="feature-content">
+                  <h3>{t(feature.titleKey)}</h3>
+                  <p>{t(feature.descKey)}</p>
+                </div>
+                <div className="expand-icon">
+                  {expandedFeature === idx ? <FaChevronUp /> : <FaChevronDown />}
+                </div>
+              </div>
             </div>
           ))}
         </div>
       </section>
 
-      {/* USE CASES */}
-      <section className="about-section">
+      {/* USE CASES - במבנה של Tips */}
+      <section className="use-cases-section">
         <h2 className="section-title centered">{t('about.useCases.sectionTitle')}</h2>
         <div className="use-cases-grid">
           {useCases.map((useCase, idx) => (
@@ -104,8 +122,6 @@ export default function AboutPage() {
           ))}
         </div>
       </section>
-
-      {/* HIGHLIGHT / CTA */}
     </div>
   );
 }
