@@ -102,7 +102,7 @@ export default function ImageCropModal({
                 className="crop-modal"
                 style={{
                     backgroundColor: '#fff',
-                    borderRadius: 8,
+                    // borderRadius: 8,
                     padding: 16,
                     width: '90%',
                     maxWidth: 500,

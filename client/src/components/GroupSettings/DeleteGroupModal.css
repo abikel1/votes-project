@@ -21,7 +21,7 @@
     width: 100%;
     max-width: 520px;
     background: #fff;
-    border-radius: 12px;
+    /* border-radius: 12px; */
     box-shadow: 0 20px 45px rgba(0, 0, 0, 0.35);
     padding: 32px 28px 30px;
     display: flex;
@@ -60,7 +60,7 @@
     padding: 10px 16px;
     border: 1px solid #ddd;
     background: #fafafa;
-    border-radius: 8px;
+    /* border-radius: 8px; */
     direction: ltr;
     color: #333;
 }
@@ -104,7 +104,7 @@
     background: #b80d0d;
     color: #fff;
     border: none;
-    border-radius: 10px;
+    /* border-radius: 10px; */
     height: 52px;
     font-weight: 700;
     font-size: 1.05rem;
@@ -126,7 +126,7 @@
     background: #fff;
     border: 2px solid #003366;
     color: #003366;
-    border-radius: 10px;
+    /* border-radius: 10px; */
     height: 52px;
     font-weight: 600;
     font-size: 1.05rem;
@@ -179,7 +179,7 @@
 
     .modal.delete-modal {
         max-width: 100%;
-        border-radius: 10px;
+        /* border-radius: 10px; */
         padding: 24px 18px 22px;
     }
 
@@ -229,7 +229,6 @@
     .modal.delete-modal {
         max-width: 94vw;
         padding: 18px 14px 20px;
-        border-radius: 12px;
     }
 
     .delete-title {
@@ -247,14 +246,14 @@
         font-size: 0.8rem;
         padding: 7px 12px;
         margin-top: 8px;
-        border-radius: 8px;
+        /* border-radius: 8px; */
     }
 
     .delete-confirm-input {
         font-size: 0.9rem;
         padding: 12px;
         margin-bottom: 20px;
-        border-radius: 10px;
+        /* border-radius: 10px; */
     }
 
     /* ✅ כפתורים – מסודר יפה במובייל */
@@ -268,14 +267,14 @@
         flex: 1;
         height: 44px;
         font-size: 0.9rem;
-        border-radius: 10px;
+        /* border-radius: 10px; */
     }
 
     .delete-cancel-btn {
         flex: 1;
         height: 44px;
         font-size: 0.9rem;
-        border-radius: 10px;
+        /* border-radius: 10px; */
         background: #fff;
         border: 1.5px solid #003366;
     }

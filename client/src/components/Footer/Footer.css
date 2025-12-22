@@ -131,7 +131,7 @@
   /* היה 50px */
   height: 42px;
   /* היה 50px */
-  border-radius: 50%;
+  /* border-radius: 50%; */
   background: rgba(255, 255, 255, 0.1);
   border: 2px solid rgba(255, 255, 255, 0.3);
   display: flex;
@@ -242,7 +242,7 @@
   color: white;
   text-decoration: none;
   padding: 6px 10px;
-  border-radius: 8px;
+  /* border-radius: 8px; */
   display: inline-block;
   margin-bottom: 8px;
   transition: background-color 0.25s ease, color 0.25s ease;

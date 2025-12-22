@@ -36,10 +36,11 @@
 
 /* תמונת פרופיל */
 .profile {
+      border-radius: 50%;
+
   width: 40px;
   /* היה 45px */
   height: 40px;
-  border-radius: 50%;
   background: white;
   color: #003366;
   display: flex;
@@ -93,7 +94,6 @@
   /* פחות padding */
   transition: all 0.2s ease;
   white-space: nowrap;
-  border-radius: 4px;
 }
 
 /* מצב hover – רק רקע עדין בלי קו תחתון */
@@ -202,7 +202,6 @@
     width: 100%;
     text-align: center;
     padding: 0.9rem 2rem;
-    border-radius: 0;
     font-size: 1rem;
   }
 

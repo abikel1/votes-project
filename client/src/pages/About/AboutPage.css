@@ -19,7 +19,6 @@ body {
   background: #1e3a8a;
   color: white;
   margin-bottom: 40px;
-  border-radius: 0;
 }
 
 .about-hero-inner {
@@ -31,7 +30,6 @@ body {
   align-items: center;
   gap: 10px;
   padding: 10px 20px;
-  border-radius: 999px;
   background: rgba(255, 255, 255, 0.15);
   border: 1px solid rgba(255, 255, 255, 0.2);
   backdrop-filter: blur(10px);
@@ -41,6 +39,7 @@ body {
 }
 
 .about-title {
+  color: #e6f0ff;
   font-size: 3rem;
   margin-bottom: 10px;
   animation: fadeIn 1s ease-out;
@@ -72,7 +71,6 @@ body {
   font-weight: bold;
   cursor: pointer;
   transition: 0.3s;
-  border-radius: 8px;
   font-size: 1.05rem;
 }
 
@@ -104,7 +102,6 @@ body {
   padding: 30px;
   margin-bottom: 40px;
   box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
-  border-radius: 0;
 }
 
 .mission-content {
@@ -150,7 +147,6 @@ body {
   overflow: hidden;
   transition: 0.3s;
   padding: 0;
-  border-radius: 0;
 }
 
 .feature-card:hover {
@@ -172,7 +168,6 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 8px;
   color: #1e3a8a;
   font-size: 24px;
 }
@@ -213,7 +208,6 @@ body {
   box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
   text-align: center;
   transition: 0.3s;
-  border-radius: 0;
 }
 
 .use-case-card:hover {
@@ -304,9 +298,7 @@ body {
   flex-direction: row-reverse;
 }
 
-[dir="rtl"] .feature-header {
-  flex-direction: row-reverse;
-}
+
 
 [dir="rtl"] .expand-icon {
   margin-right: 0;
