@@ -3,6 +3,10 @@ const multer = require("multer");
 const cors = require("cors");
 const path = require("path");
 const fs = require("fs");
+const BASE_URL =
+  process.env.NODE_ENV === 'production'
+    ? 'https://api.voteapp.online'
+    : 'http://localhost:5000';
 
 const userRoutes = require('./src/routes/user_routes');
 const candidateRoutes = require('./src/routes/candidate_routes');
@@ -21,17 +25,29 @@ const app = express();
 // 1. CORS — חשוב מאוד! חייב להיות הדבר הראשון לפני כל ה־routes
 // ----------------------------------------------------------------------
 const allowedOrigins = [
-    'http://localhost:5173',                  // Dev local
-    'https://votes-client-qoux.onrender.com', // ה־frontend ברנדר
-    'https://votes-project.onrender.com',     // ה־backend עצמו
+  'http://localhost:5173',
+  'https://votes-client-qoux.onrender.com',
+  'https://votes-project.onrender.com',
+
+  // הדומיין החדש
+  'https://voteapp.online',
+  'https://www.voteapp.online',
+  'https://api.voteapp.online',
 ];
 
 app.use(
-    cors({
-        origin: allowedOrigins,
-        credentials: true,
-    })
+  cors({
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
+    credentials: true,
+  })
 );
+
 
 // ----------------------------------------------------------------------
 // 2. Upload route — חשוב שיבוא לפני express.json()
@@ -58,7 +74,7 @@ app.post("/api/upload", upload.single("image"), (req, res) => {
   if (!req.file) return res.status(400).json({ error: "No file uploaded" });
 
   // החזרת URL
-  const fileUrl = `http://localhost:5000/uploads/${req.file.filename}`;
+  const fileUrl = `${BASE_URL}/uploads/${req.file.filename}`;
   res.json({ url: fileUrl });
 });
 

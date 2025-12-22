@@ -54,6 +54,7 @@ export default function ContactPage() {
         sendMail({
           to: CONTACT_EMAIL,
           subject: t('contact.mailSubject', { name: form.fullName.trim() }),
+          replyTo: form.fromEmail.trim(), // ✅ הכי חשוב
           text: `
 ${t('contact.mailText.nameLabel')}: ${form.fullName || '-'}
 ${t('contact.mailText.emailLabel')}: ${form.fromEmail || '-'}

@@ -1,7 +1,7 @@
 // server/src/services/mail_service.js
 const { getResend } = require('../../config/resend');
 
-async function sendMail({ to, subject, text, html, cc, bcc, attachments }) {
+async function sendMail({ to, subject, text, html, cc, bcc, attachments, replyTo }) {
   if (!to || !subject) throw new Error('Missing to/subject');
 
   const resend = getResend();
@@ -12,7 +12,7 @@ async function sendMail({ to, subject, text, html, cc, bcc, attachments }) {
     subject,
     text,
     html,
-    replyTo: process.env.MAIL_REPLY_TO,
+    replyTo: replyTo || process.env.MAIL_REPLY_TO,
   };
 
   if (cc) payload.cc = Array.isArray(cc) ? cc : [cc];
