@@ -109,7 +109,7 @@
 }
 
 /* RTL Support */
-[dir="rtl"] .language-dropdown {
+.language-dropdown {
   right: auto;
   left: 0;
 }
