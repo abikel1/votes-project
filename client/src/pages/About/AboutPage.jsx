@@ -101,9 +101,9 @@ export default function AboutPage() {
                   <h3>{t(feature.titleKey)}</h3>
                   <p>{t(feature.descKey)}</p>
                 </div>
-                <div className="expand-icon">
+                {/* <div className="expand-icon">
                   {expandedFeature === idx ? <FaChevronUp /> : <FaChevronDown />}
-                </div>
+                </div> */}
               </div>
             </div>
           ))}

@@ -6,7 +6,7 @@
   height: 56px;
   background-color: #003366; /* כחול אחיד כמו הכפתור מדריך */
   border: 3px solid #ffffff;
-  border-radius: 50%;
+  /* border-radius: 50%; */
   display: flex;
   justify-content: center;
   align-items: center;
@@ -14,6 +14,7 @@
   cursor: pointer;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
   z-index: 9999;
+  border-radius: 50%;
 }
 
 .accessibility-btn:hover {
@@ -51,7 +52,7 @@
   max-width: 90vw;
 
   background: #ffffff;
-  border-radius: 12px;
+  /* border-radius: 12px; */
   padding: 14px 16px;
   box-shadow: 0 10px 25px rgba(15, 23, 42, 0.25);
   z-index: 9999;
@@ -101,7 +102,7 @@
 
 .a11y-tile {
   flex: 1;
-  border-radius: 10px;
+  /* border-radius: 10px; */
   border: 1px solid #e5e7eb;
   background: #f9fafb;
   padding: 8px 10px;
@@ -134,7 +135,7 @@
 .a11y-tile-icon {
   width: 32px;
   height: 32px;
-  border-radius: 8px;
+  /* border-radius: 8px; */
   background: #e5edff;
   display: flex;
   align-items: center;
@@ -167,7 +168,7 @@
 .a11y-reset-btn {
   margin-top: 6px;
   width: 100%;
-  border-radius: 999px;
+  /* border-radius: 999px; */
   border: 1px solid #e5e7eb;
   background: #f3f4f6;
   padding: 6px 8px;

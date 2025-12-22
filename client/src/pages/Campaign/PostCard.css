@@ -2,7 +2,6 @@
 
 .post-card {
   background: #fff;
-  border-radius: 12px;
   padding: 20px;
   margin-bottom: 16px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
@@ -34,7 +33,6 @@
   color: #ef4444;
   cursor: pointer;
   padding: 6px;
-  border-radius: 6px;
   transition: background 0.2s;
 }
 
@@ -53,7 +51,6 @@
 /* תמונה */
 .post-image-container {
   margin: 16px 0;
-  border-radius: 8px;
   overflow: hidden;
 }
 
@@ -70,7 +67,6 @@
   padding-bottom: 56.25%; /* 16:9 aspect ratio */
   height: 0;
   overflow: hidden;
-  border-radius: 8px;
   background: #000;
 }
 
@@ -98,7 +94,6 @@
   align-items: center;
   gap: 8px;
   padding: 6px 12px;
-  border-radius: 6px;
   font-size: 0.95rem;
   transition: all 0.2s;
 }
@@ -127,7 +122,6 @@
   width: 100%;
   padding: 10px;
   border: 1px solid #d1d5db;
-  border-radius: 8px;
   font-family: inherit;
   font-size: 0.95rem;
   resize: vertical;
@@ -150,7 +144,6 @@
   background: #3b82f6;
   color: white;
   border: none;
-  border-radius: 8px;
   cursor: pointer;
   font-size: 0.95rem;
   transition: background 0.2s;
@@ -175,7 +168,6 @@
 .comment-item {
   background: #f9fafb;
   padding: 12px;
-  border-radius: 8px;
 }
 
 .comment-header {
@@ -189,7 +181,6 @@
 .comment-avatar {
   width: 32px;
   height: 32px;
-  border-radius: 50%;
   object-fit: cover;
 }
 
@@ -216,7 +207,6 @@
   color: #ef4444;
   cursor: pointer;
   padding: 4px;
-  border-radius: 4px;
   transition: background 0.2s;
 }
 
