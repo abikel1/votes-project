@@ -43,7 +43,7 @@ const HomePage = () => {
 
     groups.forEach((group) => {
       const endDate = group.endDate ? new Date(group.endDate) : null;
-      const isOpenToAll = !group.isLocked && (group.members?.length === 0);
+      const isOpenToAll = !group.isLocked ;
 
       if (isOpenToAll && (!endDate || endDate > now)) {
         active.push(group);
@@ -66,7 +66,7 @@ const HomePage = () => {
     recentlyClosed.sort((a, b) => new Date(b.endDate) - new Date(a.endDate));
 
     setActiveGroups(active.slice(0, 5));
-    setRecentlyClosedGroups(recentlyClosed.slice(0, 5));
+    setRecentlyClosedGroups(recentlyClosed.slice(0, 10));
   }, [groups]);
 
   const getTimeRemaining = (endDate) => {
