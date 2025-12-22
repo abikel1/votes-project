@@ -521,7 +521,7 @@ useEffect(() => {
         <p className="group-description">{group.description}</p>
         {group.description.length > 50 && (
           <button className="read-more-btn" onClick={toggleDesc}>
-  {descExpanded ? (
+  {/* {descExpanded ? (
         <>
           פחות <BiChevronUp size={18} style={{ verticalAlign: 'middle' }} />
         </>
@@ -529,7 +529,8 @@ useEffect(() => {
         <>
           עוד <BiChevronDown size={18} style={{ verticalAlign: 'middle' }} />
         </>
-      )}          </button>
+      )}         */}
+        </button>
         )}
       </div>
     )}

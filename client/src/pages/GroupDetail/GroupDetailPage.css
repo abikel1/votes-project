@@ -1950,18 +1950,18 @@
   .header-title {
     flex-direction: row; /* שם לצד תיאור */
     align-items: center;
-    text-align: left;
+    text-align: right;
     gap: 1rem;
-    max-width: 70%; /* מותאם לצד כפתורים */
+    max-width: 95%; /* מותאם לצד כפתורים */
   }
 
   .group-description-container {
     flex: 1;
   }
 
-  .group-description {
+  /* .group-description {
     -webkit-line-clamp: 2;
-  }
+  } */
 }
 
 /* שאר סגנונות נשארים כפי שהיו */
@@ -1983,7 +1983,7 @@
   -webkit-box-orient: vertical;
   overflow: hidden;
   text-overflow: ellipsis;
-  -webkit-line-clamp: 2;
+  /* -webkit-line-clamp: 2; */
   margin: 0;
   line-height: 1.5em;
 }
