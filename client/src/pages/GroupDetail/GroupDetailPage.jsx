@@ -612,20 +612,21 @@ function GroupDetailPageContent() {
 
       {/* במובייל: טאבים למטה */}
       {isMobile && (
-        <div id="mobile-tabs" className="mobile-tabs">
-          <button
-            className={`mobile-tab ${activeTab === 'candidates' ? 'active' : ''}`}
-            onClick={() => setActiveTab('candidates')}
-          >
-            מועמדים
-          </button>
-          <button
-            className={`mobile-tab ${activeTab === 'info' ? 'active' : ''}`}
-            onClick={() => setActiveTab('info')}
-          >
-            מידע וגרפים
-          </button>
-        </div>
+     <div id="mobile-tabs" className="mobile-tabs">
+  <button
+    className={`mobile-tab ${activeTab === 'candidates' ? 'active' : ''}`}
+    onClick={() => setActiveTab('candidates')}
+  >
+    {t('groups.detail.tabs.candidates')}
+  </button>
+
+  <button
+    className={`mobile-tab ${activeTab === 'info' ? 'active' : ''}`}
+    onClick={() => setActiveTab('info')}
+  >
+    {t('groups.detail.tabs.info')}
+  </button>
+</div>
       )}
 
       <div className="main-content-resizable" ref={containerRef}>
@@ -779,10 +780,11 @@ function GroupDetailPageContent() {
                 candidatesWithCampaign.length > 0 &&
                 barData.some((c) => c.likeCount > 0) && (
                   <div className="survey-card">
-                    <h3>סקר תמיכה (לא תוצאות רשמיות)</h3>
-                    <p className="survey-note">
-                      נתוני הסקר מתבססים על תמיכה בקמפיין. רק מועמד עם קמפיין פעיל יכול לקבל תמיכה.
-                    </p>
+                 <h3>{t('groups.detail.survey.title')}</h3>
+
+  <p className="survey-note">
+    {t('groups.detail.survey.note')}
+  </p>
 
                     <div className="survey-charts-container">
                       {/* Bar Chart */}
