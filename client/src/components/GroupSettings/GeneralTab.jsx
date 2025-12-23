@@ -18,7 +18,9 @@ export default function GeneralTab({
   updateSuccess,
   updateLoading,
 }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const locale = i18n.language === 'en' ? 'en-US' : 'he-IL';
+
 
   // תאריך של היום בפורמט YYYY-MM-DD כדי להשתמש בו ב-min
   // const todayStr = new Date().toISOString().slice(0, 10);
@@ -70,7 +72,7 @@ export default function GeneralTab({
             <small>{t('groups.create.labels.candidateEndDate')}</small>
             <b>
               {group.candidateEndDate
-                ? new Date(group.candidateEndDate).toLocaleDateString('he-IL')
+                ? new Date(group.candidateEndDate).toLocaleDateString('locale')
                 : '-'}
             </b>
           </div>
@@ -79,7 +81,7 @@ export default function GeneralTab({
             <small>{t('groups.create.labels.endDate')}</small>
             <b>
               {group.endDate
-                ? new Date(group.endDate).toLocaleDateString('he-IL')
+                ? new Date(group.endDate).toLocaleDateString('locale')
                 : '-'}
             </b>
           </div>

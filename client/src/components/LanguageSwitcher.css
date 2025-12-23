@@ -108,7 +108,7 @@
   font-size: 1.2rem;
 }
 
-/* RTL Support */
+/* RTL Support
 [dir="rtl"] .language-dropdown {
   right: auto;
   left: 0;
@@ -116,7 +116,7 @@
 
 [dir="rtl"] .language-option {
   text-align: left;
-}
+} */
 
 /* רספונסיבי */
 @media (max-width: 768px) {

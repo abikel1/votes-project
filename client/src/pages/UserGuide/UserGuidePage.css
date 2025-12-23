@@ -487,3 +487,15 @@ button {
   margin: 20px 0;
   text-align: center;
 }
+
+/* ברירת מחדל */
+.flow-arrow::before {
+  content: "→";
+  font-size: 28px; /* תתאימי */
+  line-height: 1;
+}
+
+/* כשהאתר RTL (עברית) */
+html[dir="rtl"] .flow-arrow::before {
+  content: "←";
+}
