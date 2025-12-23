@@ -1,109 +1,191 @@
 import React, { useState } from 'react';
-import { Play, Users, Vote, Bell, HelpCircle, Zap, Smartphone, Shield, Headphones, ChevronDown, ChevronUp } from 'lucide-react';
-import './UserGuidePage.css'; // קישור לקובץ CSS חיצוני
+import {
+  Users,
+  Vote,
+  Bell,
+  Zap,
+  Smartphone,
+  Shield,
+  Headphones,
+  ChevronDown,
+  ChevronUp,
+} from 'lucide-react';
+import './UserGuidePage.css';
+import { useTranslation } from 'react-i18next';
 
 export default function EnhancedUserGuide() {
+  const { t } = useTranslation();
   const [expandedSection, setExpandedSection] = useState(null);
-  const toggleSection = (index) => setExpandedSection(expandedSection === index ? null : index);
+  const toggleSection = (index) =>
+    setExpandedSection(expandedSection === index ? null : index);
 
   const FlowDiagram = () => (
     <div className="flow-diagram">
       <div className="flow-container">
         <div className="flow-step">
-          <div className="flow-box"><Users className="icon" /></div>
-          <p className="flow-label">הרשמה</p>
+          <div className="flow-box">
+            <Users className="icon" />
+          </div>
+          <p className="flow-label">{t('guide.flow.register')}</p>
         </div>
-        <div className="flow-arrow">&larr;</div>
+
+        <div className="flow-arrow" aria-hidden="true" />
+
+
         <div className="flow-step">
-          <div className="flow-box"><Users className="icon" /></div>
-          <p className="flow-label">יצירת קבוצה</p>
+          <div className="flow-box">
+            <Users className="icon" />
+          </div>
+          <p className="flow-label">{t('guide.flow.createGroup')}</p>
         </div>
-        <div className="flow-arrow">&larr;</div>
+
+        <div className="flow-arrow" aria-hidden="true" />
+
+
         <div className="flow-step">
-          <div className="flow-box"><Vote className="icon" /></div>
-          <p className="flow-label">הצבעות</p>
+          <div className="flow-box">
+            <Vote className="icon" />
+          </div>
+          <p className="flow-label">{t('guide.flow.votes')}</p>
         </div>
-        <div className="flow-arrow">&larr;</div>
+
+        <div className="flow-arrow" aria-hidden="true" />
+
+
         <div className="flow-step">
-          <div className="flow-box"><Bell className="icon" /></div>
-          <p className="flow-label">התראות</p>
+          <div className="flow-box">
+            <Bell className="icon" />
+          </div>
+          <p className="flow-label">{t('guide.flow.notifications')}</p>
         </div>
       </div>
     </div>
   );
 
   const steps = [
-    { icon: <Users className="icon-large" />, title: 'הרשמה למערכת', description: 'צור חשבון חדש במערכת תוך דקות ספורות', details: ['מלא את הפרטים הבסיסיים','אמת את כתובת האימייל שלך','צור סיסמה חזקה ומאובטחת','התחל להשתמש במערכת מיד'] },
-    { icon: <Users className="icon-large" />, title: 'ניהול קבוצות', description: 'צור וצרף קבוצות, הזמן חברים ונהל הרשאות', details: ['צור קבוצה חדשה עם שם ותיאור','הזמן משתמשים באמצעות קישור או אימייל','הגדר הרשאות ותפקידים','עקוב אחר פעילות הקבוצה'] },
-    { icon: <Vote className="icon-large" />, title: 'הצבעות וסקרים', description: 'צור הצבעות, הצבע, וצפה בתוצאות בזמן אמת', details: ['צור הצבעה חדשה עם אפשרויות מרובות','הגדר זמן סיום להצבעה','הצבע באופן פשוט ומהיר','צפה בתוצאות גרפיות ומפורטות'] },
-    { icon: <Bell className="icon-large" />, title: 'התראות ועדכונים', description: 'קבל התראות על פעילות חשובה בקבוצות שלך', details: ['התראות על הצבעות חדשות','עדכונים על תוצאות הצבעות','הזמנות לקבוצות חדשות','התאמה אישית של העדפות התראות'] }
+    {
+      icon: <Users className="icon-large" />,
+      title: t('guide.steps.registerTitle2'),
+      description: t('guide.steps.registerDesc2'),
+      details: [
+        t('guide.steps.registerDetails.0'),
+        t('guide.steps.registerDetails.1'),
+        t('guide.steps.registerDetails.2'),
+        t('guide.steps.registerDetails.3'),
+      ],
+    },
+    {
+      icon: <Users className="icon-large" />,
+      title: t('guide.steps.groupsTitle2'),
+      description: t('guide.steps.groupsDesc2'),
+      details: [
+        t('guide.steps.groupsDetails.0'),
+        t('guide.steps.groupsDetails.1'),
+        t('guide.steps.groupsDetails.2'),
+        t('guide.steps.groupsDetails.3'),
+      ],
+    },
+    {
+      icon: <Vote className="icon-large" />,
+      title: t('guide.steps.votesTitle2'),
+      description: t('guide.steps.votesDesc2'),
+      details: [
+        t('guide.steps.votesDetails.0'),
+        t('guide.steps.votesDetails.1'),
+        t('guide.steps.votesDetails.2'),
+        t('guide.steps.votesDetails.3'),
+      ],
+    },
+    {
+      icon: <Bell className="icon-large" />,
+      title: t('guide.steps.notificationsTitle2'),
+      description: t('guide.steps.notificationsDesc2'),
+      details: [
+        t('guide.steps.notificationsDetails.0'),
+        t('guide.steps.notificationsDetails.1'),
+        t('guide.steps.notificationsDetails.2'),
+        t('guide.steps.notificationsDetails.3'),
+      ],
+    },
   ];
 
+  // כרגע הסקשן של tips אצלך בהערה, אבל השארתי את המערך מוכן למקרה שתחזיר אותו
   const tips = [
-    { icon: <Zap className="icon-small" />, title: 'קיצורי דרך', description: 'שימוש במקלדת למעבר מהיר בין דפים' },
-    { icon: <Smartphone className="icon-small" />, title: 'גרסה ניידת', description: 'השתמש במערכת מכל מכשיר, בכל מקום' },
-    { icon: <Shield className="icon-small" />, title: 'פרטיות ואבטחה', description: 'המידע שלך מוגן ומאובטח' },
-    { icon: <Headphones className="icon-small" />, title: 'תמיכה טכנית', description: 'צוות התמיכה זמין לעזרה 24/7' }
+    {
+      icon: <Zap className="icon-small" />,
+      title: t('guide.tips.shortcutsTitle2'),
+      description: t('guide.tips.shortcutsDesc2'),
+    },
+    {
+      icon: <Smartphone className="icon-small" />,
+      title: t('guide.tips.mobileTitle2'),
+      description: t('guide.tips.mobileDesc2'),
+    },
+    {
+      icon: <Shield className="icon-small" />,
+      title: t('guide.tips.privacyTitle2'),
+      description: t('guide.tips.privacyDesc2'),
+    },
+    {
+      icon: <Headphones className="icon-small" />,
+      title: t('guide.tips.supportTitle2'),
+      description: t('guide.tips.supportDesc2'),
+    },
   ];
 
   return (
-    <div className="container" dir="rtl">
+    <div className="container" >
       <header className="hero">
-        <h1 className="hero-title">מדריך למשתמש</h1>
-        <p className="hero-subtitle">כל מה שצריך לדעת על המערכת במקום אחד</p>
-   
+        <h1 className="hero-title">{t('guide.pageTitle')}</h1>
+        <p className="hero-subtitle">{t('guide.pageSubtitle')}</p>
       </header>
 
       <section className="flow-section">
-        <h2 className="section-title">תרשים זרימת המערכת</h2>
+        <h2 className="section-title">{t('guide.flow.title')}</h2>
         <FlowDiagram />
       </section>
 
       <section className="steps-section">
-        {steps.map((step,index) => (
-          <div key={index} className="step-card" onClick={()=>toggleSection(index)}>
+        {steps.map((step, index) => (
+          <div
+            key={index}
+            className="step-card"
+            onClick={() => toggleSection(index)}
+            role="button"
+            tabIndex={0}
+          >
             <div className="step-header">
               <div className="step-icon">{step.icon}</div>
               <div>
                 <h3>{step.title}</h3>
                 <p>{step.description}</p>
               </div>
-              {expandedSection === index ? <ChevronUp className="icon-small"/> : <ChevronDown className="icon-small"/>}
+              {expandedSection === index ? (
+                <ChevronUp className="icon-small" />
+              ) : (
+                <ChevronDown className="icon-small" />
+              )}
             </div>
-            {expandedSection===index && (
+
+            {expandedSection === index && (
               <ul className="step-details">
-                {step.details.map((d,i)=><li key={i}><span>{i+1}</span>{d}</li>)}
+                {step.details.map((d, i) => (
+                  <li key={i}>
+                    <span>{i + 1}</span>
+                    {d}
+                  </li>
+                ))}
               </ul>
             )}
           </div>
         ))}
       </section>
-{/* <div className="video-row">
-    <div className="video-main">
-      <video controls>
-        <source src="phone-video.mp4" type="video/mp4" />
-      </video>
-    </div>
-  </div> */}
 
-
-      {/* <div className="video-row">
-    <div className="video-small">
-      <video controls>
-        <source src="small1.mp4" type="video/mp4" />
-      </video>
-    </div>
-    <div className="video-small">
-      <video controls>
-        <source src="small2.mp4" type="video/mp4" />
-      </video>
-    </div>
-  </div> */}
-
-      {/* <section className="tips-section">
-        <h2 className="section-title">טיפים ותכונות נוספות</h2>
+      {/* אם תחזיר את הטיפים, זה כבר מוכן:
+      <section className="tips-section">
+        <h2 className="section-title">{t('guide.tips.sectionTitle')}</h2>
         <div className="tips-grid">
-          {tips.map((tip,i)=>(
+          {tips.map((tip, i) => (
             <div key={i} className="tip-card">
               <div className="tip-icon">{tip.icon}</div>
               <h4>{tip.title}</h4>
@@ -111,7 +193,8 @@ export default function EnhancedUserGuide() {
             </div>
           ))}
         </div>
-      </section> */}
+      </section>
+      */}
     </div>
   );
 }

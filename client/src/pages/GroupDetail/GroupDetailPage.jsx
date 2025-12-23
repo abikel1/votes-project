@@ -82,7 +82,7 @@ function GroupDetailPageContent() {
 
   const navGroupId = location.state?.groupId || null;
   const [groupId, setGroupId] = useState(navGroupId);
-const [descExpanded, setDescExpanded] = useState(false);
+  const [descExpanded, setDescExpanded] = useState(false);
 
   const {
     selectedGroup: group,
@@ -93,7 +93,7 @@ const [descExpanded, setDescExpanded] = useState(false);
   const candidates = useSelector(selectCandidatesForGroup(groupId || '')) || [];
   const loadingCandidates = useSelector(selectCandidatesLoadingForGroup(groupId || ''));
   const errorCandidates = useSelector(selectCandidatesErrorForGroup(groupId || ''));
-const toggleDesc = () => setDescExpanded(prev => !prev);
+  const toggleDesc = () => setDescExpanded(prev => !prev);
 
   const joinedIdsSet = useSelector(selectMyJoinedIds);
 
@@ -195,53 +195,53 @@ const toggleDesc = () => setDescExpanded(prev => !prev);
   const [barData, setBarData] = useState([]);
   const [pieData, setPieData] = useState([]);
 
-// גרפים נפרדים לתוצאות הסופיות (votes)
-const [voteBarData, setVoteBarData] = useState([]);
-const [votePieData, setVotePieData] = useState([]);
+  // גרפים נפרדים לתוצאות הסופיות (votes)
+  const [voteBarData, setVoteBarData] = useState([]);
+  const [votePieData, setVotePieData] = useState([]);
 
 
 
-// ב-2 useEffect נפרדים:
+  // ב-2 useEffect נפרדים:
 
-// 1. גרפים של לייקים (סקר תמיכה)
-useEffect(() => {
-  if (!candidatesWithCampaign || candidatesWithCampaign.length === 0) return;
+  // 1. גרפים של לייקים (סקר תמיכה)
+  useEffect(() => {
+    if (!candidatesWithCampaign || candidatesWithCampaign.length === 0) return;
 
-  const bar = candidatesWithCampaign.map(c => ({
-    name: c.name ? (c.name.length > 12 ? c.name.slice(0, 12) + '...' : c.name) : 'לא ידוע',
-    likeCount: Number(c.campaign?.likeCount || 0),
-  }));
-
-  const pie = candidatesWithCampaign
-    .filter(c => Number(c.campaign?.likeCount || 0) > 0)
-    .map(c => ({
-      name: c.name,
-      value: Number(c.campaign.likeCount),
+    const bar = candidatesWithCampaign.map(c => ({
+      name: c.name ? (c.name.length > 12 ? c.name.slice(0, 12) + '...' : c.name) : 'לא ידוע',
+      likeCount: Number(c.campaign?.likeCount || 0),
     }));
 
-  setBarData(bar);
-  setPieData(pie);
-}, [candidatesWithCampaign]);
+    const pie = candidatesWithCampaign
+      .filter(c => Number(c.campaign?.likeCount || 0) > 0)
+      .map(c => ({
+        name: c.name,
+        value: Number(c.campaign.likeCount),
+      }));
 
-// 2. גרפים של הצבעות (תוצאות סופיות)
-useEffect(() => {
-  if (!candidates || candidates.length === 0) return;
+    setBarData(bar);
+    setPieData(pie);
+  }, [candidatesWithCampaign]);
 
-  const bar = candidates.map(c => ({
-    name: c.name ? (c.name.length > 12 ? c.name.slice(0, 12) + '...' : c.name) : 'לא ידוע',
-    votesCount: Number(c.votesCount || 0),
-  }));
+  // 2. גרפים של הצבעות (תוצאות סופיות)
+  useEffect(() => {
+    if (!candidates || candidates.length === 0) return;
 
-  const pie = candidates
-    .filter(c => Number(c.votesCount || 0) > 0)
-    .map(c => ({
-      name: c.name,
-      value: Number(c.votesCount),
+    const bar = candidates.map(c => ({
+      name: c.name ? (c.name.length > 12 ? c.name.slice(0, 12) + '...' : c.name) : 'לא ידוע',
+      votesCount: Number(c.votesCount || 0),
     }));
 
-  setVoteBarData(bar);
-  setVotePieData(pie);
-}, [candidates]);
+    const pie = candidates
+      .filter(c => Number(c.votesCount || 0) > 0)
+      .map(c => ({
+        name: c.name,
+        value: Number(c.votesCount),
+      }));
+
+    setVoteBarData(bar);
+    setVotePieData(pie);
+  }, [candidates]);
 
   // ===== לאחר טעינת הקבוצה =====
   useEffect(() => {
@@ -508,53 +508,53 @@ useEffect(() => {
         </button>
       )}
 
-<div id="group-detail-header" className="page-header clean-header">
-  <div className="header-title">
-    {/* שם הקבוצה תמיד מלא */}
-    <h2 className="group-name" title={group.name}>
-      {group.name}
-    </h2>
+      <div id="group-detail-header" className="page-header clean-header">
+        <div className="header-title">
+          {/* שם הקבוצה תמיד מלא */}
+          <h2 className="group-name" title={group.name}>
+            {group.name}
+          </h2>
 
-    {/* תיאור עם 'קרא עוד/קרא פחות' */}
-    {group.description && (
-      <div className={`group-description-container ${descExpanded ? 'expanded' : ''}`}>
-        <p className="group-description">{group.description}</p>
-        {group.description.length > 50 && (
-          <button className="read-more-btn" onClick={toggleDesc}>
-  {descExpanded ? (
-        <>
-          פחות <BiChevronUp size={18} style={{ verticalAlign: 'middle' }} />
-        </>
-      ) : (
-        <>
-          עוד <BiChevronDown size={18} style={{ verticalAlign: 'middle' }} />
-        </>
-      )}          </button>
-        )}
+          {/* תיאור עם 'קרא עוד/קרא פחות' */}
+          {group.description && (
+            <div className={`group-description-container ${descExpanded ? 'expanded' : ''}`}>
+              <p className="group-description">{group.description}</p>
+              {group.description.length > 50 && (
+                <button className="read-more-btn" onClick={toggleDesc}>
+                  {descExpanded ? (
+                    <>
+                      {t('groups.detail.readMore.less')} <BiChevronUp size={18} style={{ verticalAlign: 'middle' }} />
+                    </>
+                  ) : (
+                    <>
+                      {t('groups.detail.readMore.more')} <BiChevronDown size={18} style={{ verticalAlign: 'middle' }} />
+                    </>
+                  )}          </button>
+              )}
+            </div>
+          )}
+        </div>
+
+        <div className="icon-btn-container">
+          {isOwner && (
+            <button
+              id="settings-button"
+              className="icon-btn"
+              onClick={goSettings}
+              title={t('groups.detail.buttons.settings')}
+            >
+              <FiSettings size={20} />
+            </button>
+          )}
+          <button
+            className="icon-btn"
+            onClick={() => navigate('/groups')}
+            title={t('groups.detail.buttons.backToGroups')}
+          >
+            <BiArrowBack size={20} />
+          </button>
+        </div>
       </div>
-    )}
-  </div>
-
-  <div className="icon-btn-container">
-    {isOwner && (
-      <button
-        id="settings-button"
-        className="icon-btn"
-        onClick={goSettings}
-        title={t('groups.detail.buttons.settings')}
-      >
-        <FiSettings size={20} />
-      </button>
-    )}
-    <button
-      className="icon-btn"
-      onClick={() => navigate('/groups')}
-      title={t('groups.detail.buttons.backToGroups')}
-    >
-      <BiArrowBack size={20} />
-    </button>
-  </div>
-</div>
 
 
 
@@ -615,13 +615,13 @@ useEffect(() => {
             className={`mobile-tab ${activeTab === 'candidates' ? 'active' : ''}`}
             onClick={() => setActiveTab('candidates')}
           >
-            מועמדים
+            {t('groups.detail.tabs.candidates')}
           </button>
           <button
             className={`mobile-tab ${activeTab === 'info' ? 'active' : ''}`}
             onClick={() => setActiveTab('info')}
           >
-            מידע וגרפים
+            {t('groups.detail.tabs.info')}
           </button>
         </div>
       )}
@@ -642,78 +642,78 @@ useEffect(() => {
             )}
 
 
-{!loadingCandidates && candidates.length > 0 && (
-  <div className="candidates-grid">
-    {sortedCandidates.map((c, index) => {
-      const winnerIndex = winners.findIndex((w) => w._id === c._id);
-      const hasCampaign = !!c.userId; // בדיקה אם יש קמפיין
+            {!loadingCandidates && candidates.length > 0 && (
+              <div className="candidates-grid">
+                {sortedCandidates.map((c, index) => {
+                  const winnerIndex = winners.findIndex((w) => w._id === c._id);
+                  const hasCampaign = !!c.userId; // בדיקה אם יש קמפיין
 
-      return (
-        <div
-          key={c._id}
-          id={`candidate-card-${c._id}`}
-          className={`candidate-card ${winnerIndex !== -1 ? 'winner' : ''} ${hasCampaign ? 'clickable' : ''}`}
-          onClick={() => {
-            if (hasCampaign) {
-              const candidateSlug = makeCandidateSlug(c.name || '');
-              navigate(`/campaign/${slug}/${candidateSlug}`, {
-                state: { groupId },
-              });
-            }
-          }}
-          style={hasCampaign ? { cursor: 'pointer' } : {}}
-        >
-          {c.photoUrl && (
-            <img
-              src={c.photoUrl || '/h.jpg'}
-              alt={t('groups.detail.candidates.imageAlt')}
-              className="candidate-avatar"
-              onError={(e) => {
-                e.currentTarget.onerror = null;
-                e.currentTarget.src = '/h.jpg';
-              }}
-            />
-          )}
+                  return (
+                    <div
+                      key={c._id}
+                      id={`candidate-card-${c._id}`}
+                      className={`candidate-card ${winnerIndex !== -1 ? 'winner' : ''} ${hasCampaign ? 'clickable' : ''}`}
+                      onClick={() => {
+                        if (hasCampaign) {
+                          const candidateSlug = makeCandidateSlug(c.name || '');
+                          navigate(`/campaign/${slug}/${candidateSlug}`, {
+                            state: { groupId },
+                          });
+                        }
+                      }}
+                      style={hasCampaign ? { cursor: 'pointer' } : {}}
+                    >
+                      {c.photoUrl && (
+                        <img
+                          src={c.photoUrl || '/h.jpg'}
+                          alt={t('groups.detail.candidates.imageAlt')}
+                          className="candidate-avatar"
+                          onError={(e) => {
+                            e.currentTarget.onerror = null;
+                            e.currentTarget.src = '/h.jpg';
+                          }}
+                        />
+                      )}
 
-          {/* אם הקבוצה נגמרה והמועמד מנצח – הצג מקום */}
-          {isGroupExpired && winnerIndex !== -1 && (
-            <div className="winner-badge">
-              {winnerIndex + 1}
-            </div>
-          )}
+                      {/* אם הקבוצה נגמרה והמועמד מנצח – הצג מקום */}
+                      {isGroupExpired && winnerIndex !== -1 && (
+                        <div className="winner-badge">
+                          {winnerIndex + 1}
+                        </div>
+                      )}
 
-          {c.userId && (
-            <button
-              className="campaign-btn"
-              onClick={(e) => {
-                e.stopPropagation(); // מונע את הלחיצה על הכרטיס
-                const candidateSlug = makeCandidateSlug(c.name || '');
-                navigate(`/campaign/${slug}/${candidateSlug}`, {
-                  state: { groupId },
-                });
-              }}
-              title={t('groups.detail.candidates.myCampaignTitle')}
-            >
-              <FiZap size={16} />
-            </button>
-          )}
+                      {c.userId && (
+                        <button
+                          className="campaign-btn"
+                          onClick={(e) => {
+                            e.stopPropagation(); // מונע את הלחיצה על הכרטיס
+                            const candidateSlug = makeCandidateSlug(c.name || '');
+                            navigate(`/campaign/${slug}/${candidateSlug}`, {
+                              state: { groupId },
+                            });
+                          }}
+                          title={t('groups.detail.candidates.myCampaignTitle')}
+                        >
+                          <FiZap size={16} />
+                        </button>
+                      )}
 
-          <div className="candidate-text">
-            <h4>{c.name}</h4>
-            {c.description && <p>{c.description}</p>}
-          </div>
+                      <div className="candidate-text">
+                        <h4>{c.name}</h4>
+                        {c.description && <p>{c.description}</p>}
+                      </div>
 
-          {isGroupExpired && (
-            <div className="votes-count">
-              {c.votesCount || 0}{' '}
-              {t('groups.detail.candidates.cardVotesSuffix')}
-            </div>
-          )}
-        </div>
-      );
-    })}
-  </div>
-)}
+                      {isGroupExpired && (
+                        <div className="votes-count">
+                          {c.votesCount || 0}{' '}
+                          {t('groups.detail.candidates.cardVotesSuffix')}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            )}
 
             {!loadingCandidates && candidates.length === 0 && (
               <p>{t('groups.detail.candidates.none')}</p>
@@ -772,119 +772,119 @@ useEffect(() => {
               </div>
 
               {/* גרפים – מחוץ ל-grid */}
-{/* גרפים – מחוץ ל-grid */}
-{candidatesWithCampaign &&
- candidatesWithCampaign.length > 0 &&
- barData.some((c) => c.likeCount > 0) && (
-  <div className="survey-card">
-    <h3>סקר תמיכה (לא תוצאות רשמיות)</h3>
-    <p className="survey-note">
-      נתוני הסקר מתבססים על תמיכה בקמפיין. רק מועמד עם קמפיין פעיל יכול לקבל תמיכה.
-    </p>
+              {/* גרפים – מחוץ ל-grid */}
+              {candidatesWithCampaign &&
+                candidatesWithCampaign.length > 0 &&
+                barData.some((c) => c.likeCount > 0) && (
+                  <div className="survey-card">
+                    <h3>סקר תמיכה (לא תוצאות רשמיות)</h3>
+                    <p className="survey-note">
+                      נתוני הסקר מתבססים על תמיכה בקמפיין. רק מועמד עם קמפיין פעיל יכול לקבל תמיכה.
+                    </p>
 
-    <div className="survey-charts-container">
-      {/* Bar Chart */}
-      <div className="survey-chart chart-bar">
-        <ResponsiveContainer width="100%" height={300}>
-          <BarChart data={barData}>
-            <XAxis dataKey="name" angle={-45} textAnchor="end" height={50} />
-            <YAxis />
-            <Tooltip formatter={(v) => `${v} תמיכה`} labelFormatter={() => ''} />
-            <Bar dataKey="likeCount">
-              {barData.map((entry, index) => (
-                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-              ))}
-            </Bar>
-          </BarChart>
-        </ResponsiveContainer>
-      </div>
+                    <div className="survey-charts-container">
+                      {/* Bar Chart */}
+                      <div className="survey-chart chart-bar">
+                        <ResponsiveContainer width="100%" height={300}>
+                          <BarChart data={barData}>
+                            <XAxis dataKey="name" angle={-45} textAnchor="end" height={50} />
+                            <YAxis />
+                            <Tooltip formatter={(v) => `${v} תמיכה`} labelFormatter={() => ''} />
+                            <Bar dataKey="likeCount">
+                              {barData.map((entry, index) => (
+                                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                              ))}
+                            </Bar>
+                          </BarChart>
+                        </ResponsiveContainer>
+                      </div>
 
-      {/* Pie Chart */}
-      <div className="survey-chart chart-pie">
-        <ResponsiveContainer width="100%" height={300}>
-          <PieChart>
-            <Pie
-              data={pieData}
-              cx="50%"
-              cy="50%"
-              outerRadius={90}
-              dataKey="value"
-              label
-            >
-              {pieData.map((entry, index) => (
-                <Cell key={index} fill={COLORS[index % COLORS.length]} />
-              ))}
-            </Pie>
-            <Tooltip formatter={(v) => `${v} תמיכה`} labelFormatter={() => ''} />
-            <Legend />
-          </PieChart>
-        </ResponsiveContainer>
-      </div>
-    </div>
-  </div>
-)}
+                      {/* Pie Chart */}
+                      <div className="survey-chart chart-pie">
+                        <ResponsiveContainer width="100%" height={300}>
+                          <PieChart>
+                            <Pie
+                              data={pieData}
+                              cx="50%"
+                              cy="50%"
+                              outerRadius={90}
+                              dataKey="value"
+                              label
+                            >
+                              {pieData.map((entry, index) => (
+                                <Cell key={index} fill={COLORS[index % COLORS.length]} />
+                              ))}
+                            </Pie>
+                            <Tooltip formatter={(v) => `${v} תמיכה`} labelFormatter={() => ''} />
+                            <Legend />
+                          </PieChart>
+                        </ResponsiveContainer>
+                      </div>
+                    </div>
+                  </div>
+                )}
 
 
             </div>
           )}
 
 
-        
 
-{isGroupExpired && totalVotes > 0 && (
-  <div className="charts">
-    <div className="pie-chart-container">
-      <h3>{t('groups.detail.charts.pieTitle')}</h3>
-      <ResponsiveContainer width="100%" height={250}>
-        <PieChart>
-          <Pie
-            data={votePieData}  // 👈 שינוי כאן
-            dataKey="value"
-            nameKey="name"
-            cx="50%"
-            cy="50%"
-            outerRadius="80%"
-          >
-            {votePieData.map((_, i) => (  // 👈 שינוי כאן
-              <Cell
-                key={i}
-                fill={COLORS[i % COLORS.length]}
-              />
-            ))}
-          </Pie>
-          <Tooltip
-            formatter={(v) =>
-              `${v} ${t('groups.detail.charts.tooltipVotesSuffix')}`
-            }
-          />
-          <Legend verticalAlign="bottom" height={25} />
-        </PieChart>
-      </ResponsiveContainer>
-    </div>
 
-    <div className="bar-chart-container">
-      <h3>{t('groups.detail.charts.barTitle')}</h3>
-      <ResponsiveContainer width="100%" height={250}>
-        <BarChart data={voteBarData}>  {/* 👈 שינוי כאן */}
-          <XAxis
-            dataKey="name"
-            angle={-45}
-            textAnchor="end"
-            height={50}
-            interval={0}
-          />
-          <YAxis />
-          <Tooltip
-            formatter={(v) =>
-              `${v} ${t('groups.detail.charts.tooltipVotesSuffix')}`
-            }
-          />
-          <Bar dataKey="votesCount" fill="#003366" />
-        </BarChart>
-      </ResponsiveContainer>
-    </div>
-  </div>
-)}
+          {isGroupExpired && totalVotes > 0 && (
+            <div className="charts">
+              <div className="pie-chart-container">
+                <h3>{t('groups.detail.charts.pieTitle')}</h3>
+                <ResponsiveContainer width="100%" height={250}>
+                  <PieChart>
+                    <Pie
+                      data={votePieData}  // 👈 שינוי כאן
+                      dataKey="value"
+                      nameKey="name"
+                      cx="50%"
+                      cy="50%"
+                      outerRadius="80%"
+                    >
+                      {votePieData.map((_, i) => (  // 👈 שינוי כאן
+                        <Cell
+                          key={i}
+                          fill={COLORS[i % COLORS.length]}
+                        />
+                      ))}
+                    </Pie>
+                    <Tooltip
+                      formatter={(v) =>
+                        `${v} ${t('groups.detail.charts.tooltipVotesSuffix')}`
+                      }
+                    />
+                    <Legend verticalAlign="bottom" height={25} />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+
+              <div className="bar-chart-container">
+                <h3>{t('groups.detail.charts.barTitle')}</h3>
+                <ResponsiveContainer width="100%" height={250}>
+                  <BarChart data={voteBarData}>  {/* 👈 שינוי כאן */}
+                    <XAxis
+                      dataKey="name"
+                      angle={-45}
+                      textAnchor="end"
+                      height={50}
+                      interval={0}
+                    />
+                    <YAxis />
+                    <Tooltip
+                      formatter={(v) =>
+                        `${v} ${t('groups.detail.charts.tooltipVotesSuffix')}`
+                      }
+                    />
+                    <Bar dataKey="votesCount" fill="#003366" />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+          )}
 
           {isGroupExpired && totalVotes === 0 && (
             <div className="no-votes-message">
@@ -896,7 +896,7 @@ useEffect(() => {
 
       {/* כפתור צ'אט צף בצד ימין למטה – יוצג רק אם המשתמש מחובר */}
       {isAuthed && (
-        <>
+        <div className="chat-fab-wrap">
           <button
             id="chat-fab"
             type="button"
@@ -905,24 +905,22 @@ useEffect(() => {
           >
             {isChatOpen ? <FiX size={20} /> : <FiMessageSquare size={20} />}
           </button>
-       {isChatOpen && (
-  <div className="chat-panel" id="group-chat-panel">
-    <div className="chat-panel-header" />
-    <GroupChat
-      groupId={groupId}
-      canChat={canChat}
-      currentUserId={myId}
-      isOwner={isOwner}
-    />
-  </div>
-)}
 
-        </>
+          {isChatOpen && (
+            <div className="chat-panel" id="group-chat-panel">
+              <div className="chat-panel-header" />
+              <GroupChat
+                groupId={groupId}
+                canChat={canChat}
+                currentUserId={myId}
+                isOwner={isOwner}
+              />
+            </div>
+          )}
+        </div>
       )}
     </div>
   );
-
-
 }
 export default function GroupDetailPage() {
   return (

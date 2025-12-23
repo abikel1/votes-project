@@ -55,8 +55,8 @@ export default function GroupChat({ groupId, canChat, currentUserId, isOwner }) 
     const inputRef = useRef(null);
 
     const [socket, setSocket] = useState(null);
-const [confirmOpen, setConfirmOpen] = React.useState(false);
-const [messageToDelete, setMessageToDelete] = React.useState(null);
+    const [confirmOpen, setConfirmOpen] = React.useState(false);
+    const [messageToDelete, setMessageToDelete] = React.useState(null);
 
     // גלילה למטה כשמגיעות הודעות ואנחנו בתחתית
     useEffect(() => {
@@ -218,11 +218,11 @@ const [messageToDelete, setMessageToDelete] = React.useState(null);
         setIsAtBottom(true);
     };
 
-const handleDelete = (messageId) => {
-    if (!messageId || !groupId) return;
-    setMessageToDelete(messageId);
-    setConfirmOpen(true);
-};
+    const handleDelete = (messageId) => {
+        if (!messageId || !groupId) return;
+        setMessageToDelete(messageId);
+        setConfirmOpen(true);
+    };
 
 
 
@@ -239,42 +239,43 @@ const handleDelete = (messageId) => {
     };
 
     const handleConfirmDelete = () => {
-    if (!messageToDelete || !groupId || !socket) return;
+        if (!messageToDelete || !groupId || !socket) return;
 
-    setSending(true);
-    setError('');
+        setSending(true);
+        setError('');
 
-    socket.emit(
-        'chat:delete',
-        { groupId, messageId: messageToDelete },
-        (res) => {
-            if (!res || !res.ok) {
-                setError(res?.message || 'שגיאה במחיקת ההודעה');
+        socket.emit(
+            'chat:delete',
+            { groupId, messageId: messageToDelete },
+            (res) => {
+                if (!res || !res.ok) {
+                    setError(res?.message || 'שגיאה במחיקת ההודעה');
+                }
+                setSending(false);
+                setMenuOpenFor(null);
             }
-            setSending(false);
-            setMenuOpenFor(null);
+        );
+
+        if (editingId === messageToDelete) {
+            setEditingId(null);
+            setText('');
         }
-    );
 
-    if (editingId === messageToDelete) {
-        setEditingId(null);
-        setText('');
-    }
+        setConfirmOpen(false);
+        setMessageToDelete(null);
+    };
 
-    setConfirmOpen(false);
-    setMessageToDelete(null);
-};
-
-const handleCancelDelete = () => {
-    setConfirmOpen(false);
-    setMessageToDelete(null);
-};
+    const handleCancelDelete = () => {
+        setConfirmOpen(false);
+        setMessageToDelete(null);
+    };
 
 
     const formatTime = (dateString) => {
         if (!dateString) return '';
         const d = new Date(dateString);
-        return d.toLocaleTimeString('he-IL', {
+        const locale = i18n.language?.startsWith('he') ? 'he-IL' : 'en-US';
+        return d.toLocaleTimeString(locale, {
             hour: '2-digit',
             minute: '2-digit',
         });
@@ -405,14 +406,12 @@ const handleCancelDelete = () => {
                         return (
                             <div
                                 key={id}
-                                className={`group-chat-message-row ${
-                                    isMineBase ? 'mine' : 'theirs'
-                                } ${isAi ? 'ai' : ''}`}
+                                className={`group-chat-message-row ${isMineBase ? 'mine' : 'theirs'
+                                    } ${isAi ? 'ai' : ''}`}
                             >
                                 <div
-                                    className={`group-chat-message ${
-                                        isMineBase ? 'mine' : 'theirs'
-                                    } ${isDeleted ? 'deleted' : ''} ${isAi ? 'ai' : ''}`}
+                                    className={`group-chat-message ${isMineBase ? 'mine' : 'theirs'
+                                        } ${isDeleted ? 'deleted' : ''} ${isAi ? 'ai' : ''}`}
                                 >
                                     <div className="group-chat-message-header">
                                         <span className="group-chat-sender">{displayName}</span>
@@ -581,11 +580,11 @@ const handleCancelDelete = () => {
             </form>
 
             <ConfirmModal
-    open={confirmOpen}
-    message="למחוק את ההודעה?"
-    onConfirm={handleConfirmDelete}
-    onCancel={handleCancelDelete}
-/>
+                open={confirmOpen}
+                message={t('chat.confirmDelete')}
+                onConfirm={handleConfirmDelete}
+                onCancel={handleCancelDelete}
+            />
 
         </div>
     );

@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import CandidateForm from '../../components/GroupSettings/CandidateForm';
 import http from '../../api/http';
 import { useTranslation } from 'react-i18next';
+import toast from 'react-hot-toast';
 
 export default function CandidatesTab({
   candidates,
@@ -24,14 +25,14 @@ export default function CandidatesTab({
   const [localUploading, setLocalUploading] = useState(false);
 
   // ✅ פונקציה להעלאת תמונה
-const onUploadNew = async (file) => {
-  console.log('Uploading file:', file); // ← בדיקה
-  if (!file) return;
-  setLocalUploading(true);
+  const onUploadNew = async (file) => {
+    console.log('Uploading file:', file); // ← בדיקה
+    if (!file) return;
+    setLocalUploading(true);
 
-  try {
-    const formData = new FormData();
-    formData.append('image', file);
+    try {
+      const formData = new FormData();
+      formData.append('image', file);
 
 
       const { data } = await http.post('/upload', formData, {
@@ -39,14 +40,14 @@ const onUploadNew = async (file) => {
       });
 
 
-    setCandForm((prev) => ({ ...prev, photoUrl: data.url }));
-  } catch (err) {
-    console.error('Upload error:', err);
-    alert(t('candidates.upload.error'));
-  } finally {
-    setLocalUploading(false);
-  }
-};
+      setCandForm((prev) => ({ ...prev, photoUrl: data.url }));
+    } catch (err) {
+      console.error('Upload error:', err);
+      toast.error(t('candidates.upload.error'));
+    } finally {
+      setLocalUploading(false);
+    }
+  };
 
 
 
@@ -54,7 +55,7 @@ const onUploadNew = async (file) => {
     <section className="card">
 
 
-{/* <div className="actions-row">
+      {/* <div className="actions-row">
   <button className="clean-btn clean-btn-save">שמירה</button>
   <button className="clean-btn clean-btn-cancel">ביטול</button>
   <button className="clean-btn clean-btn-edit">עריכה</button>
@@ -72,8 +73,9 @@ const onUploadNew = async (file) => {
           {candLoading ? (
             <div>{t('candidates.list.loading')}</div>
           ) : candError ? (
-            <div className="err">{candError}</div>
+            <div className="err">{t(candError)}</div>
           ) : !candidates.length ? (
+
             <div className="muted">
               {t('candidates.list.empty')}
             </div>
@@ -89,8 +91,8 @@ const onUploadNew = async (file) => {
                           alt={
                             c.name
                               ? t('candidates.list.photoAltWithName', {
-                                  name: c.name,
-                                })
+                                name: c.name,
+                              })
                               : t('candidates.list.photoAlt')
                           }
                           className="avatar"

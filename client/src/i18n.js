@@ -946,7 +946,146 @@ i18n
                             "desc": "הצטרפו אלינו והפכו את הבחירות הבאות שלכם לחוויה דיגיטלית, דמוקרטית ומקצועית.",
                             "button": "צור קבוצת בחירות עכשיו"
                         }
-                    }
+                    },
+                    // User Guide - Enhanced page
+                    'guide.pageTitle': 'מדריך למשתמש',
+                    'guide.pageSubtitle': 'כל מה שצריך לדעת על המערכת במקום אחד',
+
+                    'guide.flow.title': 'תרשים זרימת המערכת',
+                    'guide.flow.register': 'הרשמה',
+                    'guide.flow.createGroup': 'יצירת קבוצה',
+                    'guide.flow.votes': 'הצבעות',
+                    'guide.flow.notifications': 'התראות',
+
+                    'guide.steps.registerTitle2': 'הרשמה למערכת',
+                    'guide.steps.registerDesc2': 'צור חשבון חדש במערכת תוך דקות ספורות',
+                    'guide.steps.registerDetails.0': 'מלא את הפרטים הבסיסיים',
+                    'guide.steps.registerDetails.1': 'אמת את כתובת האימייל שלך',
+                    'guide.steps.registerDetails.2': 'צור סיסמה חזקה ומאובטחת',
+                    'guide.steps.registerDetails.3': 'התחל להשתמש במערכת מיד',
+
+                    'guide.steps.groupsTitle2': 'ניהול קבוצות',
+                    'guide.steps.groupsDesc2': 'צור וצרף קבוצות, הזמן חברים ונהל הרשאות',
+                    'guide.steps.groupsDetails.0': 'צור קבוצה חדשה עם שם ותיאור',
+                    'guide.steps.groupsDetails.1': 'הזמן משתמשים באמצעות קישור או אימייל',
+                    'guide.steps.groupsDetails.2': 'הגדר הרשאות ותפקידים',
+                    'guide.steps.groupsDetails.3': 'עקוב אחר פעילות הקבוצה',
+
+                    'guide.steps.votesTitle2': 'הצבעות וסקרים',
+                    'guide.steps.votesDesc2': 'צור הצבעות, הצבע, וצפה בתוצאות בזמן אמת',
+                    'guide.steps.votesDetails.0': 'צור הצבעה חדשה עם אפשרויות מרובות',
+                    'guide.steps.votesDetails.1': 'הגדר זמן סיום להצבעה',
+                    'guide.steps.votesDetails.2': 'הצבע באופן פשוט ומהיר',
+                    'guide.steps.votesDetails.3': 'צפה בתוצאות גרפיות ומפורטות',
+
+                    'guide.steps.notificationsTitle2': 'התראות ועדכונים',
+                    'guide.steps.notificationsDesc2': 'קבל התראות על פעילות חשובה בקבוצות שלך',
+                    'guide.steps.notificationsDetails.0': 'התראות על הצבעות חדשות',
+                    'guide.steps.notificationsDetails.1': 'עדכונים על תוצאות הצבעות',
+                    'guide.steps.notificationsDetails.2': 'הזמנות לקבוצות חדשות',
+                    'guide.steps.notificationsDetails.3': 'התאמה אישית של העדפות התראות',
+
+                    'guide.tips.sectionTitle': 'טיפים ותכונות נוספות',
+                    'guide.tips.shortcutsTitle2': 'קיצורי דרך',
+                    'guide.tips.shortcutsDesc2': 'שימוש במקלדת למעבר מהיר בין דפים',
+                    'guide.tips.mobileTitle2': 'גרסה ניידת',
+                    'guide.tips.mobileDesc2': 'השתמש במערכת מכל מכשיר, בכל מקום',
+                    'guide.tips.privacyTitle2': 'פרטיות ואבטחה',
+                    'guide.tips.privacyDesc2': 'המידע שלך מוגן ומאובטח',
+                    'guide.tips.supportTitle2': 'תמיכה טכנית',
+                    'guide.tips.supportDesc2': 'צוות התמיכה זמין לעזרה 24/7',
+
+                    'groups.create.ai.noDescriptionError': 'לא התקבל תיאור מה-AI',
+                    'groups.create.ai.createdToast': 'נוצר תיאור מוצע',
+                    'groups.create.ai.genericError': 'שגיאה ביצירת תיאור אוטומטי',
+                    'groups.create.ai.appliedToast': 'התיאור עודכן מה-AI',
+
+                    'groups.create.ai.modal.title': 'עזרה בכתיבת תיאור (AI)',
+                    'groups.create.ai.modal.subtitle':
+                        'המערכת תשתמש בשם הקבוצה וההנחיה שלך ותציע תיאור קצר וברור (2–4 שורות).',
+
+                    'groups.create.ai.hintLabel': 'מה חשוב לך שיהיה בתיאור?',
+                    'groups.create.ai.hintPlaceholder': 'לא חובה – אפשר להשאיר ריק',
+
+                    'groups.create.ai.generating': 'יוצר תיאור…',
+                    'groups.create.ai.generate': 'יצירת הצעה',
+
+                    'groups.create.ai.previewLabel': 'תיאור מוצע:',
+                    'groups.create.ai.useDescription': 'השתמש בתיאור',
+                    chat: {
+                        confirmDelete: "למחוק את ההודעה?"
+                    },
+                    // ===== vote results notifier =====
+                    'votes.results.modalTitle': 'ההצבעה הסתיימה!',
+                    'votes.results.modalText': 'ההצבעה בקבוצה "{{name}}" הסתיימה ויש זוכה 🎉',
+                    'votes.results.winnersLabel': 'זוכה/ים:',
+                    'votes.results.seeWinnerButton': 'מעבר לדף הקבוצה',
+                    'votes.results.closeButton': 'סגור',
+                    'voting.alreadyVotedThisGroup': 'כבר הצבעת לקבוצה זו, לא ניתן להצביע שוב.',
+                    'imageCrop.title': 'חתוך תמונה',
+                    // === campaign page - missing keys ===
+
+                    // HE
+                    'campaign.loginRequired.title': 'לא ניתן לצפות בקמפיין',
+                    'campaign.loginRequired.message': 'כדי לצפות בדף הקמפיין עליך להתחבר למערכת.',
+                    'campaign.loginRequired.goToLogin': 'לעמוד התחברות',
+
+                    'campaign.posts.deletedSuccessfully': 'הפוסט נמחק בהצלחה',
+                    'campaign.posts.deleteError': 'שגיאה במחיקת הפוסט',
+
+                    'campaign.share.linkLabel': 'קישור לשיתוף:',
+                    'campaign.share.copy': 'העתק',
+                    'campaign.share.copied': 'הועתק!',
+                    'campaign.share.done': 'סיום',
+                    groups: {
+                        detail: {
+                            tabs: {
+                                candidates: "מועמדים",
+                                info: "מידע וגרפים"
+                            },
+                            readMore: {
+                                more: "עוד",
+                                less: "פחות"
+                            },
+                            survey: {
+                                title: "סקר תמיכה (לא תוצאות רשמיות)",
+                                note: "נתוני הסקר מתבססים על תמיכה בקמפיין. רק מועמד עם קמפיין פעיל יכול לקבל תמיכה.",
+                                tooltipSupportSuffix: "תמיכה"
+                            },
+                            common: {
+                                unknown: "לא ידוע"
+                            }
+                        }
+                    },
+                    "groups": {
+                        "list": {
+                            "tour": {
+                                "header": "כאן נמצאים הכלים של עמוד הקבוצות",
+                                "cardTitle": "כאן מוצג שם הקבוצה",
+                                "cardBadges": "סמלים המציינים סטטוס כמו נעול או הגשת מועמדות פתוחה",
+                                "cardDesc": "כאן מופיע תיאור קצר של הקבוצה",
+                                "cardOwner": "כאן מופיע מי מנהל/ת את הקבוצה",
+                                "cardFooter": "כאן מוצג תאריך סיום הקבוצה או שהיא פגה",
+                                "cardActions": "כאן נמצאים כפתורי הפעולה"
+                            },
+                            "card": {
+                                "candidateOpenTitle": "הגשת מועמדות פתוחה",
+                                "votingOpenTitle": "הצבעה פתוחה"
+                            }
+                        }
+                    },
+                    groups: {
+                        detail: {
+                            tour: {
+                                header: "כאן מוצג שם הקבוצה והתיאור שלה",
+                                meta: "כאן תראה את תאריך היצירה, תאריך הסיום וסך הקולות",
+                                voteButton: "לחץ כאן כדי להצביע למועמדים!",
+                                candidateCard: "כל כרטיס מציג מועמד עם תמונה, שם ותיאור",
+                                settingsButton: "כבעל הקבוצה, תוכל לנהל את הקבוצה מכאן"
+                            }
+                        }
+                    },
+
                 },
             },
             en: {
@@ -1870,7 +2009,145 @@ i18n
                             "desc": "Join us and turn your next elections into a digital, democratic, and professional experience.",
                             "button": "Create Election Group Now"
                         }
-                    }
+                    },
+
+                    // User Guide - Enhanced page
+                    'guide.pageTitle': 'User Guide',
+                    'guide.pageSubtitle': 'Everything you need to know about the system in one place',
+
+                    'guide.flow.title': 'System Flow Diagram',
+                    'guide.flow.register': 'Sign up',
+                    'guide.flow.createGroup': 'Create a group',
+                    'guide.flow.votes': 'Voting',
+                    'guide.flow.notifications': 'Notifications',
+
+                    'guide.steps.registerTitle2': 'Sign up',
+                    'guide.steps.registerDesc2': 'Create a new account in just a few minutes',
+                    'guide.steps.registerDetails.0': 'Fill in the basic details',
+                    'guide.steps.registerDetails.1': 'Verify your email address',
+                    'guide.steps.registerDetails.2': 'Create a strong and secure password',
+                    'guide.steps.registerDetails.3': 'Start using the system right away',
+
+                    'guide.steps.groupsTitle2': 'Group management',
+                    'guide.steps.groupsDesc2': 'Create and join groups, invite members, and manage permissions',
+                    'guide.steps.groupsDetails.0': 'Create a new group with a name and description',
+                    'guide.steps.groupsDetails.1': 'Invite users via a link or email',
+                    'guide.steps.groupsDetails.2': 'Set roles and permissions',
+                    'guide.steps.groupsDetails.3': 'Track group activity',
+
+                    'guide.steps.votesTitle2': 'Votes & polls',
+                    'guide.steps.votesDesc2': 'Create votes, vote, and see results in real time',
+                    'guide.steps.votesDetails.0': 'Create a new vote with multiple options',
+                    'guide.steps.votesDetails.1': 'Set an end time for the vote',
+                    'guide.steps.votesDetails.2': 'Vote quickly and easily',
+                    'guide.steps.votesDetails.3': 'View detailed visual results',
+
+                    'guide.steps.notificationsTitle2': 'Notifications & updates',
+                    'guide.steps.notificationsDesc2': 'Get notified about important activity in your groups',
+                    'guide.steps.notificationsDetails.0': 'Alerts for new votes',
+                    'guide.steps.notificationsDetails.1': 'Updates on vote results',
+                    'guide.steps.notificationsDetails.2': 'Invitations to new groups',
+                    'guide.steps.notificationsDetails.3': 'Customize notification preferences',
+
+                    'guide.tips.sectionTitle': 'Tips & extra features',
+                    'guide.tips.shortcutsTitle2': 'Shortcuts',
+                    'guide.tips.shortcutsDesc2': 'Use keyboard shortcuts to move quickly between pages',
+                    'guide.tips.mobileTitle2': 'Mobile version',
+                    'guide.tips.mobileDesc2': 'Use the system from any device, anywhere',
+                    'guide.tips.privacyTitle2': 'Privacy & security',
+                    'guide.tips.privacyDesc2': 'Your data is protected and secure',
+                    'guide.tips.supportTitle2': 'Technical support',
+                    'guide.tips.supportDesc2': 'Our support team is available 24/7',
+                    'groups.create.ai.noDescriptionError': 'No AI description was returned',
+                    'groups.create.ai.createdToast': 'Suggested description created',
+                    'groups.create.ai.genericError': 'Error generating an automatic description',
+                    'groups.create.ai.appliedToast': 'Description updated from AI',
+
+                    'groups.create.ai.modal.title': 'Help writing a description (AI)',
+                    'groups.create.ai.modal.subtitle':
+                        'The system will use the group name and your hint to suggest a short and clear description (2–4 lines).',
+
+                    'groups.create.ai.hintLabel': 'What should the description include?',
+                    'groups.create.ai.hintPlaceholder': 'Optional — you can leave it empty',
+
+                    'groups.create.ai.generating': 'Generating…',
+                    'groups.create.ai.generate': 'Generate suggestion',
+
+                    'groups.create.ai.previewLabel': 'Suggested description:',
+                    'groups.create.ai.useDescription': 'Use description',
+                    chat: {
+                        confirmDelete: "Delete this message?"
+                    },
+                    // ===== vote results notifier =====
+                    'votes.results.modalTitle': 'Voting has ended!',
+                    'votes.results.modalText': 'Voting in the group "{{name}}" has ended and there is a winner 🎉',
+                    'votes.results.winnersLabel': 'Winner(s):',
+                    'votes.results.seeWinnerButton': 'Go to group page',
+                    'votes.results.closeButton': 'Close',
+                    'voting.alreadyVotedThisGroup': 'You already voted in this group. You cannot vote again.',
+                    'imageCrop.title': 'Crop image',
+                    // EN
+                    'campaign.loginRequired.title': 'Cannot view campaign',
+                    'campaign.loginRequired.message': 'To view this campaign page, you must log in.',
+                    'campaign.loginRequired.goToLogin': 'Go to login',
+
+                    'campaign.posts.deletedSuccessfully': 'Post deleted successfully',
+                    'campaign.posts.deleteError': 'Failed to delete post',
+
+                    'campaign.stats.supp': 'supporters',
+
+                    'campaign.share.linkLabel': 'Share link:',
+                    'campaign.share.copy': 'Copy',
+                    'campaign.share.copied': 'Copied!',
+                    'campaign.share.done': 'Done',
+                    groups: {
+                        detail: {
+                            tabs: {
+                                candidates: "Candidates",
+                                info: "Info & Charts"
+                            },
+                            readMore: {
+                                more: "More",
+                                less: "Less"
+                            },
+                            survey: {
+                                title: "Support poll (not official results)",
+                                note: "Poll data is based on campaign support. Only candidates with an active campaign can receive support.",
+                                tooltipSupportSuffix: "supports"
+                            },
+                            common: {
+                                unknown: "Unknown"
+                            }
+                        }
+                    },
+                    "groups": {
+                        "list": {
+                            "tour": {
+                                "header": "These are the tools on the Groups page",
+                                "cardTitle": "This is the group name",
+                                "cardBadges": "Badges show statuses like locked or candidate submissions open",
+                                "cardDesc": "This is a short description of the group",
+                                "cardOwner": "This shows who manages the group",
+                                "cardFooter": "This shows the end date (or that the group expired)",
+                                "cardActions": "These are the available actions"
+                            },
+                            "card": {
+                                "candidateOpenTitle": "Candidate submissions are open",
+                                "votingOpenTitle": "Voting is open"
+                            }
+                        }
+                    },
+                    groups: {
+                        detail: {
+                            tour: {
+                                header: "Here you can see the group name and its description",
+                                meta: "Here you can view the creation date, end date, and total votes",
+                                voteButton: "Click here to vote for candidates!",
+                                candidateCard: "Each card shows a candidate with a photo, name, and description",
+                                settingsButton: "As the group owner, you can manage the group from here"
+                            }
+                        }
+                    },
                 },
             },
         },
