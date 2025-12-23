@@ -75,6 +75,9 @@
   margin: 0;
   color: var(--gs-text-muted);
   font-size: calc(1rem * var(--a11y-font-scale));
+
+  direction: rtl;        /* כיוון הטקסט מימין לשמאל */
+  text-align: right;     /* יישור לימין */
 }
 
 .gs-actions {

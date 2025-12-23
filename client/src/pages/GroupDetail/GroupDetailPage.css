@@ -1950,7 +1950,7 @@
     align-items: center;
     text-align: left;
     gap: 1rem;
-    max-width: 70%; /* מותאם לצד כפתורים */
+    max-width: 86%; /* מותאם לצד כפתורים */
   }
 
   .group-description-container {
