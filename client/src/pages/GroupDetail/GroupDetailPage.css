@@ -1,7 +1,5 @@
-
-
 /* ===== כפתור צ'אט צף ===== */
-.chat-fab {
+/* .chat-fab {
     position: fixed !important;
     bottom: 24px !important;
     right: 24px !important;
@@ -18,7 +16,7 @@
     z-index: 1000;
     border-radius: 50%;
     transition: transform 0.15s ease, box-shadow 0.15s ease;
-}
+} */
 
 .chat-fab:hover {
     transform: scale(1.08);
@@ -30,23 +28,23 @@
 }
 
 /* ===== חלון הצ'אט – תמיד יותר גבוה מהכפתור ===== */
-.chat-panel {
+/* .chat-panel {
     position: fixed !important;
     /* right: 24px !important; */
-    bottom: 6vw !important;
-    width: 380px;
-    /* max-height: 70vh; */
-    /* background-color: #ffffff; */
-    border-radius: 16px;
-    /* box-shadow: 0 10px 30px rgba(15, 23, 42, 0.3); */
-    padding: 0.75rem;
-    z-index: 100000;
-    display: flex;
-    flex-direction: column;
-    /* margin-left: 20px; */
-    /* background-color: #003366; */
+/* bottom: 6vw !important; */
+/* width: 380px; */
+/* max-height: 70vh; */
+/* background-color: #ffffff; */
+/* border-radius: 16px; */
+/* box-shadow: 0 10px 30px rgba(15, 23, 42, 0.3); */
+/* padding: 0.75rem; */
+/* z-index: 100000; */
+/* display: flex; */
+/* flex-direction: column; */
+/* margin-left: 20px; */
+/* background-color: #003366; */
 
-}
+/* } */
 
 
 
@@ -1807,6 +1805,7 @@
         /* אם תרצי רווחים ביניהם */
     }
 }
+
 /* במובייל – קצת להתקרב לקצה כדי שלא יתנגש עם הטקסט */
 @media (max-width: 768px) {
     .group-settings-btn-left {
@@ -1830,70 +1829,76 @@
 
 
 .page-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 8px 16px;
-  background-color: #fff;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.1);
-  flex-wrap: nowrap;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 16px;
+    background-color: #fff;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    flex-wrap: nowrap;
 }
 
 .header-title {
-  flex: 1 1 auto;
-  min-width: 0;  /* חשוב! מאפשר לשורות להתרחב בתוך flex */
+    flex: 1 1 auto;
+    min-width: 0;
+    /* חשוב! מאפשר לשורות להתרחב בתוך flex */
 }
 
 .group-name {
-  margin: 0;
-  font-size: 1.2rem;
-  font-weight: 600;
-  white-space: normal; /* מאפשר שבירה לשורות רבות */
-  overflow: visible;   /* חובה! אחרת הטקסט עלול להיחתך */
-  word-break: break-word; /* שוברת מילים ארוכות במקום לקפוץ */
+    margin: 0;
+    font-size: 1.2rem;
+    font-weight: 600;
+    white-space: normal;
+    /* מאפשר שבירה לשורות רבות */
+    overflow: visible;
+    /* חובה! אחרת הטקסט עלול להיחתך */
+    word-break: break-word;
+    /* שוברת מילים ארוכות במקום לקפוץ */
 }
 
 
 .icon-btn-container {
-  display: flex;
-  gap: 8px;
-  flex-shrink: 0;
-  align-items: center;
+    display: flex;
+    gap: 8px;
+    flex-shrink: 0;
+    align-items: center;
 }
 
 .icon-btn {
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 6px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #333;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #333;
 }
 
 .icon-btn:hover {
-  color: #007bff;
+    color: #007bff;
 }
 
 /* רספונסיבי טאבלט */
 @media (max-width: 1024px) {
-  .group-name {
-    font-size: 1.1rem;
-  }
-  .group-description {
-    font-size: 0.85rem;
-  }
+    .group-name {
+        font-size: 1.1rem;
+    }
+
+    .group-description {
+        font-size: 0.85rem;
+    }
 }
 
 /* רספונסיבי מובייל */
 @media (max-width: 600px) {
-  .group-name {
-    font-size: 1rem;
-  }
-  .group-description {
-    font-size: 0.8rem;
-  }
+    .group-name {
+        font-size: 1rem;
+    }
+
+    .group-description {
+        font-size: 0.8rem;
+    }
 }
 
 
@@ -1904,14 +1909,17 @@
 
 
 .survey-charts-container {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 20px; /* רווח בין הגרפים */
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    /* רווח בין הגרפים */
 }
 
 .survey-chart {
-  flex: 1 1 45%; /* כל גרף 45% מרוחב הקונטיינר, נשאר מקום לרווח */
-  min-width: 300px; /* לשמור על קריאות במובייל */
+    flex: 1 1 45%;
+    /* כל גרף 45% מרוחב הקונטיינר, נשאר מקום לרווח */
+    min-width: 300px;
+    /* לשמור על קריאות במובייל */
 }
 
 
@@ -1927,87 +1935,188 @@
 
 
 #group-detail-header {
-  display: flex;
-  justify-content: space-between;
-  gap: 1rem;
-  align-items: center; /* מרכז את הכותרת והכפתורים לאורך הציר האנכי */
-  flex-wrap: wrap; /* מאפשר לשורות לעבור שורה אם הצרכים גדולים */
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    align-items: center;
+    /* מרכז את הכותרת והכפתורים לאורך הציר האנכי */
+    flex-wrap: wrap;
+    /* מאפשר לשורות לעבור שורה אם הצרכים גדולים */
 }
 
 .header-title {
-  flex: 1 1 auto;
-  min-width: 0;
-  display: flex;
-  flex-direction: column; /* שם מעל תיאור */
-  gap: 0.5rem;
-  align-items: center; /* מרכז את השם והתיאור */
-  text-align: center; /* גם למקרה של מספר שורות */
-  max-width: 100%;
+    flex: 1 1 auto;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    /* שם מעל תיאור */
+    gap: 0.5rem;
+    align-items: center;
+    /* מרכז את השם והתיאור */
+    text-align: center;
+    /* גם למקרה של מספר שורות */
+    max-width: 100%;
 }
 
 @media screen and (min-width: 1024px) {
-  /* מחשב גדול */
-  .header-title {
-    flex-direction: row; /* שם לצד תיאור */
-    align-items: center;
-    text-align: left;
-    gap: 1rem;
-    max-width: 70%; /* מותאם לצד כפתורים */
-  }
 
-  .group-description-container {
-    flex: 1;
-  }
+    /* מחשב גדול */
+    .header-title {
+        flex-direction: row;
+        /* שם לצד תיאור */
+        align-items: center;
+        text-align: left;
+        gap: 1rem;
+        max-width: 70%;
+        /* מותאם לצד כפתורים */
+    }
 
-  .group-description {
-    -webkit-line-clamp: 2;
-  }
+    .group-description-container {
+        flex: 1;
+    }
+
+    .group-description {
+        -webkit-line-clamp: 2;
+    }
 }
 
 /* שאר סגנונות נשארים כפי שהיו */
 .group-name {
-  margin: 0;
-  font-size: 1.5rem;
-  font-weight: 600;
-  white-space: normal;
-  word-break: break-word;
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 600;
+    white-space: normal;
+    word-break: break-word;
 }
 
 .group-description-container {
-  display: flex;
-  flex-direction: column;
+    display: flex;
+    flex-direction: column;
 }
 
 .group-description {
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  -webkit-line-clamp: 2;
-  margin: 0;
-  line-height: 1.5em;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    -webkit-line-clamp: 2;
+    margin: 0;
+    line-height: 1.5em;
 }
 
 .group-description-container.expanded .group-description {
-  display: block;
-  -webkit-line-clamp: unset;
-  overflow: visible;
+    display: block;
+    -webkit-line-clamp: unset;
+    overflow: visible;
 }
 
 .read-more-btn {
-  display: inline-block;
-  margin-top: 0.25rem;
-  cursor: pointer;
-  color: #3b82f6;
-  background: none;
-  border: none;
-  padding: 0;
-  font-size: 0.9em;
-  user-select: none;
+    display: inline-block;
+    margin-top: 0.25rem;
+    cursor: pointer;
+    color: #3b82f6;
+    background: none;
+    border: none;
+    padding: 0;
+    font-size: 0.9em;
+    user-select: none;
 }
 
 .icon-btn-container {
-  display: flex;
-  align-items: center; /* מרכז את הכפתורים אנכית */
-  gap: 0.5rem;
+    display: flex;
+    align-items: center;
+    /* מרכז את הכפתורים אנכית */
+    gap: 0.5rem;
+}
+
+.chat-fab-wrap {
+    position: fixed;
+    right: 24px;
+    bottom: 24px;
+    z-index: 100000;
+}
+
+.chat-fab {
+    position: static;
+    /* חשוב: לא fixed */
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+}
+
+.chat-panel {
+    /* חשוב: לא fixed */
+    width: 380px;
+    max-width: calc(100vw - 48px);
+    height: 520px;
+    max-height: calc(100vh - 24px - 60px - 12px - 24px);
+    background: #fff;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.18);
+}
+
+@media (max-width:768px) {
+    .chat-fab-wrap {
+        right: 16px;
+        bottom: 16px;
+    }
+
+    .chat-panel {
+        width: calc(100vw - 32px);
+        height: 65vh;
+        max-height: calc(100vh - 16px - 60px - 12px - 16px);
+    }
+}
+
+#group-chat-panel {
+    width: 380px !important;
+    height: 520px !important;
+}
+
+/* wrapper קבוע בפינה */
+.chat-fab-wrap{
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  z-index: 100000;
+}
+
+/* הכפתור עצמו */
+.chat-fab{
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+}
+
+/* הפאנל יושב מעל הכפתור, תמיד באותה פינה */
+.chat-panel{
+  position: absolute;
+  right: 0;
+  bottom: calc(60px + 12px); /* מעל הכפתור + רווח */
+
+  width: 380px;
+  max-width: calc(100vw - 48px);
+
+  height: 520px;
+  max-height: calc(100vh - 24px - 60px - 12px - 24px);
+
+  background: #fff;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 12px 30px rgba(0,0,0,0.18);
+}
+
+/* מובייל */
+@media (max-width:768px){
+  .chat-fab-wrap{
+    right: 16px;
+    bottom: 16px;
+  }
+
+  .chat-panel{
+    width: calc(100vw - 32px);
+    height: 65vh;
+    max-height: calc(100vh - 16px - 60px - 12px - 16px);
+  }
 }

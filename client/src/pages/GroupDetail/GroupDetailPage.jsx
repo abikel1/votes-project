@@ -8,6 +8,7 @@ import { FiSettings, FiMessageSquare, FiX } from 'react-icons/fi';
 import { BiArrowBack } from 'react-icons/bi';
 import { FiZap } from 'react-icons/fi';
 import { TourProvider } from '@reactour/tour';
+import { HelpCircle } from 'lucide-react';
 
 import CountdownTimer from '../../components/CountdownTimer/CountdownTimer';
 import GroupChat from '../../components/GroupChat/GroupChat';
@@ -46,7 +47,7 @@ import {
 import http from '../../api/http';
 import CandidateApplyForm from '../../components/CandidateApplyForm';
 import { useTranslation } from 'react-i18next';
-
+import '../../Tour/TourButton.css';
 // צבעים לגרפים
 const COLORS = [
   '#003366',
@@ -501,10 +502,9 @@ function GroupDetailPageContent() {
   return (
     <div className="page-wrap dashboard">
       {/* כפתור הפעלת המדריך */}
-      {/* כפתור הפעלת המדריך */}
       {tourInitialized && (
         <button onClick={openTour} className="tour-fab">
-          ?
+          <HelpCircle className="tour-icon" />
         </button>
       )}
 
@@ -521,15 +521,16 @@ function GroupDetailPageContent() {
               <p className="group-description">{group.description}</p>
               {group.description.length > 50 && (
                 <button className="read-more-btn" onClick={toggleDesc}>
-                  {descExpanded ? (
-                    <>
-                      {t('groups.detail.readMore.less')}{' '} <BiChevronUp size={18} style={{ verticalAlign: 'middle' }} />
-                    </>
-                  ) : (
-                    <>
-                      {t('groups.detail.readMore.more')}{' '} <BiChevronDown size={18} style={{ verticalAlign: 'middle' }} />
-                    </>
-                  )}          </button>
+                  {/* {descExpanded ? (
+        <>
+          פחות <BiChevronUp size={18} style={{ verticalAlign: 'middle' }} />
+        </>
+      ) : (
+        <>
+          עוד <BiChevronDown size={18} style={{ verticalAlign: 'middle' }} />
+        </>
+      )}         */}
+                </button>
               )}
             </div>
           )}
@@ -615,13 +616,13 @@ function GroupDetailPageContent() {
             className={`mobile-tab ${activeTab === 'candidates' ? 'active' : ''}`}
             onClick={() => setActiveTab('candidates')}
           >
-            {t('groups.detail.tabs.candidates')}
+            מועמדים
           </button>
           <button
             className={`mobile-tab ${activeTab === 'info' ? 'active' : ''}`}
             onClick={() => setActiveTab('info')}
           >
-            {t('groups.detail.tabs.info')}
+            מידע וגרפים
           </button>
         </div>
       )}
@@ -777,9 +778,9 @@ function GroupDetailPageContent() {
                 candidatesWithCampaign.length > 0 &&
                 barData.some((c) => c.likeCount > 0) && (
                   <div className="survey-card">
-                    <h3>{t('groups.detail.survey.title')}</h3>
+                    <h3>סקר תמיכה (לא תוצאות רשמיות)</h3>
                     <p className="survey-note">
-                      {t('groups.detail.survey.note')}
+                      נתוני הסקר מתבססים על תמיכה בקמפיין. רק מועמד עם קמפיין פעיל יכול לקבל תמיכה.
                     </p>
 
                     <div className="survey-charts-container">
