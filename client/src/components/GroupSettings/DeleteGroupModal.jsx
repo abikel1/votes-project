@@ -17,13 +17,12 @@ export default function DeleteGroupModal({
   return (
     <div className="modal-backdrop" onClick={onClose}>
       <div className="modal delete-modal" onClick={(e) => e.stopPropagation()}>
-
         {/* כותרת */}
-        <h2 className="delete-title">מחיקת קבוצה</h2>
+        <h2 className="delete-title">{t('groupSettings.deleteModal.title')}</h2>
 
         {/* הוראה + שם הקבוצה */}
         <div className="delete-instruction">
-          כדי לאשר, הקלידי:
+          {t('groupSettings.deleteModal.typeToConfirm')}
           <div className="delete-repo">{confirmSlug}</div>
         </div>
 
@@ -38,23 +37,18 @@ export default function DeleteGroupModal({
 
         {/* כפתורים */}
         <div className="delete-actions">
-
-
           <button
             className="clean-btn clean-btn-delete"
             disabled={typedSlug.trim() !== confirmSlug}
             onClick={onDelete}
           >
-            מחיקת הקבוצה לצמיתות
+            {t('groupSettings.deleteModal.deleteForever')}
           </button>
-          <button
-            className="clean-btn clean-btn-cancel"
-            onClick={onClose}
-          >
-            ביטול
+
+          <button className="clean-btn clean-btn-cancel" onClick={onClose}>
+            {t('common.cancel')}
           </button>
         </div>
-
       </div>
     </div>
   );

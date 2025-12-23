@@ -12,7 +12,7 @@ export default function CandidateForm({
   onUploadFile,
   fileInputRef,
   clearPhoto,
-  submitLabel = 'שמור', // אפשר אחר כך לעבור ל-t('common.save') מההורה
+  submitLabel, // אפשר אחר כך לעבור ל-t('common.save') מההורה
   submitDisabled = false,
 }) {
   const { t } = useTranslation();
@@ -157,7 +157,7 @@ export default function CandidateForm({
           type="submit"
           disabled={submitDisabled}
         >
-          {submitLabel}
+          {submitLabel ?? t('common.save')}
         </button>
       </div>
 
