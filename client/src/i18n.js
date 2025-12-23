@@ -752,61 +752,6 @@ i18n
                     'groups.create.ai.fillNameFirstError': 'קודם צריך למלא שם קבוצה',
                     'groups.create.ai.tooltip': 'עזרה בכתיבת תיאור עם AI',
                     // למשל תחת groups.detail
-                    groups: {
-                        // ...
-                        detail: {
-                            error: {
-                                loadFailed: 'שגיאה בטעינת הקבוצה.',
-                                candidatesFailed: 'שגיאה בטעינת המועמדים',
-                            },
-                            buttons: {
-                                backToList: 'חזרה לרשימת הקבוצות',
-                                backToGroups: 'כל הקבוצות',
-                                joinRequest: 'בקשת הצטרפות',
-                                goVote: 'להצבעה בקלפי',
-                                settings: 'הגדרות קבוצה',
-                            },
-                            locked: {
-                                title: 'קבוצה נעולה',
-                                mustLogin:
-                                    'קבוצה זו נעולה. כדי לבקש הצטרפות עליה יש להתחבר למערכת ולאחר מכן לשלוח בקשת הצטרפות מעמוד "קבוצות".',
-                                notMember:
-                                    'אינך מחובר/ת לקבוצה זו. כדי להצטרף, חזור/י לעמוד הקבוצות ולחץ/י על "בקשת הצטרפות" בקבוצה המתאימה.',
-                            },
-                            loading: 'טוען נתוני קבוצה…',
-                            meta: {
-                                creationDate: 'תאריך יצירה:',
-                                endDate: 'תאריך סיום:',
-                                totalVotes: 'סך הצבעות:',
-                                notAvailable: 'לא זמין',
-                            },
-                            toast: {
-                                mustLoginToVote: 'אינך מחובר/ת. כדי להצביע צריך להתחבר.',
-                            },
-                            candidates: {
-                                title: 'המועמדים',
-                                loading: 'טוען מועמדים...',
-                                none: 'אין מועמדים',
-                                imageAlt: 'תמונת מועמד',
-                                votesLabelShort: 'קולות',
-                                unknownName: 'לא ידוע',
-                                cardVotesSuffix: 'קולות',
-                                myCampaignTitle: 'קמפיין שלי',
-                            },
-                            infoCards: {
-                                timeLeft: 'זמן עד סיום',
-                                totalVotes: 'סך הצבעות',
-                                candidatesCount: 'מספר מועמדים',
-                                winnersCount: 'מספר מקומות לזוכים',
-                            },
-                            charts: {
-                                pieTitle: 'אחוזי הצבעה',
-                                barTitle: 'מספר קולות',
-                                tooltipVotesSuffix: 'קולות',
-                                noVotes: '🕐 אין הצבעות — לא ניתן להציג גרפים',
-                            },
-                        },
-                    },
                     // campaign page
                     'campaign.loadingUser': 'טוען משתמש…',
                     'campaign.loading': 'טוען קמפיין…',
@@ -904,10 +849,6 @@ i18n
                             "privacy": {
                                 "title": "פרטיות מלאה",
                                 "desc": "אף אחד לא יודע מי בחר במי. גם כמות הקולות לא מוצגת במהלך הבחירות, רק בסיום - כדי לשמור על הגינות ולמנוע שכנוע."
-                            },
-                            "groups": {
-                                "title": "קבוצות סגורות ופתוחות",
-                                "desc": "אפשרות ליצור קבוצות סגורות עם בקשות הצטרפות מאושרות על ידי המנהל, או קבוצות פתוחות לכולם. אתם בשליטה מלאה."
                             },
                             "campaigns": {
                                 "title": "קמפיינים דיגיטליים",
@@ -1037,54 +978,115 @@ i18n
                     'campaign.share.copy': 'העתק',
                     'campaign.share.copied': 'הועתק!',
                     'campaign.share.done': 'סיום',
+
+                    // ===== unified groups (HE) =====
                     groups: {
+                        list: {
+                            tour: {
+                                header: "כאן נמצאים הכלים של עמוד הקבוצות",
+                                cardTitle: "כאן מוצג שם הקבוצה",
+                                cardBadges: "סמלים המציינים סטטוס כמו נעול או הגשת מועמדות פתוחה",
+                                cardDesc: "כאן מופיע תיאור קצר של הקבוצה",
+                                cardOwner: "כאן מופיע מי מנהל/ת את הקבוצה",
+                                cardFooter: "כאן מוצג תאריך סיום הקבוצה או שהיא פגה",
+                                cardActions: "כאן נמצאים כפתורי הפעולה",
+                            },
+                            card: {
+                                candidateOpenTitle: "הגשת מועמדות פתוחה",
+                                votingOpenTitle: "הצבעה פתוחה",
+                            },
+                        },
+
                         detail: {
+                            error: {
+                                loadFailed: "שגיאה בטעינת הקבוצה.",
+                                candidatesFailed: "שגיאה בטעינת המועמדים",
+                            },
+                            buttons: {
+                                backToList: "חזרה לרשימת הקבוצות",
+                                backToGroups: "כל הקבוצות",
+                                joinRequest: "בקשת הצטרפות",
+                                goVote: "להצבעה בקלפי",
+                                settings: "הגדרות קבוצה",
+                            },
+                            locked: {
+                                title: "קבוצה נעולה",
+                                mustLogin:
+                                    'קבוצה זו נעולה. כדי לבקש הצטרפות עליה יש להתחבר למערכת ולאחר מכן לשלוח בקשת הצטרפות מעמוד "קבוצות".',
+                                notMember:
+                                    'אינך מחובר/ת לקבוצה זו. כדי להצטרף, חזור/י לעמוד הקבוצות ולחץ/י על "בקשת הצטרפות" בקבוצה המתאימה.',
+                            },
+                            loading: "טוען נתוני קבוצה…",
+                            meta: {
+                                creationDate: "תאריך יצירה:",
+                                endDate: "תאריך סיום:",
+                                totalVotes: "סך הצבעות:",
+                                notAvailable: "לא זמין",
+                            },
+                            toast: {
+                                mustLoginToVote: "אינך מחובר/ת. כדי להצביע צריך להתחבר.",
+                            },
+                            candidates: {
+                                title: "המועמדים",
+                                loading: "טוען מועמדים...",
+                                none: "אין מועמדים",
+                                imageAlt: "תמונת מועמד",
+                                votesLabelShort: "קולות",
+                                unknownName: "לא ידוע",
+                                cardVotesSuffix: "קולות",
+                                myCampaignTitle: "קמפיין שלי",
+                            },
+                            infoCards: {
+                                timeLeft: "זמן עד סיום",
+                                totalVotes: "סך הצבעות",
+                                candidatesCount: "מספר מועמדים",
+                                winnersCount: "מספר מקומות לזוכים",
+                            },
+                            charts: {
+                                pieTitle: "אחוזי הצבעה",
+                                barTitle: "מספר קולות",
+                                tooltipVotesSuffix: "קולות",
+                                noVotes: "🕐 אין הצבעות — לא ניתן להציג גרפים",
+                            },
+
                             tabs: {
                                 candidates: "מועמדים",
-                                info: "מידע וגרפים"
+                                info: "מידע וגרפים",
                             },
                             readMore: {
                                 more: "עוד",
-                                less: "פחות"
+                                less: "פחות",
                             },
                             survey: {
                                 title: "סקר תמיכה (לא תוצאות רשמיות)",
                                 note: "נתוני הסקר מתבססים על תמיכה בקמפיין. רק מועמד עם קמפיין פעיל יכול לקבל תמיכה.",
-                                tooltipSupportSuffix: "תמיכה"
+                                tooltipSupportSuffix: "תמיכה",
                             },
                             common: {
-                                unknown: "לא ידוע"
-                            }
-                        }
-                    },
-                    "groups": {
-                        "list": {
-                            "tour": {
-                                "header": "כאן נמצאים הכלים של עמוד הקבוצות",
-                                "cardTitle": "כאן מוצג שם הקבוצה",
-                                "cardBadges": "סמלים המציינים סטטוס כמו נעול או הגשת מועמדות פתוחה",
-                                "cardDesc": "כאן מופיע תיאור קצר של הקבוצה",
-                                "cardOwner": "כאן מופיע מי מנהל/ת את הקבוצה",
-                                "cardFooter": "כאן מוצג תאריך סיום הקבוצה או שהיא פגה",
-                                "cardActions": "כאן נמצאים כפתורי הפעולה"
+                                unknown: "לא ידוע",
                             },
-                            "card": {
-                                "candidateOpenTitle": "הגשת מועמדות פתוחה",
-                                "votingOpenTitle": "הצבעה פתוחה"
-                            }
-                        }
-                    },
-                    groups: {
-                        detail: {
+
                             tour: {
                                 header: "כאן מוצג שם הקבוצה והתיאור שלה",
                                 meta: "כאן תראה את תאריך היצירה, תאריך הסיום וסך הקולות",
                                 voteButton: "לחץ כאן כדי להצביע למועמדים!",
                                 candidateCard: "כל כרטיס מציג מועמד עם תמונה, שם ותיאור",
-                                settingsButton: "כבעל הקבוצה, תוכל לנהל את הקבוצה מכאן"
-                            }
-                        }
+                                settingsButton: "כבעל הקבוצה, תוכל לנהל את הקבוצה מכאן",
+                            },
+                        },
                     },
+
+                    // ===== unified members (HE) =====
+                    members: {
+                        title: "משתתפי הקבוצה",
+                        empty: "אין משתתפים עדיין.",
+                        noName: "(ללא שם)",
+                        created: "נוצר",
+                        joined: "הצטרף",
+                        remove: "הסרה",
+                    },
+
+
 
                 },
             },
@@ -1817,61 +1819,6 @@ i18n
                     },
                     'groups.create.ai.fillNameFirstError': 'Please fill in a group name first',
                     'groups.create.ai.tooltip': 'Help writing a description with AI',
-                    groups: {
-                        // ...
-                        detail: {
-                            error: {
-                                loadFailed: 'Failed to load group.',
-                                candidatesFailed: 'Failed to load candidates.',
-                            },
-                            buttons: {
-                                backToList: 'Back to groups list',
-                                backToGroups: 'All groups',
-                                joinRequest: 'Request to join',
-                                goVote: 'Go to ballot',
-                                settings: 'Group settings',
-                            },
-                            locked: {
-                                title: 'Locked group',
-                                mustLogin:
-                                    'This group is locked. To request joining, please log in and send a join request from the "Groups" page.',
-                                notMember:
-                                    "You are not a member of this group. To join, go back to the groups page and click \"Request to join\" on the relevant group.",
-                            },
-                            loading: 'Loading group data…',
-                            meta: {
-                                creationDate: 'Creation date:',
-                                endDate: 'End date:',
-                                totalVotes: 'Total votes:',
-                                notAvailable: 'N/A',
-                            },
-                            toast: {
-                                mustLoginToVote: 'You are not logged in. Please log in to vote.',
-                            },
-                            candidates: {
-                                title: 'Candidates',
-                                loading: 'Loading candidates...',
-                                none: 'No candidates yet',
-                                imageAlt: 'Candidate image',
-                                votesLabelShort: 'votes',
-                                unknownName: 'Unknown',
-                                cardVotesSuffix: 'votes',
-                                myCampaignTitle: 'My campaign',
-                            },
-                            infoCards: {
-                                timeLeft: 'Time remaining',
-                                totalVotes: 'Total votes',
-                                candidatesCount: 'Number of candidates',
-                                winnersCount: 'Number of winner spots',
-                            },
-                            charts: {
-                                pieTitle: 'Voting distribution',
-                                barTitle: 'Number of votes',
-                                tooltipVotesSuffix: 'votes',
-                                noVotes: '🕐 No votes — cannot display charts',
-                            },
-                        },
-                    },
                     // campaign page
                     'campaign.loadingUser': 'Loading user…',
                     'campaign.loading': 'Loading campaign…',
@@ -1967,10 +1914,6 @@ i18n
                             "privacy": {
                                 "title": "Complete Privacy",
                                 "desc": "No one knows who voted for whom. Vote counts aren't displayed during the election, only at the end - to maintain fairness and prevent persuasion."
-                            },
-                            "groups": {
-                                "title": "Private & Public Groups",
-                                "desc": "Option to create private groups with admin-approved join requests, or public groups open to everyone. You're in full control."
                             },
                             "campaigns": {
                                 "title": "Digital Campaigns",
@@ -2100,54 +2043,113 @@ i18n
                     'campaign.share.copy': 'Copy',
                     'campaign.share.copied': 'Copied!',
                     'campaign.share.done': 'Done',
+                    // ===== unified groups (EN) =====
                     groups: {
+                        list: {
+                            tour: {
+                                header: "These are the tools on the Groups page",
+                                cardTitle: "This is the group name",
+                                cardBadges: "Badges show statuses like locked or candidate submissions open",
+                                cardDesc: "This is a short description of the group",
+                                cardOwner: "This shows who manages the group",
+                                cardFooter: "This shows the end date (or that the group expired)",
+                                cardActions: "These are the available actions",
+                            },
+                            card: {
+                                candidateOpenTitle: "Candidate submissions are open",
+                                votingOpenTitle: "Voting is open",
+                            },
+                        },
+
                         detail: {
+                            error: {
+                                loadFailed: "Failed to load group.",
+                                candidatesFailed: "Failed to load candidates.",
+                            },
+                            buttons: {
+                                backToList: "Back to groups list",
+                                backToGroups: "All groups",
+                                joinRequest: "Request to join",
+                                goVote: "Go to ballot",
+                                settings: "Group settings",
+                            },
+                            locked: {
+                                title: "Locked group",
+                                mustLogin:
+                                    'This group is locked. To request joining, please log in and send a join request from the "Groups" page.',
+                                notMember:
+                                    'You are not a member of this group. To join, go back to the groups page and click "Request to join" on the relevant group.',
+                            },
+                            loading: "Loading group data…",
+                            meta: {
+                                creationDate: "Creation date:",
+                                endDate: "End date:",
+                                totalVotes: "Total votes:",
+                                notAvailable: "N/A",
+                            },
+                            toast: {
+                                mustLoginToVote: "You are not logged in. Please log in to vote.",
+                            },
+                            candidates: {
+                                title: "Candidates",
+                                loading: "Loading candidates...",
+                                none: "No candidates yet",
+                                imageAlt: "Candidate image",
+                                votesLabelShort: "votes",
+                                unknownName: "Unknown",
+                                cardVotesSuffix: "votes",
+                                myCampaignTitle: "My campaign",
+                            },
+                            infoCards: {
+                                timeLeft: "Time remaining",
+                                totalVotes: "Total votes",
+                                candidatesCount: "Number of candidates",
+                                winnersCount: "Number of winner spots",
+                            },
+                            charts: {
+                                pieTitle: "Voting distribution",
+                                barTitle: "Number of votes",
+                                tooltipVotesSuffix: "votes",
+                                noVotes: "🕐 No votes — cannot display charts",
+                            },
+
                             tabs: {
                                 candidates: "Candidates",
-                                info: "Info & Charts"
+                                info: "Info & Charts",
                             },
                             readMore: {
                                 more: "More",
-                                less: "Less"
+                                less: "Less",
                             },
                             survey: {
                                 title: "Support poll (not official results)",
                                 note: "Poll data is based on campaign support. Only candidates with an active campaign can receive support.",
-                                tooltipSupportSuffix: "supports"
+                                tooltipSupportSuffix: "supports",
                             },
                             common: {
-                                unknown: "Unknown"
-                            }
-                        }
-                    },
-                    "groups": {
-                        "list": {
-                            "tour": {
-                                "header": "These are the tools on the Groups page",
-                                "cardTitle": "This is the group name",
-                                "cardBadges": "Badges show statuses like locked or candidate submissions open",
-                                "cardDesc": "This is a short description of the group",
-                                "cardOwner": "This shows who manages the group",
-                                "cardFooter": "This shows the end date (or that the group expired)",
-                                "cardActions": "These are the available actions"
+                                unknown: "Unknown",
                             },
-                            "card": {
-                                "candidateOpenTitle": "Candidate submissions are open",
-                                "votingOpenTitle": "Voting is open"
-                            }
-                        }
-                    },
-                    groups: {
-                        detail: {
+
                             tour: {
                                 header: "Here you can see the group name and its description",
                                 meta: "Here you can view the creation date, end date, and total votes",
                                 voteButton: "Click here to vote for candidates!",
                                 candidateCard: "Each card shows a candidate with a photo, name, and description",
-                                settingsButton: "As the group owner, you can manage the group from here"
-                            }
-                        }
+                                settingsButton: "As the group owner, you can manage the group from here",
+                            },
+                        },
                     },
+
+                    // ===== unified members (EN) =====
+                    members: {
+                        title: "Group members",
+                        empty: "No members yet.",
+                        noName: "(No name)",
+                        created: "Created",
+                        joined: "Joined",
+                        remove: "Remove",
+                    },
+
                 },
             },
         },
