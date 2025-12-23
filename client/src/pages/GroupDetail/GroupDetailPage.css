@@ -16,7 +16,7 @@
     z-index: 1000;
     border-radius: 50%;
     transition: transform 0.15s ease, box-shadow 0.15s ease;
-} */
+}
 
 .chat-fab:hover {
     transform: scale(1.08);
@@ -25,7 +25,7 @@
 
 .chat-fab:active {
     transform: scale(0.96);
-}
+} */
 
 /* ===== חלון הצ'אט – תמיד יותר גבוה מהכפתור ===== */
 /* .chat-panel {
@@ -2005,4 +2005,143 @@
     align-items: center;
     /* מרכז את הכפתורים אנכית */
     gap: 0.5rem;
+}
+
+
+
+
+
+
+
+
+
+
+/* ===== כפתור צ'אט צף ===== */
+.chat-fab {
+    position: fixed !important;
+    bottom: 24px !important;
+    right: 24px !important;
+    width: 56px;
+    height: 56px;
+    border: none;
+    background-color: #1e3a8a;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 8px 20px rgba(15, 23, 42, 0.25);
+    cursor: pointer;
+    z-index: 1000;
+    border-radius: 50%;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.chat-fab:hover {
+    transform: scale(1.08);
+    box-shadow: 0 10px 26px rgba(15, 23, 42, 0.35);
+}
+
+.chat-fab:active {
+    transform: scale(0.96);
+}
+
+/* ===== חלון הצ'אט ===== */
+.chat-panel {
+    position: fixed !important;
+    right: 24px !important;
+    bottom: 90px !important;
+    width: 420px;
+    max-height: 600px;
+    background-color: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.3);
+    padding: 0;
+    z-index: 999;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+/* ===== כפתור מדריך המשתמש (סיור) ===== */
+.tour-fab {
+    position: fixed !important;
+    bottom: 24px !important;
+    left: 24px !important;
+    width: 56px;
+    height: 56px;
+    background-color: #003366;
+    border: 3px solid #ffffff;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
+    z-index: 1000;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    color: #ffffff;
+}
+
+.tour-fab:hover {
+    transform: scale(1.1);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.tour-fab:active {
+    transform: scale(0.95);
+}
+
+.tour-icon {
+    width: 28px;
+    height: 28px;
+    color: #ffffff;
+}
+
+/* רספונסיביות למובייל */
+@media (max-width: 768px) {
+    .chat-panel {
+        bottom: 90px !important;
+        width: calc(100vw - 32px);
+        max-width: 400px;
+        right: 16px !important;
+        max-height: 500px;
+    }
+    
+    .chat-fab {
+        bottom: 20px !important;
+        right: 20px !important;
+        width: 52px;
+        height: 52px;
+    }
+    
+    .tour-fab {
+        bottom: 20px !important;
+        left: 20px !important;
+        width: 52px;
+        height: 52px;
+    }
+    
+    .tour-icon {
+        width: 24px;
+        height: 24px;
+    }
+}
+
+@media (max-width: 480px) {
+    .chat-panel {
+        width: calc(100vw - 24px);
+        right: 12px !important;
+        bottom: 80px !important;
+        max-height: 450px;
+    }
+    
+    .chat-fab {
+        bottom: 16px !important;
+        right: 16px !important;
+    }
+    
+    .tour-fab {
+        bottom: 16px !important;
+        left: 16px !important;
+    }
 }

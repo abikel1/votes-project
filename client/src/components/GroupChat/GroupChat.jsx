@@ -1,5 +1,5 @@
+// src/components/GroupChat/GroupChat.jsx
 import React from 'react';
-
 import { useEffect, useRef, useState } from 'react';
 import { FiMoreVertical, FiSmile, FiSend } from 'react-icons/fi';
 import { io } from 'socket.io-client';
@@ -8,7 +8,6 @@ import EmojiPicker from 'emoji-picker-react';
 import './GroupChat.css';
 import { useTranslation } from 'react-i18next';
 import ConfirmModal from '../../components/ConfirmModal/ConfirmModal';
-
 
 const AVATAR_COLORS = [
     '#4f46e5',
@@ -34,13 +33,13 @@ function getColorForUser(key) {
 }
 
 export default function GroupChat({ groupId, canChat, currentUserId, isOwner }) {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation(); // 👈 הוסף i18n כאן!
 
     const [messages, setMessages] = useState([]);
     const [text, setText] = useState('');
     const [loading, setLoading] = useState(false);
     const [sending, setSending] = useState(false);
-    const [error, setError] = useState('');           // נשמור KEY, לא טקסט
+    const [error, setError] = useState('');
     const [menuOpenFor, setMenuOpenFor] = useState(null);
     const [editingId, setEditingId] = useState(null);
     const messagesEndRef = useRef(null);
@@ -48,7 +47,7 @@ export default function GroupChat({ groupId, canChat, currentUserId, isOwner }) 
     const [isAtBottom, setIsAtBottom] = useState(true);
 
     const [summaryLoading, setSummaryLoading] = useState(false);
-    const [summaryError, setSummaryError] = useState(''); // גם כאן KEY
+    const [summaryError, setSummaryError] = useState('');
     const [moreOpen, setMoreOpen] = useState(false);
 
     const [showEmojiPicker, setShowEmojiPicker] = useState(false);
@@ -147,7 +146,6 @@ export default function GroupChat({ groupId, canChat, currentUserId, isOwner }) 
             );
         });
 
-        // סיכום AI – עדכון כל ההודעות בזמן אמת לכל מי שבחדר
         s.on('chat:summary-done', ({ summary, messages }) => {
             setMessages(Array.isArray(messages) ? messages : []);
             setSummaryLoading(false);
@@ -177,7 +175,6 @@ export default function GroupChat({ groupId, canChat, currentUserId, isOwner }) 
         setSending(true);
         setError('');
 
-        // עריכת הודעה
         if (editingId) {
             socket.emit(
                 'chat:update',
@@ -199,7 +196,6 @@ export default function GroupChat({ groupId, canChat, currentUserId, isOwner }) 
             return;
         }
 
-        // הודעה חדשה
         socket.emit(
             'chat:send',
             {
@@ -223,8 +219,6 @@ export default function GroupChat({ groupId, canChat, currentUserId, isOwner }) 
         setMessageToDelete(messageId);
         setConfirmOpen(true);
     };
-
-
 
     const handleStartEdit = (msg) => {
         const id = msg._id || msg.id;
@@ -269,7 +263,6 @@ export default function GroupChat({ groupId, canChat, currentUserId, isOwner }) 
         setConfirmOpen(false);
         setMessageToDelete(null);
     };
-
 
     const formatTime = (dateString) => {
         if (!dateString) return '';
