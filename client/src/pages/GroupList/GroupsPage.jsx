@@ -805,7 +805,5 @@ const votingOpen =
 </button>
     </div>
         </TourProvider>
-
-
   );
 }
