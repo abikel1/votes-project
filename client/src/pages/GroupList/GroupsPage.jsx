@@ -799,13 +799,13 @@ const votingOpen =
         </div>
       )}
 
-      <button
-        className="groups-fab"
-        onClick={onCreateGroupClick}
-        title={t('groups.list.fab.title')}
-      >
-        +
-      </button>
+     <button
+  className="groups-fab"
+  onClick={onCreateGroupClick}
+  title={t('groups.list.fab.title')}
+>
+  <span className="fab-icon">+</span>
+</button>
     </div>
         </TourProvider>
 
