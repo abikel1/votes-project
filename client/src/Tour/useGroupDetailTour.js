@@ -1,51 +1,53 @@
-// src/hooks/useGroupDetailTour.js
 import { useEffect, useState } from 'react';
 import { useTour } from '@reactour/tour';
+import { useTranslation } from 'react-i18next';
 
-export const useGroupDetailTour = ({ group, candidates, isOwner, isAuthed, isMobile }) => {
+export const useGroupDetailTour = ({ group, candidates, isOwner }) => {
   const { setIsOpen, setSteps } = useTour();
-  const [tourInitialized, setTourInitialized] = useState(false);
+  const { t, i18n } = useTranslation();
+  const [autoOpened, setAutoOpened] = useState(false);
 
-useEffect(() => {
-  if (!group || candidates.length === 0 || tourInitialized) return;
+  // ✅ תמיד מעדכנים steps כשיש שינוי שפה/נתונים
+  useEffect(() => {
+    if (!group || candidates.length === 0) return;
 
-  const firstCandidateId = String(candidates[0]._id);
-  const now = new Date();
-  const candidateEndDate = group.candidateEndDate ? new Date(group.candidateEndDate) : null;
-  const endDate = group.endDate ? new Date(group.endDate) : null;
-  const isVotingPhase = candidateEndDate && endDate && now > candidateEndDate && now <= endDate;
+    const firstCandidateId = String(candidates[0]._id);
 
-  const tourSteps = [
-    { selector: '#group-detail-header', content: 'כאן מוצג שם הקבוצה והתיאור שלה' },
-    { selector: '#group-detail-meta', content: 'כאן תראה את תאריך היצירה, תאריך הסיום וסך הקולות' },
-  ];
+    const now = new Date();
+    const candidateEndDate = group.candidateEndDate ? new Date(group.candidateEndDate) : null;
+    const endDate = group.endDate ? new Date(group.endDate) : null;
+    const isVotingPhase = candidateEndDate && endDate && now > candidateEndDate && now <= endDate;
 
-  if (isVotingPhase) {
-    tourSteps.push({ selector: '#vote-button', content: 'לחץ כאן כדי להצביע למועמדים!' });
-  }
+    const tourSteps = [
+      { selector: '#group-detail-header', content: t('groups.detail.tour.header') },
+      { selector: '#group-detail-meta', content: t('groups.detail.tour.meta') },
+    ];
 
-  tourSteps.push(
-    // { selector: '#candidates-section', content: 'כאן מוצגים כל המועמדים בקבוצה' },
-    { selector: `#candidate-card-${firstCandidateId}`, content: 'כל כרטיס מציג מועמד עם תמונה, שם ותיאור' },
-    // { selector: `#candidate-card-${firstCandidateId} .campaign-btn`,  content: 'לחץ כאן כדי לראות או ליצור קמפיין עבור המועמד' }
-  );
+    if (isVotingPhase) {
+      tourSteps.push({ selector: '#vote-button', content: t('groups.detail.tour.voteButton') });
+    }
 
-  // tourSteps.push({ selector: '#chat-fab', content: 'לחץ כאן לפתיחת הצ\'אט של הקבוצה' });
+    tourSteps.push({
+      selector: `#candidate-card-${firstCandidateId}`,
+      content: t('groups.detail.tour.candidateCard'),
+    });
 
-  if (isOwner) {
-    tourSteps.push({ selector: '#settings-button', content: 'כבעל הקבוצה, תוכל לנהל את הקבוצה מכאן' });
-  }
+    if (isOwner) {
+      tourSteps.push({ selector: '#settings-button', content: t('groups.detail.tour.settingsButton') });
+    }
 
-  setSteps(tourSteps);
-  setTourInitialized(true);
+    setSteps(tourSteps);
+  }, [group, candidates, isOwner, setSteps, t, i18n.language]); // ✅ חשוב i18n.language
 
-  // 🔹 פותח רק אם המשתמש עדיין לא ראה את המדריך
-  const tourSeen = localStorage.getItem(`groupTourSeen`);
-  if (!tourSeen) {
-    setTimeout(() => setIsOpen(true), 500);
-    localStorage.setItem(`groupTourSeen`, 'true');
-  }
-}, [group, candidates, isOwner, isAuthed, isMobile, setSteps, setIsOpen, tourInitialized]);
+  // ✅ פתיחה אוטומטית רק פעם אחת
+  useEffect(() => {
+    const tourSeen = localStorage.getItem('groupTourSeen');
+    if (!tourSeen && !autoOpened) {
+      setAutoOpened(true);
+      setTimeout(() => setIsOpen(true), 500);
+      localStorage.setItem('groupTourSeen', 'true');
+    }
+  }, [setIsOpen, autoOpened]);
 
-  return { tourInitialized, openTour: () => setIsOpen(true) };
+  return { openTour: () => setIsOpen(true) };
 };
