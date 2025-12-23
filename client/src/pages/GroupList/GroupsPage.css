@@ -487,7 +487,8 @@
   transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 .groups-fab svg {
-  display: block;
+  width: 18px;
+  height: 18px;
 }
 .groups-fab:hover {
   background: #000;

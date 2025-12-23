@@ -11,6 +11,7 @@ import {
 import { toast } from 'react-hot-toast';
 import { HiOutlineDocumentText } from "react-icons/hi";
 import { TourProvider, useTour } from '@reactour/tour';
+import { FaPlus } from 'react-icons/fa';
 
 import {
   requestJoinGroup,
@@ -799,13 +800,13 @@ export default function GroupsPage() {
           </div>
         )}
 
-        <button
-          className="groups-fab"
-          onClick={onCreateGroupClick}
-          title={t('groups.list.fab.title')}
-        >
-          +
-        </button>
+    <button
+  className="groups-fab"
+  onClick={onCreateGroupClick}
+  title={t('groups.list.fab.title')}
+>
+  <FaPlus />
+</button>
       </div>
     </TourProvider>
 
