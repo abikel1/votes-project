@@ -502,11 +502,12 @@ function GroupDetailPageContent() {
   return (
     <div className="page-wrap dashboard">
       {/* כפתור הפעלת המדריך */}
-      {tourInitialized && (
-        <button onClick={openTour} className="tour-fab">
-          <HelpCircle className="tour-icon" />
-        </button>
-      )}
+     {tourInitialized && (
+  <button onClick={openTour} className="tour-fab">
+    <HelpCircle className="tour-icon" />
+  </button>
+)}
+
 
       <div id="group-detail-header" className="page-header clean-header">
         <div className="header-title">
@@ -896,30 +897,38 @@ function GroupDetailPageContent() {
       </div>
 
       {/* כפתור צ'אט צף בצד ימין למטה – יוצג רק אם המשתמש מחובר */}
-      {isAuthed && (
-        <>
-          <button
-            id="chat-fab"
-            type="button"
-            className="chat-fab"
-            onClick={() => setIsChatOpen((prev) => !prev)}
-          >
-            {isChatOpen ? <FiX size={20} /> : <FiMessageSquare size={20} />}
-          </button>
-          {isChatOpen && (
-            <div className="chat-panel" id="group-chat-panel">
-              <div className="chat-panel-header" />
-              <GroupChat
-                groupId={groupId}
-                canChat={canChat}
-                currentUserId={myId}
-                isOwner={isOwner}
-              />
-            </div>
-          )}
 
-        </>
-      )}
+
+{/* כפתור מדריך המשתמש (סיור) - תמיד גלוי */}
+{tourInitialized && (
+  <button onClick={openTour} className="tour-fab">
+    <HelpCircle className="tour-icon" />
+  </button>
+)}
+
+{/* כפתור צ'אט צף בצד ימין למטה – יוצג רק אם המשתמש מחובר */}
+{isAuthed && (
+  <>
+    <button
+      id="chat-fab"
+      type="button"
+      className="chat-fab"
+      onClick={() => setIsChatOpen((prev) => !prev)}
+    >
+      {isChatOpen ? <FiX size={20} /> : <FiMessageSquare size={20} />}
+    </button>
+    {isChatOpen && (
+      <div className="chat-panel" id="group-chat-panel">
+        <GroupChat
+          groupId={groupId}
+          canChat={canChat}
+          currentUserId={myId}
+          isOwner={isOwner}
+        />
+      </div>
+    )}
+  </>
+)}
     </div>
   );
 
