@@ -108,11 +108,12 @@
   font-size: 1.2rem;
 }
 
-/* RTL Support
-[dir="rtl"] .language-dropdown {
+.language-dropdown {
   right: auto;
   left: 0;
 }
+/* RTL Support
+
 
 [dir="rtl"] .language-option {
   text-align: left;
