@@ -223,10 +223,7 @@ useEffect(() => {
         selector: `#groups-card-footer-${firstGroupId}`,
         content: 'כאן מוצג תאריך סיום הקבוצה או שהיא פגה',
       },
-      {
-        selector: `#groups-card-actions-${firstGroupId}`,
-        content: 'כאן נמצאים כפתורי הפעולה',
-      },
+    
     ]);
 
     setIsOpen(true);
