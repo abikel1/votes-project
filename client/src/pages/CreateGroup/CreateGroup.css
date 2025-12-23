@@ -270,3 +270,21 @@ input:checked + .slider:before {
 * {
   font-family: 'Assistant', 'Heebo', Arial, sans-serif;
 }
+.cg-input[type='date'] {
+  padding: 10px 10px;       /* פחות padding */
+  min-height: 44px;         /* גובה מגע תקני */
+  box-sizing: border-box;
+}
+
+.cg-label {
+  width: 100%;
+  overflow: hidden;
+}
+
+@media (max-width: 480px) {
+  .cg-input[type='date'] {
+    font-size: 14px;     /* קטן טיפה */
+    padding-right: 8px;
+    padding-left: 8px;
+  }
+}

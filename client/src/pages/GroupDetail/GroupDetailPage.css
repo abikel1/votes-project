@@ -201,12 +201,6 @@
     border: 1px solid #93c5fd;
 }
 
-.candidate-card p {
-    color: #64748b;
-    font-size: calc(11px * var(--a11y-font-scale));
-    line-height: 1.3;
-    margin: 6px 0;
-}
 
 .votes-count {
     margin-top: 8px;
@@ -782,11 +776,17 @@
 }
 
 .candidate-card p {
-    color: #64748b;
-    font-size: calc(11px * var(--a11y-font-scale));
-    line-height: 1.3;
-    margin: 6px 0;
+  color: #64748b;
+  font-size: calc(11px * var(--a11y-font-scale));
+  line-height: 1.3;
+  margin: 6px 0;
+
+  /* 👇 הפתרון */
+  word-break: break-word;
+  overflow-wrap: break-word;
 }
+
+
 
 .votes-count {
     margin-top: 8px;
@@ -1764,34 +1764,35 @@
         box-shadow: 0 0 0 rgba(255, 255, 200, 0);
         transform: scale(1);
     }
-
 }
-
-
-
 
 .tour-fab {
-    position: fixed;
-    bottom: 20px;
-    left: 26px;
-    /* אפשר לשנות ל-right כדי להצמיד לצד ימין */
-    width: 50px;
-    height: 50px;
-    background-color: #1e3a8a;
-    /* כחול */
-    color: #fff;
-    border: none;
-    border-radius: 50%;
-    font-size: 24px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-    z-index: 1000;
+  position: fixed;
+  bottom: 20px;
+  left: 25px;
+  width: 56px;
+  height: 56px;
+  background-color: #003366; /* כחול אחיד */
+  border: 3px solid #ffffff;
+  border-radius: 50%;
+  cursor: pointer;
+   display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.25);
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  z-index: 1000;
 }
 
+@media (max-width: 768px) {
+  .tour-btn-small {
+    bottom: 16px;   /* יותר למטה */
+    left: 95px;    /* טיפה מהשול */
+     width: 56px;
+    height: 56px;
+  }
+}
 .tour-fab:hover {
     transform: scale(1.1);
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
@@ -1901,13 +1902,6 @@
     }
 }
 
-
-
-
-
-
-
-
 .survey-charts-container {
     display: flex;
     flex-wrap: wrap;
@@ -1921,18 +1915,6 @@
     min-width: 300px;
     /* לשמור על קריאות במובייל */
 }
-
-
-
-
-
-
-
-
-
-
-
-
 
 #group-detail-header {
     display: flex;
@@ -1965,18 +1947,14 @@
         flex-direction: row;
         /* שם לצד תיאור */
         align-items: center;
-        text-align: left;
+        text-align: right;
         gap: 1rem;
-        max-width: 70%;
+        max-width: 95%;
         /* מותאם לצד כפתורים */
     }
 
     .group-description-container {
         flex: 1;
-    }
-
-    .group-description {
-        -webkit-line-clamp: 2;
     }
 }
 
@@ -1999,7 +1977,7 @@
     -webkit-box-orient: vertical;
     overflow: hidden;
     text-overflow: ellipsis;
-    -webkit-line-clamp: 2;
+    /* -webkit-line-clamp: 2; */
     margin: 0;
     line-height: 1.5em;
 }
@@ -2027,96 +2005,4 @@
     align-items: center;
     /* מרכז את הכפתורים אנכית */
     gap: 0.5rem;
-}
-
-.chat-fab-wrap {
-    position: fixed;
-    right: 24px;
-    bottom: 24px;
-    z-index: 100000;
-}
-
-.chat-fab {
-    position: static;
-    /* חשוב: לא fixed */
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-}
-
-.chat-panel {
-    /* חשוב: לא fixed */
-    width: 380px;
-    max-width: calc(100vw - 48px);
-    height: 520px;
-    max-height: calc(100vh - 24px - 60px - 12px - 24px);
-    background: #fff;
-    border-radius: 16px;
-    overflow: hidden;
-    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.18);
-}
-
-@media (max-width:768px) {
-    .chat-fab-wrap {
-        right: 16px;
-        bottom: 16px;
-    }
-
-    .chat-panel {
-        width: calc(100vw - 32px);
-        height: 65vh;
-        max-height: calc(100vh - 16px - 60px - 12px - 16px);
-    }
-}
-
-#group-chat-panel {
-    width: 380px !important;
-    height: 520px !important;
-}
-
-/* wrapper קבוע בפינה */
-.chat-fab-wrap{
-  position: fixed;
-  right: 24px;
-  bottom: 24px;
-  z-index: 100000;
-}
-
-/* הכפתור עצמו */
-.chat-fab{
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-}
-
-/* הפאנל יושב מעל הכפתור, תמיד באותה פינה */
-.chat-panel{
-  position: absolute;
-  right: 0;
-  bottom: calc(60px + 12px); /* מעל הכפתור + רווח */
-
-  width: 380px;
-  max-width: calc(100vw - 48px);
-
-  height: 520px;
-  max-height: calc(100vh - 24px - 60px - 12px - 24px);
-
-  background: #fff;
-  border-radius: 16px;
-  overflow: hidden;
-  box-shadow: 0 12px 30px rgba(0,0,0,0.18);
-}
-
-/* מובייל */
-@media (max-width:768px){
-  .chat-fab-wrap{
-    right: 16px;
-    bottom: 16px;
-  }
-
-  .chat-panel{
-    width: calc(100vw - 32px);
-    height: 65vh;
-    max-height: calc(100vh - 16px - 60px - 12px - 16px);
-  }
 }

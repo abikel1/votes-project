@@ -22,7 +22,6 @@
   box-shadow: 0 8px 25px rgba(0,0,0,0.35);
 }
 
-
 .tour-icon {
   width: 28px;
   height: 28px;
@@ -31,7 +30,7 @@
 
 /* מיקום מותאם לטלפונים */
 @media (max-width: 768px) {
-  .tour-btn-small {
+  .tour-btn{
     bottom: 16px;   /* יותר למטה */
     left: 95px;    /* טיפה מהשול */
      width: 56px;

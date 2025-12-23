@@ -8,7 +8,7 @@
 .language-btn-circle {
   width: 38px;
   height: 38px;
-  /* border-radius: 50%; */
+  border-radius: 50%;
   background: transparent;
   border: 1px solid #003366;
   color: white;
