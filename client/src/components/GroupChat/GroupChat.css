@@ -7,18 +7,14 @@
     /* border: 1px solid #003366; */
     box-shadow: 0 10px 25px rgba(129, 129, 129, 0.45);
 
-  display: flex;
-  flex-direction: column;
+    display: flex;
+    flex-direction: column;
+    max-height: calc(100vh - 35vh);
+    width: 95%;
+    padding: 0.3rem 0.6rem;
 
-  width: 100%;
-  height: 100%;
-  max-height: none;
 
-  padding: 12px;
-  margin: 0;
-  box-shadow: none; /* רצוי שהצל יהיה על ה-panel, לא על הצ'אט עצמו */
 }
-
 
 /* כותרת עליונה */
 .group-chat-header-row {

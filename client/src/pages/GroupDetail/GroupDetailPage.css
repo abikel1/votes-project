@@ -1,5 +1,5 @@
 /* ===== כפתור צ'אט צף ===== */
-/* .chat-fab {
+.chat-fab {
     position: fixed !important;
     bottom: 24px !important;
     right: 24px !important;
@@ -25,26 +25,26 @@
 
 .chat-fab:active {
     transform: scale(0.96);
-} */
+}
 
 /* ===== חלון הצ'אט – תמיד יותר גבוה מהכפתור ===== */
-/* .chat-panel {
+.chat-panel {
     position: fixed !important;
     /* right: 24px !important; */
-/* bottom: 6vw !important; */
-/* width: 380px; */
-/* max-height: 70vh; */
-/* background-color: #ffffff; */
-/* border-radius: 16px; */
-/* box-shadow: 0 10px 30px rgba(15, 23, 42, 0.3); */
-/* padding: 0.75rem; */
-/* z-index: 100000; */
-/* display: flex; */
-/* flex-direction: column; */
-/* margin-left: 20px; */
-/* background-color: #003366; */
+    bottom: 6vw !important;
+    width: 380px;
+    /* max-height: 70vh; */
+    /* background-color: #ffffff; */
+    border-radius: 16px;
+    /* box-shadow: 0 10px 30px rgba(15, 23, 42, 0.3); */
+    padding: 0.75rem;
+    z-index: 100000;
+    display: flex;
+    flex-direction: column;
+    /* margin-left: 20px; */
+    /* background-color: #003366; */
 
-/* } */
+}
 
 
 
@@ -201,6 +201,12 @@
     border: 1px solid #93c5fd;
 }
 
+.candidate-card p {
+    color: #64748b;
+    font-size: calc(11px * var(--a11y-font-scale));
+    line-height: 1.3;
+    margin: 6px 0;
+}
 
 .votes-count {
     margin-top: 8px;
@@ -776,17 +782,11 @@
 }
 
 .candidate-card p {
-  color: #64748b;
-  font-size: calc(11px * var(--a11y-font-scale));
-  line-height: 1.3;
-  margin: 6px 0;
-
-  /* 👇 הפתרון */
-  word-break: break-word;
-  overflow-wrap: break-word;
+    color: #64748b;
+    font-size: calc(11px * var(--a11y-font-scale));
+    line-height: 1.3;
+    margin: 6px 0;
 }
-
-
 
 .votes-count {
     margin-top: 8px;
@@ -1764,35 +1764,34 @@
         box-shadow: 0 0 0 rgba(255, 255, 200, 0);
         transform: scale(1);
     }
+
 }
+
+
+
 
 .tour-fab {
-  position: fixed;
-  bottom: 20px;
-  left: 25px;
-  width: 56px;
-  height: 56px;
-  background-color: #003366; /* כחול אחיד */
-  border: 3px solid #ffffff;
-  border-radius: 50%;
-  cursor: pointer;
-   display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.25);
-  cursor: pointer;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-  z-index: 1000;
+    position: fixed;
+    bottom: 20px;
+    left: 26px;
+    /* אפשר לשנות ל-right כדי להצמיד לצד ימין */
+    width: 50px;
+    height: 50px;
+    background-color: #1e3a8a;
+    /* כחול */
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    font-size: 24px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    z-index: 1000;
 }
 
-@media (max-width: 768px) {
-  .tour-btn-small {
-    bottom: 16px;   /* יותר למטה */
-    left: 95px;    /* טיפה מהשול */
-     width: 56px;
-    height: 56px;
-  }
-}
 .tour-fab:hover {
     transform: scale(1.1);
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
@@ -1806,7 +1805,6 @@
         /* אם תרצי רווחים ביניהם */
     }
 }
-
 /* במובייל – קצת להתקרב לקצה כדי שלא יתנגש עם הטקסט */
 @media (max-width: 768px) {
     .group-settings-btn-left {
@@ -1830,318 +1828,184 @@
 
 
 .page-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 8px 16px;
-    background-color: #fff;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-    flex-wrap: nowrap;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 16px;
+  background-color: #fff;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+  flex-wrap: nowrap;
 }
 
 .header-title {
-    flex: 1 1 auto;
-    min-width: 0;
-    /* חשוב! מאפשר לשורות להתרחב בתוך flex */
+  flex: 1 1 auto;
+  min-width: 0;  /* חשוב! מאפשר לשורות להתרחב בתוך flex */
 }
 
 .group-name {
-    margin: 0;
-    font-size: 1.2rem;
-    font-weight: 600;
-    white-space: normal;
-    /* מאפשר שבירה לשורות רבות */
-    overflow: visible;
-    /* חובה! אחרת הטקסט עלול להיחתך */
-    word-break: break-word;
-    /* שוברת מילים ארוכות במקום לקפוץ */
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 600;
+  white-space: normal; /* מאפשר שבירה לשורות רבות */
+  overflow: visible;   /* חובה! אחרת הטקסט עלול להיחתך */
+  word-break: break-word; /* שוברת מילים ארוכות במקום לקפוץ */
 }
 
 
 .icon-btn-container {
-    display: flex;
-    gap: 8px;
-    flex-shrink: 0;
-    align-items: center;
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+  align-items: center;
 }
 
 .icon-btn {
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: 6px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #333;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #333;
 }
 
 .icon-btn:hover {
-    color: #007bff;
+  color: #007bff;
 }
 
 /* רספונסיבי טאבלט */
 @media (max-width: 1024px) {
-    .group-name {
-        font-size: 1.1rem;
-    }
-
-    .group-description {
-        font-size: 0.85rem;
-    }
+  .group-name {
+    font-size: 1.1rem;
+  }
+  .group-description {
+    font-size: 0.85rem;
+  }
 }
 
 /* רספונסיבי מובייל */
 @media (max-width: 600px) {
-    .group-name {
-        font-size: 1rem;
-    }
-
-    .group-description {
-        font-size: 0.8rem;
-    }
+  .group-name {
+    font-size: 1rem;
+  }
+  .group-description {
+    font-size: 0.8rem;
+  }
 }
 
+
+
+
+
+
+
+
 .survey-charts-container {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 20px;
-    /* רווח בין הגרפים */
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px; /* רווח בין הגרפים */
 }
 
 .survey-chart {
-    flex: 1 1 45%;
-    /* כל גרף 45% מרוחב הקונטיינר, נשאר מקום לרווח */
-    min-width: 300px;
-    /* לשמור על קריאות במובייל */
+  flex: 1 1 45%; /* כל גרף 45% מרוחב הקונטיינר, נשאר מקום לרווח */
+  min-width: 300px; /* לשמור על קריאות במובייל */
 }
 
+
+
+
+
+
+
+
+
+
+
+
+
 #group-detail-header {
-    display: flex;
-    justify-content: space-between;
-    gap: 1rem;
-    align-items: center;
-    /* מרכז את הכותרת והכפתורים לאורך הציר האנכי */
-    flex-wrap: wrap;
-    /* מאפשר לשורות לעבור שורה אם הצרכים גדולים */
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: center; /* מרכז את הכותרת והכפתורים לאורך הציר האנכי */
+  flex-wrap: wrap; /* מאפשר לשורות לעבור שורה אם הצרכים גדולים */
 }
 
 .header-title {
-    flex: 1 1 auto;
-    min-width: 0;
-    display: flex;
-    flex-direction: column;
-    /* שם מעל תיאור */
-    gap: 0.5rem;
-    align-items: center;
-    /* מרכז את השם והתיאור */
-    text-align: center;
-    /* גם למקרה של מספר שורות */
-    max-width: 100%;
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column; /* שם מעל תיאור */
+  gap: 0.5rem;
+  align-items: center; /* מרכז את השם והתיאור */
+  text-align: center; /* גם למקרה של מספר שורות */
+  max-width: 100%;
 }
 
 @media screen and (min-width: 1024px) {
+  /* מחשב גדול */
+  .header-title {
+    flex-direction: row; /* שם לצד תיאור */
+    align-items: center;
+    text-align: left;
+    gap: 1rem;
+    max-width: 70%; /* מותאם לצד כפתורים */
+  }
 
-    /* מחשב גדול */
-    .header-title {
-        flex-direction: row;
-        /* שם לצד תיאור */
-        align-items: center;
-        text-align: right;
-        gap: 1rem;
-        max-width: 87%;
-        /* מותאם לצד כפתורים */
-    }
+  .group-description-container {
+    flex: 1;
+  }
 
-    .group-description-container {
-        flex: 1;
-    }
+  .group-description {
+    -webkit-line-clamp: 2;
+  }
 }
 
 /* שאר סגנונות נשארים כפי שהיו */
 .group-name {
-    margin: 0;
-    font-size: 1.5rem;
-    font-weight: 600;
-    white-space: normal;
-    word-break: break-word;
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+  white-space: normal;
+  word-break: break-word;
 }
 
 .group-description-container {
-    display: flex;
-    flex-direction: column;
+  display: flex;
+  flex-direction: column;
 }
 
 .group-description {
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    /* -webkit-line-clamp: 2; */
-    margin: 0;
-    line-height: 1.5em;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  -webkit-line-clamp: 2;
+  margin: 0;
+  line-height: 1.5em;
 }
 
 .group-description-container.expanded .group-description {
-    display: block;
-    -webkit-line-clamp: unset;
-    overflow: visible;
+  display: block;
+  -webkit-line-clamp: unset;
+  overflow: visible;
 }
 
 .read-more-btn {
-    display: inline-block;
-    margin-top: 0.25rem;
-    cursor: pointer;
-    color: #3b82f6;
-    background: none;
-    border: none;
-    padding: 0;
-    font-size: 0.9em;
-    user-select: none;
+  display: inline-block;
+  margin-top: 0.25rem;
+  cursor: pointer;
+  color: #3b82f6;
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: 0.9em;
+  user-select: none;
 }
 
 .icon-btn-container {
-    display: flex;
-    align-items: center;
-    /* מרכז את הכפתורים אנכית */
-    gap: 0.5rem;
-}
-
-
-
-
-
-
-
-
-
-
-/* ===== כפתור צ'אט צף ===== */
-.chat-fab {
-    position: fixed !important;
-    bottom: 24px !important;
-    right: 24px !important;
-    width: 56px;
-    height: 56px;
-    border: none;
-    background-color: #1e3a8a;
-    color: #ffffff;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 8px 20px rgba(15, 23, 42, 0.25);
-    cursor: pointer;
-    z-index: 1000;
-    border-radius: 50%;
-    transition: transform 0.15s ease, box-shadow 0.15s ease;
-}
-
-.chat-fab:hover {
-    transform: scale(1.08);
-    box-shadow: 0 10px 26px rgba(15, 23, 42, 0.35);
-}
-
-.chat-fab:active {
-    transform: scale(0.96);
-}
-
-/* ===== חלון הצ'אט ===== */
-.chat-panel {
-    position: fixed !important;
-    right: 24px !important;
-    bottom: 90px !important;
-    width: 420px;
-    max-height: 600px;
-    background-color: #ffffff;
-    border-radius: 16px;
-    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.3);
-    padding: 0;
-    z-index: 999;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-}
-
-/* ===== כפתור מדריך המשתמש (סיור) ===== */
-.tour-fab {
-    position: fixed !important;
-    bottom: 24px !important;
-    left: 24px !important;
-    width: 56px;
-    height: 56px;
-    background-color: #003366;
-    border: 3px solid #ffffff;
-    border-radius: 50%;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
-    z-index: 1000;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-    color: #ffffff;
-}
-
-.tour-fab:hover {
-    transform: scale(1.1);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-}
-
-.tour-fab:active {
-    transform: scale(0.95);
-}
-
-.tour-icon {
-    width: 28px;
-    height: 28px;
-    color: #ffffff;
-}
-
-/* רספונסיביות למובייל */
-@media (max-width: 768px) {
-    .chat-panel {
-        bottom: 90px !important;
-        width: calc(100vw - 32px);
-        max-width: 400px;
-        right: 16px !important;
-        max-height: 500px;
-    }
-    
-    .chat-fab {
-        bottom: 20px !important;
-        right: 20px !important;
-        width: 52px;
-        height: 52px;
-    }
-    
-    .tour-fab {
-        bottom: 20px !important;
-        left: 20px !important;
-        width: 52px;
-        height: 52px;
-    }
-    
-    .tour-icon {
-        width: 24px;
-        height: 24px;
-    }
-}
-
-@media (max-width: 480px) {
-    .chat-panel {
-        width: calc(100vw - 24px);
-        right: 12px !important;
-        bottom: 80px !important;
-        max-height: 450px;
-    }
-    
-    .chat-fab {
-        bottom: 16px !important;
-        right: 16px !important;
-    }
-    
-    .tour-fab {
-        bottom: 16px !important;
-        left: 16px !important;
-    }
+  display: flex;
+  align-items: center; /* מרכז את הכפתורים אנכית */
+  gap: 0.5rem;
 }
