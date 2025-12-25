@@ -12,11 +12,10 @@ function genTokenPair() {
 
 async function requestPasswordReset({ email, baseUrl, ip }) {
   const user = await User.findOne({ email });
-  // לא חושפים אם המייל קיים או לא
   if (!user) return;
 
   const { token, tokenHash } = genTokenPair();
-  const expiresAt = new Date(Date.now() + 1000 * 60 * 15); // 15 דקות
+  const expiresAt = new Date(Date.now() + 1000 * 60 * 15);
 
   await AuthToken.create({
     userId: user._id,

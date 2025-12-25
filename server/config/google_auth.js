@@ -23,14 +23,13 @@ passport.use(
           return done(null, false, { reason: 'missing_email' });
         }
 
-        // 👇 זה עושה את כל הקסם: מחפש / יוצר יוזר, ומחזיר token + user
         const result = await userService.findOrCreateGoogleUser({
           email,
           firstName,
           lastName,
         });
 
-        return done(null, result); // { token, user }
+        return done(null, result);
       } catch (err) {
         return done(err, null);
       }

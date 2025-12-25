@@ -1,10 +1,7 @@
-// validate_middleware.js
 const Joi = require('joi');
 
 const stripComma = (j) =>
   j.custom((v) => (typeof v === 'string' ? v.replace(/[,\s]+$/, '') : v));
-
-// ✅ פונקציית עזר – ממירה Joi errors ל-{ field: message }
 function joiToFieldErrors(error) {
   const fieldErrors = {};
   error.details.forEach((d) => {
@@ -15,8 +12,6 @@ function joiToFieldErrors(error) {
   });
   return fieldErrors;
 }
-
-// ✅ מידלוור כללי – תמיד מחזיר { errors: {field: msg} }
 exports.validate = (schema) => (req, res, next) => {
   const { error, value } = schema.validate(req.body, {
     abortEarly: false,
@@ -31,10 +26,6 @@ exports.validate = (schema) => (req, res, next) => {
   req.body = value;
   next();
 };
-
-/* =========================
-   סכמות משותפות למשתמש
-   ========================= */
 
 const userFields = {
   firstName: stripComma(
@@ -73,7 +64,6 @@ const userFields = {
 };
 
 exports.schemas = {
-  // 🔹 הרשמה – אותם חוקים, בלי כפילות
   register: Joi.object({
     ...userFields,
     password: Joi.string().min(6).required().messages({
@@ -83,7 +73,6 @@ exports.schemas = {
     }),
   }).fork(['firstName', 'lastName', 'email'], (s) => s.required()),
 
-  // 🔹 עדכון פרופיל – משתמש באותם שדות, בלי סיסמה
   updateProfile: Joi.object(userFields).fork(
     ['firstName', 'lastName', 'email'],
     (s) => s.required()
@@ -103,7 +92,6 @@ exports.schemas = {
     }),
   }),
 
-  // שכחתי סיסמה – כמו שהיה, רק נשאר באותו סטייל
   forgotPassword: Joi.object({
     email: stripComma(
       Joi.string().trim().email().required().messages({

@@ -1,8 +1,5 @@
-
-
 const userService = require('../services/user_service');
 
-// user_controller.js
 exports.register = async (req, res) => {
   try {
     const result = await userService.register(req.body);
@@ -13,8 +10,6 @@ exports.register = async (req, res) => {
     res.status(err.status || 500).json({ errors });
   }
 };
-
-
 
 exports.login = async (req, res) => {
   try {
@@ -31,10 +26,8 @@ exports.login = async (req, res) => {
   }
 };
 
-
 exports.getProfile = async (req, res) => {
   try {
-    // ✅ auth_middleware שם על req.user את {_id,email,name}
     const user = await userService.getProfile(req.user._id);
     res.json(user);
   } catch (err) {
@@ -51,7 +44,6 @@ exports.listUsers = async (_req, res) => {
   }
 };
 
-// ✅ חדש: עדכון פרופיל
 exports.updateProfile = async (req, res) => {
   try {
     const updatedUser = await userService.updateProfile(req.user._id, req.body);
@@ -63,8 +55,6 @@ exports.updateProfile = async (req, res) => {
   }
 };
 
-
-// ✅ חדש: שליפת משתמש לפי id
 exports.getUserById = async (req, res) => {
   try {
     const u = await userService.getUserById(req.params.id);
@@ -75,7 +65,6 @@ exports.getUserById = async (req, res) => {
   }
 };
 
-// ✅ חדש: שליפת כמה משתמשים במכה אחת
 exports.getUsersBatch = async (req, res) => {
   try {
     const ids = String(req.query.ids || '')
@@ -91,7 +80,6 @@ exports.getUsersBatch = async (req, res) => {
 
 exports.changePassword = async (req, res) => {
   const { currentPassword, newPassword } = req.body;
-
   try {
     const result = await userService.changePassword(
       req.user._id,

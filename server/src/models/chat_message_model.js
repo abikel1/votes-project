@@ -1,4 +1,3 @@
-// server/src/models/chat_message_model.js
 const mongoose = require('mongoose');
 
 const chatMessageSchema = new mongoose.Schema(
@@ -24,7 +23,6 @@ const chatMessageSchema = new mongoose.Schema(
             type: Boolean,
             default: false,
         },
-        // ⭐ חדש: האם ההודעה נשלחה ע"י ה-AI
         isAi: {
             type: Boolean,
             default: false,

@@ -4,7 +4,7 @@ const {
   getVotesByCandidateInGroupService,
   getVotersByGroupService,
   hasUserVotedInGroup,
-  getMyFinishedVotedGroupsWithWinners, // <=== חדש
+  getMyFinishedVotedGroupsWithWinners,
 } = require('../services/vote_service');
 
 async function createVote(req, res) {
@@ -12,12 +12,9 @@ async function createVote(req, res) {
     const { groupId, candidateId, userId: bodyUserId } = req.body || {};
     const isAdmin = req.user && req.user.isAdmin;
 
-    // 👇 האדמין נחשב כאילו הוא "חבר בהכל"
     const finalUserId =
-      // אם אדמין – קודם ננסה לקחת מה־req.user, ואם אין אז מה־body
       isAdmin
         ? (req.user && req.user._id) || bodyUserId
-        // אם לא אדמין – קודם מה־body, ואם אין אז מה־req.user
         : bodyUserId || (req.user && req.user._id);
 
     if (!finalUserId) {
@@ -71,7 +68,6 @@ async function getVotesByCandidateInGroup(req, res) {
   }
 }
 
-/** חדש: מחזיר את כל המצביעים בקבוצה */
 async function getVotersByGroup(req, res) {
   try {
     const { groupId } = req.params;
@@ -87,7 +83,6 @@ async function getVotersByGroup(req, res) {
   }
 }
 
-/** חדש: האם משתמש כבר הצביע בקבוצה */
 async function hasVoted(req, res) {
   try {
     const { userId, groupId } = req.query;
@@ -98,7 +93,6 @@ async function hasVoted(req, res) {
   }
 }
 
-/** קבוצות שהמשתמש הצביע בהן, ההצבעה הסתיימה, יחד עם הזוכים */
 async function getMyFinishedVotedGroups(req, res) {
   try {
     const userId = req.user && req.user._id;
@@ -120,6 +114,6 @@ module.exports = {
   getVotesByCandidateInGroup,
   getVotersByGroup,
   hasVoted,
-  getMyFinishedVotedGroups,   // <=== חדש
+  getMyFinishedVotedGroups,
 };
 

@@ -14,7 +14,7 @@ const {
   getCandidateRequestsService,
   generateGroupDescriptionService,
   getAppliedGroupsService
-  
+
 } = require('../services/group_service');
 const Group = require('../models/group_model');
 
@@ -36,7 +36,6 @@ async function updateGroup(req, res) {
 
 async function deleteGroup(req, res) {
   try {
-    // בדיקת בעלות לפני מחיקה
     const g = await Group.findById(req.params.id).lean();
     if (!g) return res.status(404).json({ message: 'Group not found' });
     if (String(g.createdById) !== String(req.user._id) && !req.user.isAdmin) {
@@ -77,7 +76,6 @@ async function requestJoinGroup(req, res) {
 
 async function listJoinRequests(req, res) {
   try {
-    // אם זה אדמין – נעביר זיהוי מיוחד, אחרת ה־_id הרגיל
     const ownerId = req.user.isAdmin ? 'ADMIN' : req.user._id;
 
     const list = await listJoinRequestsService(req.params.id, ownerId);
@@ -96,16 +94,12 @@ async function listJoinRequests(req, res) {
 async function approveJoinRequest(req, res) {
   try {
     const ownerId = req.user.isAdmin ? 'ADMIN' : req.user._id;
-
-    // קודם מאשרים
     await setJoinRequestStatusService(
       req.params.id,
       ownerId,
       req.params.reqId,
       'approved'
     );
-
-    // ואז מביאים רשימה מעודכנת
     const updatedList = await listJoinRequestsService(req.params.id, ownerId);
 
     res.json({ ok: true, pending: updatedList });
@@ -145,7 +139,6 @@ async function rejectJoinRequest(req, res) {
   }
 }
 
-/** הסרת משתתף/ת */
 async function removeMember(req, res) {
   try {
     const { memberId, email } = req.body || {};
@@ -204,7 +197,7 @@ async function getMyJoinStatuses(req, res) {
 async function getMyMembership(req, res) {
   try {
     const out = await isMemberOfGroupService(req.params.id, req.user);
-    res.json(out); // { member: boolean }
+    res.json(out);
   } catch (err) {
     const code = err.message === 'Group not found' ? 404 : 400;
     res.status(code).json({ message: err.message || 'Server error' });
@@ -222,10 +215,9 @@ async function getAppliedGroupsController(req, res) {
   }
 }
 
-// server/src/controllers/group_controller.js
 async function getCandidateRequests(req, res) {
   try {
-    const requests = await getCandidateRequestsService(req.params.id); // <– כאן השינוי
+    const requests = await getCandidateRequestsService(req.params.id);
     res.json(requests);
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -253,15 +245,13 @@ async function getAppliedGroupsController(req, res) {
   try {
     if (!req.user) return res.status(401).json({ message: 'User not authenticated' });
 
-    // ❌ קודם היה: getAppliedGroups(req.user);
-    const groups = await getAppliedGroupsService(req.user); // ✅ השם הנכון
+    const groups = await getAppliedGroupsService(req.user);
     res.json(groups);
   } catch (err) {
     console.error('getAppliedGroups error:', err);
     res.status(500).json({ message: err.message || 'Server error' });
   }
 }
-
 
 module.exports = {
   createGroup,
@@ -280,4 +270,5 @@ module.exports = {
   removeMember,
   getCandidateRequests,
   generateGroupDescription,
-getAppliedGroupsController};
+  getAppliedGroupsController
+};

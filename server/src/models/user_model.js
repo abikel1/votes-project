@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 const userSchema = new mongoose.Schema({
   firstName: { type: String, required: true, trim: true },
-  lastName:  { type: String, required: true, trim: true },
+  lastName: { type: String, required: true, trim: true },
   email: {
     type: String,
     required: true,
@@ -11,35 +11,30 @@ const userSchema = new mongoose.Schema({
     trim: true,
     match: [/^\S+@\S+\.\S+$/, 'Invalid email'],
   },
-  city:    { type: String, trim: true },
+  city: { type: String, trim: true },
   address: { type: String, trim: true },
   phone: {
     type: String,
     trim: true,
     match: [/^[\d+\-\s()]{6,20}$/, 'Invalid phone number'],
   },
-
-  // ❗ כבר לא required – מאפשר יוזר שנוצר רק מגוגל בלי סיסמה
   passwordHash: {
     type: String,
     select: false,
   },
-
-  // מאיפה המשתמש נוצר
   authProvider: {
     type: String,
     enum: ['local', 'google'],
     default: 'local',
   },
-
-    isAdmin: {
+  isAdmin: {
     type: Boolean,
     default: false,
   },
-  
-  joinedGroups:  [{ type: String }],
+
+  joinedGroups: [{ type: String }],
   createdGroups: [{ type: String }],
-  voteHistory:   [{ type: String }],
+  voteHistory: [{ type: String }],
 }, {
   timestamps: true,
   versionKey: false,

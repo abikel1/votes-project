@@ -1,8 +1,5 @@
-// server/src/services/ai_service.js
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 const Candidate = require('../models/candidate_model');
-
-// אותו פטנט כמו בקבוצות – עם בדיקת KEY
 const genAI = process.env.GEMINI_API_KEY
   ? new GoogleGenerativeAI(process.env.GEMINI_API_KEY)
   : null;
@@ -17,7 +14,6 @@ async function generateCampaignPostForCandidate(candidateId, options = {}) {
   const candidateName = candidate.name;
   const candidateDescription = candidate.description || '';
 
-  // ❗ אם אין מפתח / אין genAI – מחזירים פוסט "ידני" ולא נופלים לשגיאה
   if (!genAI || !process.env.GEMINI_API_KEY) {
     return {
       title: titleHint || `פוסט קמפיין עבור ${candidateName}`,
@@ -27,7 +23,6 @@ async function generateCampaignPostForCandidate(candidateId, options = {}) {
     };
   }
 
-  // משתמשים באותו מודל שעובד לך בתיאור קבוצה
   const model = genAI.getGenerativeModel({
     model: 'gemini-2.5-flash',
   });
@@ -70,7 +65,6 @@ ${extra}
     const result = await model.generateContent(prompt);
     text = result.response.text() || '';
   } catch (err) {
-    // ❗ אם יש שגיאת quota / 429 / כל דבר אחר – נופלים לפאלבק במקום להחזיר 500
     console.error('AI campaign post error:', err);
     return {
       title: titleHint || `פוסט קמפיין עבור ${candidateName}`,

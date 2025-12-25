@@ -1,4 +1,3 @@
-// server/src/services/mail_service.js
 const { getResend } = require('../../config/resend');
 
 async function sendMail({ to, subject, text, html, cc, bcc, attachments, replyTo }) {
@@ -18,9 +17,6 @@ async function sendMail({ to, subject, text, html, cc, bcc, attachments, replyTo
   if (cc) payload.cc = Array.isArray(cc) ? cc : [cc];
   if (bcc) payload.bcc = Array.isArray(bcc) ? bcc : [bcc];
 
-  // Attachments (אופציונלי): Resend רוצה base64 + filename
-  // if (attachments?.length) payload.attachments = ...
-
   const { data, error } = await resend.emails.send(payload);
 
   if (error) {
@@ -30,7 +26,6 @@ async function sendMail({ to, subject, text, html, cc, bcc, attachments, replyTo
   return { messageId: data?.id, previewUrl: null };
 }
 
-/** תבנית HTML – נשאר כמו אצלך */
 function renderTemplate(templateName, vars = {}) {
   if (templateName === 'resetPassword') {
     const { link, userName = '' } = vars;

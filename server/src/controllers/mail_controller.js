@@ -11,7 +11,7 @@ exports.sendGenericMail = async (req, res, next) => {
       previewUrl: result.previewUrl || undefined,
     });
   } catch (e) {
-    console.error('sendGenericMail error:', e);     // <<< חשוב לדיבוג
+    console.error('sendGenericMail error:', e);
     return res.status(500).json({ message: e.message || 'Send failed' });
   }
 };

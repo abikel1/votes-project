@@ -17,7 +17,6 @@ const {
 
 const Campaign = require('../models/campaign_model');
 
-// יצירת מועמד
 async function createCandidate(req, res) {
   try {
     const candidate = await createCandidateService(req.body);
@@ -28,7 +27,6 @@ async function createCandidate(req, res) {
   }
 }
 
-// עדכון מועמד
 async function updateCandidate(req, res) {
   try {
     const candidate = await updateCandidateService(req.params.id, req.body);
@@ -40,7 +38,6 @@ async function updateCandidate(req, res) {
   }
 }
 
-// מחיקת מועמד
 async function deleteCandidate(req, res) {
   try {
     const candidate = await deleteCandidateService(req.params.id);
@@ -52,14 +49,10 @@ async function deleteCandidate(req, res) {
   }
 }
 
-// קבלת מועמד לפי ID
-// קבלת מועמד לפי ID כולל הקמפיין שלו
 async function getCandidateById(req, res) {
   try {
     const candidate = await getCandidateByIdService(req.params.id);
     if (!candidate) return res.status(404).json({ message: 'Candidate not found' });
-
-    // מצרפים את הקמפיין
     const campaign = await Campaign.findOne({ candidate: req.params.id }).lean();
     candidate.campaign = campaign || null;
 
@@ -69,8 +62,6 @@ async function getCandidateById(req, res) {
     res.status(500).json({ message: 'Error getting candidate', error: err.message });
   }
 }
-
-// קבלת כל המועמדים של קבוצה
 async function getCandidatesByGroup(req, res) {
   try {
     const candidates = await getCandidatesByGroupService(req.params.groupId);
@@ -81,7 +72,6 @@ async function getCandidatesByGroup(req, res) {
   }
 }
 
-// ספירת הצבעות למועמד
 async function incrementVotes(req, res) {
   try {
     const candidate = await incrementVotesService(req.params.id, req.body.count);
@@ -93,7 +83,6 @@ async function incrementVotes(req, res) {
   }
 }
 
-// 1️⃣ משתמש מגיש בקשת מועמדות
 async function applyCandidate(req, res) {
   try {
     const out = await applyCandidateService(req.params.id, req.user, req.body);
@@ -109,16 +98,14 @@ async function applyCandidate(req, res) {
   }
 }
 
-
-// 2️⃣ מנהל דוחה בקשת מועמדות
 async function rejectCandidate(req, res) {
   try {
-    const ownerId = req.user.isAdmin ? 'ADMIN' : req.user._id;   // 👈 הוספה
+    const ownerId = req.user.isAdmin ? 'ADMIN' : req.user._id;
 
     const out = await rejectCandidateRequestService(
-      req.params.id,         // groupId
-      ownerId,               // ownerId
-      req.params.requestId   // requestId
+      req.params.id,
+      ownerId,
+      req.params.requestId
     );
 
     res.json({
@@ -132,15 +119,14 @@ async function rejectCandidate(req, res) {
   }
 }
 
-// 2️⃣ מנהל מאשר בקשת מועמדות
 async function approveCandidate(req, res) {
   try {
-    const ownerId = req.user.isAdmin ? 'ADMIN' : req.user._id;   // 👈 הוספה
+    const ownerId = req.user.isAdmin ? 'ADMIN' : req.user._id;
 
     const out = await approveCandidateRequestService(
-      req.params.id,         // groupId
-      ownerId,               // ownerId
-      req.params.requestId   // requestId
+      req.params.id,
+      ownerId,
+      req.params.requestId
     );
 
     res.json({
@@ -155,12 +141,9 @@ async function approveCandidate(req, res) {
   }
 }
 
-
-
-// 3️⃣ הוספה לפי מייל
 async function addCandidateByEmail(req, res) {
   try {
-    const ownerId = req.user.isAdmin ? 'ADMIN' : req.user._id;   // 👈 הוספה
+    const ownerId = req.user.isAdmin ? 'ADMIN' : req.user._id;
 
     const c = await addCandidateByEmailService(
       req.params.id,
@@ -173,7 +156,6 @@ async function addCandidateByEmail(req, res) {
     res.status(400).json({ message: err.message });
   }
 }
-
 
 module.exports = {
   createCandidate,

@@ -4,7 +4,7 @@ const Candidate = require('../models/candidate_model');
 const User = require('../models/user_model');
 const Campaign = require('../models/campaign_model');
 const ChatMessage = require('../models/chat_message_model');
-const Vote = require('../models/vote_model'); // 👈 הוספנו
+const Vote = require('../models/vote_model');
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 
 const genAI = process.env.GEMINI_API_KEY
@@ -31,7 +31,6 @@ async function createGroupService(data, user) {
     throw err;
   }
 
-  // בדיקה: תאריך סיום הגשת מועמדות לא יכול להיות אחרי תאריך הסיום של הקבוצה
   if (new Date(data.candidateEndDate) > new Date(data.endDate)) {
     throw new Error('Candidate end date cannot be after group end date');
   }
@@ -59,7 +58,6 @@ async function updateGroupService(groupId, updateData) {
     if (v !== null) updateData.isLocked = v;
   }
 
-  // אם מגיע candidateEndDate לבדוק שזה לפני endDate
   if (updateData.candidateEndDate && updateData.endDate) {
     if (new Date(updateData.candidateEndDate) > new Date(updateData.endDate)) {
       throw new Error('Candidate end date cannot be after group end date');
@@ -73,25 +71,15 @@ async function updateGroupService(groupId, updateData) {
 }
 
 async function deleteGroupService(groupId) {
-  // קודם נאתר את כל המועמדים של הקבוצה
   const candidates = await Candidate.find({ groupId }).select('_id');
   const candidateIds = candidates.map(c => c._id);
 
-  // מוחקים את כל הקמפיינים שקשורים למועמדים האלה
   if (candidateIds.length > 0) {
     await Campaign.deleteMany({ candidate: { $in: candidateIds } });
   }
-
-  // מוחקים את כל המועמדים של הקבוצה
   await Candidate.deleteMany({ groupId });
-
-  // 👇 מוחקים את כל הודעות הצ'אט של הקבוצה
   await ChatMessage.deleteMany({ groupId });
-
-  // 👇 מוחקים את כל ההצבעות של הקבוצה
   await Vote.deleteMany({ groupId });
-
-  // לבסוף מוחקים את הקבוצה עצמה
   return Group.findByIdAndDelete(groupId);
 }
 
@@ -109,19 +97,13 @@ async function getAllGroupsService() {
 
 }
 
-/* ===== בקשות הצטרפות כחבר בקבוצה ===== */
-
 async function requestJoinGroupService(groupId, user) {
   const g = await Group.findById(groupId);
   if (!g) throw new Error('Group not found');
   if (!g.isLocked) throw new Error('Group is not locked');
-
-  // כבר חבר?
   if (g.members?.some((id) => String(id) === String(user._id))) return g;
   const emailNorm = (user.email || '').trim().toLowerCase();
   if (Array.isArray(g.participants) && g.participants.includes(emailNorm)) return g;
-
-  // קיימת בקשה ממתינה?
   const exists = g.joinRequests?.find(
     (r) => String(r.userId) === String(user._id) && r.status === 'pending'
   );
@@ -181,7 +163,6 @@ async function setJoinRequestStatusService(groupId, ownerId, reqId, status) {
   return g;
 }
 
-/** אילו קבוצות המשתמש יצר ואילו הוא חבר בהן */
 async function getUserGroupsService(user) {
   if (!user || !user.email) throw new Error('User email is required');
   const email = (user.email || '').trim().toLowerCase();
@@ -200,7 +181,6 @@ async function getUserGroupsService(user) {
   return { created, joined };
 }
 
-/** סטטוסים ממתינים שלי: { pending: [groupId,..] } */
 async function getMyJoinStatusesService(user) {
   if (!user) throw new Error('User required');
 
@@ -232,7 +212,6 @@ async function getMyJoinStatusesService(user) {
   return { pending: rows.map((r) => String(r._id)) };
 }
 
-/** חברות בקבוצה מסוימת */
 async function isMemberOfGroupService(groupId, user) {
   if (!user) throw new Error('User required');
   const g = await Group.findById(groupId).lean();
@@ -250,7 +229,6 @@ async function isMemberOfGroupService(groupId, user) {
   return { member: !!(byMembers || byParticipants) };
 }
 
-/** ✅ הסרת משתתף/ת מהקבוצה ע"י מנהל/ת */
 async function removeGroupMemberService(groupId, ownerId, { memberId, email }) {
   if (!memberId && !email) {
     const e = new Error('memberId or email is required');
@@ -265,20 +243,16 @@ async function removeGroupMemberService(groupId, ownerId, { memberId, email }) {
   }
 
   const emailNorm = (email || '').trim().toLowerCase();
-
-  // הסרה מ-members לפי ObjectId
   if (memberId) {
     g.members = (g.members || []).filter((id) => String(id) !== String(memberId));
   }
 
-  // הסרה גם מ-participants לפי אימייל
   if (emailNorm) {
     g.participants = (g.participants || [])
       .map((e) => (e || '').trim().toLowerCase())
       .filter((e) => e !== emailNorm);
   }
 
-  // מחיקת בקשות בהמתנה
   g.joinRequests = (g.joinRequests || []).filter((r) => {
     const sameUser = memberId && String(r.userId) === String(memberId);
     const sameEmail =
@@ -296,8 +270,6 @@ async function removeGroupMemberService(groupId, ownerId, { memberId, email }) {
   return updated;
 }
 
-/* ===== בקשות מועמדות ===== */
-
 async function applyCandidateService(groupId, user, data) {
   const g = await Group.findById(groupId);
   if (!g) throw new Error('Group not found');
@@ -309,7 +281,6 @@ async function applyCandidateService(groupId, user, data) {
     throw e;
   }
 
-  // כבר קיים מועמד עבור המשתמש הזה בקבוצה?
   const alreadyCandidate = await Candidate.findOne({
     groupId,
     userId: user._id,
@@ -321,14 +292,12 @@ async function applyCandidateService(groupId, user, data) {
     throw e;
   }
 
-  // מחפשים בקשת מועמדות קיימת לאותו משתמש (לא משנה מה הסטטוס)
   let req =
     (g.candidateRequests || []).find(
       (r) => String(r.userId) === String(user._id)
     ) || null;
 
   if (req) {
-    // מעדכנים את הפרטים הקיימים ומחזירים ל־pending
     req.name = data.name || user.name || '';
     req.description = data.description || '';
     req.symbol = data.symbol || '';
@@ -336,7 +305,6 @@ async function applyCandidateService(groupId, user, data) {
     req.email = (user.email || '').trim().toLowerCase();
     req.status = 'pending';
   } else {
-    // יוצרים בקשה חדשה
     const newReq = {
       userId: user._id,
       email: (user.email || '').trim().toLowerCase(),
@@ -452,7 +420,7 @@ async function getAppliedGroupsService(user) {
     candidateRequests: {
       $elemMatch: {
         userId: user._id,
-        status: { $in: ['approved'] }, // רק בקשות פעילות
+        status: { $in: ['approved'] },
       },
     },
   })
@@ -461,9 +429,6 @@ async function getAppliedGroupsService(user) {
 
   return groups;
 }
-
-
-/* ===== AI תיאור קבוצה ===== */
 
 async function generateGroupDescriptionService(name, hint = '') {
 
@@ -474,17 +439,13 @@ async function generateGroupDescriptionService(name, hint = '') {
   const safeName = String(name || '').trim();
   const safeHint = String(hint || '').trim();
 
-  // נבדוק בערך באיזה שפה השם
   const hasHebrew = /[\u0590-\u05FF]/.test(safeName);
   const hasEnglish = /[A-Za-z]/.test(safeName);
 
-  // בחירת שפת ברירת־מחדל לצורך fallback
   let defaultLang = 'he';
   if (hasEnglish && !hasHebrew) {
     defaultLang = 'en';
   }
-
-  // fallback אם אין מפתח / מודל
   if (!genAI || !process.env.GEMINI_API_KEY) {
     if (defaultLang === 'en') {
       return 'A new voting group on the site. A description will be added later.';

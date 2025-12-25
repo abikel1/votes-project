@@ -20,7 +20,6 @@ async function addChatMessageService(groupId, user, text) {
     const group = await Group.findById(groupId).lean();
     if (!group) throw new Error('Group not found');
 
-    // 👈 פה בונים שם תצוגה נורמלי מתוך המשתמש
     const senderName =
         (user.firstName && user.lastName)
             ? `${user.firstName} ${user.lastName}`
@@ -105,13 +104,11 @@ async function updateChatMessageService(groupId, messageId, user, text) {
     return messages;
 }
 
-// ------ Gemini summarizer ------
 async function summarizeWithAI(groupName, messages) {
     if (!process.env.GEMINI_API_KEY) {
         return null;
     }
 
-    // ניקח את 50 ההודעות האחרונות
     const lastMessages = messages.slice(-50);
 
     const chatText = lastMessages
@@ -150,7 +147,6 @@ ${chatText}
 
     if (!text) return null;
 
-    // חיתוך נוסף ליתר ביטחון – לוקחים רק עד 3 שורות לא ריקות
     const lines = text
         .split('\n')
         .map((line) => line.trim())
@@ -161,7 +157,6 @@ ${chatText}
     return shortLines.join('\n').trim() || null;
 }
 
-// ------ שירות סיכום צ'אט ושמירת הודעת AI ------
 async function summarizeGroupChatService(groupId) {
     const group = await Group.findById(groupId).lean();
     if (!group) throw new Error('Group not found');
@@ -171,14 +166,11 @@ async function summarizeGroupChatService(groupId) {
         .lean();
 
     if (!messages.length) {
-        // גם פה נשמור כהודעת AI אם תרצי, אבל כרגע נחזיר בלי ליצור הודעה
         return {
             summary: 'אין עדיין פעילות בצ׳אט.',
             messages: await ChatMessage.find({ groupId }).sort({ createdAt: 1 }).lean(),
         };
     }
-
-    // קודם ננסה עם AI
     let finalSummary = null;
     try {
         const aiSummary = await summarizeWithAI(group.name || 'הקבוצה', messages);
@@ -189,7 +181,6 @@ async function summarizeGroupChatService(groupId) {
         console.error('AI chat summary error:', err);
     }
 
-    // FALLBACK ידני אם ה-AI נפל
     if (!finalSummary) {
         const lastMessages = messages.slice(-30);
         const texts = lastMessages.map((m) => m.text || '').filter(Boolean);
@@ -232,10 +223,8 @@ async function summarizeGroupChatService(groupId) {
             (lastPreview ? `ההודעה האחרונה: "${lastPreview}".` : '');
     }
 
-    // כאן שומרים את הסיכום כהודעת AI בדאטהבייס
     await ChatMessage.create({
         groupId,
-        // אפשר להשתמש ב-id של הקבוצה כ-userId "פיקטיבי"
         userId: group._id,
         senderName: 'AI',
         senderEmail: 'ai@chat',
@@ -244,7 +233,6 @@ async function summarizeGroupChatService(groupId) {
         isAi: true,
     });
 
-    // מחזירים את כל ההודעות המעודכנות
     const allMessages = await ChatMessage.find({ groupId })
         .sort({ createdAt: 1 })
         .lean();

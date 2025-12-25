@@ -4,9 +4,6 @@ const Group = require('../models/group_model');
 const Candidate = require('../models/candidate_model');
 const User = require('../models/user_model');
 
-/**
- * יצירת הצבעה חדשה
- */
 async function createVoteService(voteData) {
   const { userId, groupId, candidateId } = voteData || {};
   const isId = (v) => mongoose.isValidObjectId(v);
@@ -65,9 +62,6 @@ async function createVoteService(voteData) {
   }
 }
 
-/**
- * מחיקת הצבעה
- */
 async function deleteVoteService(voteData) {
   const { userId, groupId } = voteData || {};
   const isId = (v) => mongoose.isValidObjectId(v);
@@ -103,9 +97,6 @@ async function deleteVoteService(voteData) {
   }
 }
 
-/**
- * הצבעות לפי מועמד בקבוצה
- */
 async function getVotesByCandidateInGroupService({ candidateId, groupId }) {
   const isId = (v) => mongoose.isValidObjectId(v);
   if (!candidateId || !groupId) throw new Error('Missing required fields (candidateId, groupId)');
@@ -126,17 +117,11 @@ async function getVotesByCandidateInGroupService({ candidateId, groupId }) {
   return votes;
 }
 
-/**
- * האם משתמש הצביע בקבוצה
- */
 async function hasUserVotedInGroup(userId, groupId) {
   const exists = await Vote.exists({ userId, groupId });
   return Boolean(exists);
 }
 
-/**
- * מצביעים לפי קבוצה (מחזיר שם מלא אם קיים, עם רווח יחיד תקין)
- */
 async function getVotersByGroupService({ groupId }) {
   const isId = (v) => mongoose.isValidObjectId(v);
   if (!groupId) throw new Error('Missing required fields (groupId)');
@@ -148,7 +133,6 @@ async function getVotersByGroupService({ groupId }) {
   const votes = await Vote.find({ groupId }).sort({ updatedAt: -1 }).lean();
   const userIds = [...new Set(votes.map(v => String(v.userId)))];
 
-  // בוחרים מגוון שדות אפשריים לשמות + שדות מקוננים נפוצים
   const users = await User.find({ _id: { $in: userIds } })
     .select([
       '_id',
@@ -219,7 +203,6 @@ async function getMyFinishedVotedGroupsWithWinners(userId) {
 
   const now = new Date();
 
-  // כל ההצבעות של המשתמש
   const votes = await Vote.find({ userId })
     .populate({
       path: 'groupId',
@@ -230,7 +213,6 @@ async function getMyFinishedVotedGroupsWithWinners(userId) {
 
   if (!votes.length) return [];
 
-  // קבוצות שההצבעה בהן כבר הסתיימה
   const finishedGroupIds = [
     ...new Set(
       votes
@@ -274,7 +256,6 @@ async function getMyFinishedVotedGroupsWithWinners(userId) {
       continue;
     }
 
-    // מיון לפי מספר הצבעות
     const sorted = [...list].sort(
       (a, b) => (b.votesCount || 0) - (a.votesCount || 0)
     );
@@ -282,7 +263,6 @@ async function getMyFinishedVotedGroupsWithWinners(userId) {
     const maxWinners = g.maxWinners || 1;
     const top = sorted.slice(0, maxWinners);
 
-    // אם יש תיקו עם המקום האחרון – נוסיף גם אותם
     let winners = top;
     if (sorted.length > maxWinners) {
       const lastVotes = top[top.length - 1].votesCount || 0;
@@ -314,6 +294,6 @@ module.exports = {
   getVotesByCandidateInGroupService,
   getVotersByGroupService,
   hasUserVotedInGroup,
-  getMyFinishedVotedGroupsWithWinners,   // <=== חדש
+  getMyFinishedVotedGroupsWithWinners,
 };
 

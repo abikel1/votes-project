@@ -19,7 +19,6 @@ router.get('/google', (req, res, next) => {
   })(req, res, next);
 });
 
-/* ===== Google callback חדש ===== */
 router.get('/google/callback', (req, res, next) => {
   passport.authenticate('google', { session: false }, (err, result, info) => {
     if (err || !result) {

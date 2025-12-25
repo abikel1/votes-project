@@ -1,7 +1,6 @@
-// server/src/controllers/campaign_controller.js
 const campaignService = require('../services/campaign_service');
 const { generateCampaignPostForCandidate } = require('../services/ai_service');
-const Group = require('../models/group_model'); // 👈 לוודא שיש כזה
+const Group = require('../models/group_model');
 const Candidate = require('../models/candidate_model');
 
 function makeCandidateSlugFromName(name = '') {
@@ -10,8 +9,6 @@ function makeCandidateSlugFromName(name = '') {
     .toLowerCase()
     .replace(/\s+/g, '-');
 }
-
-
 
 async function getCampaign(req, res) {
   try {
@@ -25,8 +22,6 @@ async function getCampaign(req, res) {
       );
 
     const candidate = campaign.candidate;
-
-    // מזהה הקבוצה של המועמד/ת
     const groupId = candidate.groupId || candidate.group;
     if (!groupId) {
       return res.status(500).json({
@@ -46,11 +41,8 @@ async function getCampaign(req, res) {
         ? String(group.name).trim().toLowerCase().replace(/\s+/g, '-')
         : '');
 
-
-    // 🔒 האם הקבוצה נעולה
     const isLocked = !!group.isLocked;
 
-    // 👥 האם המשתמש/ת חברה בקבוצה
     const isMember =
       Array.isArray(group.members) &&
       group.members.some((m) =>
@@ -59,11 +51,9 @@ async function getCampaign(req, res) {
           : String(m) === String(currentUserId)
       );
 
-    // 👤 פרטי המשתמש/ת הנוכחית
     const myEmail = (req.user?.email || '').trim().toLowerCase();
     const myId = String(currentUserId || '');
 
-    // 👑 פרטי בעלת הקבוצה (לפי כל האפשרויות במודל)
     const createdByEmail = (
       group.createdBy ??
       group.created_by ??
@@ -77,17 +67,14 @@ async function getCampaign(req, res) {
 
     const createdById = String(group.createdById || '');
 
-    // 👑 האם המשתמש/ת אדמין
     const isAdmin = req.user?.role === 'admin' || req.user?.isAdmin;
 
-    // 👑 האם המשתמש/ת בעלת הקבוצה (או אדמין)
     const isOwner =
       isAdmin ||
       !!group.isOwner ||
       (!!myEmail && !!createdByEmail && myEmail === createdByEmail) ||
       (!!myId && !!createdById && myId === createdById);
 
-    // ❌ אם הקבוצה נעולה, ולא חברה, ולא בעלת הקבוצה → חוסמים
     if (isLocked && !isMember && !isOwner) {
       return res.status(403).json({
         ok: false,
@@ -98,13 +85,12 @@ async function getCampaign(req, res) {
       });
     }
 
-    // ✅ מותר לצפות בקמפיין
     return res.json({
       success: true,
       campaign,
       candidate: campaign.candidate,
       campaignId: campaign._id,
-      groupSlug, // 👈 חדש
+      groupSlug,
 
     });
   } catch (err) {
@@ -118,11 +104,9 @@ async function getCampaignBySlug(req, res) {
     const currentUserId = req.user?._id;
     const { groupSlug, candidateSlug } = req.params;
 
-    // נורמליזציה
     const rawGroupSlug = String(groupSlug || '').trim().toLowerCase();
     const encGroupSlug = encodeURIComponent(rawGroupSlug);
 
-    // 1) מוצאים קבוצה לפי slug (גם מקודד וגם לא מקודד) או לפי slugName
     let group = await Group.findOne({
       $or: [
         { slug: rawGroupSlug },
@@ -133,7 +117,6 @@ async function getCampaignBySlug(req, res) {
     }).lean();
 
     if (!group) {
-      // ניסיון שני – לפי name שהפך ל-slug
       const allGroups = await Group.find({}).lean();
       group = allGroups.find((g) => {
         const fromName =
@@ -153,20 +136,15 @@ async function getCampaignBySlug(req, res) {
     }
 
     const groupId = group._id;
-
-    // 2) מוצאים מועמד לפי group + slug (גם פה מקודד/לא-מקודד)
     const rawCandidateSlug = String(candidateSlug || '')
       .trim()
       .toLowerCase();
     const encCandidateSlug = encodeURIComponent(rawCandidateSlug);
-
-    // 2) מוצאים מועמד לפי group + slug
     let candidate = await Candidate.findOne({
       groupId: group._id,
       slug: candidateSlug,
     }).lean();
 
-    // 👇 אם לא מצאנו לפי השדה slug – ננסה לפי השם (כמו בצד לקוח)
     if (!candidate) {
       const candidates = await Candidate.find({ groupId: group._id }).lean();
 
@@ -184,18 +162,12 @@ async function getCampaignBySlug(req, res) {
         .json({ message: 'מועמד/ת לא נמצא/ה' });
     }
 
-
-    // 3) מוצאים את הקמפיין לפי candidateId (שירות קיים)
     const campaign =
       await campaignService.getCampaignByCandidate(
         candidate._id,
         currentUserId
       );
-
-    // 🔒 האם הקבוצה נעולה
     const isLocked = !!group.isLocked;
-
-    // 👥 האם המשתמש/ת חברה בקבוצה
     const isMember =
       Array.isArray(group.members) &&
       group.members.some((m) =>
@@ -204,11 +176,9 @@ async function getCampaignBySlug(req, res) {
           : String(m) === String(currentUserId)
       );
 
-    // 👤 פרטי המשתמש/ת הנוכחית
     const myEmail = (req.user?.email || '').trim().toLowerCase();
     const myId = String(currentUserId || '');
 
-    // 👑 פרטי בעלת הקבוצה
     const createdByEmail = (
       group.createdBy ??
       group.created_by ??
@@ -239,8 +209,6 @@ async function getCampaignBySlug(req, res) {
         groupId: String(groupId),
       });
     }
-
-    // ✅ מותר לצפות בקמפיין
     return res.json({
       success: true,
       campaign,
@@ -272,7 +240,6 @@ async function updateCampaign(req, res) {
   }
 }
 
-// ===== פוסטים =====
 async function addPost(req, res) {
   try {
     const campaign = await campaignService.addPostToCampaign(
@@ -310,13 +277,10 @@ async function deletePost(req, res) {
   }
 }
 
-// 🆕 ===== תגובות =====
 async function addComment(req, res) {
   try {
     const { campaignId, postId } = req.params;
     const { content } = req.body;
-
-    // ✅ הבאת ה-ID של המשתמש מהמ middleware
     const userId = req.user._id;
 
     const campaign = await campaignService.addCommentToPost(
@@ -325,7 +289,6 @@ async function addComment(req, res) {
       userId,
       content
     );
-
     res.json(campaign);
   } catch (err) {
     res.status(400).json({ message: err.message });
@@ -342,14 +305,12 @@ async function deleteComment(req, res) {
       postId,
       commentId
     );
-
     res.json(campaign);
   } catch (err) {
     res.status(400).json({ message: err.message });
   }
 }
 
-// ===== גלריית תמונות =====
 async function addImage(req, res) {
   try {
     const campaign = await campaignService.addImageToGallery(
@@ -374,7 +335,6 @@ async function deleteImage(req, res) {
   }
 }
 
-// ===== צפיות =====
 async function incrementView(req, res) {
   try {
     const campaign = await campaignService.incrementViewCount(req.params.campaignId);
@@ -384,7 +344,6 @@ async function incrementView(req, res) {
   }
 }
 
-// ===== AI =====
 async function getAiPostSuggestion(req, res) {
   try {
     const { candidateId } = req.params;
@@ -432,8 +391,8 @@ module.exports = {
   deleteImage,
   incrementView,
   getAiPostSuggestion,
-  addComment,    // 🆕
-  deleteComment, // 🆕
+  addComment,
+  deleteComment,
   likeCampaign,
   unlikeCampaign
 };

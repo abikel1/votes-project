@@ -1,9 +1,7 @@
-// server/src/services/candidate_service.js
 const Candidate = require('../models/candidate_model');
 const Group = require('../models/group_model');
-const Campaign = require('../models/campaign_model'); // 👈 להוסיף שורה זו
+const Campaign = require('../models/campaign_model');
 
-// יצירת מועמד
 async function createCandidateService(candidateData) {
   const candidate = new Candidate({
     name: candidateData.name,
@@ -16,7 +14,6 @@ async function createCandidateService(candidateData) {
 
   await candidate.save();
 
-  // לשמור גם במערך candidates של הקבוצה (אם יש groupId)
   if (candidate.groupId) {
     await Group.findByIdAndUpdate(
       candidate.groupId,
@@ -28,7 +25,6 @@ async function createCandidateService(candidateData) {
   return candidate;
 }
 
-// עדכון מועמד
 async function updateCandidateService(candidateId, updateData) {
   const candidate = await Candidate.findByIdAndUpdate(
     candidateId,
@@ -38,15 +34,12 @@ async function updateCandidateService(candidateId, updateData) {
   return candidate;
 }
 
-// מחיקת מועמד
 async function deleteCandidateService(candidateId) {
-  // קודם נשלוף את המועמד כדי לדעת groupId ו-userId
   const candidate = await Candidate.findById(candidateId);
   if (!candidate) {
     return null;
   }
 
-  // מחיקה ממערך המועמדים של הקבוצה
   if (candidate.groupId) {
     await Group.findByIdAndUpdate(
       candidate.groupId,
@@ -55,13 +48,9 @@ async function deleteCandidateService(candidateId) {
     );
   }
 
-  // 👇 מחיקת הקמפיין של המועמד (אם קיים)
   await Campaign.deleteMany({ candidate: candidate._id });
-
-  // מוחקים את המועמד עצמו
   await Candidate.findByIdAndDelete(candidateId);
 
-  // מעדכנים את בקשת המועמדות בקבוצה ל־"removed"
   if (candidate.groupId && candidate.userId) {
     const g = await Group.findById(candidate.groupId);
     if (g && Array.isArray(g.candidateRequests)) {
@@ -74,25 +63,19 @@ async function deleteCandidateService(candidateId) {
       }
     }
   }
-
-  // מחזירים את המועמד שנמחק (אם תרצי להשתמש בזה בצד קונטרולר)
   return candidate;
 }
 
-
-// קבלת מועמד לפי ID
 async function getCandidateByIdService(candidateId) {
   const candidate = await Candidate.findById(candidateId);
   return candidate;
 }
 
-// קבלת כל המועמדים של קבוצה מסוימת
 async function getCandidatesByGroupService(groupId) {
   const candidates = await Candidate.find({ groupId });
   return candidates;
 }
 
-// ספירת הצבעות למועמד
 async function incrementVotesService(candidateId, count = 1) {
   const candidate = await Candidate.findByIdAndUpdate(
     candidateId,

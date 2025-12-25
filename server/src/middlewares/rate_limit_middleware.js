@@ -1,4 +1,3 @@
-// server/src/middlewares/rate_limit_middleware.js
 const buckets = new Map();
 
 module.exports = function rateLimit({ windowMs = 60_000, max = 5 } = {}) {

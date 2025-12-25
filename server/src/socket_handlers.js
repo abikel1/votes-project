@@ -1,18 +1,13 @@
-// server/src/socket_handlers.js
 const jwt = require('jsonwebtoken');
 const User = require('./models/user_model');
 const {
     addChatMessageService,
     deleteChatMessageService,
     updateChatMessageService,
-    summarizeGroupChatService,   // 👈 חדש
+    summarizeGroupChatService,
 } = require('./services/chat_service');
 
-/**
- * אתחול Socket.IO
- */
 module.exports = function initSocket(io) {
-    // ---- socket auth middleware (JWT) ----
     io.use(async (socket, next) => {
         try {
             let rawAuth =
@@ -34,12 +29,11 @@ module.exports = function initSocket(io) {
 
             const payload = jwt.verify(token, process.env.JWT_SECRET);
 
-            // 👈 כאן השינוי החשוב:
             const userId =
                 payload.id ||
                 payload._id ||
                 payload.userId ||
-                payload.sub;   // <= הוספנו את sub
+                payload.sub;
 
             if (!userId) {
                 console.error('Socket auth: bad payload', payload);
@@ -63,15 +57,11 @@ module.exports = function initSocket(io) {
 
     io.on('connection', (socket) => {
         console.log('🔌 Socket connected', socket.id, socket.user?.email);
-
-        // === הצטרפות לחדר של קבוצה ===
         socket.on('join-group-chat', ({ groupId }) => {
             if (!groupId) return;
             const room = `group:${groupId}`;
             socket.join(room);
         });
-
-        // === שליחת הודעה ===
         socket.on('chat:send', async ({ groupId, text }, callback) => {
             try {
                 if (!groupId || !text || !text.trim()) {
@@ -97,7 +87,6 @@ module.exports = function initSocket(io) {
             }
         });
 
-        // === עריכת הודעה ===
         socket.on('chat:update', async ({ groupId, messageId, text }, callback) => {
             try {
                 if (!groupId || !messageId || !text || !text.trim()) {
@@ -130,7 +119,6 @@ module.exports = function initSocket(io) {
             }
         });
 
-        // === מחיקת הודעה ===
         socket.on('chat:delete', async ({ groupId, messageId }, callback) => {
             try {
                 if (!groupId || !messageId) throw new Error('Missing fields');
@@ -160,17 +148,12 @@ module.exports = function initSocket(io) {
             }
         });
 
-        // === סיכום שיחה ב-AI (זמן אמת לכולם בחדר) ===
         socket.on('chat:summarize', async ({ groupId }, callback) => {
             try {
                 if (!groupId) throw new Error('Missing groupId');
-
-                // השירות שלך גם שומר הודעת AI בצ'אט
                 const { summary, messages } = await summarizeGroupChatService(groupId);
 
                 const room = `group:${groupId}`;
-
-                // משדר לכל מי שבחדר את כל ההודעות אחרי הסיכום
                 io.to(room).emit('chat:summary-done', {
                     summary,
                     messages,
@@ -186,10 +169,7 @@ module.exports = function initSocket(io) {
                 }
             }
         });
-
         socket.on('disconnect', () => {
-            // אפשר לוג אם תרצי
-            // console.log('Socket disconnected', socket.id);
         });
     });
 };

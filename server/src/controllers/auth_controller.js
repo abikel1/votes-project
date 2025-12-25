@@ -5,7 +5,6 @@ exports.forgotPassword = async (req, res) => {
   try {
     const baseUrl = process.env.CLIENT_BASE_URL || 'http://localhost:5173';
     await requestPasswordReset({ email, baseUrl, ip: req.ip });
-    // תשובה אחידה
     res.json({ message: 'אם המייל קיים, נשלחו הוראות לאיפוס.' });
   } catch (e) {
     console.error('forgotPassword error:', e);

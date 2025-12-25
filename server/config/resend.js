@@ -1,4 +1,3 @@
-// server/config/resend.js
 const { Resend } = require('resend');
 
 let resendClient;

@@ -1,9 +1,7 @@
-// server/src/routes/upload_routes.js
 const express = require("express");
 const multer = require("multer");
-const cloudinary = require("../cloudinaryConfig"); // אם ב-CJS: require
+const cloudinary = require("../cloudinaryConfig");
 const { Readable } = require("stream");
-
 const router = express.Router();
 const upload = multer({ storage: multer.memoryStorage() });
 
@@ -18,11 +16,10 @@ router.post("/", upload.single("image"), async (req, res) => {
     }
   );
 
-  // סיום הזרימה
   const bufferStream = new Readable();
   bufferStream.push(req.file.buffer);
   bufferStream.push(null);
   bufferStream.pipe(stream);
 });
 
-module.exports = router; // ✅ חובה: export router
+module.exports = router; 

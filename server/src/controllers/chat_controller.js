@@ -68,7 +68,6 @@ async function updateChatMessage(req, res) {
     }
 }
 
-// סיכום צ׳אט – יוצר הודעת AI ושולח חזרה את כל ההודעות
 async function getGroupChatSummary(req, res) {
     try {
         const { id } = req.params;

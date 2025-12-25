@@ -1,14 +1,13 @@
-// server/src/services/campaign_service.js
 const Campaign = require('../models/campaign_model');
 
 async function getCampaignByCandidate(candidateId, currentUserId) {
   let campaign = await Campaign.findOne({ candidate: candidateId })
     .populate("candidate")
-  .populate("posts.comments.user", "firstName lastName photoUrl") // חשוב שמות + תמונה
+    .populate("posts.comments.user", "firstName lastName photoUrl")
     .lean();
 
   if (!campaign) {
-    
+
     const newCampaign = await Campaign.create({
       candidate: candidateId,
       description: "",
@@ -22,8 +21,6 @@ async function getCampaignByCandidate(candidateId, currentUserId) {
       .populate("posts.comments.user", "firstName lastName photoUrl")
       .lean();
   }
-
-  // ✨ הוספת שדה liked
   const liked =
     currentUserId && Array.isArray(campaign.likes)
       ? campaign.likes.includes(currentUserId.toString())
@@ -45,7 +42,6 @@ async function updateCampaign(campaignId, data) {
   return Campaign.findByIdAndUpdate(campaignId, data, { new: true });
 }
 
-// ===== פוסטים =====
 async function addPostToCampaign(campaignId, post) {
   const campaign = await Campaign.findById(campaignId);
   if (!campaign) throw new Error("קמפיין לא נמצא");
@@ -54,19 +50,19 @@ async function addPostToCampaign(campaignId, post) {
     title: post.title,
     content: post.content,
     image: post.image,
-    youtubeUrl: post.youtubeUrl || '', // 🆕
-    comments: [], // 🆕
+    youtubeUrl: post.youtubeUrl || '',
+    comments: [],
     createdAt: new Date()
   });
 
- await campaign.save();
+  await campaign.save();
 
-const updatedCampaign = await Campaign.findById(campaignId)
-  .populate("posts.comments.user", "firstName lastName photoUrl");
+  const updatedCampaign = await Campaign.findById(campaignId)
+    .populate("posts.comments.user", "firstName lastName photoUrl");
 
-const newPost = updatedCampaign.posts[updatedCampaign.posts.length - 1];
+  const newPost = updatedCampaign.posts[updatedCampaign.posts.length - 1];
 
-return newPost;
+  return newPost;
 
 }
 
@@ -80,14 +76,14 @@ async function updatePost(campaignId, postId, postData) {
   post.title = postData.title ?? post.title;
   post.content = postData.content ?? post.content;
   post.image = postData.image ?? post.image;
-  post.youtubeUrl = postData.youtubeUrl ?? post.youtubeUrl; // 🆕
+  post.youtubeUrl = postData.youtubeUrl ?? post.youtubeUrl;
 
- await campaign.save();
+  await campaign.save();
 
-const updatedCampaign = await Campaign.findById(campaignId)
-  .populate("posts.comments.user", "firstName lastName photoUrl");
+  const updatedCampaign = await Campaign.findById(campaignId)
+    .populate("posts.comments.user", "firstName lastName photoUrl");
 
-return updatedCampaign.posts.id(postId);
+  return updatedCampaign.posts.id(postId);
 
 }
 
@@ -97,13 +93,12 @@ async function deletePost(campaignId, postId) {
 
   campaign.posts = campaign.posts.filter(p => p._id.toString() !== postId);
   await campaign.save();
-  
+
   return Campaign.findById(campaignId)
     .populate("candidate")
     .populate("posts.comments.user", "firstName lastName photoUrl");
 }
 
-// 🆕 ===== תגובות =====
 async function addCommentToPost(campaignId, postId, userId, content) {
   const campaign = await Campaign.findById(campaignId);
   if (!campaign) throw new Error("קמפיין לא נמצא");
@@ -118,13 +113,13 @@ async function addCommentToPost(campaignId, postId, userId, content) {
   });
 
   await campaign.save();
-  
- const updatedCampaign = await Campaign.findById(campaignId)
-  .populate("posts.comments.user", "firstName lastName photoUrl");
 
-const updatedPost = updatedCampaign.posts.id(postId);
+  const updatedCampaign = await Campaign.findById(campaignId)
+    .populate("posts.comments.user", "firstName lastName photoUrl");
 
-return updatedPost;
+  const updatedPost = updatedCampaign.posts.id(postId);
+
+  return updatedPost;
 
 }
 
@@ -136,17 +131,16 @@ async function deleteComment(campaignId, postId, commentId) {
   if (!post) throw new Error("פוסט לא נמצא");
 
   post.comments = post.comments.filter(c => c._id.toString() !== commentId);
-  
-  await campaign.save();
-  
- const updatedCampaign = await Campaign.findById(campaignId)
-  .populate("posts.comments.user", "firstName lastName photoUrl");
 
-return updatedCampaign.posts.id(postId);
+  await campaign.save();
+
+  const updatedCampaign = await Campaign.findById(campaignId)
+    .populate("posts.comments.user", "firstName lastName photoUrl");
+
+  return updatedCampaign.posts.id(postId);
 
 }
 
-// ===== גלריית תמונות =====
 async function addImageToGallery(campaignId, imageUrl) {
   const campaign = await Campaign.findById(campaignId);
   if (!campaign) throw new Error("קמפיין לא נמצא");
@@ -165,7 +159,6 @@ async function deleteImageFromGallery(campaignId, imageUrl) {
   return campaign;
 }
 
-// ===== צפיות =====
 async function incrementViewCount(campaignId) {
   const campaign = await Campaign.findByIdAndUpdate(
     campaignId,
@@ -188,7 +181,7 @@ async function likeCampaign(campaignId, userId) {
     campaign.likes.push(userId);
   }
 
-  campaign.likeCount = campaign.likes.length; // חובה לעדכן
+  campaign.likeCount = campaign.likes.length;
   await campaign.save();
 
   return {
@@ -205,7 +198,7 @@ async function unlikeCampaign(campaignId, userId) {
     id => id.toString() !== userId.toString()
   );
 
-  campaign.likeCount = campaign.likes.length; // חובה לעדכן
+  campaign.likeCount = campaign.likes.length;
   await campaign.save();
 
   return {
@@ -213,8 +206,6 @@ async function unlikeCampaign(campaignId, userId) {
     liked: false,
   };
 }
-
-
 
 module.exports = {
   getCampaignByCandidate,
@@ -226,8 +217,8 @@ module.exports = {
   addImageToGallery,
   deleteImageFromGallery,
   incrementViewCount,
-  addCommentToPost, // 🆕
-  deleteComment,    // 🆕
+  addCommentToPost,
+  deleteComment,
   unlikeCampaign,
   likeCampaign,
 };

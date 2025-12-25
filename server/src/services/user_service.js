@@ -1,6 +1,6 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const fetch = require('node-fetch'); // אם יש לך פונקציות כתובות לזה, אפשר להשאיר
+const fetch = require('node-fetch');
 const User = require('../models/user_model');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'dev_secret';
@@ -20,29 +20,21 @@ function generateToken(user) {
   );
 }
 
-/* =========================
-   REGISTER
-   ========================= */
-
 async function register({ firstName, lastName, email, phone, city, address, password }) {
-  // מחפשים אם יש כבר יוזר עם אותו מייל
   const existing = await User.findOne({ email }).select('+passwordHash');
 
   if (existing) {
-    // אם יש לו כבר סיסמה → משתמש רגיל קיים
     if (existing.passwordHash) {
       throw { status: 409, errors: { email: 'המייל כבר קיים במערכת' } };
     }
 
-    // 👇 משתמש שנוצר רק דרך Google (בלי סיסמה) → משלימים עליו הרשמה
     existing.firstName = firstName;
     existing.lastName = lastName;
     existing.phone = phone;
     existing.city = city || '';
     existing.address = address;
     existing.passwordHash = await bcrypt.hash(password, 12);
-    existing.authProvider = 'local'; // עכשיו יש לו גם סיסמה
-
+    existing.authProvider = 'local';
     await existing.save();
 
     const token = generateToken(existing);
@@ -50,7 +42,6 @@ async function register({ firstName, lastName, email, phone, city, address, pass
     return { token, user: safe };
   }
 
-  // 👇 משתמש חדש לגמרי
   const passwordHash = await bcrypt.hash(password, 12);
 
   const user = await User.create({
@@ -72,14 +63,9 @@ async function register({ firstName, lastName, email, phone, city, address, pass
   return { token, user: safe };
 }
 
-/* =========================
-   LOGIN
-   ========================= */
-
 async function login({ email, password }) {
   const user = await User.findOne({ email }).select('+passwordHash');
   if (!user) {
-    // קוד לוגי – לא טקסט למשתמש
     throw { status: 404, errors: { email: 'EMAIL_NOT_FOUND' } };
   }
 
@@ -96,11 +82,6 @@ async function login({ email, password }) {
   const { passwordHash: _pwd, ...safe } = user.toObject();
   return { token, user: safe };
 }
-
-
-/* =========================
-   PROFILE / USERS
-   ========================= */
 
 async function getProfile(userId) {
   const user = await User.findById(userId).select('-passwordHash');
@@ -129,15 +110,10 @@ async function getUsersBatch(ids = []) {
   return map;
 }
 
-/* =========================
-   UPDATE PROFILE
-   ========================= */
-
 async function updateProfile(userId, updates) {
   const allowedFields = ['firstName', 'lastName', 'email', 'phone', 'city', 'address', 'password'];
   const dataToUpdate = {};
 
-  // אימייל – בדיקת כפילות
   if (updates.email !== undefined && updates.email !== null) {
     const trimmedEmail = updates.email.trim();
     if (trimmedEmail) {
@@ -184,17 +160,12 @@ async function updateProfile(userId, updates) {
   return user;
 }
 
-/* =========================
-   CHANGE PASSWORD
-   ========================= */
-
 async function changePassword(userId, currentPassword, newPassword) {
   const user = await User.findById(userId).select('+passwordHash');
   if (!user) {
     throw { status: 404, errors: { form: 'User not found' } };
   }
 
-  // 👇 אם נוצר רק דרך גוגל ואין לו סיסמה, לא מאפשרים שינוי פה
   if (!user.passwordHash) {
     throw {
       status: 400,
@@ -202,7 +173,6 @@ async function changePassword(userId, currentPassword, newPassword) {
     };
   }
 
-  // קודם בודקים סיסמה נוכחית
   const ok = await bcrypt.compare(currentPassword, user.passwordHash);
   if (!ok) {
     throw { status: 401, errors: { currentPassword: 'הסיסמה הנוכחית שגויה' } };
@@ -212,7 +182,6 @@ async function changePassword(userId, currentPassword, newPassword) {
     throw { status: 400, errors: { newPassword: 'סיסמה חייבת לפחות 6 תווים' } };
   }
 
-  // שלא תהיה זהה לישנה
   const same = await bcrypt.compare(newPassword, user.passwordHash);
   if (same) {
     throw {
@@ -228,10 +197,6 @@ async function changePassword(userId, currentPassword, newPassword) {
   return true;
 }
 
-/* =========================
-   GOOGLE – FIND / CREATE
-   ========================= */
-
 async function findOrCreateGoogleUser({ email, firstName, lastName }) {
   if (!email) {
     const err = new Error('Google account has no email');
@@ -242,7 +207,6 @@ async function findOrCreateGoogleUser({ email, firstName, lastName }) {
   let user = await User.findOne({ email });
 
   if (!user) {
-    // משתמש חדש שנוצר אוטומטית מגוגל – בלי סיסמה
     user = await User.create({
       firstName: firstName || '',
       lastName: lastName || '',
@@ -263,10 +227,6 @@ async function findOrCreateGoogleUser({ email, firstName, lastName }) {
   return { token, user: safe };
 }
 
-/* =========================
-   EXPORTS
-   ========================= */
-
 module.exports = {
   register,
   login,
@@ -276,5 +236,5 @@ module.exports = {
   getUsersBatch,
   updateProfile,
   changePassword,
-  findOrCreateGoogleUser, // 👈 חשוב!
+  findOrCreateGoogleUser,
 };
