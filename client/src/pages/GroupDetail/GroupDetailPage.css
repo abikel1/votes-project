@@ -1,4 +1,3 @@
-/* ===== כפתור צ'אט צף ===== */
 .chat-fab {
     position: fixed !important;
     bottom: 24px !important;
@@ -27,26 +26,16 @@
     transform: scale(0.96);
 }
 
-/* ===== חלון הצ'אט – תמיד יותר גבוה מהכפתור ===== */
 .chat-panel {
     position: fixed !important;
-    /* right: 24px !important; */
     bottom: 6vw !important;
     width: 380px;
-    /* max-height: 70vh; */
-    /* background-color: #ffffff; */
     border-radius: 16px;
-    /* box-shadow: 0 10px 30px rgba(15, 23, 42, 0.3); */
     padding: 0.75rem;
     z-index: 100000;
     display: flex;
     flex-direction: column;
-    /* margin-left: 20px; */
-    /* background-color: #003366; */
-
 }
-
-
 
 .vote-btn:hover {
     background: #2563eb;
@@ -63,8 +52,6 @@
     overflow: hidden;
     min-height: 0;
     gap: 0;
-    /* border: 1px solid #e2e8f0; */
-    /* background: white; */
 }
 
 .resize-handle {
@@ -143,7 +130,6 @@
 
 .candidate-card.leader {
     border: 1px solid #10b981;
-    /* background: #f0fdf4; */
 }
 
 .winner-badge {
@@ -153,13 +139,11 @@
     width: 28px;
     height: 28px;
     background-color: #f5ce0b;
-    /* צהוב-כתום */
     color: #fff;
     font-weight: bold;
     display: flex;
     align-items: center;
     justify-content: center;
-    /* border-radius: 4px; */
     font-size: calc(14px * var(--a11y-font-scale));
     box-shadow: 0 0 4px rgba(0, 0, 0, 0.3);
     z-index: 2;
@@ -296,13 +280,10 @@
     margin: auto;
 }
 
-/* ========== רספונסיביות למובייל ========== */
-/* טאבלטים */
 @media (max-width: 1024px) {
     .main-content-resizable {
         flex-direction: column;
         align-items: center;
-        /* מרכז את שתי העמודות */
     }
 
     .resize-handle {
@@ -316,7 +297,6 @@
         width: 100%;
         max-width: 800px;
         margin: 0 auto 16px;
-        /* ממורכזת */
     }
 
     .right-section {
@@ -325,20 +305,15 @@
         width: 100%;
         max-width: 800px;
         margin: 0 auto;
-        /* ממורכזת */
         display: flex;
         flex-direction: column;
         align-items: center;
-        /* מרכז את התוכן שבתוך הצד הימני */
     }
 
-    /* כאן הטופס עצמו */
     .candidate-form-card {
         width: 100%;
         max-width: 520px;
-        /* רוחב נוח לטופס */
         margin: 0 auto 24px;
-        /* מרכז ונותן רווח מלמטה */
     }
 
     .charts {
@@ -359,7 +334,6 @@
     }
 }
 
-/* מובייל */
 @media (max-width: 768px) {
     .page-wrap {
         padding: 8px;
@@ -367,11 +341,6 @@
         min-height: 100vh;
         overflow: auto;
     }
-
-    /* .page-header {
-        padding: 10px;
-        margin-bottom: 10px;
-    } */
 
     .page-title {
         font-size: calc(20px * var(--a11y-font-scale));
@@ -542,15 +511,6 @@
     box-sizing: border-box;
 }
 
-/* .page-header {
-    text-align: center;
-    margin-bottom: 12px;
-    background: white;
-    padding: 12px;
-    border: 1px solid #e2e8f0;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-} */
-
 .page-title {
     font-size: calc(24px * var(--a11y-font-scale));
     margin: 0 0 6px 0;
@@ -633,7 +593,6 @@
     transform: scale(0.98);
 }
 
-/* טאבים למובייל */
 .mobile-tabs {
     display: none;
 }
@@ -879,10 +838,6 @@
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     margin: auto;
 }
-
-/* .page-header {
-    position: relative;
-} */
 
 .current-leader {
     position: absolute;
@@ -1179,9 +1134,6 @@
     color: #555;
 }
 
-/* ========== רספונסיביות למובייל ========== */
-
-/* טאבלטים ומובייל - נעלים את הסרגל ומציגים טאבים */
 @media (max-width: 768px) {
     .mobile-tabs {
         display: flex;
@@ -1228,11 +1180,6 @@
         min-height: 100vh;
         overflow: auto;
     }
-
-    /* .page-header {
-        padding: 10px;
-        margin-bottom: 10px;
-    } */
 
     .page-title {
         font-size: calc(20px * var(--a11y-font-scale));
@@ -1398,7 +1345,6 @@
     }
 }
 
-/* נוף (landscape) במובייל */
 @media (max-width: 768px) and (orientation: landscape) {
     .page-wrap {
         height: auto;
@@ -1432,13 +1378,11 @@
     }
 }
 
-/* תמיכה בגלילה חלקה */
 .candidates-container,
 .right-section {
     -webkit-overflow-scrolling: touch;
 }
 
-/* שיפור תצוגה בפאדינג */
 @media (max-width: 768px) {
 
     .candidate-card,
@@ -1450,11 +1394,7 @@
 
 
 .group-details-card {
-    /* background: #ffffff; */
-    /* border: 1px solid #e5e5e5; */
-    /* border-radius: 12px; */
     padding: 24px;
-    /* box-shadow: 0 2px 10px rgba(0,0,0,0.05); */
     display: flex;
     flex-direction: column;
     gap: 20px;
@@ -1482,7 +1422,6 @@
 
 .info-card {
     background: #ffffff;
-    /* border-radius: 10px; */
     padding: 16px;
     text-align: center;
     transition: all 0.2s;
@@ -1548,12 +1487,6 @@
     color: #555;
 }
 
-
-/* כדי שאפשר יהיה למקם את כפתור ההגדרות באופן מוחלט בתוך ההדר */
-/* .page-header {
-    position: relative;
-} */
-
 .current-leader {
     position: absolute;
     top: -10px;
@@ -1568,11 +1501,8 @@
     font-size: calc(14px * var(--a11y-font-scale));
     font-weight: 700;
     border: 2px solid white;
-    /* border-radius: 4px; */
 }
 
-
-/* כפתור הגדרות בצד שמאל למעלה */
 .group-settings-btn-left {
     position: absolute;
     left: 12px;
@@ -1605,9 +1535,6 @@
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
-
-
-
 .clean-header {
     display: flex;
     align-items: center;
@@ -1616,24 +1543,6 @@
     background: white;
     border-bottom: 1px solid #e2e8f0;
 }
-
-/* .header-title {
-    flex: 1;
-    text-align: center;
-} */
-/* 
-.header-title h2 {
-    font-size: calc(24px * var(--a11y-font-scale));
-    margin: 0;
-    font-weight: 700;
-    color: #1e293b;
-} */
-
-/* .header-title p {
-    font-size: calc(13px * var(--a11y-font-scale));
-    color: #64748b;
-    margin: 2px 0 0 0;
-} */
 
 .icon-btn {
     background: transparent;
@@ -1698,7 +1607,6 @@
     font-size: calc(1.1rem * var(--a11y-font-scale));
 }
 
-/* כותרת החלון */
 .chat-panel-header {
     display: flex;
     justify-content: space-between;
@@ -1709,13 +1617,11 @@
 
 .chat-fab:hover {
     transform: scale(1.08);
-    /* גדילה קלה */
     box-shadow: 0 10px 26px rgba(15, 23, 42, 0.35);
 }
 
 .chat-fab:active {
     transform: scale(0.96);
-    /* קליק – טיפה מצטמצם */
 }
 
 .campaign-btn {
@@ -1738,7 +1644,6 @@
     transform: scale(1.2);
 }
 
-/* אנימציית "ברק" */
 @keyframes lightning {
     0% {
         box-shadow: 0 0 0 rgba(255, 255, 200, 0);
@@ -1767,19 +1672,14 @@
 
 }
 
-
-
-
 .tour-fab {
     position: fixed;
     bottom: 20px;
     left: 28px;
     border: 3px solid #ffffff;
-    /* אפשר לשנות ל-right כדי להצמיד לצד ימין */
     width: 50px;
     height: 50px;
     background-color: #1e3a8a;
-    /* כחול */
     color: #fff;
     border-radius: 50%;
     font-size: 24px;
@@ -1797,15 +1697,13 @@
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
 }
 
-/* 4 כרטיסים בשורה אחת בטאבלט בלבד */
 @media (min-width: 769px) and (max-width: 1024px) {
     .group-info-grid {
         grid-template-columns: repeat(4, minmax(0, 1fr));
         gap: 16px;
-        /* אם תרצי רווחים ביניהם */
     }
 }
-/* במובייל – קצת להתקרב לקצה כדי שלא יתנגש עם הטקסט */
+
 @media (max-width: 768px) {
     .group-settings-btn-left {
         left: 8px;
@@ -1820,96 +1718,86 @@
 
     .tour-fab {
         bottom: 16px;
-        /* יותר קרוב לתחתית במסך קטן */
         left: 17px;
-        /* להזזה עדינה */
     }
 }
 
 
 .page-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 8px 16px;
-  background-color: #fff;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.1);
-  flex-wrap: nowrap;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 16px;
+    background-color: #fff;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    flex-wrap: nowrap;
 }
 
 .header-title {
-  flex: 1 1 auto;
-  min-width: 0;  /* חשוב! מאפשר לשורות להתרחב בתוך flex */
+    flex: 1 1 auto;
+    min-width: 0;
 }
 
 .group-name {
-  margin: 0;
-  font-size: 1.2rem;
-  font-weight: 600;
-  white-space: normal; /* מאפשר שבירה לשורות רבות */
-  overflow: visible;   /* חובה! אחרת הטקסט עלול להיחתך */
-  word-break: break-word; /* שוברת מילים ארוכות במקום לקפוץ */
+    margin: 0;
+    font-size: 1.2rem;
+    font-weight: 600;
+    white-space: normal;
+    overflow: visible;
+    word-break: break-word;
 }
 
-
 .icon-btn-container {
-  display: flex;
-  gap: 8px;
-  flex-shrink: 0;
-  align-items: center;
+    display: flex;
+    gap: 8px;
+    flex-shrink: 0;
+    align-items: center;
 }
 
 .icon-btn {
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 6px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #333;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #333;
 }
 
 .icon-btn:hover {
-  color: #007bff;
+    color: #007bff;
 }
 
-/* רספונסיבי טאבלט */
 @media (max-width: 1024px) {
-  .group-name {
-    font-size: 1.1rem;
-  }
-  .group-description {
-    font-size: 0.85rem;
-  }
+    .group-name {
+        font-size: 1.1rem;
+    }
+
+    .group-description {
+        font-size: 0.85rem;
+    }
 }
 
-/* רספונסיבי מובייל */
 @media (max-width: 600px) {
-  .group-name {
-    font-size: 1rem;
-  }
-  .group-description {
-    font-size: 0.8rem;
-  }
+    .group-name {
+        font-size: 1rem;
+    }
+
+    .group-description {
+        font-size: 0.8rem;
+    }
 }
-
-
-
-
-
-
-
 
 .survey-charts-container {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 20px; /* רווח בין הגרפים */
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
 }
 
 .survey-chart {
-  flex: 1 1 45%; /* כל גרף 45% מרוחב הקונטיינר, נשאר מקום לרווח */
-  min-width: 300px; /* לשמור על קריאות במובייל */
+    flex: 1 1 45%;
+    min-width: 300px;
 }
 
 
@@ -1925,87 +1813,96 @@
 
 
 #group-detail-header {
-  display: flex;
-  justify-content: space-between;
-  gap: 1rem;
-  align-items: center; /* מרכז את הכותרת והכפתורים לאורך הציר האנכי */
-  flex-wrap: wrap; /* מאפשר לשורות לעבור שורה אם הצרכים גדולים */
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    align-items: center;
+    /* מרכז את הכותרת והכפתורים לאורך הציר האנכי */
+    flex-wrap: wrap;
+    /* מאפשר לשורות לעבור שורה אם הצרכים גדולים */
 }
 
 .header-title {
-  flex: 1 1 auto;
-  min-width: 0;
-  display: flex;
-  flex-direction: column; /* שם מעל תיאור */
-  gap: 0.5rem;
-  align-items: center; /* מרכז את השם והתיאור */
-  text-align: center; /* גם למקרה של מספר שורות */
-  max-width: 100%;
+    flex: 1 1 auto;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    /* שם מעל תיאור */
+    gap: 0.5rem;
+    align-items: center;
+    /* מרכז את השם והתיאור */
+    text-align: center;
+    /* גם למקרה של מספר שורות */
+    max-width: 100%;
 }
 
 @media screen and (min-width: 1024px) {
-  /* מחשב גדול */
-  .header-title {
-    flex-direction: row; /* שם לצד תיאור */
-    align-items: center;
-    text-align: left;
-    gap: 1rem;
-    max-width: 86%; /* מותאם לצד כפתורים */
-  }
 
-  .group-description-container {
-    flex: 1;
-  }
+    /* מחשב גדול */
+    .header-title {
+        flex-direction: row;
+        /* שם לצד תיאור */
+        align-items: center;
+        text-align: left;
+        gap: 1rem;
+        max-width: 86%;
+        /* מותאם לצד כפתורים */
+    }
 
-  .group-description {
-    -webkit-line-clamp: 2;
-  }
+    .group-description-container {
+        flex: 1;
+    }
+
+    .group-description {
+        -webkit-line-clamp: 2;
+    }
 }
 
 /* שאר סגנונות נשארים כפי שהיו */
 .group-name {
-  margin: 0;
-  font-size: 1.5rem;
-  font-weight: 600;
-  white-space: normal;
-  word-break: break-word;
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 600;
+    white-space: normal;
+    word-break: break-word;
 }
 
 .group-description-container {
-  display: flex;
-  flex-direction: column;
+    display: flex;
+    flex-direction: column;
 }
 
 .group-description {
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  -webkit-line-clamp: 2;
-  margin: 0;
-  line-height: 1.5em;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    -webkit-line-clamp: 2;
+    margin: 0;
+    line-height: 1.5em;
 }
 
 .group-description-container.expanded .group-description {
-  display: block;
-  -webkit-line-clamp: unset;
-  overflow: visible;
+    display: block;
+    -webkit-line-clamp: unset;
+    overflow: visible;
 }
 
 .read-more-btn {
-  display: inline-block;
-  margin-top: 0.25rem;
-  cursor: pointer;
-  color: #3b82f6;
-  background: none;
-  border: none;
-  padding: 0;
-  font-size: 0.9em;
-  user-select: none;
+    display: inline-block;
+    margin-top: 0.25rem;
+    cursor: pointer;
+    color: #3b82f6;
+    background: none;
+    border: none;
+    padding: 0;
+    font-size: 0.9em;
+    user-select: none;
 }
 
 .icon-btn-container {
-  display: flex;
-  align-items: center; /* מרכז את הכפתורים אנכית */
-  gap: 0.5rem;
+    display: flex;
+    align-items: center;
+    /* מרכז את הכפתורים אנכית */
+    gap: 0.5rem;
 }

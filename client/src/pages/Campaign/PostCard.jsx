@@ -19,14 +19,10 @@ export default function PostCard({
   const [showComments, setShowComments] = useState(false);
   const [newComment, setNewComment] = useState('');
   const [submittingComment, setSubmittingComment] = useState(false);
-
-  // ✅ state למודל
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [commentToDelete, setCommentToDelete] = useState(null);
-
   const usersMap = useSelector(selectUsersMap);
   const { t, i18n } = useTranslation();
-
   const handleSubmitComment = async () => {
     if (!newComment.trim() || submittingComment) return;
 
@@ -41,13 +37,11 @@ export default function PostCard({
     }
   };
 
-  // ✅ הפונקציה לפתיחת המודל
   const confirmDeleteComment = (commentId) => {
     setCommentToDelete(commentId);
     setConfirmOpen(true);
   };
 
-  // ✅ הפונקציה שמבוצעת כשמאשרים את המחיקה
   const handleConfirmDelete = async () => {
     if (!commentToDelete) return;
     try {
@@ -73,9 +67,7 @@ export default function PostCard({
         <h4>{post.title}</h4>
         {isCandidateOwner && isEditMode && (
           <button
-    onClick={onDeletePost} // פשוט
-
-
+            onClick={onDeletePost}
             className="post-delete-btn"
             title={t('campaign.posts.deletePostTitle')}
           >
@@ -115,12 +107,12 @@ export default function PostCard({
                 rows={2}
                 disabled={submittingComment}
               />
-           <button
-  type="button"
-  onClick={handleSubmitComment}
-  disabled={!newComment.trim() || submittingComment}
-  className="comment-submit-btn"
->
+              <button
+                type="button"
+                onClick={handleSubmitComment}
+                disabled={!newComment.trim() || submittingComment}
+                className="comment-submit-btn"
+              >
 
                 {submittingComment
                   ? t('campaign.comments.sending')
@@ -158,7 +150,6 @@ export default function PostCard({
                       </div>
 
                       {(currentUserId === userId || isCandidateOwner) && (
-                        // ✅ כאן משתמשים בפונקציה החדשה לפתיחת המודל
                         <button
                           onClick={() => confirmDeleteComment(comment._id)}
                           className="comment-delete-btn"
@@ -178,7 +169,6 @@ export default function PostCard({
             )}
           </div>
 
-          {/* ✅ קומפוננטת המודל */}
           <ConfirmModal
             open={confirmOpen}
             message={t('campaign.comments.confirmDelete')}

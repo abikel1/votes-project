@@ -1,7 +1,3 @@
-/* ===============================
-   Overlay
-   =============================== */
-
 .modal-backdrop {
     position: fixed;
     inset: 0;
@@ -12,10 +8,6 @@
     z-index: 9999;
     padding: 20px;
 }
-
-/* ===============================
-   Modal – Desktop Default
-   =============================== */
 
 .modal.delete-modal {
     width: 100%;
@@ -30,20 +22,12 @@
     text-align: center;
 }
 
-/* ===============================
-   Title
-   =============================== */
-
 .delete-title {
     margin: 0 0 24px;
     font-size: 1.7rem;
     font-weight: 700;
     color: #b80d0d;
 }
-
-/* ===============================
-   Instruction + Group Name
-   =============================== */
 
 .delete-instruction {
     font-size: 1.05rem;
@@ -60,14 +44,9 @@
     padding: 10px 16px;
     border: 1px solid #ddd;
     background: #fafafa;
-    /* border-radius: 8px; */
     direction: ltr;
     color: #333;
 }
-
-/* ===============================
-   Input
-   =============================== */
 
 .delete-confirm-input {
     width: 100%;
@@ -89,10 +68,6 @@
     box-shadow: 0 0 0 3px rgba(184, 13, 13, 0.15);
 }
 
-/* ===============================
-   Buttons – Desktop
-   =============================== */
-
 .delete-actions {
     display: flex;
     gap: 16px;
@@ -104,7 +79,6 @@
     background: #b80d0d;
     color: #fff;
     border: none;
-    /* border-radius: 10px; */
     height: 52px;
     font-weight: 700;
     font-size: 1.05rem;
@@ -126,7 +100,6 @@
     background: #fff;
     border: 2px solid #003366;
     color: #003366;
-    /* border-radius: 10px; */
     height: 52px;
     font-weight: 600;
     font-size: 1.05rem;
@@ -137,10 +110,6 @@
 .delete-cancel-btn:hover {
     background: #f0f7ff;
 }
-
-/* =========================================================
-   ✅ Tablet (עד 900px)
-   ========================================================= */
 
 @media (max-width: 900px) {
     .modal.delete-modal {
@@ -168,10 +137,6 @@
     }
 }
 
-/* =========================================================
-   ✅ Mobile (עד 600px)
-   ========================================================= */
-
 @media (max-width: 600px) {
     .modal-backdrop {
         padding: 12px;
@@ -179,7 +144,6 @@
 
     .modal.delete-modal {
         max-width: 100%;
-        /* border-radius: 10px; */
         padding: 24px 18px 22px;
     }
 
@@ -216,10 +180,6 @@
     }
 }
 
-/* ===============================
-   ✅ Mobile Buttons – Fix Final (עד 480px)
-   =============================== */
-
 @media (max-width: 480px) {
 
     .modal-backdrop {
@@ -246,17 +206,14 @@
         font-size: 0.8rem;
         padding: 7px 12px;
         margin-top: 8px;
-        /* border-radius: 8px; */
     }
 
     .delete-confirm-input {
         font-size: 0.9rem;
         padding: 12px;
         margin-bottom: 20px;
-        /* border-radius: 10px; */
     }
 
-    /* ✅ כפתורים – מסודר יפה במובייל */
     .delete-actions {
         display: flex;
         flex-direction: row;
@@ -267,14 +224,12 @@
         flex: 1;
         height: 44px;
         font-size: 0.9rem;
-        /* border-radius: 10px; */
     }
 
     .delete-cancel-btn {
         flex: 1;
         height: 44px;
         font-size: 0.9rem;
-        /* border-radius: 10px; */
         background: #fff;
         border: 1.5px solid #003366;
     }

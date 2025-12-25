@@ -1,4 +1,3 @@
-// src/pages/GroupSettingsPage/EditCandidateModal.jsx
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import ImageCropModal from '../../components/ImageCropModal';
@@ -19,27 +18,24 @@ export default function EditCandidateModal({
   canEditName = true,
 }) {
   const { t } = useTranslation();
-  const [fileToCrop, setFileToCrop] = useState(null); // 👈 קובץ לחיתוך במודאל
+  const [fileToCrop, setFileToCrop] = useState(null);
 
   if (!open) return null;
 
   const disabled = updatingThisCandidate;
 
-  // בחירת קובץ (גם מהאינפוט הנסתר וגם מהגלוי)
   const handleFileChange = (e) => {
     const file = e.target.files?.[0];
     if (!file || disabled || uploadingEdit) return;
 
-    setFileToCrop(file);   // 👈 פותח מודאל החיתוך
-    e.target.value = '';   // כדי שאפשר יהיה לבחור שוב אותו קובץ
+    setFileToCrop(file);
+    e.target.value = '';
   };
 
-  // אחרי שהמשתמש סיים חיתוך ולחץ "שמור"
   const handleCroppedFile = (croppedFile) => {
     setFileToCrop(null);
     if (!croppedFile || !onUploadEdit) return;
 
-    // שולחים להורה כבר את הקובץ החתוך
     onUploadEdit(croppedFile);
   };
 
@@ -56,7 +52,6 @@ export default function EditCandidateModal({
         <h3>{t('candidates.edit.title')}</h3>
 
         <form className="field" onSubmit={onSaveEditedCandidate}>
-          {/* Name */}
           <label>{t('candidates.form.nameLabel')}</label>
           <input
             className="input"
@@ -70,7 +65,6 @@ export default function EditCandidateModal({
             <div className="err small-err">{t(editCandErrors.name)}</div>
           )}
 
-          {/* Description */}
           <label>{t('candidates.form.descriptionLabel')}</label>
           <textarea
             className="input"
@@ -85,7 +79,6 @@ export default function EditCandidateModal({
             <div className="err small-err">{t(editCandErrors.description)}</div>
           )}
 
-          {/* Symbol */}
           <label>{t('candidates.form.symbolLabel')}</label>
           <input
             className="input"
@@ -100,16 +93,14 @@ export default function EditCandidateModal({
             <div className="err small-err">{t(editCandErrors.symbol)}</div>
           )}
 
-          {/* Image */}
           <label>{t('candidates.form.photoLabel')}</label>
 
-          {/* אינפוט נסתר ל"שינוי תמונה" */}
           <input
             ref={editFileInputRef}
             type="file"
             accept="image/*"
             style={{ display: 'none' }}
-            onChange={handleFileChange}   // 👈 דרך המודאל
+            onChange={handleFileChange}
             disabled={disabled || uploadingEdit}
           />
 
@@ -118,7 +109,7 @@ export default function EditCandidateModal({
               <input
                 type="file"
                 accept="image/*"
-                onChange={handleFileChange}  // 👈 גם כאן
+                onChange={handleFileChange}
                 disabled={disabled || uploadingEdit}
               />
               {(disabled || uploadingEdit) && (
@@ -163,7 +154,6 @@ export default function EditCandidateModal({
             </div>
           )}
 
-          {/* General update error */}
           {updateCandidateError && (
             <div className="err" style={{ marginTop: 6 }}>
               {t(updateCandidateError)}
@@ -192,11 +182,10 @@ export default function EditCandidateModal({
           </div>
         </form>
 
-        {/* מודאל חיתוך – נפתח כשיש fileToCrop */}
         {fileToCrop && (
           <ImageCropModal
             file={fileToCrop}
-            aspect={1}          // 1:1 לפרופיל עגול
+            aspect={1}
             onCancel={handleCancelCrop}
             onCropped={handleCroppedFile}
           />

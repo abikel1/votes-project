@@ -1,5 +1,3 @@
-/* src/pages/Contact/ContactPage.css */
-
 .contact-container {
   min-height: 100vh;
   display: flex;
@@ -100,7 +98,6 @@
   }
 }
 
-/* וודא שכל הטקסטים בטופס משתמשים בפונט הראשי של האתר */
 .contact-form input,
 .contact-form textarea,
 .contact-form input::placeholder,

@@ -24,7 +24,7 @@ export default function ProfilePage() {
   const message = useSelector((state) => state.auth.message);
   const [userGroups, setUserGroups] = useState({ created: [], joined: [] });
   const navigate = useNavigate();
-const [appliedGroups, setAppliedGroups] = useState([]);
+  const [appliedGroups, setAppliedGroups] = useState([]);
 
   const [editMode, setEditMode] = useState(false);
 
@@ -37,7 +37,6 @@ const [appliedGroups, setAppliedGroups] = useState([]);
     address: '',
   });
 
-  // 🔐 שינוי סיסמה – סטייטים
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirm, setConfirm] = useState('');
@@ -58,24 +57,23 @@ const [appliedGroups, setAppliedGroups] = useState([]);
       });
     }
   }, [user, token, dispatch]);
-useEffect(() => {
-  if (!user || !token) return;
+  useEffect(() => {
+    if (!user || !token) return;
 
-  // קבוצות שבהן את מועמדת
-  http.get('/groups/applied')
-    .then((res) => {
-      setAppliedGroups(res.data);
-    })
-    .catch((err) => {
-      console.error('Error fetching applied groups:', err);
-    });
-}, [user, token]);
+    http.get('/groups/applied')
+      .then((res) => {
+        setAppliedGroups(res.data);
+      })
+      .catch((err) => {
+        console.error('Error fetching applied groups:', err);
+      });
+  }, [user, token]);
 
   useEffect(() => {
     if (!user || !token) return;
 
     http
-      .get('/groups/my')  // שם הראוט בצד שרת: /api/groups/my
+      .get('/groups/my')
       .then((res) => {
         setUserGroups(res.data);
       })
@@ -84,8 +82,6 @@ useEffect(() => {
       });
   }, [user, token]);
 
-
-  // 💡 ולידציה "חיה" לאימות סיסמה
   useEffect(() => {
     setPwErrors((prev) => ({
       ...prev,
@@ -96,7 +92,6 @@ useEffect(() => {
     }));
   }, [newPassword, confirm, t]);
 
-  // כשפותחים את חלון שינוי הסיסמה – לנקות שגיאות ישנות
   useEffect(() => {
     if (showPasswordModal) {
       setPwErrors({});
@@ -104,7 +99,6 @@ useEffect(() => {
     }
   }, [showPasswordModal, dispatch]);
 
-  // ✅ להעלים את הודעת "סיסמה עודכנה" אחרי 3 שניות
   useEffect(() => {
     if (!message) return;
 
@@ -190,10 +184,7 @@ useEffect(() => {
       );
     } catch (err) {
       console.log('changePassword error (client):', err);
-
-      // err זה ה־errors מהשרת (rejectWithValue)
       if (err && typeof err === 'object') {
-        // למשל { currentPassword: 'הסיסמה שהוזנה שגויה' }
         setPwErrors((prev) => ({
           ...prev,
           ...err,
@@ -210,8 +201,6 @@ useEffect(() => {
   return (
     <div className="profile-container">
       <h1>{t('profile.title', 'הפרופיל שלי')}</h1>
-
-      {/* ✅ הודעת הצלחה גלובלית */}
       {message && (
         <div className="top-msg success" style={{ marginBottom: 10 }}>
           {message}
@@ -394,24 +383,24 @@ useEffect(() => {
         </ul>
 
 
-        
-      <div className="profile-groups-divider" />
 
-<h2>{t('profile.groupsApplied', 'קבוצות שבהן אני מועמד/ת')}</h2>
-<ul>
-  {appliedGroups.length > 0 ? (
-    appliedGroups.map((g) => (
-      <li key={g._id} className="group-item">
-        <span>{g.name}</span>
-        <button onClick={() => navigate(`/groups/${g._id}`)}>
-          {t('profile.viewGroup', 'לפרטי הקבוצה')}
-        </button>
-      </li>
-    ))
-  ) : (
-    <li>{t('profile.noGroups', 'אין קבוצות')}</li>
-  )}
-</ul>
+        <div className="profile-groups-divider" />
+
+        <h2>{t('profile.groupsApplied', 'קבוצות שבהן אני מועמד/ת')}</h2>
+        <ul>
+          {appliedGroups.length > 0 ? (
+            appliedGroups.map((g) => (
+              <li key={g._id} className="group-item">
+                <span>{g.name}</span>
+                <button onClick={() => navigate(`/groups/${g._id}`)}>
+                  {t('profile.viewGroup', 'לפרטי הקבוצה')}
+                </button>
+              </li>
+            ))
+          ) : (
+            <li>{t('profile.noGroups', 'אין קבוצות')}</li>
+          )}
+        </ul>
 
       </div>
 

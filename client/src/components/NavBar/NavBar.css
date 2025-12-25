@@ -1,11 +1,7 @@
-/* NavBar.css */
-
 .navbar {
   background: linear-gradient(135deg, #003366 0%, #004d99 100%);
   padding: 0 1.5rem;
-  /* היה 2rem */
   height: 60px;
-  /* היה 70px */
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -15,13 +11,10 @@
   z-index: 1000;
   direction: rtl;
   gap: 1rem;
-  /* היה 1.5rem */
 }
 
-/* לוגו/שם האתר */
 .site-name {
   font-size: 1.3rem;
-  /* קצת קטן יותר */
   font-weight: bold;
   color: white;
   letter-spacing: 1px;
@@ -34,12 +27,9 @@
   text-shadow: 0 0 8px rgba(255, 255, 255, 0.4);
 }
 
-/* תמונת פרופיל */
 .profile {
       border-radius: 50%;
-
   width: 40px;
-  /* היה 45px */
   height: 40px;
   background: white;
   color: #003366;
@@ -59,29 +49,24 @@
   box-shadow: 0 3px 10px rgba(255, 255, 255, 0.25);
 }
 
-/* קישורים – wrapper כללי */
 .links {
   display: flex;
   align-items: center;
   flex: 1;
 }
 
-/* הקישורים עצמם – קצת ימינה */
 .nav-links-right {
   display: flex;
   align-items: center;
   gap: 0.6rem;
   margin-right: 1.5rem;
-  /* הזזה ימינה */
 }
 
-/* יציאה + שפה – שמאלה */
 .nav-links-left {
   display: flex;
   align-items: center;
   gap: 0.6rem;
   margin-left: auto;
-  /* דוחף אותם שמאלה */
 }
 
 .links a,
@@ -91,23 +76,19 @@
   font-size: 0.95rem;
   font-weight: 500;
   padding: 0.35rem 0.75rem;
-  /* פחות padding */
   transition: all 0.2s ease;
   white-space: nowrap;
 }
 
-/* מצב hover – רק רקע עדין בלי קו תחתון */
 .links a:hover {
   background: rgba(255, 255, 255, 0.12);
 }
 
-/* קישור פעיל – הדגשה עדינה */
 .active-link {
   background: rgba(255, 255, 255, 0.2);
   font-weight: 600;
 }
 
-/* תפריט המבורגר */
 .hamburger {
   display: none;
   flex-direction: column;
@@ -137,7 +118,6 @@
   transform: rotate(-45deg) translate(6px, -6px);
 }
 
-/* רספונסיבי */
 @media (max-width: 968px) {
 
   .links a,
@@ -187,7 +167,6 @@
     right: 0;
   }
 
-  /* במובייל – שני ה־divs אחד מתחת לשני */
   .nav-links-right,
   .nav-links-left {
     flex-direction: column;
@@ -227,15 +206,12 @@
   }
 }
 
-/* בדסקטופ – מזיז את היציאה והשפות שמאלה */
 @media (min-width: 769px) {
   .site-name {
     font-size: 2rem;
   }
 }
 
-
-/* כפתור יציאה כאייקון */
 .logout-icon-btn {
   background: transparent;
   border: 1px solid #003366;
@@ -258,7 +234,6 @@
   box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);
 }
 
-/* עטיפה לפרופיל + יציאה */
 .profile-wrapper {
   display: flex;
   align-items: center;

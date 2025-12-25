@@ -1,4 +1,3 @@
-// src/pages/GroupSettingsPage/DeleteGroupModal.jsx
 import { useTranslation } from 'react-i18next';
 import './DeleteGroupModal.css';
 
@@ -17,16 +16,11 @@ export default function DeleteGroupModal({
   return (
     <div className="modal-backdrop" onClick={onClose}>
       <div className="modal delete-modal" onClick={(e) => e.stopPropagation()}>
-        {/* כותרת */}
         <h2 className="delete-title">{t('groupSettings.deleteModal.title')}</h2>
-
-        {/* הוראה + שם הקבוצה */}
         <div className="delete-instruction">
           {t('groupSettings.deleteModal.typeToConfirm')}
           <div className="delete-repo">{confirmSlug}</div>
         </div>
-
-        {/* שדה קלט */}
         <input
           className="delete-confirm-input"
           placeholder={confirmSlug}
@@ -35,7 +29,6 @@ export default function DeleteGroupModal({
           style={{ direction: 'ltr' }}
         />
 
-        {/* כפתורים */}
         <div className="delete-actions">
           <button
             className="clean-btn clean-btn-delete"

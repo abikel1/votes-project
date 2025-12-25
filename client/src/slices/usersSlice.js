@@ -2,7 +2,6 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import http from '../api/http';
 import i18n from '../i18n';
 
-/** ===== עזר ===== */
 const asId = (u, fallback) => String(u?._id ?? u?.id ?? u?.userId ?? fallback ?? '');
 const toMapById = (arr) => {
   const out = {};
@@ -13,19 +12,16 @@ const toMapById = (arr) => {
   return out;
 };
 
-/** 1) ניסיון להביא לפי רשימת מזהים (batch/יחידני) — לא מפיל אם אין ראוט */
 export const fetchUsersByIds = createAsyncThunk(
   'users/fetchByIds',
   async (ids, { rejectWithValue }) => {
     try {
       const uniq = Array.from(new Set((ids || []).filter(Boolean).map(String)));
       if (!uniq.length) return {};
-      // batch
       try {
         const { data } = await http.get('/users/batch', { params: { ids: uniq.join(',') } });
         return toMapById(data);
       } catch {
-        // יחידני — לא מפיל על 404
         const results = await Promise.all(
           uniq.map(async (id) => {
             try {
@@ -46,7 +42,6 @@ export const fetchUsersByIds = createAsyncThunk(
   }
 );
 
-/** 2) פולבאק לפי קבוצה: מנסה כמה ראוטים נפוצים להחזרת חברי קבוצה כ-users */
 export const hydrateUsersForGroup = createAsyncThunk(
   'users/hydrateForGroup',
   async ({ groupId }, { rejectWithValue }) => {
@@ -62,7 +57,6 @@ export const hydrateUsersForGroup = createAsyncThunk(
           const map = toMapById(data);
           if (Object.keys(map).length) return map;
         } catch (_) {
-          /* נמשיך לנסות */
         }
       }
       return {};
@@ -77,12 +71,11 @@ export const hydrateUsersForGroup = createAsyncThunk(
 const usersSlice = createSlice({
   name: 'users',
   initialState: {
-    byId: {},         // { [userId]: user }
+    byId: {},
     loading: false,
     error: null,
   },
   reducers: {
-    /** הזרקה ידנית (למשל אחרי אישור בקשה) */
     upsertUsers(state, action) {
       const arr = Array.isArray(action.payload) ? action.payload : [action.payload];
       arr.forEach((u) => {
@@ -118,6 +111,4 @@ const usersSlice = createSlice({
 
 export const { upsertUsers } = usersSlice.actions;
 export default usersSlice.reducer;
-
-/** סלקטור נוח למיפוי מזהים -> אובייקטים */
 export const selectUsersMap = (s) => s.users.byId || {};

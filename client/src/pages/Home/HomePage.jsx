@@ -1,4 +1,3 @@
-// src/pages/Home/HomePage.jsx
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
@@ -43,7 +42,7 @@ const HomePage = () => {
 
     groups.forEach((group) => {
       const endDate = group.endDate ? new Date(group.endDate) : null;
-      const isOpenToAll = !group.isLocked ;
+      const isOpenToAll = !group.isLocked;
 
       if (isOpenToAll && (!endDate || endDate > now)) {
         active.push(group);
@@ -144,14 +143,12 @@ const HomePage = () => {
   }
 
   const onLoginClick = () => {
-  navigate('/login'); // או הנתיב שבו נמצא עמוד ההתחברות
-};
+    navigate('/login');
+  };
 
 
   return (
     <div className="home-page">
-      {/* Hero Section */}
-      
       <section className="hero-section">
         <div className="hero-overlay"></div>
         <div className="hero-content">
@@ -161,13 +158,12 @@ const HomePage = () => {
             <HiPlus className="btn-icon" />
             {t('home.hero.cta')}
           </button>
-          
-{/* כפתור התחברות אם לא מחוברת */}
-{(!authId && !authEmail) && (
-  <button className="hero-cta hero-login" onClick={onLoginClick}>
-    {t('home.hero.login')}
-  </button>
-)}
+
+          {(!authId && !authEmail) && (
+            <button className="hero-cta hero-login" onClick={onLoginClick}>
+              {t('home.hero.login')}
+            </button>
+          )}
 
         </div>
         <div className="scroll-indicator">
@@ -176,10 +172,8 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* Main Content */}
       <div className="main-content">
         <div className="content-wrapper">
-          {/* Active Groups - Right Column */}
           <section className="groups-column active-column">
             <div className="column-header">
               <div className="header-title">
@@ -210,7 +204,6 @@ const HomePage = () => {
                       )}
 
                       <div className="card-meta">
-                        {/* אפשר להחזיר בעתיד את כמות המצביעים */}
                         <div className="meta-item time-meta">
                           <HiClock className="meta-icon" />
                           <span className="time-text">
@@ -218,15 +211,6 @@ const HomePage = () => {
                           </span>
                         </div>
                       </div>
-
-                      {/* כפתור הצבעה אפשרי בעתיד */}
-                      {/* <button
-                        className="card-action-btn active-btn"
-                        onClick={(e) => handleVoteClick(group, e)}
-                      >
-                        {t('home.active.voteNow')}
-                        <span className="btn-arrow">←</span>
-                      </button> */}
                     </div>
                   </div>
                 ))}
@@ -237,8 +221,6 @@ const HomePage = () => {
               </div>
             )}
           </section>
-
-          {/* Closed Groups - Left Column */}
           <section className="groups-column closed-column">
             <div className="column-header">
               <div className="header-title">
@@ -269,7 +251,6 @@ const HomePage = () => {
                       )}
 
                       <div className="card-meta">
-                        {/* אפשר להחזיר בעתיד נתונים נוספים */}
                       </div>
 
                       <button className="card-action-btn closed-btn">
@@ -288,7 +269,6 @@ const HomePage = () => {
           </section>
         </div>
 
-        {/* Empty State - when no groups at all */}
         {activeGroups.length === 0 && recentlyClosedGroups.length === 0 && (
           <div className="empty-state-full">
             <div className="empty-icon">🗳️</div>
@@ -302,7 +282,6 @@ const HomePage = () => {
         )}
       </div>
 
-      {/* Quick Actions Footer */}
       <section className="quick-actions">
         <button
           className="action-btn"

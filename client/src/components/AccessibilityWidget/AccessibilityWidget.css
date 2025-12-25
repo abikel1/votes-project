@@ -4,13 +4,12 @@
   left: 25px !important;
   width: 56px;
   height: 56px;
-  background-color: #003366; /* כחול אחיד כמו הכפתור מדריך */
+  background-color: #003366;
   border: 3px solid #ffffff;
-  /* border-radius: 50%; */
   display: flex;
   justify-content: center;
   align-items: center;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.25);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
   cursor: pointer;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
   z-index: 9999;
@@ -19,7 +18,7 @@
 
 .accessibility-btn:hover {
   transform: scale(1.1);
-  box-shadow: 0 8px 25px rgba(0,0,0,0.35);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.35);
 }
 
 .accessibility-btn:active {
@@ -29,10 +28,9 @@
 .accessibility-btn svg {
   width: 28px;
   height: 28px;
-  color: #ffffff; /* צהוב אחיד */
+  color: #ffffff;
 }
 
-/* מובייל */
 @media (max-width: 768px) {
   .accessibility-btn {
     bottom: 90px !important;
@@ -40,28 +38,21 @@
   }
 }
 
-
-/* ===== פאנל נגישות – נפתח מעל הכפתור ===== */
 .accessibility-panel {
   position: fixed !important;
-  bottom: calc(90px + 56px + 10px) !important; /* ✅ בדיוק מעל הכפתור */
-  left: 16px !important;                        /* ✅ צד שמאל */
+  bottom: calc(90px + 56px + 10px) !important;
+  left: 16px !important;
   right: auto !important;
-
   width: 320px;
   max-width: 90vw;
-
   background: #ffffff;
-  /* border-radius: 12px; */
   padding: 14px 16px;
   box-shadow: 0 10px 25px rgba(15, 23, 42, 0.25);
   z-index: 9999;
-
   direction: rtl;
   font-family: inherit;
 }
 
-/* ===== כותרת הפאנל ===== */
 .a11y-panel-header {
   display: flex;
   align-items: center;
@@ -82,7 +73,6 @@
   cursor: pointer;
 }
 
-/* ===== סקשנים ===== */
 .a11y-section {
   margin-top: 10px;
 }
@@ -94,7 +84,6 @@
   margin-bottom: 6px;
 }
 
-/* ===== אריחים ===== */
 .a11y-tile-row {
   display: flex;
   gap: 8px;
@@ -102,7 +91,6 @@
 
 .a11y-tile {
   flex: 1;
-  /* border-radius: 10px; */
   border: 1px solid #e5e7eb;
   background: #f9fafb;
   padding: 8px 10px;
@@ -131,11 +119,9 @@
   color: #15803d;
 }
 
-/* ===== אייקונים ===== */
 .a11y-tile-icon {
   width: 32px;
   height: 32px;
-  /* border-radius: 8px; */
   background: #e5edff;
   display: flex;
   align-items: center;
@@ -147,7 +133,6 @@
   font-size: 20px;
 }
 
-/* ===== טקסט ===== */
 .a11y-tile-text {
   display: flex;
   flex-direction: column;
@@ -164,11 +149,9 @@
   color: #6b7280;
 }
 
-/* ===== כפתור איפוס ===== */
 .a11y-reset-btn {
   margin-top: 6px;
   width: 100%;
-  /* border-radius: 999px; */
   border: 1px solid #e5e7eb;
   background: #f3f4f6;
   padding: 6px 8px;
@@ -180,10 +163,9 @@
   background: #e5e7eb;
 }
 
-/* ===== מובייל ===== */
 @media (max-width: 768px) {
   .accessibility-btn {
-    bottom: 90px !important; /* ✅ כפתור גבוה יותר במובייל */
+    bottom: 90px !important;
     left: 16px !important;
   }
 

@@ -1,4 +1,3 @@
-// src/components/ImageCropModal.jsx
 import React, { useState, useCallback, useEffect } from 'react';
 import Cropper from 'react-easy-crop';
 import { useTranslation } from 'react-i18next';

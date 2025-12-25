@@ -6,9 +6,8 @@ export const useGroupDetailTour = ({ group, candidates, isOwner, isAuthed, isMob
   const { setIsOpen, setSteps } = useTour();
   const { t, i18n } = useTranslation();
   const [autoOpened, setAutoOpened] = useState(false);
-  const [tourInitialized, setTourInitialized] = useState(false); // ✅ ×"×•×¡×£
+  const [tourInitialized, setTourInitialized] = useState(false);
 
-  // ✅ תמיד מעדכנים steps כשיש שינוי שפה/נתונים
   useEffect(() => {
     if (!group || !candidates || candidates.length === 0) {
       setTourInitialized(false);
@@ -23,19 +22,19 @@ export const useGroupDetailTour = ({ group, candidates, isOwner, isAuthed, isMob
     const isVotingPhase = candidateEndDate && endDate && now > candidateEndDate && now <= endDate;
 
     const tourSteps = [
-      { 
-        selector: '#group-detail-header', 
+      {
+        selector: '#group-detail-header',
         content: t('groups.detail.tour.header') || 'זה כותרת הקבוצה - כאן תראה את שם הקבוצה ותיאור'
       },
-      { 
-        selector: '#group-detail-meta', 
+      {
+        selector: '#group-detail-meta',
         content: t('groups.detail.tour.meta') || 'כאן תמצא מידע חשוב על הקבוצה - תאריך יצירה, תאריך סיום וסך הצבעות'
       },
     ];
 
     if (isVotingPhase) {
-      tourSteps.push({ 
-        selector: '#vote-button', 
+      tourSteps.push({
+        selector: '#vote-button',
         content: t('groups.detail.tour.voteButton') || 'לחץ כאן כדי להצביע למועמדים'
       });
     }
@@ -46,8 +45,8 @@ export const useGroupDetailTour = ({ group, candidates, isOwner, isAuthed, isMob
     });
 
     if (isOwner) {
-      tourSteps.push({ 
-        selector: '#settings-button', 
+      tourSteps.push({
+        selector: '#settings-button',
         content: t('groups.detail.tour.settingsButton') || 'כמנהל הקבוצה, תוכל לערוך הגדרות כאן'
       });
     }
@@ -60,13 +59,12 @@ export const useGroupDetailTour = ({ group, candidates, isOwner, isAuthed, isMob
     }
 
     setSteps(tourSteps);
-    setTourInitialized(true); // ✅ מאתחל רק אחרי שיש steps
+    setTourInitialized(true);
   }, [group, candidates, isOwner, isAuthed, setSteps, t, i18n.language]);
 
-  // ✅ פתיחה אוטומטית רק פעם אחת
   useEffect(() => {
-    if (!tourInitialized) return; // ✅ ממתין שה-tour יהיה מוכן
-    
+    if (!tourInitialized) return;
+
     const tourSeen = localStorage.getItem('groupTourSeen');
     if (!tourSeen && !autoOpened) {
       setAutoOpened(true);
@@ -75,8 +73,8 @@ export const useGroupDetailTour = ({ group, candidates, isOwner, isAuthed, isMob
     }
   }, [tourInitialized, setIsOpen, autoOpened]);
 
-  return { 
-    tourInitialized, // ✅ מחזיר את הסטטוס
-    openTour: () => setIsOpen(true) 
+  return {
+    tourInitialized,
+    openTour: () => setIsOpen(true)
   };
 };

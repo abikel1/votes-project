@@ -1,5 +1,3 @@
-/* src/components/Campaign/PostCard.css */
-
 .post-card {
   background: #fff;
   padding: 20px;
@@ -12,7 +10,6 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
 }
 
-/* כותרת */
 .post-header {
   display: flex;
   justify-content: space-between;
@@ -40,7 +37,6 @@
   background: #fee2e2;
 }
 
-/* תוכן */
 .post-content {
   color: #4b5563;
   line-height: 1.6;
@@ -48,7 +44,6 @@
   white-space: pre-wrap;
 }
 
-/* תמונה */
 .post-image-container {
   margin: 16px 0;
   overflow: hidden;
@@ -60,11 +55,10 @@
   display: block;
 }
 
-/* YouTube */
 .post-youtube-container {
   margin: 16px 0;
   position: relative;
-  padding-bottom: 56.25%; /* 16:9 aspect ratio */
+  padding-bottom: 56.25%;
   height: 0;
   overflow: hidden;
   background: #000;
@@ -78,7 +72,6 @@
   height: 100%;
 }
 
-/* פוטר */
 .post-footer {
   border-top: 1px solid #e5e7eb;
   padding-top: 12px;
@@ -103,14 +96,12 @@
   color: #3b82f6;
 }
 
-/* תגובות */
 .post-comments-section {
   margin-top: 16px;
   padding-top: 16px;
   border-top: 1px solid #e5e7eb;
 }
 
-/* טופס תגובה */
 .comment-form {
   display: flex;
   flex-direction: column;
@@ -158,7 +149,6 @@
   cursor: not-allowed;
 }
 
-/* רשימת תגובות */
 .comments-list {
   display: flex;
   flex-direction: column;
@@ -218,7 +208,7 @@
   color: #4b5563;
   line-height: 1.5;
   margin: 0;
-  padding-right: 42px; /* יישור עם התוכן */
+  padding-right: 42px;
   white-space: pre-wrap;
 }
 
@@ -229,7 +219,6 @@
   font-size: 0.95rem;
 }
 
-/* Responsive */
 @media (max-width: 768px) {
   .post-card {
     padding: 16px;

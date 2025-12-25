@@ -1,6 +1,3 @@
-/* =======================
-   משתני בסיס
-======================= */
 :root {
   --brand: #0d47a1;
   --brand-700: #0b3b88;
@@ -15,22 +12,14 @@
   --a11y-font-scale: 1;
 }
 
-/* =======================
-   מעטפת עמוד
-======================= */
 .vd-wrap {
   direction: rtl;
   max-width: 1400px;
-  /* margin: 0 ; */
   padding: 24px clamp(16px, 4vw, 50px) 32px;
   color: var(--text);
   min-height: 100vh;
 }
 
-
-/* =======================
-   כותרת
-======================= */
 .vd-header {
   text-align: center;
   margin-bottom: 32px;
@@ -51,9 +40,6 @@
   font-weight: 500;
 }
 
-/* =======================
-   פריסת תוכן ראשית
-======================= */
 .vd-container {
   display: grid;
   grid-template-columns: 1fr 350px;
@@ -61,9 +47,6 @@
   align-items: start;
 }
 
-/* =======================
-   אזור פתקים
-======================= */
 .vd-slips-area {
   display: flex;
   flex-direction: column;
@@ -83,16 +66,11 @@
   grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
   gap: 12px;
   width: 100%;
-  /* margin: 0 auto; */
   background: #003366;
   overflow-y: auto;
-  /* max-height: calc(100vh - 100px); */
   padding: 12px;
 }
 
-/* =======================
-   פתק בודד
-======================= */
 .vd-slip,
 .vd-slip-empty {
   background: #fff;
@@ -203,9 +181,6 @@
   pointer-events: none;
 }
 
-/* =======================
-   אזור קלפי
-======================= */
 .vd-voting-area {
   position: sticky;
   top: 24px;
@@ -218,7 +193,6 @@
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
 }
 
-/* מעטפה */
 .vd-envelope {
   position: relative;
   width: 240px;
@@ -299,14 +273,12 @@
   color: var(--brand);
 }
 
-/* כפתור שלשול למעטפה */
 .vd-insert-button {
   position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  /* padding: 10px 20px; */
   color: #003366;
   font-weight: 600;
   border: none;
@@ -343,15 +315,17 @@
 }
 
 @keyframes bounce {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: translateY(0);
   }
+
   50% {
     transform: translateY(8px);
   }
 }
 
-/* קלפי */
 .vd-ballot {
   position: relative;
   width: 240px;
@@ -404,7 +378,6 @@
   cursor: not-allowed;
 }
 
-/* מעטפה בזמן גרירה */
 .vd-envelope-dragging {
   position: fixed;
   width: 240px;
@@ -446,9 +419,6 @@
   z-index: 1;
 }
 
-/* =======================
-   מודל פרטי מועמד
-======================= */
 .vd-modal-overlay {
   position: fixed;
   top: 0;
@@ -579,15 +549,13 @@
     opacity: 0;
     transform: translateY(20px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
   }
 }
 
-/* =======================
-   הודעות שגיאה וריקות
-======================= */
 .vd-error {
   color: #c62828;
   background: #fde8e8;
@@ -606,7 +574,6 @@
   font-size: calc(18px * var(--a11y-font-scale));
 }
 
-/* כפתורי פעולה */
 .vd-actions {
   display: flex;
   justify-content: center;
@@ -647,9 +614,6 @@
   color: #1e3a8a;
 }
 
-/* =======================
-   רספונסיביות - טאבלט
-======================= */
 @media (max-width: 1024px) {
   .vd-container {
     grid-template-columns: 1fr;
@@ -673,9 +637,6 @@
   }
 }
 
-/* =======================
-   רספונסיביות - מובייל
-======================= */
 @media (max-width: 768px) {
   .vd-wrap {
     padding: 16px 12px 24px;
@@ -694,7 +655,6 @@
     gap: 20px;
   }
 
-  /* אזור הקלפי - מתרחב על כל הרוחב - מופיע אחרי המועמדים */
   .vd-voting-area {
     position: static;
     order: 1;
@@ -703,7 +663,6 @@
     max-width: 100%;
   }
 
-  /* מעטפה וקלפי - מתרחבים למובייל */
   .vd-envelope {
     width: 100%;
     max-width: 280px;
@@ -750,7 +709,6 @@
     font-size: calc(16px * var(--a11y-font-scale));
   }
 
-  /* מגש הפתקים - ללא גלילה פנימית במובייל - מועמדים לפני הקלפי */
   .vd-slips-area {
     order: 0;
   }
@@ -805,9 +763,6 @@
   }
 }
 
-/* =======================
-   מכשירים קטנים מאוד
-======================= */
 @media (max-width: 480px) {
   .vd-header h2 {
     font-size: calc(20px * var(--a11y-font-scale));
@@ -890,9 +845,6 @@
   }
 }
 
-/* =======================
-   תמיכה בנוף (landscape) במובייל
-======================= */
 @media (max-width: 768px) and (orientation: landscape) {
   .vd-container {
     grid-template-columns: 1fr 300px;
@@ -915,14 +867,14 @@
   }
 }
 
-/* =======================
-   אנימציות
-======================= */
 @keyframes pulseRing {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: scale(1);
     opacity: 0.6;
   }
+
   50% {
     transform: scale(1.1);
     opacity: 0.8;
@@ -934,6 +886,7 @@
     opacity: 0;
     transform: translateY(-20px) scale(0.95);
   }
+
   to {
     opacity: 1;
     transform: translateY(0) scale(1);

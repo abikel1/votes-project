@@ -10,7 +10,6 @@ const LanguageSwitcher = () => {
   const languages = [
     { code: 'he', name: 'עברית', flag: '🇮🇱' },
     { code: 'en', name: 'English', flag: '🇺🇸' },
-    // { code: 'ar', name: 'العربية', flag: '🇸🇦' },
   ];
 
   const currentLang = languages.find(lang => lang.code === i18n.language) || languages[0];
@@ -21,7 +20,6 @@ const LanguageSwitcher = () => {
     document.documentElement.dir = code === 'he' || code === 'ar' ? 'rtl' : 'ltr';
   };
 
-  // סגירת התפריט בלחיצה מחוץ לו
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {

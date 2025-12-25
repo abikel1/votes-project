@@ -10,7 +10,6 @@ export default function Footer() {
         <footer className="site-footer">
             <div className="footer-inner">
 
-                {/* טור טקסט על המערכת */}
                 <div className="footer-col footer-col-main">
                     <h4>{t('footer.title')}</h4>
                     <p>
@@ -35,8 +34,6 @@ export default function Footer() {
                     </div>
                 </div>
 
-
-                {/* טור רשתות חברתיות */}
                 <div className="footer-col footer-col-social">
                     <h4>{t('footer.followUs')}</h4>
 

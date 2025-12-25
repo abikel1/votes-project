@@ -1,4 +1,3 @@
-/* ========== עיצוב כללי - זהה לדף קבוצה ========== */
 .page-wrap.dashboard {
   display: flex;
   flex-direction: column;
@@ -9,7 +8,6 @@
   background: #f8fafc;
 }
 
-/* ========== HEADER - זהה לדף קבוצה ========== */
 .page-header {
   position: relative;
   display: flex;
@@ -57,7 +55,6 @@
   border: 1px solid #93c5fd;
 }
 
-/* סטטיסטיקות */
 .stats-row {
   display: flex;
   gap: 20px;
@@ -81,7 +78,6 @@
   left: 16px;
 }
 
-/* כפתורים */
 .back-btn,
 .icon-btn {
   background: transparent;
@@ -122,7 +118,6 @@
   cursor: not-allowed;
 }
 
-/* כפתור לייק מיוחד */
 .vote-btn.liked {
   background: #dc2626;
 }
@@ -131,7 +126,6 @@
   background: #b91c1c;
 }
 
-/* ========== תוכן ראשי ========== */
 .main-content-resizable {
   display: flex;
   gap: 0;
@@ -159,7 +153,6 @@
   overflow-y: auto;
 }
 
-/* ========== Resize Handle ========== */
 .resize-handle {
   width: 6px;
   background: #e2e8f0;
@@ -187,7 +180,6 @@
   transition: background 0.2s ease;
 }
 
-/* ========== כותרות סקשן ========== */
 .section-title {
   font-size: calc(16px * var(--a11y-font-scale));
   color: #1e293b;
@@ -197,7 +189,6 @@
   border-bottom: 2px solid #003366;
 }
 
-/* ========== קונטיינר מועמדים/פוסטים ========== */
 .candidates-container {
   background: #ffffff;
   padding: 12px;
@@ -206,7 +197,6 @@
   height: 100%;
 }
 
-/* ========== כרטיסים ========== */
 .info-card {
   background: white;
   border: 1px solid #e2e8f0;
@@ -244,7 +234,6 @@
   white-space: pre-wrap;
 }
 
-/* ========== רשימת פוסטים ========== */
 .posts-list {
   display: flex;
   flex-direction: column;
@@ -270,7 +259,6 @@
   background: #94a3b8;
 }
 
-/* ========== שדות טופס ========== */
 .info-card input[type="text"],
 .info-card textarea {
   width: 100%;
@@ -305,7 +293,6 @@
   font-size: calc(13px * var(--a11y-font-scale));
 }
 
-/* ========== גלריה ========== */
 .gallery-container {
   background: white;
   border: 1px solid #e2e8f0;
@@ -367,7 +354,6 @@
   background: #b91c1c;
 }
 
-/* ========== כפתור מחיקה ========== */
 .delete-btn {
   margin-top: 10px;
   padding: 6px 12px;
@@ -384,7 +370,6 @@
   background: #b91c1c;
 }
 
-/* ========== שורת העלאה ========== */
 .upload-row {
   display: flex;
   gap: 10px;
@@ -402,7 +387,6 @@
   font-weight: 500;
 }
 
-/* ========== Empty State ========== */
 .empty-state {
   text-align: center;
   padding: 40px 20px;
@@ -412,7 +396,6 @@
   border: 1px solid #e2e8f0;
 }
 
-/* ========== Loading Spinner ========== */
 .loading-spinner {
   display: inline-block;
   width: 16px;
@@ -447,7 +430,6 @@
   font-size: calc(13px * var(--a11y-font-scale));
 }
 
-/* ========== Lightbox (תמונות) ========== */
 .lightbox-overlay {
   position: fixed;
   top: 0;
@@ -489,7 +471,6 @@
   background: #f1f5f9;
 }
 
-/* ========== רספונסיביות - טאבלטים ========== */
 @media (max-width: 1024px) {
   .main-content-resizable {
     flex-direction: column;
@@ -513,7 +494,6 @@
   }
 }
 
-/* ========== רספונסיביות - מובייל ========== */
 @media (max-width: 768px) {
   .page-wrap.dashboard {
     padding: 8px;
@@ -594,7 +574,6 @@
   }
 }
 
-/* ========== רספונסיביות - ביניים (581-768) ========== */
 @media (min-width: 581px) and (max-width: 768px) {
   .page-header {
     flex-direction: column;
@@ -613,7 +592,6 @@
     justify-content: center;
   }
 
-  /* שמירה על חלוקה נוחה בין רשימת מועמדים לתוכן */
   .main-content-resizable {
     flex-direction: column;
     height: auto;
@@ -623,7 +601,6 @@
   .left-section {
     width: 100% !important;
     max-height: 45vh;
-    /* פחות חונק מ-60vh */
     overflow-y: auto;
   }
 
@@ -633,20 +610,17 @@
     overflow: visible;
   }
 
-  /* הגריד במידות האלה—עדיף 2-3 עמודות קבועות */
   .gallery-grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 10px;
   }
 
-  /* אם הפוסטים “נמרחים”/נחתכים */
   .posts-list {
     max-height: 520px;
   }
 }
 
 
-/* ========== רספונסיביות - מכשירים קטנים מאוד ========== */
 @media (max-width: 480px) {
   .page-wrap.dashboard {
     padding: 6px;
@@ -719,7 +693,6 @@
   }
 }
 
-/* ========== נוף (landscape) במובייל ========== */
 @media (max-width: 768px) and (orientation: landscape) {
   .page-wrap.dashboard {
     height: auto;
@@ -744,7 +717,6 @@
   }
 }
 
-/* ========== גלילה חלקה ========== */
 .candidates-container,
 .right-section,
 .posts-list,
@@ -761,7 +733,6 @@
   }
 }
 
-/* סטטיסטיקות */
 .stats-cards {
   display: flex;
   gap: 12px;
@@ -794,8 +765,6 @@
 .stat-box.clickable:hover {
   background: #e9eefc;
 }
-
-/* ========== AI Modal (פוסט קמפיין) ========== */
 
 .ai-overlay {
   background: rgba(148, 163, 184, 0.30);
@@ -957,8 +926,6 @@
   fill: red;
 }
 
-/* ===== Share modal ===== */
-
 .share-overlay {
   display: flex;
   align-items: center;
@@ -968,7 +935,6 @@
 .share-modal-card {
   direction: rtl;
   background: #ffffff;
-  /* border-radius: 10px; */
   padding: 24px 28px;
   max-width: 480px;
   width: 90%;
@@ -985,7 +951,6 @@
 .share-input-row {
   display: flex;
   flex-direction: row-reverse;
-  /* כדי שהכפתור יהיה משמאל והשדה מימין ב-RTL */
   align-items: stretch;
   gap: 10px;
 }
@@ -994,11 +959,9 @@
   flex: 1;
   padding: 8px 10px;
   border: 1px solid #003366;
-  /* border-radius: 4px; */
   font-size: 0.95rem;
   background-color: #f9fafb;
   direction: ltr;
-  /* שהקישור עצמו יהיה אנגלי שמאל-לימין */
 }
 
 .share-input:focus {
@@ -1022,7 +985,6 @@
   min-width: 120px;
 }
 
-/* רספונסיביות למודאל שיתוף במובייל */
 @media (max-width: 480px) {
   .share-modal-card {
     padding: 16px;
@@ -1033,20 +995,17 @@
 
   .share-input-row {
     flex-direction: row-reverse;
-    /* נשארים בשורה כמו בתמונה */
     gap: 6px;
   }
 
   .share-copy-btn {
     flex: 0 0 70px;
-    /* עוד טיפה קטן בפלאפון */
     font-size: 0.8rem;
   }
 
   .share-input {
     flex: 1 1 auto;
     min-width: 0;
-    /* הכי חשוב – מאפשר לשדה להתכווץ */
     font-size: 0.85rem;
   }
 
@@ -1064,17 +1023,14 @@
     box-sizing: border-box;
   }
 
-  /* התיאור + הסטטיסטיקות יקבלו רוחב מלא */
   .stats-cards {
     width: 100%;
     margin-top: 20px;
-    /* קצת מרווח מה"אודות" */
     gap: 12px;
   }
 
   .stat-box {
     flex: 1 1 1;
-    /* כל כרטיס תופס שורה שלמה */
     width: 100%;
   }
 }

@@ -41,7 +41,6 @@ import ImageCropModal from '../../components/ImageCropModal';
 import toast from 'react-hot-toast';
 import ConfirmModal from '../../components/ConfirmModal/ConfirmModal';
 
-// ===== עוזר לניקוי תשובת ה-AI =====
 function normalizeAiSuggestion(suggestion, fallbackTitle = '') {
   if (!suggestion) {
     return { title: fallbackTitle || '', content: '', youtubeUrl: '' };
@@ -81,7 +80,6 @@ function normalizeAiSuggestion(suggestion, fallbackTitle = '') {
       };
     }
   } catch (e) {
-    // אין JSON תקין
   }
 
   return {
@@ -91,15 +89,12 @@ function normalizeAiSuggestion(suggestion, fallbackTitle = '') {
   };
 }
 
-// slug לשם המועמד לקישור שיתוף – בלי encodeURIComponent
 function makeCandidateSlug(name = '') {
   return String(name)
     .trim()
     .toLowerCase()
-    .replace(/\s+/g, '-');   // רווחים ל־-
+    .replace(/\s+/g, '-');
 }
-
-
 
 export default function CampaignPage() {
   const { candidateId, groupSlug, candidateSlug } = useParams();
@@ -107,32 +102,21 @@ export default function CampaignPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const { t } = useTranslation();
-
   const [copiedShare, setCopiedShare] = useState(false);
-
   const [galleryFileToCrop, setGalleryFileToCrop] = useState(null);
-
   const groupId = location.state?.groupId || null;
-
-  // Redux state
   const campaign = useSelector(selectCampaign);
-
   const candidate = campaign?.candidate || null;
   const campaignLoading = useSelector((state) => state.campaign.loading);
   const campaignError = useSelector((state) => state.campaign.error);
   const isLocked = useSelector(selectCampaignLocked);               // 🔒
   const lockedGroupId = useSelector(selectCampaignLockedGroupId);   // 🔒
-
   const currentUserId = useSelector((state) => state.auth.userId);
   const userLoading = useSelector((state) => state.auth.loading);
-
   const token = useSelector((state) => state.auth.token);
-
   const aiSuggestion = useSelector(selectAiSuggestion);
   const aiLoading = useSelector(selectAiLoading);
   const aiError = useSelector(selectAiError);
-
-  // Local state
   const [newPost, setNewPost] = useState({
     title: '',
     content: '',
@@ -150,22 +134,14 @@ export default function CampaignPage() {
 
   const [isEditMode, setIsEditMode] = useState(false);
   const [uploadingImage, setUploadingImage] = useState(false);
-
   const [likeCount, setLikeCount] = useState(0);
   const [hasLiked, setHasLiked] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
-
-  // AI modal
   const [showAiModal, setShowAiModal] = useState(false);
   const [aiNote, setAiNote] = useState('');
   const [aiGenerated, setAiGenerated] = useState(false);
-
-  // 🔗 מודאל שיתוף
   const [showShareModal, setShowShareModal] = useState(false);
-
   const hasIncrementedViewRef = useRef(false);
-
-  // === סטייט למודאל עריכת מועמד ===
   const [editCandidateOpen, setEditCandidateOpen] = useState(false);
   const [editCandForm, setEditCandForm] = useState({
     name: '',
@@ -183,7 +159,6 @@ export default function CampaignPage() {
     postId: null,
   });
 
-  // groupId "יעיל" – גם מהמיקום, גם מהקמפיין, וגם מהשגיאה אם נעול
   const effectiveGroupId = groupId || campaign?.groupId || lockedGroupId || null;
 
 
@@ -221,14 +196,12 @@ export default function CampaignPage() {
 
       await dispatch(deletePost({ campaignId: campaign._id, postId })).unwrap();
 
-      // הצלחה — ריענון ותסגור מודאל
       refetchCampaign();
       closeDeletePostModal();
       toast.success(t('campaign.posts.deletedSuccessfully') || 'הפוסט נמחק בהצלחה');
       setIsEditMode(false);
     } catch (err) {
       console.error('שגיאה במחיקת פוסט:', err);
-      // הראה שגיאה למשתמש
       const msg =
         err?.response?.data?.message ||
         err?.message ||
@@ -243,13 +216,10 @@ export default function CampaignPage() {
 
 
 
-  // === פונקציה נוחה לריענון הקמפיין מהשרת אחרי פעולות עריכה ===
   const refetchCampaign = () => {
     if (groupSlug && candidateSlug) {
-      // URL יפה – לפי slug
       dispatch(fetchCampaignBySlug({ groupSlug, candidateSlug }));
     } else if (candidateId) {
-      // URL ישן – לפי id
       dispatch(fetchCampaign(candidateId));
     }
   };
@@ -267,17 +237,14 @@ export default function CampaignPage() {
   const { selectedGroup: group, loading: groupLoading } = useSelector((s) => s.groups);
 
   useEffect(() => {
-    // פונקציית ה-return רצה רק ב־unmount (כשעוזבים את העמוד)
     return () => {
       dispatch(clearCampaign());
     };
   }, [dispatch]);
-  // טעינת קמפיין + incrementView + redirect מ-ID ל-URL יפה
   useEffect(() => {
 
     dispatch(clearCampaign());
     if (!token) return;
-    // ----- מקרה 1: כבר בתוך URL יפה (/campaign/:groupSlug/:candidateSlug) -----
     if (groupSlug && candidateSlug) {
       hasIncrementedViewRef.current = false;
 
@@ -298,10 +265,9 @@ export default function CampaignPage() {
           console.error('שגיאה בטעינת קמפיין (slug):', err);
         });
 
-      return; // 👈 לא ממשיכים למקרה של ID
+      return;
     }
 
-    // ----- מקרה 2: נכנסו עם URL ישן (/campaign/:candidateId) -----
     if (candidateId) {
       hasIncrementedViewRef.current = false;
 
@@ -311,14 +277,10 @@ export default function CampaignPage() {
           const campaignId =
             res?.campaignId || res?.campaign?._id || res?._id;
 
-          // לבנות slugים לפי הנתונים שחזרו מהשרת
           const candidateName = res?.candidate?.name || '';
           const candidateSlugFromName = makeCandidateSlug(candidateName);
-
-          // groupSlug הגיע מהשרת (הוספנו ב-controller בצד השרת)
           const groupSlugFromServer = res?.groupSlug || '';
 
-          // אם יש לנו שני slugים – נעשה redirect ל-URL היפה
           if (groupSlugFromServer && candidateSlugFromName) {
             navigate(
               `/campaign/${groupSlugFromServer}/${candidateSlugFromName}`,
@@ -326,7 +288,6 @@ export default function CampaignPage() {
             );
           }
 
-          // צפיות
           if (campaignId && !hasIncrementedViewRef.current) {
             hasIncrementedViewRef.current = true;
             dispatch(incrementView(campaignId)).catch((err) =>
@@ -349,7 +310,6 @@ export default function CampaignPage() {
   }, [isLocked, effectiveGroupId, dispatch, token]);
 
 
-  // סנכרון לייקים
   useEffect(() => {
     if (campaign && currentUserId) {
       setLikeCount(campaign.likes?.length || 0);
@@ -357,16 +317,14 @@ export default function CampaignPage() {
     }
   }, [campaign, currentUserId]);
 
-  // AI suggestion
   useEffect(() => {
     if (aiSuggestion) {
       const normalized = normalizeAiSuggestion(aiSuggestion, newPost.title);
       setNewPost(normalized);
       setAiGenerated(true);
     }
-  }, [aiSuggestion]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [aiSuggestion]);
 
-  // Loading / Locked states
   if (userLoading) {
     return (
       <div className="loading-wrap">
@@ -375,7 +333,6 @@ export default function CampaignPage() {
     );
   }
 
-  // 👇 חדש – לא מחוברים
   if (!token) {
     return (
       <div className="page-wrap dashboard">
@@ -425,7 +382,6 @@ export default function CampaignPage() {
     );
   }
 
-  // אם הקמפיין נעול ויש groupId אבל הקבוצה עוד בטעינה – מחכים, לא בודקים עדיין isOwner
   if (isLocked && effectiveGroupId && groupLoading && !group) {
     return (
       <div className="loading-wrap">
@@ -434,7 +390,6 @@ export default function CampaignPage() {
     );
   }
 
-  // מחשבים isOwner רק אחרי שטענו קבוצה (או שהקבוצה לא רלוונטית)
   let isOwner = false;
 
   if (group) {
@@ -463,7 +418,6 @@ export default function CampaignPage() {
       (!!myId && !!createdById && myId === createdById);
   }
 
-  // 🔒 קמפיין נעול בגלל קבוצה נעולה – אבל נותנים למנהלת / אדמין להיכנס
   if (isLocked && !isOwner) {
     return (
       <div className="page-wrap dashboard">
@@ -512,7 +466,6 @@ export default function CampaignPage() {
     );
   }
 
-
   if (campaignError) {
     return (
       <div className="err">
@@ -522,13 +475,11 @@ export default function CampaignPage() {
     );
   }
 
-  // בדיקת התאמה בין הקמפיין שבסטור לבין ה־URL (כדי לא להציג "קמפיין קודם" לשנייה)
   const matchesRoute =
     !candidateSlug ||
     makeCandidateSlug(campaign?.candidate?.name || '') === candidateSlug;
 
 
-  // 👇 הכי חשוב – אם עדיין אין קמפיין, אל תגעי בו בכלל
   if (!campaign || (candidateSlug && !matchesRoute)) {
     return (
       <div className="loading-wrap">
@@ -537,7 +488,7 @@ export default function CampaignPage() {
     );
   }
   const candidateUserId = candidate?.userId;
-  const candidateDbId = candidate?._id; // 👈 מזהה ה־Mongo של המועמד
+  const candidateDbId = candidate?._id;
   const isCandidateOwner =
     currentUserId &&
     candidateUserId &&
@@ -545,7 +496,6 @@ export default function CampaignPage() {
 
   const viewCount = campaign?.viewCount || 0;
 
-  // הקישור האמיתי שיועתק ללוח – לפי ה־URL הנוכחי (groupSlug + candidateSlug)
   const shareUrl =
     typeof window !== 'undefined' &&
       groupSlug &&
@@ -553,13 +503,10 @@ export default function CampaignPage() {
       ? `${window.location.origin}/campaign/${groupSlug}/${candidateSlug}`
       : '';
 
-  // מה שמציגים באינפוט (בלי https://)
   const prettyShareUrl = shareUrl
     ? shareUrl.replace(/^https?:\/\//, '')
     : '';
 
-
-  // Handlers
   const handleUpdateCampaign = () => {
     dispatch(
       updateCampaign({
@@ -593,29 +540,8 @@ export default function CampaignPage() {
       });
   };
 
-  // const handleDeletePost = (postId) => {
-
-  //   if (!window.confirm(t('campaign.posts.confirmDelete'))) return;
-
-  //   dispatch(deletePost({ campaignId: campaign._id, postId }))
-  //     .unwrap()
-  //     .then(() => {
-  //       refetchCampaign();
-  //       setIsEditMode(false);
-  //     })
-  //     .catch((err) => {
-  //       console.error('שגיאה במחיקת פוסט:', err);
-  //     });
-  // };
-
-  // const handleDeletePost = (postId) => {
-  //   console.log("פתיחת מודל למחיקת פוסט", postId); // ← את תראי את זה בקונסול
-  //   setDeletePostModal({ open: true, postId });
-  // };
-
   const handleDeletePost = (postId) => openDeletePostModal(postId);
 
-  // תגובות
   const handleAddComment = async (campaignId, postId, content) => {
     await dispatch(addComment({ campaignId, postId, content })).unwrap();
     refetchCampaign();
@@ -626,18 +552,14 @@ export default function CampaignPage() {
     refetchCampaign();
   };
 
-  // 👇 במקום handleUploadGalleryFile הישן
-
-  // כשבוחרים קובץ לגלריה – רק פותח מודאל חיתוך
   const handleGalleryFileChange = (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    setGalleryFileToCrop(file);   // 👈 מפעיל את המודאל
-    e.target.value = '';          // כדי שאפשר שוב לבחור אותו קובץ
+    setGalleryFileToCrop(file);
+    e.target.value = '';
   };
 
-  // אחרי חיתוך ושמירה
   const handleCroppedGalleryFile = async (croppedFile) => {
     if (!croppedFile) {
       setGalleryFileToCrop(null);
@@ -660,10 +582,9 @@ export default function CampaignPage() {
       alert(t('common.uploadError'));
     } finally {
       setUploadingImage(false);
-      setGalleryFileToCrop(null);   // לסגור את המודאל
+      setGalleryFileToCrop(null);
     }
   };
-
 
   const handleAddImage = () => {
     if (!newImageUrl.trim()) return;
@@ -691,7 +612,6 @@ export default function CampaignPage() {
       });
   };
 
-  // 🔗 פתיחת/סגירת מודאל שיתוף
   const handleOpenShare = () => setShowShareModal(true);
   const handleCloseShare = () => setShowShareModal(false);
 
@@ -705,15 +625,12 @@ export default function CampaignPage() {
           setCopiedShare(true);
           toast.success(t('groups.create.toast.linkCopied'));
 
-          // אחרי זמן קצר מחזירים את הכפתור למצב רגיל
           setTimeout(() => setCopiedShare(false), 1500);
         })
         .catch(console.error);
     }
   };
 
-
-  // AI
   const handleAskAiForPost = () => {
     if (!candidateDbId) return;
     setNewPost({ title: '', content: '', youtubeUrl: '' });
@@ -750,7 +667,6 @@ export default function CampaignPage() {
     setAiGenerated(false);
   };
 
-  // === פונקציות למודאל עריכת מועמד ===
   const handleOpenEditCandidate = () => {
     if (!candidate) return;
 
@@ -807,7 +723,6 @@ export default function CampaignPage() {
 
     const { name, description, symbol, photoUrl } = editCandForm;
 
-    // ולידציות בסיסיות לטופס
     const errors = {};
     if (!name?.trim()) errors.name = t('campaign.editCandidate.errors.nameRequired');
     if (!description?.trim()) errors.description = t('campaign.editCandidate.errors.descriptionRequired');
@@ -830,7 +745,7 @@ export default function CampaignPage() {
 
     dispatch(
       updateCandidate({
-        candidateId: candidateDbId, // מזהה המועמד מה־DB
+        candidateId: candidateDbId,
         groupId: effectiveGroupId,
         patch,
       })
@@ -839,7 +754,7 @@ export default function CampaignPage() {
       .then(() => {
         setUpdatingThisCandidate(false);
         setEditCandidateOpen(false);
-        refetchCampaign();        // כדי לעדכן שם/סמל/תמונה בקמפיין
+        refetchCampaign();
       })
       .catch((err) => {
         console.error('שגיאה בעדכון המועמד/ת:', err);
@@ -854,7 +769,6 @@ export default function CampaignPage() {
 
   return (
     <div className="page-wrap dashboard">
-      {/* HEADER */}
       <div className="page-header">
         <div className="header-actions">
           <button
@@ -915,7 +829,6 @@ export default function CampaignPage() {
       </div>
 
       <div className="main-content-resizable">
-        {/* LEFT: POSTS */}
         <div className="left-section" style={{ width: '35%' }}>
           <div className="candidates-container">
             <h3 className="section-title">
@@ -939,15 +852,6 @@ export default function CampaignPage() {
                     setNewPost({ ...newPost, content: e.target.value })
                   }
                 />
-                {/* <input
-                  type="text"
-                  placeholder={t('campaign.posts.new.youtubePlaceholder')}
-                  value={newPost.youtubeUrl}
-                  onChange={(e) =>
-                    setNewPost({ ...newPost, youtubeUrl: e.target.value })
-                  }
-                /> */}
-
                 <div
                   style={{
                     display: 'flex',
@@ -995,12 +899,10 @@ export default function CampaignPage() {
           </div>
         </div>
 
-        {/* RESIZE HANDLE */}
         <div className="resize-handle">
           <div className="resize-line" />
         </div>
 
-        {/* RIGHT: DESCRIPTION + GALLERY */}
         <div className="right-section" style={{ width: '65%' }}>
           <h3 className="section-title">
             {t('campaign.sections.about')}
@@ -1008,7 +910,6 @@ export default function CampaignPage() {
 
           <div className="info-card">
             {isCandidateOwner && isEditMode && isEditingDescription ? (
-              // מצב עריכה – יש טקסטאריאה + שמור/ביטול
               <div>
                 <textarea
                   value={editDescription}
@@ -1035,7 +936,6 @@ export default function CampaignPage() {
                     className="delete-btn"
                     type="button"
                     onClick={() => {
-                      // מחזירים את הערך הישן ומבטלים עריכה
                       setEditDescription(campaign.description || '');
                       setIsEditingDescription(false);
                     }}
@@ -1045,7 +945,6 @@ export default function CampaignPage() {
                 </div>
               </div>
             ) : (
-              // מצב צפייה (או שאין הרשאה לערוך)
               <div>
                 <p>
                   {(campaign?.description && campaign.description.trim()) ||
@@ -1066,9 +965,6 @@ export default function CampaignPage() {
               </div>
             )}
           </div>
-
-
-          {/* סטטיסטיקות */}
           <div className="stats-cards">
             <div className="stat-box">
               <FiEye size={20} />
@@ -1086,8 +982,6 @@ export default function CampaignPage() {
               <span style={{ marginTop: '4px' }}>{likeCount}  {t('campaign.stats.supp')}</span>
             </div>
 
-
-            {/* כפתור שתף פותח מודאל */}
             <div className="stat-box clickable" onClick={handleOpenShare}>
               <FiShare2 size={20} />
               <span>{t('campaign.stats.share')}</span>
@@ -1179,7 +1073,6 @@ export default function CampaignPage() {
         </div>
       </div>
 
-      {/* Lightbox לתמונה */}
       {selectedImage && (
         <div
           className="lightbox-overlay"
@@ -1199,8 +1092,6 @@ export default function CampaignPage() {
           </button>
         </div>
       )}
-
-      {/* מודאל עריכת מועמד/ת */}
       <EditCandidateModal
         open={editCandidateOpen}
         editCandForm={editCandForm}
@@ -1217,19 +1108,16 @@ export default function CampaignPage() {
         canEditName={false}
       />
 
-      {/* מודאל חיתוך לתמונות גלריה (ריבוע) */}
       {galleryFileToCrop && (
         <ImageCropModal
           file={galleryFileToCrop}
-          aspect={1}             // ריבוע
-          cropShape="rect"       // 👈 כאן ההבדל מהפרופיל
+          aspect={1}
+          cropShape="rect"
           onCancel={() => setGalleryFileToCrop(null)}
           onCropped={handleCroppedGalleryFile}
         />
       )}
 
-
-      {/* מודאל AI לפוסט קמפיין */}
       {showAiModal && (
         <div
           className="lightbox-overlay ai-overlay"
@@ -1332,7 +1220,6 @@ export default function CampaignPage() {
         </div>
       )}
 
-      {/* מודאל שיתוף קישור */}
       {showShareModal && (
         <div
           className="lightbox-overlay share-overlay"
@@ -1347,7 +1234,6 @@ export default function CampaignPage() {
             </div>
 
             <div className="share-input-row">
-              {/* כפתור העתק – בצד שמאל (ב-RTL) */}
               <button
                 type="button"
                 className="vote-btn share-copy-btn"
@@ -1357,7 +1243,6 @@ export default function CampaignPage() {
                   ? t('campaign.share.copied', 'הועתק!')
                   : t('campaign.share.copy', 'העתק')}
               </button>
-
               <input
                 type="text"
                 readOnly
@@ -1367,7 +1252,6 @@ export default function CampaignPage() {
                 onFocus={(e) => e.target.select()}
               />
             </div>
-
 
             <div className="share-actions">
               <button
@@ -1382,7 +1266,6 @@ export default function CampaignPage() {
         </div>
       )}
 
-
       {deletePostModal.open && (
         <ConfirmModal
           open={deletePostModal.open}
@@ -1391,9 +1274,6 @@ export default function CampaignPage() {
           onCancel={closeDeletePostModal}
         />
       )}
-
-
-
     </div>
   );
 }

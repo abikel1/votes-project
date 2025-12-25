@@ -30,23 +30,16 @@ export default function VotingDragPage() {
   const { groupSlug } = useParams();
   const location = useLocation();
   const { t } = useTranslation();
-
-  // id שהגיע מניווט פנימי (כפתור "להצבעה בקלפי")
   const navGroupId = location.state?.groupId || null;
-  // state פנימי ל-id
   const [groupId, setGroupId] = useState(navGroupId);
   const [slugResolved, setSlugResolved] = useState(!!navGroupId);
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  // נתוני משתמש
   const { userId, userEmail, firstName, lastName, isAdmin } = useSelector(
     (s) => s.auth,
   );
-
-
-  // קבוצות שאני חברה בהן
   const joinedIdsSet = useSelector(selectMyJoinedIds);
 
   const {
@@ -77,9 +70,7 @@ export default function VotingDragPage() {
   const [hasCheckedForGroup, setHasCheckedForGroup] = useState(false);
   const hasShownAlreadyVotedToast = useRef(false); // 👈 חדש – כדי לא להראות פעמיים
   const justVotedRef = useRef(false);
-  // --- פתרון slug ל-id כשנכנסים ישירות ל-URL ---
   useEffect(() => {
-    // אם הגיע id מהניווט – משתמשים בו
     if (navGroupId) {
       setGroupId(navGroupId);
       setSlugResolved(true);
@@ -91,7 +82,7 @@ export default function VotingDragPage() {
     (async () => {
       try {
         const { data } = await http.get(`/groups/slug/${groupSlug}`);
-        setGroupId(data._id); // id של הקבוצה
+        setGroupId(data._id);
       } catch (err) {
         console.error('failed to resolve group by slug', err);
         setGroupId(null);
@@ -101,25 +92,20 @@ export default function VotingDragPage() {
     })();
   }, [navGroupId, groupSlug]);
 
-  // טעינת נתוני קבוצה + מועמדים
   useEffect(() => {
     if (!groupId) return;
     dispatch(fetchGroupOnly(groupId));
     dispatch(fetchCandidatesByGroup(groupId));
   }, [dispatch, groupId]);
 
-  // טעינת הקבוצות שאני חברה בהן
   useEffect(() => {
     if (!groupId) return;
     dispatch(fetchMyGroups());
   }, [dispatch, groupId]);
 
-  // בדיקה אם כבר הצבעתי
-  // בדיקה אם כבר הצבעתי לקבוצה הזו (עם סימון שסיימנו לבדוק)
   useEffect(() => {
     if (!groupId) return;
 
-    // מתחילים בדיקה חדשה לקבוצה הזו
     setHasCheckedForGroup(false);
 
     dispatch(checkHasVoted({ groupId }))
@@ -128,24 +114,20 @@ export default function VotingDragPage() {
         console.error('checkHasVoted failed:', err);
       })
       .finally(() => {
-        // סיימנו לבדוק מול השרת עבור הקבוצה הזו
         setHasCheckedForGroup(true);
       });
   }, [dispatch, groupId]);
-  // כשהקבוצה מתחלפת – מאפסים דגלים של טוסטים
   useEffect(() => {
     hasShownAlreadyVotedToast.current = false;
     justVotedRef.current = false;
   }, [groupId]);
 
-  // אחרי שסיימנו לבדוק מול השרת – אם כבר הצבענו בקבוצה הזו, מציגים טוסט
-  // אחרי שסיימנו לבדוק מול השרת – אם כבר הצבענו בקבוצה הזו, מציגים טוסט (רק אם לא הצבענו עכשיו)
   useEffect(() => {
     if (!groupId) return;
-    if (!hasCheckedForGroup) return;          // עדיין לא סיימנו בדיקה לקבוצה זו
-    if (!hasVoted) return;                    // השרת אמר שלא הצבענו – לא מציגים כלום
-    if (justVotedRef.current) return;         // 👈 הצבענו עכשיו – לא להציג "כבר הצבעת"
-    if (hasShownAlreadyVotedToast.current) return; // 👈 שלא יהיה פעמיים
+    if (!hasCheckedForGroup) return;
+    if (!hasVoted) return;
+    if (justVotedRef.current) return;
+    if (hasShownAlreadyVotedToast.current) return;
 
     toast(
       t(
@@ -155,7 +137,7 @@ export default function VotingDragPage() {
       { icon: 'ℹ️' }
     );
 
-    hasShownAlreadyVotedToast.current = true; // שלא יוצג שוב לכניסות חוזרות בעמוד
+    hasShownAlreadyVotedToast.current = true;
   }, [groupId, hasCheckedForGroup, hasVoted, t]);
 
   const confirmVote = (candidate) => {
@@ -166,13 +148,9 @@ export default function VotingDragPage() {
 
   const handleConfirmVote = async () => {
     if (!candidateToVote) return;
-
-    // 🔵 הכנס למעטפה
     setSlipInEnvelope(candidateToVote);
 
     setShowConfirmModal(false);
-
-    // 🔵 ואז מבצעים את השליחה
     await voteForCandidateToBallot();
 
     setCandidateToVote(null);
@@ -186,12 +164,9 @@ export default function VotingDragPage() {
   const attemptVote = (candidate) => {
     if (!candidate || hasVoted || isSubmitting) return;
 
-    // 🔵 פותחים מודל אישור
     setCandidateToVote(candidate);
     setShowConfirmModal(true);
   };
-
-
 
   const handleSlipDragStart = (e, candidate) => {
     if (hasVoted) return;
@@ -218,50 +193,15 @@ export default function VotingDragPage() {
     e.dataTransfer.dropEffect = 'move';
   };
 
-  // const handleBallotDrop = async (e) => {
-  //   e.preventDefault();
-  //   if (!slipInEnvelope || hasVoted || isSubmitting) return;
-
-  //   setIsDraggingEnvelope(false);
-  //   setEnvelopePosition({ x: 0, y: 0 });
-
-  //   try {
-  //     setIsSubmitting(true);
-  //     await dispatch(
-  //       voteForCandidate({
-  //         groupId,
-  //         candidateId: slipInEnvelope._id,
-  //       }),
-  //     ).unwrap();
-
-  //     await dispatch(fetchCandidatesByGroup(groupId));
-  //   } catch (err) {
-  //     const msg = String(err || '');
-  //     if (
-  //       msg.includes('already voted') ||
-  //       msg.includes('כבר הצבעת')
-  //     ) {
-  //       // נתעלם, הסטייט יתעדכן מהשרת
-  //     } else {
-  //       toast.error(t('voting.voteErrorPrefix') + msg);
-  //     }
-  //   } finally {
-  //     setIsSubmitting(false);
-  //   }
-  // };
-
-
   const handleBallotDrop = (e) => {
     e.preventDefault();
     if (!slipInEnvelope) return;
 
-    // 🔵 אם אין מועמד לאישור — מבקשים אישור
     if (!candidateToVote) {
       attemptVote(slipInEnvelope);
       return;
     }
 
-    // 🔵 אחרי אישור – מצביעים
     voteForCandidateToBallot();
   };
 
@@ -271,8 +211,6 @@ export default function VotingDragPage() {
     setIsSubmitting(true);
     setIsDraggingEnvelope(false);
     setEnvelopePosition({ x: 0, y: 0 });
-
-    // 👈 מסמנים שכבר "בהצבעה" לפני ש־hasVoted מתעדכן ב־Redux
     justVotedRef.current = true;
 
     try {
@@ -283,10 +221,8 @@ export default function VotingDragPage() {
         })
       ).unwrap();
 
-      // ✅ טוסט הצבעה נקלטה
       toast(t('voting.voteSuccessToast'), { icon: '🗳️' });
 
-      // 👇 דואגים שגם טוסט "כבר הצבעת" לא יקפוץ באותו סשן
       hasShownAlreadyVotedToast.current = true;
 
       dispatch(fetchCandidatesByGroup(groupId));
@@ -294,7 +230,6 @@ export default function VotingDragPage() {
     } catch (err) {
       const msg = String(err || '');
 
-      // ❌ אם הייתה שגיאה – לא נחשיב את זה כהצבעה מוצלחת
       justVotedRef.current = false;
       hasShownAlreadyVotedToast.current = false;
 
@@ -333,8 +268,6 @@ export default function VotingDragPage() {
     setShowModal(false);
     setSelectedCandidate(null);
   };
-
-  // ----------- מצבי טעינה / שגיאה בסיסיים -----------
 
   if (!slugResolved && !groupId) {
     return (
@@ -378,8 +311,6 @@ export default function VotingDragPage() {
     );
   }
 
-  // ----------- בדיקת הרשאות להצבעה -----------
-
   const gidStr = String(groupId);
 
   const isMember =
@@ -387,7 +318,6 @@ export default function VotingDragPage() {
     typeof joinedIdsSet.has === 'function' &&
     joinedIdsSet.has(gidStr);
 
-  // זיהוי מנהלת הקבוצה (כמו בדף פרטי קבוצה)
   const myEmail = (userEmail || localStorage.getItem('userEmail') || '')
     .trim()
     .toLowerCase();
@@ -406,13 +336,12 @@ export default function VotingDragPage() {
   const createdById = String(group.createdById ?? '');
 
   const isOwner =
-    isAdmin ||                                         // 👑 אדמין נחשב כמו בעל הקבוצה
+    isAdmin ||
     !!group.isOwner ||
     (!!myEmail && !!createdByEmail && myEmail === createdByEmail) ||
     (!!myId && !!createdById && myId === createdById);
 
 
-  // קבוצה נעולה + לא חברה בקבוצה + לא מנהלת → חסימה
   if (group.isLocked && !isMember && !isOwner) {
     return (
       <div className="vd-wrap">
@@ -441,8 +370,6 @@ export default function VotingDragPage() {
       </div>
     );
   }
-
-  // ----------- מכאן – מותר להצביע -----------
 
   if (candLoading) {
     return (
@@ -501,11 +428,8 @@ export default function VotingDragPage() {
                 onClick={() => openModal(c)}
               >
                 {c.photoUrl ? (
-
-
-
                   <img
-                    src={c.photoUrl || '/h.jpg'}           // אם אין URL – ברירת מחדל
+                    src={c.photoUrl || '/h.jpg'}
                     alt={
                       c.name
                         ? t('candidates.list.photoAltWithName', { name: c.name })
@@ -513,11 +437,10 @@ export default function VotingDragPage() {
                     }
                     className="vd-slip-photo"
                     onError={(e) => {
-                      e.currentTarget.onerror = null;      // מונע loop אם גם הברירת מחדל לא קיימת
-                      e.currentTarget.src = '/h.jpg';     // מציב ברירת מחדל במקרה של שגיאה בטעינה
+                      e.currentTarget.onerror = null;
+                      e.currentTarget.src = '/h.jpg';
                     }}
                   />
-
                 ) : (
                   <div className="vd-slip-photo-placeholder">👤</div>
                 )}
@@ -558,14 +481,14 @@ export default function VotingDragPage() {
               </div>
             )}
           </div>
-        <button
-  className="vd-insert-button"
-  disabled={!slipInEnvelope || hasVoted}
-  onClick={() => attemptVote(slipInEnvelope)}
->
-  {t('voting.insertEnvelope')}
-  <span className="vd-arrow">↓</span>
-</button>
+          <button
+            className="vd-insert-button"
+            disabled={!slipInEnvelope || hasVoted}
+            onClick={() => attemptVote(slipInEnvelope)}
+          >
+            {t('voting.insertEnvelope')}
+            <span className="vd-arrow">↓</span>
+          </button>
 
 
           <div
@@ -605,58 +528,53 @@ export default function VotingDragPage() {
         </div>
       )}
 
-   {showModal && selectedCandidate && (
-  <div className="vd-modal-overlay" onClick={closeModal}>
-    <div
-      className="vd-modal"
-      onClick={(e) => e.stopPropagation()}
-    >
-      <button className="vd-modal-close" onClick={closeModal}>
-        ×
-      </button>
-      
-      {/* תמונה אופציונלית בראש הפתק */}
-      {selectedCandidate.photoUrl && (
-        <div className="vd-modal-photo">
-          <img
-            src={selectedCandidate.photoUrl}
-            alt={selectedCandidate.name}
-          />
+      {showModal && selectedCandidate && (
+        <div className="vd-modal-overlay" onClick={closeModal}>
+          <div
+            className="vd-modal"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button className="vd-modal-close" onClick={closeModal}>
+              ×
+            </button>
+
+            {selectedCandidate.photoUrl && (
+              <div className="vd-modal-photo">
+                <img
+                  src={selectedCandidate.photoUrl}
+                  alt={selectedCandidate.name}
+                />
+              </div>
+            )}
+
+            <div className="vd-modal-header">
+              <div className="vd-modal-symbol">
+                {selectedCandidate.symbol ||
+                  selectedCandidate.name?.substring(0, 2) ||
+                  '??'}
+              </div>
+
+              <h3>{selectedCandidate.name || t('voting.noName')}</h3>
+            </div>
+
+            {selectedCandidate.description && (
+              <div className="vd-modal-desc">
+                {selectedCandidate.description}
+              </div>
+            )}
+
+            <button
+              className="vd-select-button"
+              onClick={() => {
+                setSlipInEnvelope(selectedCandidate);
+                closeModal();
+              }}
+            >
+              {t('voting.selectForVote')}
+            </button>
+          </div>
         </div>
       )}
-
-      <div className="vd-modal-header">
-        {/* הסמל הגדול - לב הפתק */}
-        <div className="vd-modal-symbol">
-          {selectedCandidate.symbol ||
-            selectedCandidate.name?.substring(0, 2) ||
-            '??'}
-        </div>
-        
-        {/* שם המועמד */}
-        <h3>{selectedCandidate.name || t('voting.noName')}</h3>
-      </div>
-
-      {selectedCandidate.description && (
-        <div className="vd-modal-desc">
-          {selectedCandidate.description}
-        </div>
-      )}
-
-      {/* כפתור הפעולה הראשי - למטה */}
-      <button
-        className="vd-select-button"
-        onClick={() => {
-          setSlipInEnvelope(selectedCandidate);
-          closeModal();
-        }}
-      >
-        {t('voting.selectForVote')}
-      </button>
-    </div>
-  </div>
-)}
-
       <ConfirmModal
         open={showConfirmModal}
         message={
@@ -668,7 +586,5 @@ export default function VotingDragPage() {
       />
 
     </div>
-
-
   );
 }

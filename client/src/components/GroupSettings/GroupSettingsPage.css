@@ -1,6 +1,3 @@
-/* =========================================
-   משתנים גלובליים
-   ========================================= */
 :root {
   --gs-primary: #003366;
   --gs-primary-hover: #095eb5;
@@ -12,9 +9,6 @@
   --a11y-font-scale: 1;
 }
 
-/* =========================================
-   מבנה כללי
-   ========================================= */
 * {
   box-sizing: border-box;
 }
@@ -29,33 +23,28 @@
   width: 100%;
 }
 
-/* =========================================
-   כותרת
-   ========================================= */
-  .gs-header {
-    flex-direction: column; /* כל השאר עמודה */
-    align-items: flex-start;
-  }
+.gs-header {
+  flex-direction: column;
+  align-items: flex-start;
+}
 
-  .gs-header .icon-btn-container {
-    display: flex;           /* הכפתורים בשורה */
-    gap: 8px;                /* רווח בין הכפתורים */
-    margin-top: 8px;
-  }
-/* מובייל - הצג את שני הכפתורים בשורה אחת */
+.gs-header .icon-btn-container {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+
 @media (max-width: 767px) {
   .gs-header {
-    flex-direction: column; /* כל השאר עמודה */
+    flex-direction: column;
     align-items: flex-start;
   }
 
   .gs-header .icon-btn-container {
-    display: flex;           /* הכפתורים בשורה */
-    gap: 8px;                /* רווח בין הכפתורים */
+    display: flex;
+    gap: 8px;
     margin-top: 8px;
   }
-
-
 }
 
 .clean-header {
@@ -76,8 +65,8 @@
   color: var(--gs-text-muted);
   font-size: calc(1rem * var(--a11y-font-scale));
 
-  direction: rtl;        /* כיוון הטקסט מימין לשמאל */
-  text-align: right;     /* יישור לימין */
+  direction: rtl;
+  text-align: right;
 }
 
 .gs-actions {
@@ -93,16 +82,12 @@
   color: var(--gs-primary);
   padding: 10px;
   transition: background 0.2s;
-  /* border-radius: 4px; */
 }
 
 .icon-btn:hover {
   background: #eef4ff;
 }
 
-/* =========================================
-   Layout ראשי - סיידבר + תוכן
-   ========================================= */
 .gs-main-layout {
   display: flex;
   flex-direction: row-reverse;
@@ -118,9 +103,6 @@
   width: 100%;
 }
 
-/* =========================================
-   סיידבר (דסקטופ)
-   ========================================= */
 .gs-sidebar-tabs {
   width: 260px;
   display: flex;
@@ -139,7 +121,6 @@
   cursor: pointer;
   background: #fff;
   border: 1px solid var(--gs-border);
-  /* border-radius: 6px; */
   font-weight: 500;
   color: #444;
   transition: all 0.2s ease;
@@ -152,7 +133,7 @@
 .side-tab:hover {
   background: #f8fbff;
   color: var(--gs-primary);
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   transform: translateX(-2px);
 }
 
@@ -182,30 +163,25 @@
 .join-requests-count {
   background-color: #f00b0b;
   color: white;
-  /* border-radius: 50%; */
   padding: 3px 8px;
   font-size: calc(0.75rem * var(--a11y-font-scale));
   margin-left: 8px;
   font-weight: 600;
 }
 
-.join-requests-count1{
+.join-requests-count1 {
   background-color: #003366;
   color: rgb(255, 255, 255);
-  /* border-radius: 50%; */
   padding: 3px 8px;
   font-size: calc(0.75rem * var(--a11y-font-scale));
   margin-left: 8px;
   font-weight: 600;
 }
-/* =========================================
-   כרטיסים
-   ========================================= */
+
 .card {
   border: 2px solid var(--gs-primary);
   padding: 28px;
   background: #fff;
-  /* border-radius: 0; */
   box-shadow: 0 4px 12px rgba(0, 51, 102, 0.1);
   margin-bottom: 24px;
   width: 100%;
@@ -225,9 +201,6 @@
   color: var(--gs-primary);
 }
 
-/* =========================================
-   טפסים
-   ========================================= */
 .field {
   margin-bottom: 18px;
   width: 100%;
@@ -246,7 +219,6 @@ textarea.input {
   width: 100%;
   padding: 12px 14px;
   border: 1px solid #dcdcdc;
-  /* border-radius: 6px; */
   outline: none;
   transition: border-color 0.2s, box-shadow 0.2s;
   font-family: inherit;
@@ -264,20 +236,13 @@ textarea.input {
   min-height: 100px;
 }
 
-/* =========================================
-   Grid Layouts
-   ========================================= */
-/* src/components/GroupSettings/GeneralTab.css */
-
-/* כרטיס הראשי */
 .card {
   background: #fff;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
   padding: 20px;
   margin-bottom: 20px;
 }
 
-/* כותרת הכרטיס */
 .card-head {
   display: flex;
   justify-content: space-between;
@@ -291,8 +256,6 @@ textarea.input {
   color: #333;
 }
 
-
-/* תצוגת קריאה */
 .read-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -324,7 +287,6 @@ textarea.input {
   font-size: 0.9rem;
 }
 
-/* שורות השיתוף */
 .share-row {
   display: flex;
   align-items: center;
@@ -338,15 +300,12 @@ textarea.input {
   border: 1px solid #ccc;
 }
 
-
-
 .share-hint {
   font-size: 0.85rem;
   color: #666;
   margin-top: 4px;
 }
 
-/* שגיאות והודעות הצלחה */
 .err {
   color: #c00;
   font-size: 0.9rem;
@@ -357,7 +316,6 @@ textarea.input {
   font-size: 0.9rem;
 }
 
-/* טפסים לעריכה */
 .field {
   display: flex;
   flex-direction: column;
@@ -379,14 +337,12 @@ textarea.input {
   resize: vertical;
 }
 
-/* רשת לשדות כפולים */
 .grid-2 {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
   gap: 16px;
 }
 
-/* כפתורים בתחתית הטופס */
 .actions-row {
   display: flex;
   gap: 10px;
@@ -394,7 +350,6 @@ textarea.input {
 }
 
 
-/* רספונסיביות */
 @media (max-width: 768px) {
   .read-grid {
     grid-template-columns: 1fr;
@@ -410,10 +365,6 @@ textarea.input {
   }
 }
 
-
-/* =========================================
-   רשימות
-   ========================================= */
 .list {
   list-style: none;
   padding: 0;
@@ -438,7 +389,7 @@ textarea.input {
 
 .row:hover {
   background: #fafafa;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
 }
 
 .row-main {
@@ -507,9 +458,6 @@ textarea.input {
   flex-wrap: wrap;
 }
 
-/* =========================================
-   Share Section
-   ========================================= */
 .share-row {
   display: flex;
   gap: 10px;
@@ -541,9 +489,6 @@ textarea.input {
   color: var(--gs-text-muted);
 }
 
-/* =========================================
-   Upload Section
-   ========================================= */
 .upload-row {
   display: flex;
   gap: 10px;
@@ -560,9 +505,6 @@ textarea.input {
   flex-wrap: wrap;
 }
 
-/* =========================================
-   Tabs (אופקי)
-   ========================================= */
 .gs-tabs {
   display: flex;
   flex-wrap: wrap;
@@ -601,9 +543,6 @@ textarea.input {
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
 }
 
-/* =========================================
-   Accordion
-   ========================================= */
 .acc {
   border: 1px solid var(--gs-primary);
   background: #fff;
@@ -653,9 +592,6 @@ textarea.input {
   font-weight: 600;
 }
 
-/* =========================================
-   הודעות (Alerts)
-   ========================================= */
 .err {
   color: #b92c28;
   background: #fdeaea;
@@ -694,9 +630,6 @@ textarea.input {
   width: 100%;
 }
 
-/* =========================================
-   קישורים
-   ========================================= */
 .link {
   color: var(--gs-primary);
   text-decoration: none;
@@ -708,9 +641,6 @@ textarea.input {
   color: var(--gs-primary-hover);
 }
 
-/* =========================================
-   RESPONSIVE - טאבלט (iPad)
-   ========================================= */
 @media (max-width: 1024px) {
   .gs-wrap {
     padding: 20px;
@@ -733,21 +663,16 @@ textarea.input {
   }
 }
 
-/* =========================================
-   RESPONSIVE - טאבלט קטן / iPad אנכי
-   ========================================= */
 @media (max-width: 900px) {
   .gs-wrap {
     padding: 16px;
   }
 
-  /* שינוי Layout לעמודה */
   .gs-main-layout {
     flex-direction: column;
     gap: 16px;
   }
 
-  /* סיידבר הופך לרצועה אופקית למעלה */
   .gs-sidebar-tabs {
     order: -1;
     width: 100%;
@@ -760,7 +685,7 @@ textarea.input {
     background: #fff;
     padding: 10px 8px;
     border-bottom: 2px solid #eee;
-    box-shadow: 0 4px 8px -4px rgba(0,0,0,0.12);
+    box-shadow: 0 4px 8px -4px rgba(0, 0, 0, 0.12);
     gap: 8px;
     -ms-overflow-style: none;
     scrollbar-width: none;
@@ -789,7 +714,6 @@ textarea.input {
     transform: none;
   }
 
-  /* כותרת */
   .clean-header {
     flex-direction: column;
     align-items: flex-start;
@@ -807,7 +731,6 @@ textarea.input {
     padding-top: 12px;
   }
 
-  /* גרידים */
   .grid-2 {
     grid-template-columns: 1fr;
   }
@@ -843,10 +766,9 @@ textarea.input {
     padding: 6px 0;
   }
 
-  /* כרטיסים */
   .card {
     padding: 20px;
-        border-width: 2px;
+    border-width: 2px;
   }
 
   .card-head {
@@ -854,7 +776,6 @@ textarea.input {
     border-bottom-width: 2px;
   }
 
-  /* רשימות */
   .row {
     flex-direction: column;
     align-items: flex-start;
@@ -879,7 +800,6 @@ textarea.input {
     width: 100%;
   }
 
-  /* Share */
   .share-row {
     flex-direction: column;
     align-items: stretch;
@@ -898,7 +818,6 @@ textarea.input {
     flex: 1;
   }
 
-  /* Tabs */
   .gs-tabs {
     justify-content: flex-start;
     gap: 6px;
@@ -910,9 +829,6 @@ textarea.input {
   }
 }
 
-/* =========================================
-   RESPONSIVE - מובייל
-   ========================================= */
 @media (max-width: 600px) {
   .gs-wrap {
     padding: 12px;
@@ -961,8 +877,6 @@ textarea.input {
     font-size: calc(0.8rem * var(--a11y-font-scale));
   }
 
-
-
   button.small {
     padding: 6px 10px;
     font-size: calc(0.8rem * var(--a11y-font-scale));
@@ -992,7 +906,6 @@ textarea.input {
   position: absolute;
   right: 10px;
   top: 10%;
-  /* transform: translateY(-50%); */
   cursor: pointer;
   color: #727880;
   transition: 0.2s;
@@ -1002,24 +915,6 @@ textarea.input {
   color: #4a4e55;
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/* בסיס אחיד לכל הכפתורים */
 .clean-btn {
   padding: 6px 14px;
   cursor: pointer;
@@ -1035,7 +930,6 @@ textarea.input {
   white-space: nowrap;
 }
 
-/* כפתור שמירה - כחול כהה #003366 */
 .clean-btn-save {
   background: #003366;
   color: #fff;
@@ -1047,7 +941,6 @@ textarea.input {
   border-color: #095eb5;
 }
 
-/* כפתור ביטול - לבן עם מסגרת כחולה */
 .clean-btn-cancel {
   background: #fff;
   color: #003366;
@@ -1058,7 +951,6 @@ textarea.input {
   background: #eef4ff;
 }
 
-/* כפתור עריכה - אפור */
 .clean-btn-edit {
   background: #6c757d;
   color: #fff;
@@ -1070,7 +962,6 @@ textarea.input {
   border-color: #5a6268;
 }
 
-/* כפתור מחיקה - אדום */
 .clean-btn-delete {
   background: #dc3545;
   color: #fff;
@@ -1082,15 +973,7 @@ textarea.input {
   border-color: #a71d2a;
 }
 
-/* כפתור Disabled */
 .clean-btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
 }
-
-
-
-
-
-
-

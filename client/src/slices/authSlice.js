@@ -1,21 +1,17 @@
-// src/slices/authSlice.js
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import http from '../api/http';
 import i18n from '../i18n';
 
-/** ===== עזר: פענוח JWT ללא אימות חתימה ===== */
 function decodeJwtNoVerify(token) {
   try {
     const [, payload] = token.split('.');
     const base = payload.replace(/-/g, '+').replace(/_/g, '/');
     const json = decodeURIComponent(escape(atob(base)));
-    return JSON.parse(json); // { exp, email?, sub? ... }
+    return JSON.parse(json);
   } catch {
     return {};
   }
 }
-
-/** ===== ניהול תפוגת טוקן בצד לקוח ===== */
 
 let logoutTimer = null;
 
@@ -54,8 +50,6 @@ function scheduleAutoLogout(expUnixSeconds) {
   }, delay);
 }
 
-
-/** ===== קריאה ראשונית מערכי localStorage ===== */
 const initialToken = localStorage.getItem('token');
 const initialUserEmail = localStorage.getItem('userEmail');
 const initialUserId = localStorage.getItem('userId');
@@ -64,14 +58,10 @@ const initialLastName = localStorage.getItem('lastName');
 const initialExp = Number(localStorage.getItem('token_exp') || 0);
 const initialIsAdmin = localStorage.getItem('isAdmin') === '1';
 
-// אם יש טוקן + exp – נבדוק אם כבר פג
 if (initialToken && initialExp * 1000 <= Date.now()) {
   clearAuthStorage();
 }
 
-/** ===== Thunks ===== */
-
-// רישום
 export const register = createAsyncThunk(
   'auth/register',
   async (form, thunkAPI) => {
@@ -87,28 +77,24 @@ export const register = createAsyncThunk(
   }
 );
 
-
-
-// פרופיל
 export const fetchProfile = createAsyncThunk(
   'auth/fetchProfile',
   async (_, { rejectWithValue }) => {
     try {
       const { data } = await http.get('/users/me');
-      return data; // { _id, name, email, ... }
+      return data;
     } catch (err) {
       return rejectWithValue(i18n.t('auth.profile.loadFailed'));
     }
   }
 );
 
-// עדכון פרופיל
 export const updateProfile = createAsyncThunk(
   'auth/updateProfile',
   async (payload, { rejectWithValue }) => {
     try {
       const { data } = await http.patch('/users/me', payload);
-      return data; // המשתמש המעודכן
+      return data;
     } catch (err) {
       const serverErrors = err?.response?.data?.errors;
       if (serverErrors) {
@@ -135,24 +121,19 @@ export const login = createAsyncThunk(
         if (errors.email === 'EMAIL_NOT_FOUND') {
           translated.email = i18n.t('auth.login.errors.emailNotFound');
         } else if (typeof errors.email === 'string') {
-          // fallback – אם שכחנו קוד חדש
           translated.email = errors.email;
         }
-
         if (errors.password === 'INVALID_PASSWORD') {
           translated.password = i18n.t('auth.login.errors.invalidPassword');
         } else if (typeof errors.password === 'string') {
           translated.password = errors.password;
         }
-
         return rejectWithValue(translated);
       }
-
       return rejectWithValue({ form: i18n.t('auth.serverError') });
     }
   }
 );
-
 
 export const fetchMe = createAsyncThunk('auth/me', async (_, { rejectWithValue }) => {
   try {
@@ -163,8 +144,6 @@ export const fetchMe = createAsyncThunk('auth/me', async (_, { rejectWithValue }
   }
 });
 
-
-// בקשת מייל איפוס
 export const requestPasswordReset = createAsyncThunk(
   'auth/requestPasswordReset',
   async (email, { rejectWithValue }) => {
@@ -177,7 +156,6 @@ export const requestPasswordReset = createAsyncThunk(
   }
 );
 
-// איפוס בפועל
 export const resetPassword = createAsyncThunk(
   'auth/resetPassword',
   async ({ token, password }, { rejectWithValue }) => {
@@ -209,7 +187,6 @@ export const changePassword = createAsyncThunk(
   }
 );
 
-/** ===== Slice ===== */
 const authSlice = createSlice({
   name: 'auth',
   initialState: {
@@ -250,7 +227,6 @@ const authSlice = createSlice({
       clearAuthStorage();
     },
 
-    // משמש בעיקר לחזרה מגוגל OAuth
     loginSuccess(state, action) {
       const { token, user = {} } = action.payload;
       state.token = token;
@@ -278,7 +254,6 @@ const authSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      /** register */
       .addCase(register.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -292,7 +267,6 @@ const authSlice = createSlice({
         state.error = action.payload;
       })
 
-      /** fetchProfile */
       .addCase(fetchProfile.pending, (s) => {
         s.loading = true;
         s.error = null;
@@ -305,8 +279,6 @@ const authSlice = createSlice({
         s.loading = false;
         s.error = a.payload;
       })
-
-      /** login */
       .addCase(login.pending, (s) => { s.loading = true; s.error = null; })
       .addCase(login.fulfilled, (s, a) => {
         s.loading = false;
@@ -351,8 +323,6 @@ const authSlice = createSlice({
         localStorage.setItem('isAdmin', s.isAdmin ? '1' : '0');
       })
       .addCase(fetchMe.rejected, (s, a) => { s.loading = false; s.error = a.payload; })
-
-      /** updateProfile */
       .addCase(updateProfile.pending, (s) => {
         s.loading = true;
         s.updateErrors = null;
@@ -378,22 +348,6 @@ const authSlice = createSlice({
         s.loading = false;
         s.updateErrors = { form: i18n.t('auth.profile.updateFailed') };
       })
-
-      // /** password reset request */
-      // .addCase(requestPasswordReset.pending, (s) => {
-      //   s.loading = true;
-      //   s.error = null;
-      // })
-      // .addCase(requestPasswordReset.fulfilled, (s, a) => {
-      //   s.loading = false;
-      //   s.error = null;
-      //   s.message = a.payload;
-      // })
-      // .addCase(requestPasswordReset.rejected, (s, a) => {
-      //   s.loading = false;
-      //   s.error = a.payload;
-      // })
-
       .addCase(requestPasswordReset.pending, (s) => {
         s.forgotLoading = true;   // ✅
         s.error = null;
@@ -407,9 +361,6 @@ const authSlice = createSlice({
         s.forgotLoading = false;  // ✅
         s.error = a.payload;
       })
-
-
-      /** resetPassword */
       .addCase(resetPassword.pending, (s) => {
         s.loading = true;
         s.error = null;
@@ -424,7 +375,6 @@ const authSlice = createSlice({
         s.error = a.payload;
       })
 
-      /** changePassword */
       .addCase(changePassword.pending, (s) => {
         s.updateErrors = null;
         s.message = '';
@@ -442,7 +392,5 @@ const authSlice = createSlice({
 
 export const { logout, loginSuccess, clearError, clearMessage } = authSlice.actions;
 export default authSlice.reducer;
-// src/slices/authSlice.js
-
 export const selectUser = (state) => state.auth.user;
 export const selectUserId = (state) => state.auth.userId;

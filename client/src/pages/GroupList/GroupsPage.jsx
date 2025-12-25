@@ -1,4 +1,3 @@
-// src/pages/GroupList/GroupsPage.jsx
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
@@ -62,7 +61,6 @@ export default function GroupsPage() {
 
   const { loading, error: err, list: groups } = useSelector((s) => s.groups);
   const { userEmail: authEmail, userId: authId, isAdmin } = useSelector((s) => s.auth);
-  // const { userEmail: authEmail, userId: authId } = useSelector((s) => s.auth);
   useEffect(() => {
     console.log('Auth in GroupsPage:', {
       authEmail,
@@ -75,21 +73,16 @@ export default function GroupsPage() {
   const pendingIdsSet = useSelector(selectMyPendingSet);
   const rejectedIdsSet = useSelector(selectMyRejectedSet);
   const createdIdsSet = useSelector(selectMyCreatedIds);
-
   const [showFilters, setShowFilters] = useState(false);
   const [showSort, setShowSort] = useState(false);
   const [filter, setFilter] = useState('all');
   const [sortBy, setSortBy] = useState('creationDate');
   const [searchTerm, setSearchTerm] = useState('');
-
   const [currentPage, setCurrentPage] = useState(1);
   const PAGE_SIZE = 16;
-
   const removedMap = useSelector((s) => s.joinReq.removedNotice || {});
-
   const isAuthed = !!authId || !!authEmail;
   const [steps, setSteps] = useState([]);
-
   const onCreateGroupClick = () => {
     if (!isAuthed) {
       toast.error(t('groups.list.toasts.loginToCreate'));
@@ -98,49 +91,6 @@ export default function GroupsPage() {
     navigate('/groups/create');
   };
 
-
-  // const steps = [
-  //   {
-  //     selector: '#groups-header',
-  //     content: 'כאן נמצאים הכלים של עמוד הקבוצות',
-  //   },
-  //   {
-  //     selector: '#groups-search',
-  //     content: 'כאן מחפשים קבוצות לפי שם',
-  //   },
-  //   {
-  //     selector: '#groups-filter',
-  //     content: 'כאן מסננים קבוצות לפי קטגוריות',
-  //   },
-  //   {
-  //     selector: '#groups-list',
-  //     content: 'כאן נמצאות כל הקבוצות המוצגות',
-  //   },
-  //    {
-  //   selector: `#groups-card-title-${gid}`,
-  //   content: 'כאן מוצג שם הקבוצה',
-  // },
-  // {
-  //   selector: `#groups-card-badges-${gid}`,
-  //   content: 'סמלים המציינים סטטוס כמו נעול או הגשת מועמדות פתוחה',
-  // },
-  // {
-  //   selector: `#groups-card-desc-${gid}`,
-  //   content: 'כאן מופיע תיאור קצר של הקבוצה',
-  // },
-  // {
-  //   selector: `#groups-card-owner-${gid}`,
-  //   content: 'כאן מופיע מי מנהל/ת את הקבוצה',
-  // },
-  // {
-  //   selector: `#groups-card-footer-${gid}`,
-  //   content: 'כאן מוצג תאריך סיום הקבוצה או שהיא פגה',
-  // },
-  // {
-  //   selector: `#groups-card-actions-${gid}`,
-  //   content: 'כאן נמצאים כפתורי הפעולה: בקשת הצטרפות, pending, rejected, או הגדרות',
-  // },
-  // ];
   const filteredGroups = groups
     .filter((g) => {
       const gid = String(g._id);
@@ -153,8 +103,6 @@ export default function GroupsPage() {
       const now = new Date();
       const candidateOpen = g.candidateEndDate && new Date(g.candidateEndDate) > now;
 
-      // הצבעה פתוחה: תאריך סיום הקבוצה בעתיד
-      // וגם או שאין תאריך הגשת מועמדות, או שהוא כבר עבר
       const votingOpen =
         g.endDate &&
         new Date(g.endDate) > now &&
@@ -193,7 +141,6 @@ export default function GroupsPage() {
   const startIndex = (safePage - 1) * PAGE_SIZE;
   const pageGroups = filteredGroups.slice(startIndex, startIndex + PAGE_SIZE);
 
-  // 🌟 העבר את pageGroups לכאן לפני ה-useEffect
 
   useEffect(() => {
     if (pageGroups.length > 0) {
@@ -233,8 +180,6 @@ export default function GroupsPage() {
       setIsOpen(true);
     }
   }, []);
-
-
 
   useEffect(() => { dispatch(hydratePendingFromLocalStorage()); }, [dispatch]);
 
@@ -334,7 +279,6 @@ export default function GroupsPage() {
     <TourProvider steps={steps} initialFocus={false}>
       <GlobalTour steps={steps} />
       <div className="groups-page">
-        {/* סרגל עליון */}
 
         <TourButton />
 
@@ -496,7 +440,6 @@ export default function GroupsPage() {
           </div>
         </div>
 
-        {/* רשת קבוצות */}
         <div id="groups-list" className="groups-grid">
           {pageGroups.map((g) => {
             const gid = String(g._id);
@@ -555,7 +498,6 @@ export default function GroupsPage() {
             };
 
             const onCardClick = async () => {
-              // 👑 אדמין – תמיד נכנס, גם לקבוצות נעולות
               if (isAdmin) {
                 navigate(`/groups/${slug}`, {
                   state: { groupId: gid },
@@ -563,7 +505,6 @@ export default function GroupsPage() {
                 return;
               }
 
-              // קבוצה פתוחה – תמיד נכנסים
               if (!isLocked) {
                 navigate(`/groups/${slug}`, {
                   state: { groupId: gid },
@@ -571,7 +512,6 @@ export default function GroupsPage() {
                 return;
               }
 
-              // קבוצה נעולה + pending + לא חברה
               if (!isOwner && isLocked && isPending && !isMember) {
                 if (!isAuthed) {
                   toast.error(t('groups.list.toasts.lockedLoginToJoin'));
@@ -593,7 +533,6 @@ export default function GroupsPage() {
                 return;
               }
 
-              // קבוצה נעולה + לא חברה
               if (!isOwner && isLocked && !isMember) {
                 if (!isAuthed) {
                   toast.error(t('groups.list.toasts.lockedLoginToJoin'));
@@ -606,14 +545,13 @@ export default function GroupsPage() {
                 return;
               }
 
-              // בעל/ת הקבוצה / חבר/ה בקבוצה נעולה
               navigate(`/groups/${slug}`, {
                 state: { groupId: gid },
               });
             };
 
             const cardDisabled =
-              !isAdmin &&            // 👈 רק מי שלא אדמין יכול להיות "מנוטרל"
+              !isAdmin &&
               !isOwner &&
               isLocked &&
               ((isPending && !isMember) || (!isPending && !isMember));
@@ -626,7 +564,7 @@ export default function GroupsPage() {
             return (
               <div
                 key={gid}
-                id={`groups-card-${gid}`}          // 🌟 ID ייחודי לכל כרטיס
+                id={`groups-card-${gid}`}
                 onClick={onCardClick}
                 className={`groups-card 
     ${cardDisabled ? 'groups-card-disabled' : ''} 
@@ -675,7 +613,6 @@ export default function GroupsPage() {
                         id={`groups-badge-candidate-${gid}`}
                       />
                     )}
-                    {/* אייקון הצבעה פתוחה */}
                     {votingOpen && (
                       <LuSquareCheck
                         size={20}
@@ -684,10 +621,6 @@ export default function GroupsPage() {
                         id={`groups-badge-vote-${gid}`}
                       />
                     )}
-
-
-
-
                   </div>
                 </div>
 
@@ -767,7 +700,6 @@ export default function GroupsPage() {
           })}
         </div>
 
-        {/* פג'ינציה */}
         {filteredGroups.length > PAGE_SIZE && (
           <div className="groups-pagination">
             <button
@@ -800,16 +732,14 @@ export default function GroupsPage() {
           </div>
         )}
 
-    <button
-  className="groups-fab"
-  onClick={onCreateGroupClick}
-  title={t('groups.list.fab.title')}
->
-  <FaPlus />
-</button>
+        <button
+          className="groups-fab"
+          onClick={onCreateGroupClick}
+          title={t('groups.list.fab.title')}
+        >
+          <FaPlus />
+        </button>
       </div>
     </TourProvider>
-
-
   );
 }

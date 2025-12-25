@@ -1,4 +1,3 @@
-// src/components/GroupSettings/CandidateForm.jsx
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import ImageCropModal from '../ImageCropModal';
@@ -12,33 +11,26 @@ export default function CandidateForm({
   onUploadFile,
   fileInputRef,
   clearPhoto,
-  submitLabel, // אפשר אחר כך לעבור ל-t('common.save') מההורה
+  submitLabel,
   submitDisabled = false,
 }) {
   const { t } = useTranslation();
 
-  // קובץ שמחכים לחתוך במודאל
   const [fileToCrop, setFileToCrop] = useState(null);
 
-  // כשמשתמש בוחר קובץ (גם באינפוט הגלוי וגם ב" שינוי תמונה ")
   const handleFileChange = (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
     if (!onUploadFile) return;
 
-    setFileToCrop(file); // מפעיל את המודאל
-
-    
-  // 👇 חשוב: איפוס הערך, כדי שגם אם בוחרים שוב את אותו קובץ – onChange ירוץ
-  e.target.value = '';
+    setFileToCrop(file);
+    e.target.value = '';
   };
 
-  // אחרי שהמשתמש סיים חיתוך ולחץ "שמור"
   const handleCroppedFile = (croppedFile) => {
     setFileToCrop(null);
     if (!croppedFile || !onUploadFile) return;
 
-    // מעביר להורה כבר את הקובץ החתוך
     onUploadFile(croppedFile);
   };
 
@@ -88,14 +80,13 @@ export default function CandidateForm({
 
       <label>{t('candidates.form.photoLabel')}</label>
 
-      {/* אינפוט נסתר ל"שינוי תמונה" */}
       {fileInputRef && (
         <input
           ref={fileInputRef}
           type="file"
           accept="image/*"
           style={{ display: 'none' }}
-          onChange={handleFileChange}    // 👈 עכשיו דרך החיתוך
+          onChange={handleFileChange}
           disabled={uploading}
         />
       )}
@@ -105,7 +96,7 @@ export default function CandidateForm({
           <input
             type="file"
             accept="image/*"
-            onChange={handleFileChange}  // 👈 גם כאן
+            onChange={handleFileChange}
             disabled={uploading}
           />
           {uploading && (
@@ -161,11 +152,10 @@ export default function CandidateForm({
         </button>
       </div>
 
-      {/* מודאל חיתוך – נפתח כשיש fileToCrop */}
       {fileToCrop && (
         <ImageCropModal
           file={fileToCrop}
-          aspect={1} // 1:1 – מתאים לתמונת פרופיל עגולה
+          aspect={1}
           onCancel={handleCancelCrop}
           onCropped={handleCroppedFile}
         />

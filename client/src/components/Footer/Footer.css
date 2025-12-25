@@ -1,4 +1,3 @@
-/* Footer.css */
 .site-footer {
   background: linear-gradient(135deg, #003366 0%, #004d99 100%);
   color: white;
@@ -26,22 +25,17 @@
 
 .footer-col-main p {
   line-height: 1.6;
-  /* היה 1.8 */
   color: rgba(255, 255, 255, 0.9);
   font-size: 0.95rem;
-  /* היה 1rem */
 }
 
 .footer-tagline {
   margin-top: 0.7rem;
-  /* היה 1rem */
   font-style: italic;
   color: rgba(255, 255, 255, 0.8);
   font-size: 0.9rem;
-  /* היה 0.95rem */
 }
 
-/* כותרות עמודות */
 .footer-col h4 {
   font-size: 1.1rem;
   margin-bottom: 0.9rem;
@@ -49,9 +43,6 @@
   font-weight: 600;
   position: relative;
   padding-bottom: 0.35rem;
-  /* text-align: center; */
-  /* width: fit-content; */
-  /* margin: 0 auto 0.9rem auto */
 }
 
 .footer-col h4::after {
@@ -60,7 +51,6 @@
   bottom: 0;
   right: 0;
   width: 40px;
-  /* היה 50px */
   height: 2px;
   background: white;
 }
@@ -75,14 +65,12 @@
 
 .footer-links p a {
   padding-bottom: 0.6rem;
-  /* היה 0.8rem */
 }
 
 .footer-links a {
   color: rgba(255, 255, 255, 0.85);
   text-decoration: none;
   font-size: 0.95rem;
-  /* היה 1rem */
   transition: all 0.3s ease;
   display: inline-block;
   position: relative;
@@ -98,16 +86,13 @@
 .footer-links a:hover {
   color: white;
   transform: translateX(-3px);
-  /* היה -5px */
 }
 
 .footer-links a:hover::before {
   opacity: 1;
   margin-left: 10px;
-  /* היה 12px */
 }
 
-/* רשתות חברתיות */
 .footer-col-social {
   text-align: center;
 }
@@ -121,17 +106,12 @@
   display: flex;
   justify-content: center;
   gap: 1.1rem;
-  /* היה 1.5rem */
   margin-top: 0.7rem;
-  /* היה 1rem */
 }
 
 .footer-social-icons a {
   width: 42px;
-  /* היה 50px */
   height: 42px;
-  /* היה 50px */
-  /* border-radius: 50%; */
   background: rgba(255, 255, 255, 0.1);
   border: 2px solid rgba(255, 255, 255, 0.3);
   display: flex;
@@ -139,7 +119,6 @@
   justify-content: center;
   color: white;
   font-size: 1.3rem;
-  /* היה 1.5rem */
   transition: all 0.3s ease;
   text-decoration: none;
 }
@@ -148,42 +127,34 @@
   background: white;
   color: #003366;
   transform: translateY(-3px) scale(1.07);
-  /* היה -5px ו-1.1 */
   box-shadow: 0 4px 12px rgba(255, 255, 255, 0.25);
 }
 
-/* וואטסאפ */
 .footer-social-icons a:nth-child(1):hover {
   background: #25D366;
   border-color: #25D366;
   color: white;
 }
 
-/* אינסטגרם */
 .footer-social-icons a:nth-child(2):hover {
   background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
   border-color: #bc1888;
   color: white;
 }
 
-/* טלגרם */
 .footer-social-icons a:nth-child(3):hover {
   background: #0088cc;
   border-color: #0088cc;
   color: white;
 }
 
-/* שורה תחתונה */
 .footer-bottom {
   text-align: center;
   padding: 0.9rem 0;
-  /* היה 1.5rem */
   color: rgba(255, 255, 255, 0.75);
   font-size: 0.9rem;
-  /* היה 0.95rem */
 }
 
-/* RTL Support */
 [dir="rtl"] .footer-links a::before {
   content: '▶';
   margin-left: 0;
@@ -192,7 +163,6 @@
 
 [dir="rtl"] .footer-links a:hover {
   transform: translateX(3px);
-  /* היה 5px */
 }
 
 [dir="rtl"] .footer-links a:hover::before {
@@ -210,7 +180,6 @@
   transform: translateX(-50%);
 }
 
-/* רספונסיבי - טאבלט */
 @media (max-width: 968px) {
   .footer-inner {
     grid-template-columns: 1fr 1fr;
@@ -233,22 +202,18 @@
   column-gap: 2rem;
   row-gap: 0.7rem;
   justify-content: center;
-  /* באמצע מתחת לכותרת */
   justify-items: center;
-  /* כל קישור במרכז התא שלו */
 }
 
 .footer-col p a {
   color: white;
   text-decoration: none;
   padding: 6px 10px;
-  /* border-radius: 8px; */
   display: inline-block;
   margin-bottom: 8px;
   transition: background-color 0.25s ease, color 0.25s ease;
 }
 
-/* אפקט מעבר עכבר – כמו בתמונה */
 .footer-col p a:hover {
   background-color: rgba(255, 255, 255, 0.15);
   color: white;
@@ -263,7 +228,7 @@
   direction: rtl;
   text-align: right;
 }
-/* רספונסיבי - מובייל */
+
 @media (max-width: 640px) {
   .site-footer {
     padding: 1.5rem 1rem 0;
@@ -282,12 +247,10 @@
 
   .footer-col-main h4 {
     font-size: 1.2rem;
-    /* היה 1.3rem */
   }
 
   .footer-col-main p {
     font-size: 0.9rem;
-    /* היה 0.95rem */
   }
 
   .footer-col {
@@ -312,12 +275,10 @@
 
   .footer-links a:hover {
     transform: scale(1.04);
-    /* היה 1.05 */
   }
 
   .footer-social-icons {
     gap: 0.8rem;
-    /* היה 1rem */
   }
 
   .footer-social-icons a {
@@ -333,11 +294,8 @@
 
   .footer-links-two-rows {
     display: flex;
-    /* במקום grid */
     flex-direction: column;
-    /* טור אחד */
     align-items: center;
-    /* במרכז מתחת לכותרת */
     row-gap: 0.5rem;
     width: 100%;
     text-align: center;

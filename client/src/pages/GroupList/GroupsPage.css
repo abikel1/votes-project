@@ -1,8 +1,3 @@
-/* ======================================
-   עמוד קבוצות - עיצוב מינימליסטי ונקי
-   ====================================== */
-
-/* כללי */
 * {
   box-sizing: border-box;
 }
@@ -17,7 +12,6 @@
   min-height: 100vh;
 }
 
-/* סרגל עליון */
 .groups-toolbar {
   display: flex;
   justify-content: space-between;
@@ -36,7 +30,6 @@
   flex: 1;
 }
 
-/* שדה חיפוש */
 .groups-search {
   flex: 1;
   max-width: 400px;
@@ -57,7 +50,6 @@
   color: #aaa;
 }
 
-/* כפתורי בקרה */
 .groups-controls {
   display: flex;
   gap: 6px;
@@ -92,7 +84,6 @@
   opacity: 1;
 }
 
-/* תפריט נפתח */
 .groups-dropdown {
   position: absolute;
   top: calc(100% + 4px);
@@ -125,7 +116,6 @@
   margin: 0;
 }
 
-/* כפתור יצירת קבוצה */
 .groups-create-btn {
   padding: 9px 20px;
   font-size: calc(14px * var(--a11y-font-scale));
@@ -142,21 +132,18 @@
   background: #000;
 }
 
-/* רשת קבוצות */
 .groups-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 16px;
 }
 
-/* כרטיס קבוצה */
 .groups-card {
   background: #ffffff;
   border: 1px solid #003366;
   padding: 18px;
   cursor: pointer;
   position: relative;
-  /* אנימציה חלקה על גדילה / צל */
   transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
 }
 
@@ -164,12 +151,10 @@
   border-color: #999;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
   transform: scale(1.02);
-  /* 👈 מגדיל קצת את הכרטיס */
 }
 
 .groups-card-disabled {
   opacity: 0.6;
-  /* cursor: not-allowed; */
 }
 
 .groups-card-disabled:hover {
@@ -177,7 +162,6 @@
   box-shadow: none;
 }
 
-/* כותרת כרטיס */
 .groups-card-header {
   display: flex;
   justify-content: space-between;
@@ -204,7 +188,6 @@
   flex-shrink: 0;
 }
 
-/* תג נעילה */
 .groups-badge-locked {
   width: 20px;
   height: 20px;
@@ -212,7 +195,6 @@
   flex-shrink: 0;
 }
 
-/* כפתור הגדרות */
 .groups-settings-btn {
   width: 24px;
   height: 24px;
@@ -236,7 +218,6 @@
   opacity: 1;
 }
 
-/* תיאור קבוצה */
 .groups-card-desc {
   font-size: calc(13px * var(--a11y-font-scale));
   color: #666;
@@ -250,7 +231,6 @@
   -webkit-box-orient: vertical;
 }
 
-/* תחתית כרטיס */
 .groups-card-footer {
   padding-top: 10px;
   border-top: 1px solid #f0f0f0;
@@ -273,12 +253,6 @@
   font-weight: 500;
 }
 
-/* .groups-card-date-expired .groups-card-date-label,
-.groups-card-date-expired .groups-card-date-value {
-  color: #bbb;
-  text-decoration: line-through;
-} */
-
 .groups-card-date-expired-text {
   margin-top: 10px;
   padding: 8px 10px;
@@ -290,20 +264,17 @@
   text-align: center;
 }
 
-/* כרטיס שבו תקופת ההצבעה הסתיימה */
 .groups-card-expired {
   border-color: #d93025;
   background: #fff8f8;
 }
 
-/* גם בהובר – להישאר אדום ואפילו קצת יותר חזק */
 .groups-card.groups-card-expired:hover {
   border-color: #b30000;
   box-shadow: 0 4px 12px rgba(217, 48, 37, 0.3);
   transform: scale(1.02);
 }
 
-/* פעולות בכרטיס */
 .groups-card-actions {
   margin-top: 12px;
   padding-top: 12px;
@@ -335,7 +306,6 @@
   background: #aaa;
 }
 
-/* סטטוסים */
 .groups-status {
   display: inline-block;
   width: 100%;
@@ -348,7 +318,6 @@
   border: 1px solid #d4edda;
 }
 
-/* הודעות */
 .groups-notice {
   padding: 10px;
   font-size: calc(12px * var(--a11y-font-scale));
@@ -375,7 +344,6 @@
   text-align: center;
 }
 
-/* מצבי טעינה ושגיאה */
 .groups-loading,
 .groups-error,
 .groups-empty {
@@ -413,17 +381,14 @@
   height: 10px;
   border-radius: 50%;
   border: 1px solid #fff;
-  /* קו מסביב כדי שיהיה ברור על הרקע */
 }
 
 .groups-lock-status.member {
   background-color: #27ae60;
-  /* ירוק */
 }
 
 .groups-lock-status.not-member {
   background-color: #c0392b;
-  /* אדום */
 }
 
 .groups-pagination {
@@ -459,48 +424,41 @@
   color: #fff;
 }
 
-/* כפתור צף ליצירת קבוצה */
 .groups-fab {
   position: fixed;
   bottom: 20px;
   left: 24px;
-
   width: 56px;
   height: 56px;
   border-radius: 50%;
   border: 3px solid #ffffff;
-
   background-color: #003366;
   color: #fff;
-
   display: flex;
   align-items: center;
   justify-content: center;
-
   font-size: calc(28px * var(--a11y-font-scale));
-  line-height: 1; /* 👈 חשוב! */
-
+  line-height: 1;
   cursor: pointer;
   z-index: 1000;
-
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
   transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
+
 .groups-fab svg {
   width: 18px;
   height: 18px;
 }
+
 .groups-fab:hover {
   background: #000;
   transform: scale(1.12);
-  /* 👈 מגדיל את הכפתור */
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.35);
 }
 
 .groups-card-owner {
   display: flex;
   justify-content: first baseline;
-  /* מעביר את כל השורה לצד ימין */
   gap: 6px;
   margin-bottom: 10px;
   font-size: calc(14px * var(--a11y-font-scale));
@@ -508,7 +466,6 @@
 }
 
 .groups-card-owner-label {
-  /* font-weight: 600; */
   color: #555;
 }
 
@@ -519,20 +476,19 @@
 
 .groups-badge-candidate {
   margin-left: 6px;
-  color: #727880; /* אפור נחמד (Tailwind gray-400 style) */
+  color: #727880;
 }
-/* <<<<<<< HEAD */
+
 .groups-badge-vote {
-   margin-left: 6px;
-  color: #727880; 
+  margin-left: 6px;
+  color: #727880;
 }
-/* ======= */
+
 @media (max-width: 768px) {
   .groups-page {
     padding: 12px;
   }
 
-  /* סרגל עליון – בשורה אחת במובייל */
   .groups-toolbar {
     display: flex;
     flex-direction: row;
@@ -561,7 +517,6 @@
     justify-content: center;
   }
 
-  /* כרטיסים ורשת */
   .groups-grid {
     grid-template-columns: 1fr;
     gap: 12px;
@@ -571,7 +526,6 @@
     padding: 16px;
   }
 
-  /* כפתור צף */
   .groups-fab {
     bottom: 16px;
     left: 16px;
@@ -579,5 +533,4 @@
     height: 56px;
     font-size: calc(26px * var(--a11y-font-scale));
   }
-/* >>>>>>> 8/c860ab9d0070123a713ec5bc757fb1adce96db2 */
 }

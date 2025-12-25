@@ -1,4 +1,3 @@
-// src/pages/GroupSettingsPage/GeneralTab.jsx
 import { useTranslation } from 'react-i18next';
 import { LuCopy } from "react-icons/lu";
 
@@ -20,12 +19,6 @@ export default function GeneralTab({
 }) {
   const { t, i18n } = useTranslation();
   const locale = i18n.language === 'en' ? 'en-US' : 'he-IL';
-
-
-  // תאריך של היום בפורמט YYYY-MM-DD כדי להשתמש בו ב-min
-  // const todayStr = new Date().toISOString().slice(0, 10);
-
-  // היום בפורמט YYYY-MM-DD לפי אזור זמן מקומי
   const todayStr = (() => {
     const d = new Date();
     d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
@@ -136,7 +129,6 @@ export default function GeneralTab({
                   aria-label={t('groupSettings.general.shareInputAria')}
                 />
 
-                {/* אייקון העתקה במקום הכפתור */}
                 <LuCopy
                   size={20}
                   className="copy-icon"
@@ -212,7 +204,6 @@ export default function GeneralTab({
                 type="date"
                 value={form.candidateEndDate}
                 onChange={onGroupChange}
-              // min={todayStr}
               />
             </div>
 

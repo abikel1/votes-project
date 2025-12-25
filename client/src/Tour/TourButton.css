@@ -4,14 +4,14 @@
   left: 100px;
   width: 56px;
   height: 56px;
-  background-color: #003366; /* כחול אחיד */
+  background-color: #003366;
   border: 3px solid #ffffff;
   border-radius: 50%;
   cursor: pointer;
-   display: flex;
+  display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.25);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
   cursor: pointer;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
   z-index: 1000;
@@ -19,22 +19,20 @@
 
 .tour-btn-small:hover {
   transform: scale(1.1);
-  box-shadow: 0 8px 25px rgba(0,0,0,0.35);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.35);
 }
 
 .tour-icon {
   width: 28px;
   height: 28px;
-  color: #ffffff; /* צהוב בולט */
+  color: #ffffff;
 }
 
-/* מיקום מותאם לטלפונים */
 @media (max-width: 768px) {
-  .tour-btn{
-    bottom: 16px;   /* יותר למטה */
-    left: 95px;    /* טיפה מהשול */
-     width: 56px;
+  .tour-btn {
+    bottom: 16px;
+    left: 95px;
+    width: 56px;
     height: 56px;
   }
 }
-

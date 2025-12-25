@@ -1,4 +1,3 @@
-// src/components/GroupChat/GroupChat.jsx
 import React from 'react';
 import { useEffect, useRef, useState } from 'react';
 import { FiMoreVertical, FiSmile, FiSend } from 'react-icons/fi';
@@ -33,8 +32,7 @@ function getColorForUser(key) {
 }
 
 export default function GroupChat({ groupId, canChat, currentUserId, isOwner }) {
-    const { t, i18n } = useTranslation(); // 👈 הוסף i18n כאן!
-
+    const { t, i18n } = useTranslation();
     const [messages, setMessages] = useState([]);
     const [text, setText] = useState('');
     const [loading, setLoading] = useState(false);
@@ -43,28 +41,22 @@ export default function GroupChat({ groupId, canChat, currentUserId, isOwner }) 
     const [menuOpenFor, setMenuOpenFor] = useState(null);
     const [editingId, setEditingId] = useState(null);
     const messagesEndRef = useRef(null);
-
     const [isAtBottom, setIsAtBottom] = useState(true);
-
     const [summaryLoading, setSummaryLoading] = useState(false);
     const [summaryError, setSummaryError] = useState('');
     const [moreOpen, setMoreOpen] = useState(false);
-
     const [showEmojiPicker, setShowEmojiPicker] = useState(false);
     const inputRef = useRef(null);
-
     const [socket, setSocket] = useState(null);
     const [confirmOpen, setConfirmOpen] = React.useState(false);
     const [messageToDelete, setMessageToDelete] = React.useState(null);
 
-    // גלילה למטה כשמגיעות הודעות ואנחנו בתחתית
     useEffect(() => {
         if (isAtBottom && messagesEndRef.current) {
             messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
         }
     }, [messages, isAtBottom]);
 
-    // טעינת הודעות ראשוניות ב-HTTP (פעם אחת לכל groupId)
     useEffect(() => {
         if (!groupId) return;
 
@@ -95,7 +87,6 @@ export default function GroupChat({ groupId, canChat, currentUserId, isOwner }) 
         };
     }, [groupId]);
 
-    // חיבור Socket.IO והאזנה לאירועים
     useEffect(() => {
         if (!groupId) return;
 
@@ -578,7 +569,6 @@ export default function GroupChat({ groupId, canChat, currentUserId, isOwner }) 
                 onConfirm={handleConfirmDelete}
                 onCancel={handleCancelDelete}
             />
-
         </div>
     );
 }

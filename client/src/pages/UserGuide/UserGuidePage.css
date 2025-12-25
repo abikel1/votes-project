@@ -5,12 +5,11 @@ body {
 }
 
 .container {
-padding: 20px;
-    max-width: 1200px;
-    margin: auto;
+  padding: 20px;
+  max-width: 1200px;
+  margin: auto;
 }
 
-/* Hero */
 .hero {
   text-align: center;
   padding: 80px 20px;
@@ -18,16 +17,19 @@ padding: 20px;
   color: white;
   margin-bottom: 40px;
 }
+
 .hero-title {
   font-size: 3rem;
   margin-bottom: 10px;
   animation: fadeIn 1s ease-out;
 }
+
 .hero-subtitle {
   font-size: 1.5rem;
   opacity: 0.9;
   margin-bottom: 20px;
 }
+
 .hero-buttons button {
   margin: 0 10px;
   padding: 12px 32px;
@@ -35,41 +37,47 @@ padding: 20px;
   cursor: pointer;
   transition: 0.3s;
 }
+
 .btn-primary {
   background: white;
   color: #1e3a8a;
   border: none;
 }
+
 .btn-primary:hover {
   opacity: 0.9;
   transform: scale(1.05);
 }
+
 .btn-secondary {
   background: none;
   color: white;
   border: 2px solid white;
 }
+
 .btn-secondary:hover {
   background: white;
   color: #1e3a8a;
 }
 
-/* Flow diagram */
 .flow-diagram {
   display: flex;
   justify-content: center;
   margin: 40px 0;
   flex-wrap: wrap;
 }
+
 .flow-container {
   display: flex;
   align-items: center;
   gap: 20px;
   flex-wrap: wrap;
 }
+
 .flow-step {
   text-align: center;
 }
+
 .flow-box {
   width: 80px;
   height: 80px;
@@ -78,26 +86,28 @@ padding: 20px;
   justify-content: center;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
   transition: 0.3s;
-  background: #1e3a8a; /* כחול כהה */
+  background: #1e3a8a;
   color: #f0f4ff;
 }
+
 .flow-box:hover {
   transform: translateY(-5px) scale(1.1);
   box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
 }
+
 .flow-arrow {
   font-size: 2rem;
   font-weight: bold;
   color: #1e3a8a;
   margin: 0 10px;
 }
+
 .flow-label {
   margin-top: 10px;
   font-weight: bold;
   color: #1e3a8a;
 }
 
-/* Video layout */
 .video-row {
   display: flex;
   gap: 20px;
@@ -111,7 +121,7 @@ padding: 20px;
   max-width: 300px;
   border: 3px solid #1e3a8a;
   overflow: hidden;
-  box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
 }
 
 .video-small {
@@ -119,10 +129,9 @@ padding: 20px;
   max-width: 140px;
   border: 2px solid #1e3a8a;
   overflow: hidden;
-  box-shadow: 0 3px 15px rgba(0,0,0,0.2);
+  box-shadow: 0 3px 15px rgba(0, 0, 0, 0.2);
 }
 
-/* Steps stacked vertically */
 .steps-section {
   display: flex;
   flex-direction: column;
@@ -132,51 +141,57 @@ padding: 20px;
 
 .step-card {
   background: white;
-  box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
   cursor: pointer;
   overflow: hidden;
   transition: 0.3s;
   padding: 15px;
 }
 
-
 .step-card:hover {
   transform: scale(1.02);
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
 }
+
 .step-header {
   display: flex;
   align-items: center;
   padding: 20px;
   gap: 15px;
 }
+
 .step-icon {
   width: 60px;
   height: 60px;
-  background: rgba(30, 58, 138, 0.2); /* כחול בהיר */
+  background: rgba(30, 58, 138, 0.2);
   display: flex;
   align-items: center;
   justify-content: center;
 }
+
 .icon-small {
   width: 24px;
   height: 24px;
 }
+
 .icon-large {
   width: 40px;
   height: 40px;
 }
+
 .step-details {
   padding: 20px;
   background: #f0f4ff;
   list-style: none;
 }
+
 .step-details li {
   margin-bottom: 10px;
   display: flex;
   align-items: start;
   gap: 10px;
 }
+
 .step-details li span {
   width: 24px;
   height: 24px;
@@ -188,12 +203,12 @@ padding: 20px;
   font-weight: bold;
 }
 
-/* Tips */
 .tips-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 20px;
 }
+
 .tip-card {
   background: white;
   padding: 20px;
@@ -201,10 +216,12 @@ padding: 20px;
   text-align: center;
   transition: 0.3s;
 }
+
 .tip-card:hover {
   transform: scale(1.05);
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
 }
+
 .tip-icon {
   width: 60px;
   height: 60px;
@@ -212,23 +229,26 @@ padding: 20px;
   align-items: center;
   justify-content: center;
   margin: auto 0 10px 0;
-  background: #1e3a8a; /* כחול */
+  background: #1e3a8a;
   color: white;
 }
 
-/* Video card */
 .video-card video {
-  box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
 }
 
-/* Animations */
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(-20px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-/* GlobalStyles.css - ייבוא בקובץ App.jsx או index.jsx */
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
 
-/* Reset and Base Styles */
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 * {
   box-sizing: border-box;
 }
@@ -244,7 +264,6 @@ body {
   color: #0f172a;
 }
 
-/* Global Container */
 .container,
 .page-container {
   padding: 20px;
@@ -253,7 +272,6 @@ body {
   width: 100%;
 }
 
-/* Global Colors */
 :root {
   --primary-blue: #1e3a8a;
   --primary-blue-light: #0052a3;
@@ -268,8 +286,12 @@ body {
   --shadow-md: 0 10px 30px rgba(0, 0, 0, 0.2);
 }
 
-/* Global Typography */
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   margin: 0;
   font-weight: 700;
   color: var(--text-dark);
@@ -280,7 +302,6 @@ p {
   line-height: 1.7;
 }
 
-/* Global Buttons */
 button {
   font-family: inherit;
   cursor: pointer;
@@ -317,7 +338,6 @@ button {
   color: var(--white);
 }
 
-/* Global Cards */
 .card {
   background: var(--white);
   padding: 20px;
@@ -330,7 +350,6 @@ button {
   box-shadow: var(--shadow-md);
 }
 
-/* Global Hero Section */
 .hero {
   text-align: center;
   padding: 80px 20px;
@@ -367,7 +386,6 @@ button {
   transition: 0.3s;
 }
 
-/* Global Section Title */
 .section-title {
   font-size: 2.2rem;
   font-weight: 700;
@@ -376,12 +394,12 @@ button {
   text-align: center;
 }
 
-/* Global Animations */
 @keyframes fadeIn {
   from {
     opacity: 0;
     transform: translateY(-20px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -393,14 +411,15 @@ button {
     opacity: 0;
     transform: translateX(-20px);
   }
+
   to {
     opacity: 1;
     transform: translateX(0);
   }
 }
 
-/* Global Responsive */
 @media (max-width: 768px) {
+
   .container,
   .page-container {
     padding: 15px;
@@ -439,7 +458,6 @@ button {
   }
 }
 
-/* RTL Support */
 [dir="rtl"] {
   direction: rtl;
 }
@@ -448,7 +466,6 @@ button {
   flex-direction: row-reverse;
 }
 
-/* Loading States */
 .loading {
   display: flex;
   justify-content: center;
@@ -470,7 +487,6 @@ button {
   }
 }
 
-/* Error States */
 .error-message {
   background: #fee;
   color: #c00;
@@ -479,7 +495,6 @@ button {
   text-align: center;
 }
 
-/* Success States */
 .success-message {
   background: #efe;
   color: #080;
@@ -488,14 +503,12 @@ button {
   text-align: center;
 }
 
-/* ברירת מחדל */
 .flow-arrow::before {
   content: "→";
-  font-size: 28px; /* תתאימי */
+  font-size: 28px;
   line-height: 1;
 }
 
-/* כשהאתר RTL (עברית) */
 html[dir="rtl"] .flow-arrow::before {
   content: "←";
 }

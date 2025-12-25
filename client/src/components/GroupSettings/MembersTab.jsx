@@ -1,4 +1,3 @@
-// src/pages/GroupSettingsPage/MembersTab.jsx
 import MemberRow from './MemberRow';
 import { useTranslation } from 'react-i18next';
 

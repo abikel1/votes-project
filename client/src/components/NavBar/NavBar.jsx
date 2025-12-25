@@ -39,7 +39,6 @@ const NavBar = () => {
 
   return (
     <nav className="navbar">
-      {/* תפריט המבורגר */}
       <div
         className={`hamburger ${mobileMenuOpen ? 'active' : ''}`}
         onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -49,7 +48,6 @@ const NavBar = () => {
         <span></span>
       </div>
 
-      {/* שם האתר */}
       <div
         className="site-name"
         onClick={() => {
@@ -60,7 +58,6 @@ const NavBar = () => {
         {t('app.title')}
       </div>
 
-      {/* קישורים */}
       <div className={`links ${mobileMenuOpen ? 'mobile-active' : ''}`}>
         <div className="nav-links-right">
           {links.map((link) => (
@@ -88,9 +85,7 @@ const NavBar = () => {
         </div>
       </div>
 
-      {/* שפה + (אם מחובר) יציאה + פרופיל */}
       <div className="profile-wrapper">
-        {/* תמיד מוצג */}
         <LanguageSwitcher />
 
         {isAuthed && (

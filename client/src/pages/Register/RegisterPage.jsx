@@ -1,4 +1,3 @@
-// src/pages/Register/RegisterPage.jsx
 import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
@@ -45,13 +44,11 @@ const PasswordField = ({ label, placeholder, value, onChange, onFocus, error }) 
           aria-label={show ? t('auth.reset.hidePassword') : t('auth.reset.showPassword')}
         >
           {show ? (
-            // 👁️ עין פתוחה — סיסמה מוצגת
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
               <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" strokeWidth="2" strokeLinecap="round" />
               <circle cx="12" cy="12" r="3" strokeWidth="2" />
             </svg>
           ) : (
-            // 👁️‍🗨️ עין סגורה — סיסמה מוסתרת
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
               <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" strokeWidth="2" strokeLinecap="round" />
               <line x1="1" y1="1" x2="23" y2="23" strokeWidth="2" strokeLinecap="round" />
@@ -221,7 +218,6 @@ export default function RegisterPage() {
           />
 
           <div className="form-row">
-            {/* עיר */}
             <div className="form-group">
               <label>{t('auth.register.cityLabel')}</label>
               <CityStreetAuto
@@ -238,7 +234,6 @@ export default function RegisterPage() {
               {errors.city && <span className="error-text">{errors.city}</span>}
             </div>
 
-            {/* רחוב */}
             <div className="form-group">
               <label>{t('auth.register.streetLabel')}</label>
               <CityStreetAuto
@@ -281,10 +276,9 @@ export default function RegisterPage() {
             <div className="password-strength">
               <div className="strength-indicator">
                 <div
-                  className={`strength-bar ${
-                    form.password.length < 6 ? 'weak' :
-                    form.password.length < 10 ? 'medium' : 'strong'
-                  }`}
+                  className={`strength-bar ${form.password.length < 6 ? 'weak' :
+                      form.password.length < 10 ? 'medium' : 'strong'
+                    }`}
                   style={{
                     width: form.password.length < 6 ? '33%' :
                       form.password.length < 10 ? '66%' : '100%'

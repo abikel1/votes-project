@@ -38,7 +38,6 @@ export default function CreateGroupPage() {
   const [showModal, setShowModal] = useState(false);
   const [copied, setCopied] = useState(false);
 
-  // חלון AI
   const [aiModalOpen, setAiModalOpen] = useState(false);
 
   useEffect(() => {
@@ -57,7 +56,6 @@ export default function CreateGroupPage() {
     setForm((prev) => ({ ...prev, isLocked: !prev.isLocked }));
   };
 
-  // פתיחת חלון AI
   const openAiModal = () => {
     if (!form.name.trim()) {
       toast.error(t('groups.create.ai.fillNameFirstError'));
@@ -112,7 +110,6 @@ export default function CreateGroupPage() {
       await navigator.clipboard.writeText(text);
       toast.success(t('groups.create.toast.linkCopied'));
     } catch {
-      // אפשר להוסיף toast.error אם רוצים
     }
   };
 
@@ -136,7 +133,6 @@ export default function CreateGroupPage() {
       setCopied(true);
       setTimeout(() => setCopied(false), 1500);
     } catch {
-      // אפשר לשים fallback אם תרצי
     }
   };
 
@@ -159,7 +155,6 @@ export default function CreateGroupPage() {
       <h2 className="cg-title">{t('groups.create.title')}</h2>
 
       <form className="cg-form" onSubmit={onSubmit}>
-        {/* שם קבוצה */}
         <label className="cg-label">
           {t('groups.create.labels.name')} *
           <input
@@ -171,7 +166,6 @@ export default function CreateGroupPage() {
           />
         </label>
 
-        {/* תיאור + AI */}
         <label className="cg-label">
           {t('groups.create.labels.description')} *
           <div className="cg-desc-wrapper">
@@ -194,7 +188,6 @@ export default function CreateGroupPage() {
           </div>
         </label>
 
-        {/* תאריך סיום הגשת מועמדות */}
         <label className="cg-label">
           {t('groups.create.labels.candidateEndDate')} *
           <input
@@ -208,7 +201,6 @@ export default function CreateGroupPage() {
           />
         </label>
 
-        {/* תאריך סיום קבוצה */}
         <label className="cg-label">
           {t('groups.create.labels.endDate')} *
           <input
@@ -222,7 +214,6 @@ export default function CreateGroupPage() {
           />
         </label>
 
-        {/* מקסימום זוכים */}
         <label className="cg-label">
           {t('groups.create.labels.maxWinners')}
           <input
@@ -236,7 +227,6 @@ export default function CreateGroupPage() {
           />
         </label>
 
-        {/* מצב קבוצה – פתוחה/נעולה */}
         <div className="cg-label">
           {t('groups.create.labels.status')} *
           <div className="switch-container">
@@ -271,7 +261,6 @@ export default function CreateGroupPage() {
         </div>
       </form>
 
-      {/* מודל ה-AI החדש */}
       <AiDescriptionModal
         isOpen={aiModalOpen}
         groupName={form.name}
@@ -282,7 +271,6 @@ export default function CreateGroupPage() {
         onClose={() => setAiModalOpen(false)}
       />
 
-      {/* חלון אחרי יצירת קבוצה */}
       {showModal && selectedGroup?._id && (
         <div className="modal-backdrop" onClick={() => setShowModal(false)}>
           <div className="modal" onClick={(e) => e.stopPropagation()}>

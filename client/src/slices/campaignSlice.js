@@ -1,9 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import http from '../api/http';
 
-// ===== Thunks =====
-
-// שליפת קמפיין לפי מזהה מועמד
 export const fetchCampaign = createAsyncThunk(
   'campaign/fetchCampaign',
   async (candidateId, thunkAPI) => {
@@ -22,7 +19,6 @@ export const fetchCampaign = createAsyncThunk(
   }
 );
 
-// יצירת קמפיין חדש למועמד
 export const createCampaign = createAsyncThunk(
   'campaign/createCampaign',
   async ({ candidateId, payload }, thunkAPI) => {
@@ -40,7 +36,6 @@ export const createCampaign = createAsyncThunk(
   }
 );
 
-// עדכון קמפיין
 export const updateCampaign = createAsyncThunk(
   'campaign/updateCampaign',
   async ({ campaignId, payload }, thunkAPI) => {
@@ -54,8 +49,6 @@ export const updateCampaign = createAsyncThunk(
     }
   }
 );
-
-// ===== פוסטים =====
 
 export const addPost = createAsyncThunk(
   'campaign/addPost',
@@ -104,8 +97,6 @@ export const deletePost = createAsyncThunk(
   }
 );
 
-// ===== תגובות =====
-
 export const addComment = createAsyncThunk(
   'campaign/addComment',
   async ({ campaignId, postId, content }, thunkAPI) => {
@@ -120,7 +111,7 @@ export const addComment = createAsyncThunk(
         }
       );
 
-      return data; // מחזיר את הפוסט המעודכן בלבד!
+      return data;
     } catch (err) {
       return thunkAPI.rejectWithValue(
         err.response?.data?.message || 'שגיאה בהוספת תגובה'
@@ -136,7 +127,7 @@ export const deleteComment = createAsyncThunk(
       const { data } = await http.delete(
         `/campaigns/${campaignId}/posts/${postId}/comments/${commentId}`
       );
-      return data; // גם פה עדיף להחזיר רק פוסט מעודכן
+      return data;
     } catch (err) {
       return thunkAPI.rejectWithValue(
         err.response?.data?.message || 'שגיאה במחיקת תגובה'
@@ -144,8 +135,6 @@ export const deleteComment = createAsyncThunk(
     }
   }
 );
-
-// ===== גלריית תמונות =====
 
 export const addImage = createAsyncThunk(
   'campaign/addImage',
@@ -179,8 +168,6 @@ export const deleteImage = createAsyncThunk(
   }
 );
 
-// ===== צפיות =====
-
 export const incrementView = createAsyncThunk(
   'campaign/incrementView',
   async (campaignId, thunkAPI) => {
@@ -194,8 +181,6 @@ export const incrementView = createAsyncThunk(
     }
   }
 );
-
-// ===== AI =====
 
 export const generatePostSuggestion = createAsyncThunk(
   'campaign/generatePostSuggestion',
@@ -233,7 +218,6 @@ export const toggleLike = createAsyncThunk(
   }
 );
 
-// שליפת קמפיין לפי groupSlug + candidateSlug
 export const fetchCampaignBySlug = createAsyncThunk(
   'campaign/fetchCampaignBySlug',
   async ({ groupSlug, candidateSlug }, thunkAPI) => {
@@ -241,7 +225,7 @@ export const fetchCampaignBySlug = createAsyncThunk(
       const { data } = await http.get(
         `/campaigns/by-slug/${groupSlug}/${candidateSlug}`
       );
-      return data; // { success, campaign, candidate, campaignId, ... }
+      return data;
     } catch (err) {
       const status = err.response?.status;
       const code = err.response?.data?.code;
@@ -254,18 +238,13 @@ export const fetchCampaignBySlug = createAsyncThunk(
   }
 );
 
-// ===== Slice =====
-
 const initialState = {
   loading: false,
   data: null,
   candidate: null,
   error: null,
-
-  // 🔒 קמפיין נעול בגלל קבוצה נעולה
   locked: false,
   lockedGroupId: null,
-
   aiLoading: false,
   aiError: null,
   aiSuggestion: null,
@@ -282,8 +261,6 @@ const campaignSlice = createSlice({
       state.error = null;
       state.locked = false;
       state.lockedGroupId = null;
-
-      // אופציונלי – לנקות גם מצב ה-AI
       state.aiLoading = false;
       state.aiError = null;
       state.aiSuggestion = null;
@@ -291,7 +268,6 @@ const campaignSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      // ----- Fetch campaign BY SLUG -----
       .addCase(fetchCampaignBySlug.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -325,7 +301,6 @@ const campaignSlice = createSlice({
         }
       })
 
-      // ----- Fetch campaign BY CANDIDATE ID -----
       .addCase(fetchCampaign.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -336,7 +311,6 @@ const campaignSlice = createSlice({
         state.loading = false;
 
         const payload = action.payload || {};
-        // ה־controller מחזיר { success, campaign, candidate, campaignId, groupSlug }
         state.data = payload.campaign || null;
         state.candidate = payload.candidate || null;
         state.locked = false;
@@ -361,18 +335,12 @@ const campaignSlice = createSlice({
           state.lockedGroupId = null;
         }
       })
-
-      // ----- Create -----
       .addCase(createCampaign.fulfilled, (state, action) => {
         state.data = action.payload;
       })
-
-      // ----- Update campaign -----
       .addCase(updateCampaign.fulfilled, (state, action) => {
         state.data = action.payload;
       })
-
-      // ----- Posts -----
       .addCase(addPost.fulfilled, (state, action) => {
         state.data = action.payload;
       })
@@ -382,16 +350,14 @@ const campaignSlice = createSlice({
       .addCase(deletePost.fulfilled, (state, action) => {
         state.data = action.payload;
       })
-
-      // 🆕 ----- Comments (הכי חשוב!!) -----
       .addCase(addComment.fulfilled, (state, action) => {
-        const updatedPost = action.payload; // פוסט בודד שחזר מהשרת
+        const updatedPost = action.payload;
         const index = state.data.posts.findIndex(
           (p) => p._id === updatedPost._id
         );
 
         if (index !== -1) {
-          state.data.posts[index] = updatedPost; // מעדכן רק את הפוסט
+          state.data.posts[index] = updatedPost;
         }
       })
 
@@ -404,27 +370,18 @@ const campaignSlice = createSlice({
           state.data.posts[index] = updatedPost;
         }
       })
-
-      // ----- Gallery -----
       .addCase(addImage.fulfilled, (state, action) => {
         state.data = action.payload;
       })
       .addCase(deleteImage.fulfilled, (state, action) => {
         state.data = action.payload;
       })
-
-      // ----- Views -----
       .addCase(incrementView.fulfilled, (state, action) => {
         state.data = action.payload;
       })
       .addCase(incrementView.rejected, (state, action) => {
         state.error = action.payload;
       })
-      // .addCase(toggleLike.fulfilled, (state, action) => {
-      //   if (!state.data) return;
-      //   state.data.likeCount = action.payload.likeCount;
-      //   state.data.liked = action.payload.liked;
-      // })
       .addCase(toggleLike.rejected, (state, action) => {
         state.error = action.payload;
       })
@@ -432,7 +389,6 @@ const campaignSlice = createSlice({
         state.data.likeCount = action.payload.likeCount;
         state.data.liked = action.payload.liked;
       })
-
       .addCase(generatePostSuggestion.pending, (state) => {
         state.aiLoading = true;
         state.aiError = null;
@@ -450,19 +406,14 @@ const campaignSlice = createSlice({
 });
 
 export const { clearCampaign } = campaignSlice.actions;
-
 export default campaignSlice.reducer;
-
-// Selectors
 export const selectCampaign = (state) => state.campaign.data || null;
 export const selectCandidate = (state) => state.campaign.candidate || null;
 export const selectCampaignLoading = (state) => state.campaign.loading;
 export const selectCampaignError = (state) => state.campaign.error;
-
 export const selectCampaignLocked = (state) => state.campaign.locked;
 export const selectCampaignLockedGroupId = (state) =>
   state.campaign.lockedGroupId;
-
 export const selectAiSuggestion = (state) => state.campaign.aiSuggestion;
 export const selectAiLoading = (state) => state.campaign.aiLoading;
 export const selectAiError = (state) => state.campaign.aiError;

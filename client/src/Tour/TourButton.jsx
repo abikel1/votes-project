@@ -9,7 +9,7 @@ export default function TourButton() {
     <button
       className="tour-btn-small"
       onClick={() => setIsOpen(true)}
-      title="מדריך למשתמש" // כאן הטולטיפ
+      title="מדריך למשתמש"
     >
       <HelpCircle className="tour-icon" />
     </button>

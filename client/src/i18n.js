@@ -1,30 +1,28 @@
-// src/i18n.js
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
 
 i18n
-    .use(LanguageDetector) // מזהה שפה מהדפדפן / localStorage
-    .use(initReactI18next) // מחבר ל-React
+    .use(LanguageDetector)
+    .use(initReactI18next)
     .init({
-        fallbackLng: 'he', // אם אין תרגום – ברירת מחדל עברית
+        fallbackLng: 'he',
         supportedLngs: ['he', 'en'],
         debug: false,
 
         detection: {
-            order: ['localStorage', 'navigator'], // קודם מה-localStorage, אח"כ מהדפדפן
+            order: ['localStorage', 'navigator'],
             caches: ['localStorage'],
-            lookupLocalStorage: 'appLanguage', // 👈 אותו שם שהיה ב-switcher
+            lookupLocalStorage: 'appLanguage',
         },
 
         interpolation: {
-            escapeValue: false, // React כבר עושה escape
+            escapeValue: false,
         },
 
         resources: {
             he: {
                 translation: {
-                    // כאן שמים את כל המחרוזות בעברית
                     'app.title': 'בחירות',
                     'nav.home': 'בית',
                     'nav.groups': 'קבוצות',
@@ -42,7 +40,6 @@ i18n
                     'timer.minutes': 'דקות',
                     'timer.seconds': 'שניות',
 
-                    // === mail form ===
                     'mail.sendTitle': 'שליחת מייל',
                     'mail.toPlaceholder': 'נמען (to)',
                     'mail.subjectPlaceholder': 'נושא (subject)',
@@ -56,7 +53,6 @@ i18n
                     'mail.etherealNote': '(Ethereal)',
                     'mail.previewLink': 'פתח תצוגה מקדימה',
 
-                    // === footer ===
                     'footer.title': 'מערכת ההצבעות',
                     'footer.description.line1': 'פלטפורמה פשוטה לניהול הצבעות וקבוצות.',
                     'footer.description.line2': 'יצירת קבוצות, הוספת מועמדים, שליחת קישורי הצבעה ועוד.',
@@ -73,7 +69,6 @@ i18n
 
                     'footer.bottomText': 'מערכת ההצבעות · כל הזכויות שמורות',
 
-                    // === voting page ===
                     'voting.pageTitle': 'דף הצבעה',
                     'voting.loadingGroup': 'טוען נתוני קבוצה...',
                     'voting.groupNotFound': 'הקבוצה לא נמצאה.',
@@ -104,12 +99,10 @@ i18n
                     'voting.voteSuccessToast': 'הצבעתך נקלטה במערכת',
                     'voting.confirmVoteMessage': 'את/ה בטוח/ה רוצה להצביע למועמד {{name}}?',
 
-                    // === address autocomplete ===
                     'address.cityPlaceholder': '*עיר',
                     'address.streetPlaceholder': '*כתובת / רחוב',
                     'address.selectCityFirst': 'בחרי עיר מהרשימה',
 
-                    // === about page (simple) ===
                     'about.title': 'אודות',
                     'about.subtitle': 'הכירו את הפלטפורמה שלנו – פשוטה, יעילה ובטוחה',
 
@@ -143,7 +136,6 @@ i18n
                     'about.cards.mini.customization.desc':
                         'אפשרויות התאמה אישית של קבוצות ותצוגות לפי צרכי המשתמש.',
 
-                    // === contact page ===
                     'contact.title': 'צור קשר',
 
                     'contact.fullNameLabel': 'שם מלא',
@@ -174,7 +166,6 @@ i18n
                     'contact.mailText.phoneLabel': 'טלפון',
                     'contact.mailText.messageLabel': 'הודעה',
 
-                    // === groups create page ===
                     'groups.create.title': 'יצירת קבוצה חדשה',
 
                     'groups.create.labels.name': 'שם קבוצה',
@@ -209,7 +200,6 @@ i18n
                     'groups.create.modal.shareCopied': 'הועתק ✓',
                     'groups.create.modal.finish': 'סיום',
 
-                    // === groups list page ===
                     'groups.list.loading': 'טוען...',
 
                     'groups.list.empty.noGroups': 'אין קבוצות עדיין.',
@@ -273,7 +263,6 @@ i18n
                     'groups.list.toasts.rejected':
                         'בקשתך נדחתה על ידי מנהל/ת הקבוצה. ניתן לשלוח בקשה חדשה.',
 
-                    // === home page ===
                     'home.loading': 'טוען...',
 
                     'home.error.title': 'שגיאה',
@@ -311,7 +300,6 @@ i18n
 
                     'home.toasts.loginToCreate': 'כדי ליצור קבוצה יש להתחבר תחילה.',
 
-                    // === join group page ===
                     'join.loading': 'טוען…',
 
                     'join.errors.groupNotFound': 'קבוצה לא נמצאה',
@@ -328,7 +316,6 @@ i18n
                     'join.successModal.title': 'הפניה בוצעה ✔',
                     'join.successModal.defaultHint': 'הבקשה נשלחה וממתינה לאישור מנהל/ת הקבוצה.',
 
-                    // common/auth shared
                     'common.cancel': 'ביטול',
                     'common.close': 'סגור',
                     'common.or': 'או',
@@ -341,7 +328,6 @@ i18n
                     'common.linkCopied': 'הקישור הועתק ללוח!',
                     'common.nothingToSave': 'אין שינויים לשמירה',
 
-                    // auth
                     'auth.login': 'התחברות',
                     'auth.forgot.title': 'שכחת סיסמה?',
                     'auth.forgot.subtitle': 'אל דאגה, נשלח לך קישור לאיפוס',
@@ -447,7 +433,6 @@ i18n
                     'auth.changePassword.genericSuccess': 'הסיסמה עודכנה בהצלחה',
                     'auth.changePassword.genericError': 'עדכון הסיסמה נכשל',
 
-                    // candidates/groups/votes errors
                     'candidates.errors.loadFailed': 'טעינת המועמדים נכשלה',
                     'candidates.errors.createFailed': 'יצירת המועמד נכשלה',
                     'candidates.errors.updateFailed': 'עדכון המועמד נכשל',
@@ -481,7 +466,6 @@ i18n
                     'votes.errors.voteFailed': 'הצבעה נכשלה',
                     'votes.errors.fetchVotersFailed': 'טעינת רשימת המצביעים נכשלה',
 
-                    // === chat (group chat) ===
                     'chat.title': "צ'אט",
                     'chat.readOnlyNote': 'ניתן לקרוא הודעות בלבד. רק חברי קבוצה יכולים לכתוב.',
                     'chat.loading': 'טוען הודעות…',
@@ -515,7 +499,6 @@ i18n
                     'chat.errors.deleteFailed': 'שגיאה במחיקת ההודעה',
                     'chat.errors.summaryFailed': 'שגיאה בסיכום השיחה',
 
-                    // === candidates form ===
                     'candidates.form.nameLabel': 'שם *',
                     'candidates.form.descriptionLabel': 'תיאור *',
                     'candidates.form.symbolLabel': 'סמל *',
@@ -526,14 +509,12 @@ i18n
                     'candidates.form.removePhoto': 'הסרת תמונה',
                     'candidates.form.uploading': 'מעלה…',
 
-                    // === candidate requests tab ===
                     'candidates.requests.title': 'בקשות מועמדות',
                     'candidates.requests.loading': 'טוען…',
                     'candidates.requests.empty': 'אין בקשות.',
                     'candidates.requests.approve': 'אשר/י',
                     'candidates.requests.reject': 'דחה/י',
 
-                    // === candidates tab (list & add) ===
                     'candidates.tab.title': 'מועמדים',
                     'candidates.list.loading': 'טוען מועמדים…',
                     'candidates.list.empty': 'אין מועמדים בקבוצה.',
@@ -548,24 +529,20 @@ i18n
 
                     'candidates.upload.error': 'שגיאה בהעלאת התמונה',
 
-                    // === group settings – danger zone ===
                     'groupSettings.danger.title': 'מחיקת קבוצה',
                     'groupSettings.danger.warning':
                         'מחיקה היא פעולה בלתי הפיכה. כל נתוני הקבוצה יימחקו לכולם.',
                     'groupSettings.danger.deleteButton': 'מחיקת הקבוצה ',
 
-                    // === group settings – delete modal ===
                     'groupSettings.deleteModal.title': 'מחק/י את הקבוצה',
                     'groupSettings.deleteModal.typeToConfirm': 'כדי לאשר, הקלד/י בתיבה את',
                     'groupSettings.deleteModal.mustMatch': 'יש להקליד בדיוק את הערך לעיל',
                     'groupSettings.deleteModal.deleteForever': 'מחיקת הקבוצה לצמיתות',
 
-                    // === edit candidate modal ===
                     'candidates.edit.title': 'עריכת מועמד/ת',
                     'candidates.edit.save': 'שמור/י',
                     'candidates.edit.saving': 'שומר/ת…',
 
-                    // === group settings – general tab ===
                     'groupSettings.general.title': 'פרטי הקבוצה',
                     'groupSettings.general.status': 'סטטוס',
                     'groupSettings.general.symbolLabel': 'סמל',
@@ -585,14 +562,12 @@ i18n
                     'groupSettings.general.symbolLabelOptional': 'סמל (אופציונלי)',
                     'groupSettings.general.symbolPlaceholder': 'למשל: א׳',
 
-                    // === candidates validation ===
                     'candidates.validation.nameRequired': 'שם הוא שדה חובה',
                     'candidates.validation.nameTooShort': 'השם צריך להיות לפחות באורך 2 תווים',
                     'candidates.validation.nameTooLong': 'השם ארוך מדי (מקסימום 50 תווים)',
                     'candidates.validation.descriptionTooLong': 'התיאור ארוך מדי (מקסימום 500 תווים)',
                     'candidates.validation.symbolTooLong': 'הסמל יכול להכיל עד 3 תווים',
 
-                    // === group settings – page ===
                     'groupSettings.pageTitle': 'הגדרות קבוצה',
                     'groupSettings.loadingResolving': 'טוען נתוני קבוצה...',
                     'groupSettings.loading': 'טוען...',
@@ -616,7 +591,6 @@ i18n
 
                     'candidates.errors.deleteIdMissing': 'מחיקת המועמד נכשלה – מזהה לא נמצא',
 
-                    // === nested sections (no duplicates) ===
                     joinRequests: {
                         title: 'בקשות הצטרפות',
                         loading: 'טוען בקשות…',
@@ -722,7 +696,6 @@ i18n
                     'groups.create.ai.previewLabel': 'תיאור מוצע:',
                     'groups.create.ai.useDescription': 'השתמש בתיאור',
 
-                    // ===== vote results notifier =====
                     'votes.results.modalTitle': 'ההצבעה הסתיימה!',
                     'votes.results.modalText': 'ההצבעה בקבוצה "{{name}}" הסתיימה ויש זוכה 🎉',
                     'votes.results.winnersLabel': 'זוכה/ים:',
@@ -732,7 +705,6 @@ i18n
 
                     'imageCrop.title': 'חתוך תמונה',
 
-                    // === campaign page - missing keys ===
                     'campaign.loginRequired.title': 'לא ניתן לצפות בקמפיין',
                     'campaign.loginRequired.message': 'כדי לצפות בדף הקמפיין עליך להתחבר למערכת.',
                     'campaign.loginRequired.goToLogin': 'לעמוד התחברות',
@@ -816,7 +788,6 @@ i18n
                     'campaign.comments.anonymousUser': 'משתמש',
                     'campaign.comments.deleteButtonTitle': 'מחק תגובה',
 
-                    // === about (enhanced) ===
                     about: {
                         hero: {
                             badge: 'פלטפורמת בחירות דיגיטלית',
@@ -879,7 +850,6 @@ i18n
                         },
                     },
 
-                    // User Guide - Enhanced page
                     'guide.pageTitle': 'מדריך למשתמש',
                     'guide.pageSubtitle': 'כל מה שצריך לדעת על המערכת במקום אחד',
 
@@ -927,7 +897,6 @@ i18n
                     'guide.tips.supportTitle2': 'תמיכה טכנית',
                     'guide.tips.supportDesc2': 'צוות התמיכה זמין לעזרה 24/7',
 
-                    // ===== unified groups (HE) =====
                     groups: {
                         list: {
                             tour: {
@@ -1018,11 +987,7 @@ i18n
                                 voteButton: 'לחץ כאן כדי להצביע למועמדים!',
                                 candidateCard: 'כל כרטיס מציג מועמד עם תמונה, שם ותיאור',
                                 settingsButton: 'כבעל הקבוצה, תוכל לנהל את הקבוצה מכאן',
-                                                                chatButton: 'לחץ כאן לפתוח את הצאט של הקבוצה',
-
-                               
-
-
+                                chatButton: 'לחץ כאן לפתוח את הצאט של הקבוצה',
                             },
                         },
                     },
@@ -1062,7 +1027,6 @@ i18n
                     'common.linkCopied': 'Link copied to clipboard!',
                     'common.nothingToSave': 'No changes to save',
 
-                    // === mail form ===
                     'mail.sendTitle': 'Send Email',
                     'mail.toPlaceholder': 'Recipient (to)',
                     'mail.subjectPlaceholder': 'Subject',
@@ -1078,7 +1042,6 @@ i18n
                     'mail.sendSuccess': 'Mail was sent successfully.',
                     'mail.sendFailed': 'Failed to send mail.',
 
-                    // === footer ===
                     'footer.title': 'Voting System',
                     'footer.description.line1': 'A simple platform for managing votes and groups.',
                     'footer.description.line2': 'Create groups, add candidates, send voting links and more.',
@@ -1092,7 +1055,6 @@ i18n
                     'footer.followUs': 'Follow Us',
                     'footer.bottomText': 'Voting System · All rights reserved',
 
-                    // === voting page ===
                     'voting.pageTitle': 'Voting Page',
                     'voting.loadingGroup': 'Loading group data...',
                     'voting.groupNotFound': 'Group not found.',
@@ -1118,12 +1080,10 @@ i18n
                     'voting.alreadyVotedThisGroup':
                         'You already voted in this group. You cannot vote again.',
 
-                    // === address autocomplete ===
                     'address.cityPlaceholder': '*City',
                     'address.streetPlaceholder': '*Address / Street',
                     'address.selectCityFirst': 'Please select a city first',
 
-                    // === about page (simple) ===
                     'about.title': 'About',
                     'about.subtitle': 'Get to know our platform – simple, efficient and secure.',
                     'about.cards.main.whatWeDo.title': 'What we do',
@@ -1150,7 +1110,6 @@ i18n
                     'about.cards.mini.customization.desc':
                         'Options to customize groups and views according to the user’s needs.',
 
-                    // === contact page ===
                     'contact.title': 'Contact Us',
                     'contact.fullNameLabel': 'Full name',
                     'contact.fullNamePlaceholder': 'How should we address you?',
@@ -1175,7 +1134,6 @@ i18n
                     'contact.mailText.phoneLabel': 'Phone',
                     'contact.mailText.messageLabel': 'Message',
 
-                    // === groups create page ===
                     'groups.create.title': 'Create a new group',
                     'groups.create.labels.name': 'Group name',
                     'groups.create.labels.description': 'Description',
@@ -1204,7 +1162,6 @@ i18n
                     'groups.create.modal.shareCopied': 'Copied ✓',
                     'groups.create.modal.finish': 'Done',
 
-                    // === groups list page ===
                     'groups.list.loading': 'Loading groups...',
                     'groups.list.empty.noGroups': 'There are no groups yet.',
                     'groups.list.empty.createButton': '+ Create a new group',
@@ -1258,7 +1215,6 @@ i18n
                     'groups.list.toasts.rejected':
                         'Your request was rejected by the group admin. You may send a new request.',
 
-                    // === home page ===
                     'home.loading': 'Loading groups...',
                     'home.error.title': 'Error',
                     'home.error.retry': 'Try again',
@@ -1286,7 +1242,6 @@ i18n
                     'home.common.noName': 'No name',
                     'home.toasts.loginToCreate': 'You must log in before creating a group.',
 
-                    // === join group page ===
                     'join.loading': 'Loading…',
                     'join.errors.groupNotFound': 'Group not found',
                     'join.errors.sendRequestFailed': 'Failed to send join request',
@@ -1299,7 +1254,6 @@ i18n
                     'join.successModal.defaultHint':
                         'Your request has been sent and is waiting for admin approval.',
 
-                    // === auth ===
                     'auth.login': 'Login',
                     'auth.forgot.title': 'Forgot your password?',
                     'auth.forgot.subtitle': "No worries, we'll send you a reset link",
@@ -1387,7 +1341,6 @@ i18n
                     'auth.changePassword.genericSuccess': 'Password changed successfully',
                     'auth.changePassword.genericError': 'Changing password failed',
 
-                    // === profile page ===
                     'profile.title': 'My profile',
                     'profile.loading': 'Loading profile...',
                     'profile.firstName': 'First name',
@@ -1409,7 +1362,6 @@ i18n
                     'profile.passwordErrors.newRequired': 'New password is required',
                     'profile.passwordErrors.mismatch': 'Passwords do not match',
 
-                    // === User Guide ===
                     'guide.title': 'User Guide',
                     'guide.subtitle': 'Everything you need to know to use the site comfortably and safely',
                     'guide.steps.registerTitle': 'Register & Login',
@@ -1432,7 +1384,6 @@ i18n
                     'guide.tips.supportTitle': 'Professional Support',
                     'guide.tips.supportDesc': 'Contact us anytime — we’re here to help.',
 
-                    // User Guide - Enhanced page
                     'guide.pageTitle': 'User Guide',
                     'guide.pageSubtitle': 'Everything you need to know about the system in one place',
                     'guide.flow.title': 'System Flow Diagram',
@@ -1479,14 +1430,12 @@ i18n
                     'guide.tips.supportTitle2': 'Technical support',
                     'guide.tips.supportDesc2': 'Our support team is available 24/7',
 
-                    // === users ===
                     'users.title': 'All Users',
                     'users.loading': 'Loading users...',
                     'users.error': 'Error loading users: {{error}}',
                     'users.loadFailed': 'Failed to load users',
                     'users.hydrateFailed': 'Failed to load user details',
 
-                    // === candidates errors ===
                     'candidates.errors.loadFailed': 'Failed to load candidates',
                     'candidates.errors.createFailed': 'Failed to create candidate',
                     'candidates.errors.updateFailed': 'Failed to update candidate',
@@ -1497,7 +1446,6 @@ i18n
                     'candidates.errors.rejectFailed': 'Failed to reject candidate request',
                     'candidates.errors.deleteIdMissing': 'Candidate deletion failed – id not found',
 
-                    // === groups errors ===
                     'groups.errors.loadAllFailed': 'Failed to load groups',
                     'groups.errors.loadOneFailed': 'Failed to load group',
                     'groups.errors.loadWithMembersFailed': 'Failed to load group and members',
@@ -1507,18 +1455,15 @@ i18n
                     'groups.errors.removeMemberFailed': 'Failed to remove member',
                     'groups.errors.deleteFailed': 'Failed to delete group',
 
-                    // === join errors ===
                     'join.errors.statusLoadFailed': 'Failed to load join statuses',
                     'join.errors.loadRequestsFailed': 'Failed to load join requests',
                     'join.errors.approveFailed': 'Failed to approve request',
                     'join.errors.rejectFailed': 'Failed to reject request',
 
-                    // === votes errors ===
                     'votes.errors.notLoggedIn': 'You must be logged in to vote',
                     'votes.errors.voteFailed': 'Voting failed',
                     'votes.errors.fetchVotersFailed': 'Failed to load voters list',
 
-                    // ===== vote results notifier =====
                     'votes.results.modalTitle': 'Voting has ended!',
                     'votes.results.modalText':
                         'Voting in the group "{{name}}" has ended and there is a winner 🎉',
@@ -1526,10 +1471,8 @@ i18n
                     'votes.results.seeWinnerButton': 'Go to group page',
                     'votes.results.closeButton': 'Close',
 
-                    // === image crop ===
                     'imageCrop.title': 'Crop image',
 
-                    // === chat (group chat) ===
                     'chat.title': 'Chat',
                     'chat.readOnlyNote': 'You can only read messages. Only group members can write.',
                     'chat.loading': 'Loading messages…',
@@ -1556,7 +1499,6 @@ i18n
                     'chat.errors.deleteFailed': 'Failed to delete message',
                     'chat.errors.summaryFailed': 'Failed to summarize chat',
 
-                    // === candidates form ===
                     'candidates.form.nameLabel': 'Name *',
                     'candidates.form.descriptionLabel': 'Description *',
                     'candidates.form.symbolLabel': 'Symbol *',
@@ -1567,14 +1509,12 @@ i18n
                     'candidates.form.removePhoto': 'Remove image',
                     'candidates.form.uploading': 'Uploading…',
 
-                    // === candidate requests tab ===
                     'candidates.requests.title': 'Candidate requests',
                     'candidates.requests.loading': 'Loading…',
                     'candidates.requests.empty': 'No requests.',
                     'candidates.requests.approve': 'Approve',
                     'candidates.requests.reject': 'Reject',
 
-                    // === candidates tab (list & add) ===
                     'candidates.tab.title': 'Candidates',
                     'candidates.list.loading': 'Loading candidates…',
                     'candidates.list.empty': 'No candidates in this group.',
@@ -1587,24 +1527,20 @@ i18n
                     'candidates.add.submit': 'Add candidate',
                     'candidates.upload.error': 'Error uploading image',
 
-                    // === group settings – danger zone ===
                     'groupSettings.danger.title': 'Delete Group',
                     'groupSettings.danger.warning':
                         'Deleting is irreversible. All group data will be removed for all members.',
                     'groupSettings.danger.deleteButton': 'Delete group…',
 
-                    // === group settings – delete modal ===
                     'groupSettings.deleteModal.title': 'Delete the group',
                     'groupSettings.deleteModal.typeToConfirm': 'To confirm, type the following:',
                     'groupSettings.deleteModal.mustMatch': 'You must type the exact value above',
                     'groupSettings.deleteModal.deleteForever': 'Delete group permanently',
 
-                    // === edit candidate modal ===
                     'candidates.edit.title': 'Edit candidate',
                     'candidates.edit.save': 'Save',
                     'candidates.edit.saving': 'Saving…',
 
-                    // === group settings – general tab ===
                     'groupSettings.general.title': 'Group details',
                     'groupSettings.general.status': 'Status',
                     'groupSettings.general.symbolLabel': 'Symbol',
@@ -1624,7 +1560,6 @@ i18n
                     'groupSettings.general.symbolLabelOptional': 'Symbol (optional)',
                     'groupSettings.general.symbolPlaceholder': 'e.g.: A',
 
-                    // === candidates validation ===
                     'candidates.validation.nameRequired': 'Name is required',
                     'candidates.validation.nameTooShort': 'Name must be at least 2 characters long',
                     'candidates.validation.nameTooLong': 'Name is too long (maximum 50 characters)',
@@ -1632,7 +1567,6 @@ i18n
                         'Description is too long (maximum 500 characters)',
                     'candidates.validation.symbolTooLong': 'Symbol can contain up to 3 characters',
 
-                    // === group settings – page ===
                     'groupSettings.pageTitle': 'Group settings',
                     'groupSettings.loadingResolving': 'Loading group data...',
                     'groupSettings.loading': 'Loading...',
@@ -1651,7 +1585,6 @@ i18n
                     'groupSettings.removeMemberConfirm': 'Remove {{name}} from the group?',
                     'groupSettings.deleteCandidateConfirm': 'Remove {{name}}?',
 
-                    // ===== joinRequests / members / voters / candidateApply / toastDemo =====
                     joinRequests: {
                         title: 'Join requests',
                         loading: 'Loading requests…',
@@ -1753,7 +1686,6 @@ i18n
                     'groups.create.ai.previewLabel': 'Suggested description:',
                     'groups.create.ai.useDescription': 'Use description',
 
-                    // === campaign page ===
                     'campaign.loadingUser': 'Loading user…',
                     'campaign.loading': 'Loading campaign…',
                     'campaign.errorPrefix': 'Error: ',
@@ -1813,20 +1745,17 @@ i18n
                     'campaign.comments.anonymousUser': 'User',
                     'campaign.comments.deleteButtonTitle': 'Delete comment',
 
-                    // EN - campaign login required
                     'campaign.loginRequired.title': 'Cannot view campaign',
                     'campaign.loginRequired.message': 'To view this campaign page, you must log in.',
                     'campaign.loginRequired.goToLogin': 'Go to login',
                     'campaign.posts.deletedSuccessfully': 'Post deleted successfully',
                     'campaign.posts.deleteError': 'Failed to delete post',
 
-                    // share modal
                     'campaign.share.linkLabel': 'Share link:',
                     'campaign.share.copy': 'Copy',
                     'campaign.share.copied': 'Copied!',
                     'campaign.share.done': 'Done',
 
-                    // ===== unified groups (EN) =====
                     groups: {
                         list: {
                             tour: {
@@ -1935,7 +1864,6 @@ i18n
                         },
                     },
 
-                    // === About page (enhanced nested) ===
                     about: {
                         hero: {
                             badge: "Digital Election Platform",

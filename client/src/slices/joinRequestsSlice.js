@@ -1,9 +1,7 @@
-// src/slices/joinRequestsSlice.js
 import { createSlice, createAsyncThunk, createSelector } from '@reduxjs/toolkit';
 import http from '../api/http';
 import i18n from '../i18n';
 
-// === helpers לשם מפתח שמבוסס על המשתמש הנוכחי ===
 function getUserKey() {
   try {
     return (
@@ -45,7 +43,6 @@ function saveRejectedMap(map) {
   } catch { }
 }
 
-// ===== LocalStorage helpers =====
 function loadPendingFromLS() {
   try {
     const raw = localStorage.getItem(getPendingKey());
@@ -84,9 +81,6 @@ function saveRemovedMap(map) {
   } catch { }
 }
 
-/* ===== Thunks ===== */
-
-// שליחת בקשת הצטרפות — חסום אם לא מחוברים (כדי למנוע 401)
 export const requestJoinGroup = createAsyncThunk(
   'joinReq/requestJoinGroup',
   async (groupId, { getState, rejectWithValue }) => {
@@ -96,25 +90,21 @@ export const requestJoinGroup = createAsyncThunk(
       !!auth?.userEmail ||
       !!localStorage.getItem('authToken');
     if (!isAuthed) {
-      // לא נשלחת בקשה לשרת כלל
       return rejectWithValue('AUTH_REQUIRED');
     }
     try {
       const { data } = await http.post(`/groups/${groupId}/join`);
       return { groupId: String(groupId), group: data };
     } catch (err) {
-      // תמיד טקסט מה-i18n
       return rejectWithValue(i18n.t('join.errors.sendRequestFailed'));
     }
   }
 );
 
-// סטטוסים ממתינים שלי מהשרת
 export const fetchMyJoinStatuses = createAsyncThunk(
   'joinReq/fetchMyStatuses',
   async (_, { rejectWithValue }) => {
     try {
-      // צפי: { pending: string[] }
       const { data } = await http.get('/groups/my-join-status');
       return data;
     } catch (err) {
@@ -123,7 +113,6 @@ export const fetchMyJoinStatuses = createAsyncThunk(
   }
 );
 
-// (לבעלי קבוצה) רשימת בקשות לקבוצה
 export const fetchJoinRequests = createAsyncThunk(
   'joinReq/fetchJoinRequests',
   async (groupId, { rejectWithValue }) => {
@@ -136,7 +125,6 @@ export const fetchJoinRequests = createAsyncThunk(
   }
 );
 
-// (לבעלי קבוצה) אישור/דחייה
 export const approveJoinRequest = createAsyncThunk(
   'joinReq/approve',
   async ({ groupId, requestId }, { rejectWithValue }) => {
@@ -165,16 +153,13 @@ export const rejectJoinRequest = createAsyncThunk(
   }
 );
 
-/* ===== Slice ===== */
-
 const joinReqSlice = createSlice({
   name: 'joinReq',
   initialState: {
     byGroup: {},
     actionError: null,
-    // [groupId]: { requesting, status: 'none'|'pending'|'member'|'rejected'|'error', error?, rejectedAt? }
     my: {},
-    removedNotice: {}, // { [groupId]: timestamp } מי שסומן כהוסר
+    removedNotice: {},
   },
   reducers: {
     clearJoinRequestsError(s) {
@@ -182,17 +167,12 @@ const joinReqSlice = createSlice({
     },
 
     hydratePendingFromLocalStorage(s) {
-      // pending לפי המשתמש הנוכחי
       const set = loadPendingFromLS();
       set.forEach((gid) => {
         const prev = s.my[gid] || {};
         s.my[gid] = { ...prev, requesting: false, status: 'pending', error: null };
       });
-
-      // “הוסרת מהקבוצה” לפי המשתמש הנוכחי
       s.removedNotice = loadRemovedMap();
-
-      // קבוצות שנדחינו מהן (rejected) לפי המשתמש הנוכחי
       const rejectedMap = loadRejectedMap();
       Object.entries(rejectedMap).forEach(([gid, ts]) => {
         const prev = s.my[gid] || {};
@@ -216,13 +196,11 @@ const joinReqSlice = createSlice({
         savePendingToLS(set);
       }
 
-      // אם היה דגל "הוסרת" — ננקה אותו
       if (s.removedNotice[gid]) {
         delete s.removedNotice[gid];
         saveRemovedMap(s.removedNotice);
       }
 
-      // ואם הייתה חותמת "נדחית" — ננקה גם אותה
       const rejectedMap = loadRejectedMap();
       if (rejectedMap[gid]) {
         delete rejectedMap[gid];
@@ -230,7 +208,6 @@ const joinReqSlice = createSlice({
       }
     },
 
-    // לנקות הודעת "הוסרת" ידנית (למשל אחרי SEND שוב)
     clearRemovedNotice(s, a) {
       const gid = String(a.payload);
       if (s.removedNotice[gid]) {
@@ -239,7 +216,6 @@ const joinReqSlice = createSlice({
       }
     },
 
-    // איפוס דגל "נדחה" — אם רוצים לנקות ידנית
     clearRejectedForGroup(s, a) {
       const gid = String(a.payload);
       const prev = s.my[gid] || {};
@@ -254,16 +230,14 @@ const joinReqSlice = createSlice({
     },
   },
   extraReducers: (b) => {
-    b
-      /* ===== בעלי קבוצה ===== */
-      .addCase(fetchJoinRequests.pending, (s, a) => {
-        const g = String(a.meta.arg);
-        s.byGroup[g] = {
-          loading: true,
-          error: null,
-          list: s.byGroup[g]?.list || [],
-        };
-      })
+    b.addCase(fetchJoinRequests.pending, (s, a) => {
+      const g = String(a.meta.arg);
+      s.byGroup[g] = {
+        loading: true,
+        error: null,
+        list: s.byGroup[g]?.list || [],
+      };
+    })
       .addCase(fetchJoinRequests.fulfilled, (s, a) => {
         const { groupId, requests } = a.payload;
         s.byGroup[groupId] = {
@@ -305,24 +279,16 @@ const joinReqSlice = createSlice({
         s.actionError = a.payload;
       })
 
-      /* ===== הזרימה שלי ===== */
       .addCase(requestJoinGroup.pending, (s, a) => {
         const gid = String(a.meta.arg);
-        // אם היה rejected – נעבור מייד ל-pending ונאפס rejectedAt
         s.my[gid] = { requesting: true, status: 'pending', error: null };
-
-        // pending ל־LS של המשתמש הנוכחי
         const set = loadPendingFromLS();
         set.add(gid);
         savePendingToLS(set);
-
-        // אם הייתה עליו חותמת "הוסרת" – ננקה
         if (s.removedNotice[gid]) {
           delete s.removedNotice[gid];
           saveRemovedMap(s.removedNotice);
         }
-
-        // אם הייתה עליו חותמת "נדחית" – ננקה גם אותה
         const rejectedMap = loadRejectedMap();
         if (rejectedMap[gid]) {
           delete rejectedMap[gid];
@@ -336,7 +302,6 @@ const joinReqSlice = createSlice({
       })
       .addCase(requestJoinGroup.rejected, (s, a) => {
         const gid = String(a.meta.arg);
-        // אם נדחינו כי לא מחוברים — לא נרצה להשאיר מצב error רועש
         if (a.payload === 'AUTH_REQUIRED') {
           s.my[gid] = { requesting: false, status: 'none', error: null };
           return;
@@ -354,7 +319,6 @@ const joinReqSlice = createSlice({
         }
       })
 
-      // ✅ “אני חבר/ה” מ־/groups/my
       .addCase('groups/fetchMy/fulfilled', (s, a) => {
         const joined = Array.isArray(a.payload?.joined) ? a.payload.joined : [];
         const currentJoinedSet = new Set(joined.map((g) => String(g._id)));
@@ -369,8 +333,6 @@ const joinReqSlice = createSlice({
             saveRemovedMap(s.removedNotice);
           }
         }
-
-        // אם מישהו סומן member מקומית אבל אינו חבר בשרת (הוסר) → none
         for (const [gid, st] of Object.entries(s.my)) {
           if (st?.status === 'member' && !currentJoinedSet.has(String(gid))) {
             s.my[gid] = { requesting: false, status: 'none', error: null };
@@ -381,23 +343,18 @@ const joinReqSlice = createSlice({
         savePendingToLS(ls);
         saveRemovedMap(s.removedNotice);
       })
-
-      // ✅ יישור קו עם שרת לגבי pending
       .addCase(fetchMyJoinStatuses.fulfilled, (s, a) => {
         const ids = Array.isArray(a.payload?.pending)
           ? a.payload.pending.map(String)
           : [];
         const serverSet = new Set(ids);
 
-        // עדכון לכל אלו שבשרת עדיין pending
         serverSet.forEach((gid) => {
           s.my[gid] = { requesting: false, status: 'pending', error: null };
         });
 
         const localSet = loadPendingFromLS();
         const rejectedMap = loadRejectedMap();
-
-        // מי שהיה pending מקומית אך לא בשרת → נדחה
         for (const [gid, st] of Object.entries(s.my)) {
           if (st?.status === 'pending' && !serverSet.has(String(gid))) {
             const ts = Date.now();
@@ -408,23 +365,20 @@ const joinReqSlice = createSlice({
               rejectedAt: ts,
             };
             if (localSet.has(gid)) localSet.delete(gid);
-            rejectedMap[gid] = ts; // ← נשמור ל־LS
+            rejectedMap[gid] = ts;
           }
         }
 
-        // שמירת LS אחרי ניקוי הדחויים
         const union = new Set([...localSet, ...serverSet]);
         savePendingToLS(union);
         saveRejectedMap(rejectedMap);
       })
 
       .addCase('auth/logout', (s) => {
-        // מאפסים state בזיכרון כדי שלא ידלוף בין משתמשים
         s.byGroup = {};
         s.actionError = null;
         s.my = {};
         s.removedNotice = {};
-        // לא נוגעים ב-localStorage – הוא ממילא מופרד לפי משתמש (userId/email)
       });
   },
 });
@@ -439,7 +393,6 @@ export const {
 
 export default joinReqSlice.reducer;
 
-/* ===== Selectors ===== */
 export const selectJoinRequestsForGroup = (groupId) => (s) =>
   s.joinReq.byGroup[groupId]?.list || [];
 export const selectJoinRequestsLoading = (groupId) => (s) =>
@@ -458,7 +411,6 @@ export const selectMyPendingSet = createSelector(
   }
 );
 
-// סט ממואזר של קבוצות שנדחו
 export const selectMyRejectedSet = createSelector(
   (s) => s.joinReq.my,
   (my) => {
@@ -481,10 +433,8 @@ export const selectMyMemberSet = createSelector(
   }
 );
 
-// “הוסרת”
 export const selectWasRemovedFromGroup = (groupId) => (s) =>
   !!s.joinReq.removedNotice?.[String(groupId)];
 
-// סטטוס לקבוצה
 export const selectMyStatusByGroup = (groupId) => (s) =>
   s.joinReq.my?.[String(groupId)]?.status || 'none';

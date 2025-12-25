@@ -1,4 +1,3 @@
-// src/components/GroupSettings/CandidateRequestsTab.jsx
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
@@ -34,7 +33,6 @@ export default function CandidateRequestsTab({ groupId, onApprove, onReject }) {
             <div>{t('candidates.requests.loading')}</div>
           ) : error ? (
             <div className="err">
-              {/* אם error הוא כבר טקסט אנושי – t יחזיר אותו כמו שהוא, ואם זה key – יתורגם */}
               {t(error)}
             </div>
           ) : !requests.length ? (

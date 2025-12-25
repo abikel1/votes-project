@@ -135,7 +135,6 @@ export default function LoginPage() {
                 }
               >
                 {showPassword ? (
-                  // עין פתוחה – הסיסמה מוצגת
                   <svg
                     width="20"
                     height="20"
@@ -156,7 +155,6 @@ export default function LoginPage() {
                     />
                   </svg>
                 ) : (
-                  // עין סגורה – הסיסמה מוסתרת
                   <svg
                     width="20"
                     height="20"

@@ -1,14 +1,10 @@
-/* =======================
-   Countdown – בסיס (Mobile first)
-======================= */
 .countdown-row {
   display: flex;
   align-items: center;
   justify-content: center;
-  /* gap: 4px; */
   font-family: 'Rubik', sans-serif;
   direction: rtl;
-  flex-wrap: nowrap; /* שלא ישבר שורה */
+  flex-wrap: nowrap;
 }
 
 .countdown-item {
@@ -40,10 +36,6 @@
   margin: 0 2px;
 }
 
-
-/* =======================
-   טאבלט
-======================= */
 @media (min-width: 600px) {
 
 
@@ -61,12 +53,8 @@
   }
 }
 
-
-/* =======================
-   מחשב
-======================= */
 @media (min-width: 1024px) {
- 
+
 
   .count-number {
     font-size: calc(18px * var(--a11y-font-scale));

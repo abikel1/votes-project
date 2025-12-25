@@ -12,7 +12,6 @@ import { useTranslation } from 'react-i18next';
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState('');
   const dispatch = useDispatch();
-  // const { loading, error, message } = useSelector((s) => s.auth);
   const { forgotLoading, error, message } = useSelector((s) => s.auth);
   const { t } = useTranslation();
 
@@ -23,7 +22,6 @@ export default function ForgotPasswordPage() {
   };
 
   useEffect(() => {
-    // כשנכנסים לעמוד – מנקים הודעות ישנות
     dispatch(clearMessage());
     dispatch(clearError());
   }, [dispatch]);
@@ -105,16 +103,6 @@ export default function ForgotPasswordPage() {
           <button type="submit" className="btn btn-primary" disabled={forgotLoading}>
             {forgotLoading ? t('auth.forgot.submitting') : t('auth.forgot.submit')}
           </button>
-
-          {/* <button
-            type="submit"
-            className="btn btn-primary"
-            disabled={loading}
-          >
-            {loading
-              ? t('auth.forgot.submitting')
-              : t('auth.forgot.submit')}
-          </button> */}
         </form>
 
         <div className="auth-footer">

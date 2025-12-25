@@ -1,4 +1,3 @@
-// src/components/GroupSettings/GroupSettingsPage.jsx
 import { useEffect, useMemo, useState, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
@@ -77,31 +76,21 @@ import {
   humanizeName,
   validateCandidateFields,
 } from './groupSettingsHelpers';
-
 import http from '../../api/http';
-
-// ---------- קומפוננטה ראשית ----------
 import { selectCandidateRequestsForGroup } from '../../slices/candidateSlice';
-
 
 export default function GroupSettingsPage() {
   const { t } = useTranslation();
 
   const { groupSlug } = useParams();
   const location = useLocation();
-
-  // id שהועבר בניווט פנימי (מכרטיס קבוצה)
   const navGroupId = location.state?.groupId || null;
-
-  // state פנימי ל-id של הקבוצה
   const [groupId, setGroupId] = useState(navGroupId);
   const [slugResolved, setSlugResolved] = useState(!!navGroupId); // האם ניסינו לפתור slug ל-id
   const requests = useSelector((state) => selectCandidateRequestsForGroup(state, groupId));
   const pendingCount = requests.filter(r => r.status === 'pending').length;
-
   const dispatch = useDispatch();
   const navigate = useNavigate();
-
   const {
     selectedGroup: group,
     loading: groupLoading,
@@ -110,12 +99,10 @@ export default function GroupSettingsPage() {
     updateError,
     updateSuccess,
   } = useSelector((s) => s.groups);
-
   const enrichedMembers = useSelector(selectSelectedGroupMembersEnriched);
   const { userId, userEmail, firstName, lastName, isAdmin } = useSelector(
     (s) => s.auth,
   );
-
   const candidates =
     useSelector(selectCandidatesForGroup(groupId || '')) || EMPTY_ARR;
   const candLoading = useSelector(
@@ -124,17 +111,14 @@ export default function GroupSettingsPage() {
   const candError = useSelector(
     selectCandidatesErrorForGroup(groupId || ''),
   );
-
   const [showConfirm, setShowConfirm] = useState(false);
   const [selectedMember, setSelectedMember] = useState(null);
-
   const reqs =
     useSelector(selectJoinRequestsForGroup(groupId || '')) || EMPTY_ARR;
   const reqsLoading = useSelector(
     selectJoinRequestsLoading(groupId || ''),
   );
   const reqsError = useSelector(selectJoinRequestsError(groupId || ''));
-
   const voters =
     useSelector(selectVotersForGroup(groupId || '')) || EMPTY_ARR;
   const votersLoading = useSelector(
@@ -143,11 +127,8 @@ export default function GroupSettingsPage() {
   const votersError = useSelector(
     selectVotersErrorForGroup(groupId || ''),
   );
-
-  // טאב נבחר
   const [activeTab, setActiveTab] = useState('general');
 
-  // טופס קבוצה
   const [form, setForm] = useState({
     name: '',
     description: '',
@@ -159,12 +140,8 @@ export default function GroupSettingsPage() {
     isLocked: false,
   });
   const [editMode, setEditMode] = useState(false);
-
-  // מחיקת קבוצה
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [typedSlug, setTypedSlug] = useState('');
-
-  // טופס יצירת מועמד/ת
   const [candForm, setCandForm] = useState({
     name: '',
     description: '',
@@ -172,8 +149,6 @@ export default function GroupSettingsPage() {
     photoUrl: '',
   });
   const [candErrors, setCandErrors] = useState({});
-
-  // עריכת מועמד/ת
   const [editCandOpen, setEditCandOpen] = useState(false);
   const [editCandForm, setEditCandForm] = useState({
     _id: '',
@@ -190,23 +165,15 @@ export default function GroupSettingsPage() {
   const updateCandidateError = useSelector(
     selectCandidateUpdateError(editCandForm._id || ''),
   );
-
-  // סטטוס העלאות
   const [uploadingNew, setUploadingNew] = useState(false);
   const [uploadingEdit, setUploadingEdit] = useState(false);
-
   const newFileInputRef = useRef(null);
   const editFileInputRef = useRef(null);
-
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [selectedCandidate, setSelectedCandidate] = useState(null);
-
-  // שיתוף
   const [copied, setCopied] = useState(false);
 
-  // ---- פתרון slug ל-id כשנכנסים ישירות ל-URL ----
   useEffect(() => {
-    // אם הגיע id בניווט – לא צריך פתרון דרך slug
     if (navGroupId) {
       setGroupId(navGroupId);
       setSlugResolved(true);
@@ -228,7 +195,6 @@ export default function GroupSettingsPage() {
     })();
   }, [navGroupId, groupSlug]);
 
-  // טעינת נתונים לפי groupId
   useEffect(() => {
     if (!groupId) return;
     dispatch(fetchGroupWithMembers(groupId));
@@ -363,9 +329,6 @@ export default function GroupSettingsPage() {
     }
   };
 
-  // ---------- הגנות / מצבי טעינה ----------
-
-  // עדיין פותרים את ה-slug ל-id
   if (!slugResolved && !groupId) {
     return (
       <div className="gs-wrap">
@@ -375,7 +338,6 @@ export default function GroupSettingsPage() {
     );
   }
 
-  // ניסינו לפתור slug ואין groupId בכלל – כנראה קבוצה לא קיימת
   if (slugResolved && !groupId) {
     return (
       <div className="gs-wrap">
@@ -421,7 +383,6 @@ export default function GroupSettingsPage() {
     );
   }
 
-  // משתמש מחובר אבל לא מנהל – הודעה נעימה
   if (!isOwnerOrAdmin) {
     return (
       <div className="gs-wrap">
@@ -436,7 +397,6 @@ export default function GroupSettingsPage() {
     );
   }
 
-  // ---------- handlers ----------
   const handleApprove = (req) => {
     dispatch(approveCandidateRequest({ groupId, requestId: req._id }))
       .unwrap()
@@ -470,26 +430,22 @@ export default function GroupSettingsPage() {
 
   const toIsoFromDateInput = (s) => {
     if (!s) return null;
-    // תאריך מקומי כדי שלא יזוז בגלל UTC
     return new Date(`${s}T00:00:00`).toISOString();
   };
 
 
   const onSaveGroup = async (e) => {
     e.preventDefault();
-
-    // ערכי מקור להשוואה (כדי שלא נשלח תאריכים אם לא נגעת בהם)
     const orig = {
       name: (group?.name || '').trim(),
       description: (group?.description || '').trim(),
       symbol: (group?.symbol || '').trim(),
       maxWinners: Number(group?.maxWinners ?? 1),
       isLocked: !!group?.isLocked,
-      endDate: toLocalDateInputValue(group?.endDate), // YYYY-MM-DD או ''
+      endDate: toLocalDateInputValue(group?.endDate),
       candidateEndDate: toLocalDateInputValue(group?.candidateEndDate),
     };
 
-    // בדיקה: candidateEndDate לא אחרי endDate (רק אם שניהם קיימים בפורם)
     const groupEnd = form.endDate ? new Date(`${form.endDate}T00:00:00`) : null;
     const candEnd = form.candidateEndDate
       ? new Date(`${form.candidateEndDate}T00:00:00`)
@@ -500,7 +456,6 @@ export default function GroupSettingsPage() {
       return;
     }
 
-    // ✅ שולחים רק מה שהשתנה
     const patch = {};
 
     const nextName = (form.name || '').trim();
@@ -508,25 +463,20 @@ export default function GroupSettingsPage() {
     const nextSymbol = (form.symbol || '').trim();
     const nextMax = Number(form.maxWinners) || 1;
     const nextLocked = !!form.isLocked;
-
     if (nextName !== orig.name) patch.name = nextName;
     if (nextDesc !== orig.description) patch.description = nextDesc;
     if (nextSymbol !== orig.symbol) patch.symbol = nextSymbol;
     if (nextMax !== orig.maxWinners) patch.maxWinners = nextMax;
     if (nextLocked !== orig.isLocked) patch.isLocked = nextLocked;
-
-    // תאריכים: רק אם השתנו בפועל
     if ((form.endDate || '') !== (orig.endDate || '')) {
       patch.endDate = form.endDate ? toIsoFromDateInput(form.endDate) : null;
     }
-
     if ((form.candidateEndDate || '') !== (orig.candidateEndDate || '')) {
       patch.candidateEndDate = form.candidateEndDate
         ? toIsoFromDateInput(form.candidateEndDate)
         : null;
     }
 
-    // אם אין מה לשמור
     if (Object.keys(patch).length === 0) {
       toast(t('common.nothingToSave'));
       setEditMode(false);
@@ -760,18 +710,13 @@ export default function GroupSettingsPage() {
     setSelectedMember(null);
   };
 
-  // ---------- JSX ----------
-
   return (
     <div className="gs-wrap">
       <div className="gs-header clean-header">
-        {/* כותרת מרכזית */}
         <div className="header-title">
           <h2>{group.name}</h2>
-          {/* <p>{group.description}</p> */}
         </div>
 
-        {/* כפתורים */}
         <div className="icon-btn-container">
           <p className="group-description" title={group.description}>
             {group.description}
@@ -799,10 +744,7 @@ export default function GroupSettingsPage() {
         </div>
       </div>
 
-
-      {/* layout: תוכן משמאל + סיידבר מימין */}
       <div className="gs-main-layout">
-        {/* תוכן הטאב */}
         <div className="gs-tab-panel">
           {activeTab === 'general' && (
             <GeneralTab
@@ -889,7 +831,6 @@ export default function GroupSettingsPage() {
           )}
         </div>
 
-        {/* סיידבר הניווט מימין */}
         <aside className="gs-sidebar-tabs">
           <button
             className={`side-tab ${activeTab === 'general' ? 'active' : ''}`}
@@ -898,8 +839,6 @@ export default function GroupSettingsPage() {
             <FaInfoCircle style={{ marginInlineEnd: 6 }} />
             {t('groupSettings.sidebar.general')}
           </button>
-
-          {/* Candidates */}
 
           <button
             className={`side-tab ${activeTab === 'candidates' ? 'active' : ''}`}
@@ -913,9 +852,6 @@ export default function GroupSettingsPage() {
 
           </button>
 
-
-
-          {/* Voters */}
           <button
             className={`side-tab ${activeTab === 'voters' ? 'active' : ''}`}
             onClick={() => setActiveTab('voters')}
@@ -927,7 +863,6 @@ export default function GroupSettingsPage() {
             )}
           </button>
 
-          {/* Members */}
           {group.isLocked && (
             <button
               className={`side-tab ${activeTab === 'members' ? 'active' : ''}`}
@@ -941,7 +876,6 @@ export default function GroupSettingsPage() {
             </button>
           )}
 
-          {/* Danger */}
           <button
             className={`side-tab danger ${activeTab === 'danger' ? 'active' : ''}`}
             onClick={() => setActiveTab('danger')}
@@ -952,7 +886,6 @@ export default function GroupSettingsPage() {
         </aside>
       </div>
 
-      {/* מודאל מחיקת קבוצה */}
       <DeleteGroupModal
         open={deleteOpen}
         confirmSlug={confirmSlug}
@@ -962,7 +895,6 @@ export default function GroupSettingsPage() {
         onDelete={doDeleteGroup}
       />
 
-      {/* מודאל עריכת מועמד/ת */}
       <EditCandidateModal
         open={editCandOpen}
         editCandForm={editCandForm}
@@ -978,7 +910,6 @@ export default function GroupSettingsPage() {
         clearEditPhoto={clearEditPhoto}
       />
 
-      {/* הסרת משתתף */}
       <ConfirmModal
         open={showConfirm}
         message={
@@ -995,7 +926,6 @@ export default function GroupSettingsPage() {
         onCancel={cancelDelete}
       />
 
-      {/* מחיקת מועמד */}
       <ConfirmModal
         open={showDeleteConfirm}
         message={

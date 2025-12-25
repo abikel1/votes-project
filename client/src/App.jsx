@@ -1,4 +1,3 @@
-// src/App.jsx
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Routes, Route } from 'react-router-dom';
@@ -6,7 +5,6 @@ import { Toaster } from 'react-hot-toast';
 import { fetchMe, loginSuccess } from './slices/authSlice';
 import GlobalTour from '../src/Tour/GlobalTour.jsx';
 import { TourProvider } from '@reactour/tour';
-
 import GroupsPage from './pages/GroupList/GroupsPage.jsx';
 import GroupSettingsPage from './components/GroupSettings/GroupSettingsPage.jsx';
 import RegisterPage from './pages/Register/RegisterPage.jsx';
@@ -28,27 +26,18 @@ import Footer from './components/Footer/Footer';
 import ContactPage from './pages/ContactForm/ContactForm.jsx';
 import ScrollToTop from './components/ScrollToTop.jsx';
 import CampaignPage from './pages/Campaign/CampaignPage';
-// <<<<<<< HEAD
-// =======
 import AccessibilityWidget from './components/AccessibilityWidget/AccessibilityWidget.jsx';
-
-// >>>>>>> f626efaa96775a3bd42eed6f5e1db18dfb2f900a
-// 👇 ה־Guard
 import RequireAuth from './components/RequireAuth/RequireAuth.jsx';
-
-// 🔔 פופ-אפ תוצאות הצבעה
 import VoteResultNotifier from './components/VoteResultNotifier/VoteResultNotifier.jsx';
 
 export default function App() {
   const dispatch = useDispatch();
   const token = useSelector((s) => s.auth.token);
 
-  // אם יש טוקן – טוענים פרופיל
   useEffect(() => {
     if (token) dispatch(fetchMe());
   }, [token, dispatch]);
 
-  // סינכרון בין טאבים – התחברות בטאב אחד תפעיל התחברות גם באחרים
   useEffect(() => {
     const listener = (e) => {
       if (e.key === 'token') {
@@ -70,94 +59,78 @@ export default function App() {
 
   return (
 
- <TourProvider>
+    <TourProvider>
+      <div className="page-wrapper">
+        <Toaster
+          position="top-center"
+          reverseOrder={false}
+          containerStyle={{ zIndex: 999999 }}
 
-
-
-
-    <div className="page-wrapper">
-      <Toaster
-        position="top-center"
-        reverseOrder={false}
-        containerStyle={{ zIndex: 999999 }}   // ✅ זה הפתרון לבעיה שלך
-
-        toastOptions={{
-          duration: 3000,
-          style: {
-            background: '#fff',
-            color: '#363636',
-            fontSize: '16px',
-            fontFamily: 'inherit',
-          },
-          success: {
+          toastOptions={{
             duration: 3000,
-            iconTheme: {
-              primary: '#10b981',
-              secondary: '#fff',
+            style: {
+              background: '#fff',
+              color: '#363636',
+              fontSize: '16px',
+              fontFamily: 'inherit',
             },
-          },
-          error: {
-            duration: 4000,
-            iconTheme: {
-              primary: '#ef4444',
-              secondary: '#fff',
+            success: {
+              duration: 3000,
+              iconTheme: {
+                primary: '#10b981',
+                secondary: '#fff',
+              },
             },
-          },
-        }}
-      />
+            error: {
+              duration: 4000,
+              iconTheme: {
+                primary: '#ef4444',
+                secondary: '#fff',
+              },
+            },
+          }}
+        />
 
-      {/* פופ-אפ תוצאות הצבעה גלובלי */}
-      <VoteResultNotifier />
+        <VoteResultNotifier />
 
-      <NavBar />
-      <ScrollToTop />
+        <NavBar />
+        <ScrollToTop />
 
-      <Routes>
-        {/* ראוטים פתוחים */}
-        <Route path="/" element={<HomeRoute />} />
-        <Route path="/a" element={<ToastDemo />} />
-        <Route path="/groups" element={<GroupsPage />} />
-        <Route path="/join/:slug" element={<JoinGroupPage />} />
-        <Route path="/contact" element={<ContactPage />} />
-        <Route path="/register" element={<RegisterPage />} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-        <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
-        <Route path="/about" element={<AboutPage />} />
-        <Route path="/user-guide" element={<UserGuidePage />} />
+        <Routes>
+          <Route path="/" element={<HomeRoute />} />
+          <Route path="/a" element={<ToastDemo />} />
+          <Route path="/groups" element={<GroupsPage />} />
+          <Route path="/join/:slug" element={<JoinGroupPage />} />
+          <Route path="/contact" element={<ContactPage />} />
+          <Route path="/register" element={<RegisterPage />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+          <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
+          <Route path="/about" element={<AboutPage />} />
+          <Route path="/user-guide" element={<UserGuidePage />} />
+          <Route path="/groups/:groupSlug" element={<GroupDetailPage />} />
+          <Route path="/campaign/:groupSlug/:candidateSlug" element={<CampaignPage />} />
+          <Route path="/campaign/:candidateId" element={<CampaignPage />} />
+          <Route element={<RequireAuth />}>
+            <Route path="/groups/create" element={<CreateGroupPage />} />
+            <Route
+              path="/groups/:groupSlug/settings"
+              element={<GroupSettingsPage />}
+            />
+            <Route
+              path="/groups/:groupSlug/candidates"
+              element={<VotingPage />}
+            />
 
+            <Route path="/profile" element={<ProfilePage />} />
+            <Route path="/tools/send-email" element={<SendEmailPage />} />
+          </Route>
+        </Routes>
 
-        {/* דף פרטי קבוצה – פתוח לכולם */}
-        <Route path="/groups/:groupSlug" element={<GroupDetailPage />} />
-
-        {/* 👇 קמפיין – גם פתוח לכולם */}
-        <Route path="/campaign/:groupSlug/:candidateSlug" element={<CampaignPage />} />
-        <Route path="/campaign/:candidateId" element={<CampaignPage />} />
-
-        {/* ראוטים שדורשים התחברות */}
-        <Route element={<RequireAuth />}>
-          <Route path="/groups/create" element={<CreateGroupPage />} />
-          <Route
-            path="/groups/:groupSlug/settings"
-            element={<GroupSettingsPage />}
-          />
-          <Route
-            path="/groups/:groupSlug/candidates"
-            element={<VotingPage />}
-          />
-
-          {/* <Route path="/campaign/:groupSlug/:candidateSlug" element={<CampaignPage />} />
-          <Route path="/campaign/:candidateId" element={<CampaignPage />} /> */}
-
-          <Route path="/profile" element={<ProfilePage />} />
-          <Route path="/tools/send-email" element={<SendEmailPage />} />
-        </Route>
-      </Routes>
-
-      <Footer />
-      <AccessibilityWidget />
-    </div>
-      </TourProvider>
+        <Footer />
+        <AccessibilityWidget />
+      </div>
+    </TourProvider>
 
   );
 }

@@ -1,4 +1,3 @@
-// src/pages/About/AboutPage.jsx
 import React, { useState } from 'react';
 import './AboutPage.css';
 import { useTranslation } from 'react-i18next';
@@ -15,35 +14,35 @@ export default function AboutPage() {
   };
 
   const features = [
-    { 
-      icon: <FaVoteYea />, 
-      titleKey: 'about.features.democratic.title', 
-      descKey: 'about.features.democratic.desc' 
+    {
+      icon: <FaVoteYea />,
+      titleKey: 'about.features.democratic.title',
+      descKey: 'about.features.democratic.desc'
     },
-    { 
-      icon: <FaLock />, 
-      titleKey: 'about.features.privacy.title', 
-      descKey: 'about.features.privacy.desc' 
+    {
+      icon: <FaLock />,
+      titleKey: 'about.features.privacy.title',
+      descKey: 'about.features.privacy.desc'
     },
-    { 
-      icon: <FaUsers />, 
-      titleKey: 'about.features.groups.title', 
-      descKey: 'about.features.groups.desc' 
+    {
+      icon: <FaUsers />,
+      titleKey: 'about.features.groups.title',
+      descKey: 'about.features.groups.desc'
     },
-    { 
-      icon: <FaChartLine />, 
-      titleKey: 'about.features.campaigns.title', 
-      descKey: 'about.features.campaigns.desc' 
+    {
+      icon: <FaChartLine />,
+      titleKey: 'about.features.campaigns.title',
+      descKey: 'about.features.campaigns.desc'
     },
-    { 
-      icon: <FaShieldAlt />, 
-      titleKey: 'about.features.secure.title', 
-      descKey: 'about.features.secure.desc' 
+    {
+      icon: <FaShieldAlt />,
+      titleKey: 'about.features.secure.title',
+      descKey: 'about.features.secure.desc'
     },
-    { 
-      icon: <FaLeaf />, 
-      titleKey: 'about.features.green.title', 
-      descKey: 'about.features.green.desc' 
+    {
+      icon: <FaLeaf />,
+      titleKey: 'about.features.green.title',
+      descKey: 'about.features.green.desc'
     },
   ];
 
@@ -56,7 +55,6 @@ export default function AboutPage() {
 
   return (
     <div className="about-page" dir={i18n.dir()}>
-      {/* HERO */}
       <header className="about-hero">
         <div className="about-hero-inner">
           <div className="about-badge">
@@ -75,7 +73,6 @@ export default function AboutPage() {
         </div>
       </header>
 
-      {/* MISSION STATEMENT */}
       <section className="mission-section">
         <div className="mission-content">
           <h2 className="section-title">{t('about.mission.title')}</h2>
@@ -83,13 +80,12 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* FEATURES - במבנה של Steps */}
       <section className="about-section">
         <h2 className="section-title centered">{t('about.features.sectionTitle')}</h2>
         <div className="features-section">
           {features.map((feature, idx) => (
-            <div 
-              key={idx} 
+            <div
+              key={idx}
               className="feature-card"
               onClick={() => toggleFeature(idx)}
             >
@@ -101,16 +97,12 @@ export default function AboutPage() {
                   <h3>{t(feature.titleKey)}</h3>
                   <p>{t(feature.descKey)}</p>
                 </div>
-                {/* <div className="expand-icon">
-                  {expandedFeature === idx ? <FaChevronUp /> : <FaChevronDown />}
-                </div> */}
               </div>
             </div>
           ))}
         </div>
       </section>
 
-      {/* USE CASES - במבנה של Tips */}
       <section className="use-cases-section">
         <h2 className="section-title centered">{t('about.useCases.sectionTitle')}</h2>
         <div className="use-cases-grid">

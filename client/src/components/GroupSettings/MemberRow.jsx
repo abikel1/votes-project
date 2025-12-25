@@ -1,4 +1,3 @@
-// src/pages/GroupSettingsPage/MemberRow.jsx
 import { useTranslation } from 'react-i18next';
 
 export default function MemberRow({ m, onRemove, isOwner }) {

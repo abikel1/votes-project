@@ -1,4 +1,3 @@
-// src/pages/Contact/ContactPage.jsx
 import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { sendMail } from '../../slices/mailSlice';
@@ -54,7 +53,7 @@ export default function ContactPage() {
         sendMail({
           to: CONTACT_EMAIL,
           subject: t('contact.mailSubject', { name: form.fullName.trim() }),
-          replyTo: form.fromEmail.trim(), // ✅ הכי חשוב
+          replyTo: form.fromEmail.trim(),
           text: `
 ${t('contact.mailText.nameLabel')}: ${form.fullName || '-'}
 ${t('contact.mailText.emailLabel')}: ${form.fromEmail || '-'}

@@ -18,7 +18,6 @@ export default function CountdownTimer({ endDate }) {
 
       const now = new Date();
 
-      // סוף היום – 23:59:59
       const endBase = new Date(endDate);
       const endOfDay = new Date(
         endBase.getFullYear(),
@@ -58,16 +57,13 @@ export default function CountdownTimer({ endDate }) {
 
   return (
     <div className="countdown-row">
-      
-      {/* שניות */}
+
       <div className="countdown-item">
         <span className="count-number">{timeLeft.seconds}</span>
         <span className="count-label">{t("timer.seconds")}</span>
       </div>
 
       <span className="count-sep">:</span>
-
-      {/* דקות */}
       <div className="countdown-item">
         <span className="count-number">{timeLeft.minutes}</span>
         <span className="count-label">{t("timer.minutes")}</span>
@@ -75,7 +71,6 @@ export default function CountdownTimer({ endDate }) {
 
       <span className="count-sep">:</span>
 
-      {/* שעות */}
       <div className="countdown-item">
         <span className="count-number">{timeLeft.hours}</span>
         <span className="count-label">{t("timer.hours")}</span>
@@ -83,7 +78,6 @@ export default function CountdownTimer({ endDate }) {
 
       <span className="count-sep">:</span>
 
-      {/* ימים */}
       <div className="countdown-item">
         <span className="count-number">{timeLeft.days}</span>
         <span className="count-label">{t("timer.days")}</span>

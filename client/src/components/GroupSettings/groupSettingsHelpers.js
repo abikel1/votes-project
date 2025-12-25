@@ -1,9 +1,5 @@
-// src/utils/groupSettingsHelpers.js
-
-// מערך ריק Immutable לשימוש בסלקטורים
 export const EMPTY_ARR = Object.freeze([]);
 
-// יצירת slug יפה לשם קבוצה
 export const makeSlug = (name = '') =>
   encodeURIComponent(
     String(name)
@@ -12,7 +8,6 @@ export const makeSlug = (name = '') =>
       .replace(/\s+/g, '-'),
   );
 
-// המרה של תאריך ל-value של input[type="date"]
 export function toLocalDateInputValue(d) {
   if (!d) return '';
   try {
@@ -25,7 +20,6 @@ export function toLocalDateInputValue(d) {
   }
 }
 
-// חילוץ userId מבקשת הצטרפות, לפי כל מיני שמות שדות אפשריים
 export function getReqUserId(r) {
   return (
     String(
@@ -40,7 +34,6 @@ export function getReqUserId(r) {
   );
 }
 
-// הצגת שם מצביע בצורה "יפה" מתוך name/email
 export const humanizeName = (raw, email) => {
   const cap = (s) => (s ? s.charAt(0).toUpperCase() + s.slice(1) : '');
   if (!raw && email) {
@@ -75,7 +68,6 @@ export const humanizeName = (raw, email) => {
   return parts.map((p) => cap(p.toLowerCase())).join(' ') || s;
 };
 
-// ולידציה בסיסית לטופס מועמד/ת
 export function validateCandidateFields({ name, description, symbol }) {
   const errors = {};
 

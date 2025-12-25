@@ -12,7 +12,7 @@ export default function SendEmailForm() {
   const [subject, setSubject] = useState('');
   const [text, setText] = useState('');
   const [html, setHtml] = useState('');
-  const [template, setTemplate] = useState(''); // לדוגמה: "resetPassword"
+  const [template, setTemplate] = useState('');
   const [varsJson, setVarsJson] = useState('{"link": "https://example.com"}');
 
   const onSubmit = (e) => {

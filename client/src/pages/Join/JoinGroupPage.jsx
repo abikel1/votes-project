@@ -1,4 +1,3 @@
-// client/src/pages/Join/JoinGroupPage.jsx
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -8,35 +7,23 @@ import { useTranslation } from 'react-i18next';
 const lc = (s) => (s || '').trim().toLowerCase();
 
 export default function JoinGroupPage() {
-  // בקישור יש שם קבוצה (slug), לא id
   const { slug } = useParams();
   const navigate = useNavigate();
   const { t } = useTranslation();
-
-  // מזהה/ת התחברות גם לפי userEmail (למשל אחרי OAuth)
   const { userId, userEmail } = useSelector((s) => s.auth || {});
-
   const [groupName, setGroupName] = useState('');
   const [group, setGroup] = useState(null);
   const [loading, setLoading] = useState(true);
-
-  // מודאלים
   const [showLoginPrompt, setShowLoginPrompt] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
-
-  // הודעות
   const [error, setError] = useState('');
-  const [hint, setHint] = useState(''); // הודעות ידידותיות (כבר חבר/ה, כבר יש בקשה וכו')
-
-  // למניעת שליחה כפולה
+  const [hint, setHint] = useState('');
   const postedOnceRef = useRef(false);
 
-  // אם עוברים לקישור /join/slug אחר – מאפסים את הדגל
   useEffect(() => {
     postedOnceRef.current = false;
   }, [slug]);
 
-  // טוען מידע על קבוצה לפי slug ומחזיר את האובייקט
   const loadGroupInfo = useCallback(async () => {
     if (!slug) {
       setGroup(null);
@@ -63,12 +50,11 @@ export default function JoinGroupPage() {
     }
   }, [slug, t]);
 
-  // שולח בקשת הצטרפות (למחוברים) – לפי groupId אמיתי מהשרת
   const sendJoinRequest = useCallback(
     async (groupIdFromServer) => {
       if (!groupIdFromServer) return;
 
-      if (postedOnceRef.current) return; // אל תשגר פעמיים
+      if (postedOnceRef.current) return;
       postedOnceRef.current = true;
 
       setLoading(true);
@@ -77,7 +63,6 @@ export default function JoinGroupPage() {
 
       try {
         const { data } = await http.post(`/groups/${groupIdFromServer}/join`);
-        // הצלחה רגילה
         setShowSuccess(true);
         if (data?.message && typeof data.message === 'string') {
           setHint(data.message);
@@ -85,10 +70,9 @@ export default function JoinGroupPage() {
       } catch (e) {
         const msg = String(
           e?.response?.data?.message ||
-            t('join.errors.sendRequestFailed')
+          t('join.errors.sendRequestFailed')
         );
 
-        // טיפול במקרים נפוצים – מציגים כהצלחה “רכה”
         if (/pending|already.*pending|exists/i.test(msg)) {
           setHint(t('join.hints.alreadyPending'));
           setShowSuccess(true);
@@ -99,9 +83,8 @@ export default function JoinGroupPage() {
           setHint(t('join.hints.groupOpen'));
           setShowSuccess(true);
         } else {
-          // שגיאה אמיתית
           setError(msg);
-          postedOnceRef.current = false; // אפשר לנסות שוב אם תרצי
+          postedOnceRef.current = false;
         }
       } finally {
         setLoading(false);
@@ -110,21 +93,17 @@ export default function JoinGroupPage() {
     [t]
   );
 
-  // זרימה ראשית
   useEffect(() => {
     (async () => {
       setLoading(true);
 
-      // 1) טוענים מידע על הקבוצה לפי slug
       const g = await loadGroupInfo();
       if (!g) {
         setLoading(false);
         return;
       }
 
-      const realGroupId = g._id; // זה ה־ObjectId האמיתי של הקבוצה
-
-      // 2) אם לא מחובר/ת – מבקשים להתחבר
+      const realGroupId = g._id;
       const loggedIn = !!(userId || userEmail);
       if (!loggedIn) {
         setShowLoginPrompt(true);
@@ -132,7 +111,6 @@ export default function JoinGroupPage() {
         return;
       }
 
-      // 3) בדיקת בעלות – אם זה המנהל, אין טעם בבקשה → ישר לעמוד הקבוצה
       const myEmailLc = lc(userEmail);
       const createdByEmailLc = lc(
         g.createdBy || g.created_by || g.ownerEmail || g.owner
@@ -147,7 +125,6 @@ export default function JoinGroupPage() {
       const isOwner = !!(isOwnerByEmail || isOwnerById || g.isOwner);
 
       if (isOwner) {
-        // ניווט לפי slug, לא לפי ID
         navigate(`/groups/${encodeURIComponent(slug)}`, {
           replace: true,
           state: { groupId: realGroupId },
@@ -156,7 +133,6 @@ export default function JoinGroupPage() {
         return;
       }
 
-      // 4) בודקים מול השרת אם המשתמש כבר חבר בקבוצה (לפי ID אמיתי)
       try {
         const { data: mem } = await http.get(
           `/groups/${realGroupId}/my-membership`
@@ -170,17 +146,13 @@ export default function JoinGroupPage() {
           return;
         }
       } catch (err) {
-        // אם נכשל (401/403 וכו') לא עוצרים – פשוט נעבור למסלול בקשת הצטרפות
       }
 
-      // 5) אם הגענו לכאן → לא מנהל/ת, לא חבר/ה → שולחים בקשת הצטרפות
       await sendJoinRequest(realGroupId);
     })();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userId, userEmail, loadGroupInfo, sendJoinRequest, slug, navigate]);
 
   const goLogin = () => {
-    // אחרי התחברות נחזור ל־/join/<slug>
     const redirectPath = `/join/${slug}`;
     const redirect = encodeURIComponent(redirectPath);
     navigate(`/login?redirect=${redirect}`);
@@ -203,7 +175,6 @@ export default function JoinGroupPage() {
         <div style={{ color: 'red', marginTop: 8 }}>{error}</div>
       ) : null}
 
-      {/* מודאל: דרושה התחברות לפני בקשה */}
       {showLoginPrompt && (
         <div className="modal-backdrop" onClick={cancelAndBack}>
           <div className="modal" onClick={(e) => e.stopPropagation()}>
@@ -238,7 +209,6 @@ export default function JoinGroupPage() {
         </div>
       )}
 
-      {/* מודאל: הצלחה לאחר שליחת בקשה / מצבים “רכים” */}
       {showSuccess && (
         <div className="modal-backdrop" onClick={closeSuccess}>
           <div className="modal" onClick={(e) => e.stopPropagation()}>
@@ -270,4 +240,3 @@ export default function JoinGroupPage() {
     </div>
   );
 }
-// סיום הקובץ JoinGroupPage.jsx

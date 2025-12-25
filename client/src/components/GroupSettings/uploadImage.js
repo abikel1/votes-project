@@ -11,7 +11,7 @@ export async function uploadImage(file) {
     if (!res.ok) throw new Error('Upload failed');
 
     const data = await res.json();
-    return data.url; // URL של התמונה ב-Cloudinary
+    return data.url;
   } catch (err) {
     console.error(err);
     return null;

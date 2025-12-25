@@ -1,4 +1,3 @@
-// src/components/AccessibilityWidget.jsx
 import { useState, useEffect } from "react";
 import "./AccessibilityWidget.css";
 import { FaUniversalAccess } from "react-icons/fa";
@@ -36,7 +35,7 @@ export default function AccessibilityWidget() {
     try {
       const saved = parseFloat(localStorage.getItem(STORAGE_KEY));
       if (!Number.isNaN(saved)) initial = saved;
-    } catch {}
+    } catch { }
     const clamped = applyFontScale(initial);
     setFontScale(clamped);
   }, []);
@@ -65,12 +64,10 @@ export default function AccessibilityWidget() {
 
   return (
     <>
-      {/* כפתור עגול צף */}
       <button className="accessibility-btn" onClick={toggle} title="נגישות">
         <FaUniversalAccess />
       </button>
 
-      {/* פאנל נגישות בסגנון אריחים */}
       {open && (
         <div className="accessibility-panel">
           <div className="a11y-panel-header">
@@ -84,7 +81,6 @@ export default function AccessibilityWidget() {
             </button>
           </div>
 
-          {/* התאמות גודל טקסט */}
           <div className="a11y-section">
             <div className="a11y-section-title">התאמות טקסט</div>
             <div className="a11y-tile-row">
@@ -128,7 +124,6 @@ export default function AccessibilityWidget() {
             </button>
           </div>
 
-          {/* התאמות ניגודיות וקישורים */}
           <div className="a11y-section">
             <div className="a11y-section-title">התאמות ניגודיות וקישורים</div>
             <div className="a11y-tile-row">

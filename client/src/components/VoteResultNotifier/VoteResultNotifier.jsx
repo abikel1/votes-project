@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-
 import {
     fetchMyFinishedVotedGroups,
     selectFinishedVotedGroups,
@@ -10,14 +9,12 @@ import {
 
 import './VoteResultNotifier.css';
 
-// מפתח ייחודי למשתמש (כדי להפריד בין משתמשים שונים באותו דפדפן)
 const makeUserKey = (userId, email) => {
     if (userId) return `id:${String(userId)}`;
     if (email) return `email:${String(email).trim().toLowerCase()}`;
     return null;
 };
 
-// קריאת רשימת קבוצות שהמשתמש כבר ראה עבורן פופ־אפ
 function loadNotifiedGroups(userKey) {
     if (!userKey) return new Set();
     try {
@@ -30,7 +27,6 @@ function loadNotifiedGroups(userKey) {
     }
 }
 
-// כתיבת הרשימה ל־localStorage
 function saveNotifiedGroups(userKey, set) {
     if (!userKey) return;
     try {
@@ -39,14 +35,9 @@ function saveNotifiedGroups(userKey, set) {
             JSON.stringify(Array.from(set || [])),
         );
     } catch {
-        // לא מפילים את האפליקציה :)
     }
 }
 
-/**
- * פופ־אפ גלובלי: "ההצבעה הסתיימה ויש זוכה"
- * ➤ לכל משתמש: פעם אחת לכל קבוצה שהוא הצביע בה.
- */
 export default function VoteResultNotifier() {
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -62,7 +53,6 @@ export default function VoteResultNotifier() {
     const [notifiedSet, setNotifiedSet] = useState(new Set());
     const [currentGroup, setCurrentGroup] = useState(null);
 
-    // טעינת סט הקבוצות שנצפו מה־localStorage כשמשתמש משתנה
     useEffect(() => {
         if (!isAuthed || !userKey) {
             setNotifiedSet(new Set());
@@ -72,22 +62,17 @@ export default function VoteResultNotifier() {
         setNotifiedSet(loadNotifiedGroups(userKey));
     }, [isAuthed, userKey]);
 
-    // טעינת קבוצות שהסתיימו והמשתמש הצביע בהן
     useEffect(() => {
         if (!isAuthed) return;
         dispatch(fetchMyFinishedVotedGroups());
     }, [dispatch, isAuthed]);
 
-    // בחירת קבוצה אחת שלא קיבלה עדיין פופ־אפ עבור *המשתמש הזה*
     useEffect(() => {
         if (!isAuthed) return;
         if (!finishedGroups.length) return;
 
         const candidate = finishedGroups.find((g) => {
             const gid = String(g.groupId);
-
-            // ✅ אם יש שדה votedByMe – נסנן לפיו.
-            // ✅ אם אין שדה כזה – נניח true (כלומר ה־API כבר החזיר רק קבוצות שהמשתמש הצביע בהן).
             const votedFlag = Object.prototype.hasOwnProperty.call(g, 'votedByMe')
                 ? g.votedByMe === true
                 : true;
@@ -102,12 +87,9 @@ export default function VoteResultNotifier() {
         }
     }, [finishedGroups, notifiedSet, isAuthed]);
 
-    // אם אין קבוצה להציג – לא מציגים כלום
     if (!currentGroup) return null;
 
     const gid = String(currentGroup.groupId);
-
-    // 👇 מציגים את *כל* הזוכים (למקרה של תיקו, כמה זוכים וכו')
     const winnerNames =
         (currentGroup.winners || [])
             .filter((w) => w && w.name)

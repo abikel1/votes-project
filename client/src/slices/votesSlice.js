@@ -1,22 +1,15 @@
-// src/slices/votesSlice.js
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import http from '../api/http';
 import i18n from '../i18n';
 
-/**
- * הצבעה למועמד/ת
- * POST /votes/create  body: { userId, groupId, candidateId }
- */
 export const voteForCandidate = createAsyncThunk(
   'votes/voteForCandidate',
   async ({ groupId, candidateId }, { getState, rejectWithValue }) => {
     try {
       const userId = getState().auth?.userId;
       if (!userId) {
-        // לא מחובר – הודעה מתורגמת
         return rejectWithValue(i18n.t('votes.errors.notLoggedIn'));
       }
-
       const { data } = await http.post('/votes/create', { userId, groupId, candidateId });
       return { groupId, candidateId, data };
     } catch (e) {
@@ -27,10 +20,6 @@ export const voteForCandidate = createAsyncThunk(
   }
 );
 
-/**
- * מצביעים לפי קבוצה
- * GET /votes/group/:groupId/voters
- */
 export const fetchVotersByGroup = createAsyncThunk(
   'votes/fetchVotersByGroup',
   async (groupId, { rejectWithValue }) => {
@@ -48,10 +37,6 @@ export const fetchVotersByGroup = createAsyncThunk(
   }
 );
 
-/**
- * האם המשתמש הנוכחי כבר הצביע בקבוצה
- * GET /votes/has-voted?userId=..&groupId=..
- */
 export const checkHasVoted = createAsyncThunk(
   'votes/checkHasVoted',
   async ({ groupId }, { getState, rejectWithValue }) => {
@@ -69,16 +54,12 @@ export const checkHasVoted = createAsyncThunk(
   }
 );
 
-/**
- * 🔔 מהשרת: קבוצות שהמשתמש הצביע בהן, ההצבעה הסתיימה, כולל זוכים
- * GET /votes/my-finished
- */
 export const fetchMyFinishedVotedGroups = createAsyncThunk(
   'votes/fetchMyFinishedVotedGroups',
   async (_, { rejectWithValue }) => {
     try {
       const { data } = await http.get('/votes/my-finished');
-      return data; // array
+      return data;
     } catch (e) {
       return rejectWithValue(i18n.t('votes.errors.fetchMyFinishedFailed'));
     }
@@ -89,17 +70,13 @@ const initialState = {
   status: 'idle',
   error: null,
   lastVote: null,
-  hasVoted: false,             // האם המשתמש הנוכחי הצביע בקבוצה האחרונה שנבדקה
-
-  // 🔔 קבוצות שהמשתמש הצביע בהן וההצבעה הסתיימה (מהשרת)
-  finishedVotedGroups: [],     // [{ groupId, groupName, endDate, winners: [...] }]
+  hasVoted: false,
+  finishedVotedGroups: [],
   finishedStatus: 'idle',
   finishedError: null,
-
-  // מפות פר-קבוצה להצגת המצביעים
-  votersByGroup: {},           // { [groupId]: Voter[] }
-  votersLoadingByGroup: {},    // { [groupId]: boolean }
-  votersErrorByGroup: {},      // { [groupId]: string|null }
+  votersByGroup: {},
+  votersLoadingByGroup: {},
+  votersErrorByGroup: {},
 };
 
 const votesSlice = createSlice({
@@ -111,11 +88,9 @@ const votesSlice = createSlice({
       const gid = String(action.payload);
       if (gid) state.votersErrorByGroup[gid] = null;
     },
-    // אופציונלי: איפוס סטטוס ההצבעה המקומי
     resetHasVoted(state) { state.hasVoted = false; },
   },
   extraReducers: (b) => {
-    // הצבעה
     b.addCase(voteForCandidate.pending, (s) => {
       s.status = 'loading';
       s.error = null;
@@ -130,7 +105,6 @@ const votesSlice = createSlice({
       s.error = a.payload || i18n.t('votes.errors.voteFailed');
     });
 
-    // בדיקת "כבר הצבעתי"
     b.addCase(checkHasVoted.pending, (s) => {
       s.status = 'loading';
     });
@@ -142,8 +116,6 @@ const votesSlice = createSlice({
       s.status = 'failed';
       s.hasVoted = false;
     });
-
-    // מצביעים לפי קבוצה
     b.addCase(fetchVotersByGroup.pending, (s, a) => {
       const gid = String(a.meta.arg);
       s.votersLoadingByGroup[gid] = true;
@@ -160,8 +132,6 @@ const votesSlice = createSlice({
       s.votersErrorByGroup[gid] =
         a.payload?.message || i18n.t('votes.errors.fetchVotersFailed');
     });
-
-    // 🔔 קבוצות שסיימו הצבעה עבור המשתמש
     b.addCase(fetchMyFinishedVotedGroups.pending, (s) => {
       s.finishedStatus = 'loading';
       s.finishedError = null;
@@ -185,7 +155,6 @@ export const {
 
 export default votesSlice.reducer;
 
-/** Selectors פר-קבוצה */
 export const selectVotersForGroup = (groupId) => (state) =>
   state.votes?.votersByGroup?.[String(groupId)] || [];
 
@@ -195,6 +164,5 @@ export const selectVotersLoadingForGroup = (groupId) => (state) =>
 export const selectVotersErrorForGroup = (groupId) => (state) =>
   state.votes?.votersErrorByGroup?.[String(groupId)] || null;
 
-// 🔔 סלקטור לפופ-אפ
 export const selectFinishedVotedGroups = (state) =>
   state.votes?.finishedVotedGroups || [];

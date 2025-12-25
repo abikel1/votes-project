@@ -1,4 +1,3 @@
-// src/components/CandidateApplyForm.jsx
 import { useDispatch, useSelector } from 'react-redux';
 import { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -42,7 +41,6 @@ export default function CandidateApplyForm({ groupId, candidateRequests = [] }) 
 
   const [userRequest, setUserRequest] = useState(null);
 
-  // 👇 חדש: קובץ שמחכים לחתוך
   const [fileToCrop, setFileToCrop] = useState(null);
 
   useEffect(() => {
@@ -69,8 +67,6 @@ export default function CandidateApplyForm({ groupId, candidateRequests = [] }) 
     setForm((prev) => ({ ...prev, photoUrl: '' }));
   };
 
-  // ❌ זה היה קודם handleUpload שעשה upload ישיר
-  // ✅ עכשיו – רק שומר את הקובץ לחיתוך ופותח מודאל
   const handleUpload = async (file) => {
     if (!file) return;
 
@@ -142,7 +138,6 @@ export default function CandidateApplyForm({ groupId, candidateRequests = [] }) 
     );
   }
 
-  // סטטוסים שחוסמים את הצגת הטופס
   if (userRequest) {
     if (userRequest.status === 'pending') {
       return (
@@ -163,14 +158,12 @@ export default function CandidateApplyForm({ groupId, candidateRequests = [] }) 
 
   return (
     <div className="auth-card register-card">
-      {/* נדחה */}
       {userRequest?.status === 'rejected' && (
         <div className="alert alert-warning">
           {t('candidateApply.status.rejected')}
         </div>
       )}
 
-      {/* נמחק */}
       {userRequest?.status === 'removed' && (
         <div className="alert alert-warning">
           {t('candidateApply.status.removed')}
@@ -188,25 +181,13 @@ export default function CandidateApplyForm({ groupId, candidateRequests = [] }) 
         onChange={handleFieldChange}
         onSubmit={handleSubmit}
         uploading={uploading}
-        onUploadFile={handleUpload}  // 👈 עכשיו
+        onUploadFile={handleUpload}  
         fileInputRef={fileInputRef}
         clearPhoto={clearPhoto}
         submitLabel={loading ? t('candidateApply.submitting') : t('candidateApply.submit')}
         submitDisabled={loading || uploading}
       />
-
-
       {error && <p className="error-text">❌ {error}</p>}
-
-      {/* מודאל חיתוך – נפתח רק כשיש fileToCrop */}
-      {/* {fileToCrop && (
-        <ImageCropModal
-          file={fileToCrop}
-          aspect={1} // 1:1 – פרופיל
-          onCancel={() => setFileToCrop(null)}
-          onCropped={handleCroppedFile}
-        />
-      )} */}
     </div>
   );
 }

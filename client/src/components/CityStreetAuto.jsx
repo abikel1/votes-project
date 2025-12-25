@@ -53,7 +53,6 @@ export default function CityStreetAuto({
   maxSuggestions = 20,
   cityInputProps = {},
   streetInputProps = {},
-  // ✅ חדשים:
   onlyCity = false,
   onlyStreet = false,
 }) {
@@ -62,8 +61,8 @@ export default function CityStreetAuto({
   const [cityInput, setCityInput] = useState(city || "");
   const [streetInput, setStreetInput] = useState(address || "");
 
-  const [allCities, setAllCities] = useState([]); // [{name, code}]
-  const [cityNames, setCityNames] = useState([]); // ["תל אביב-יפו", ...]
+  const [allCities, setAllCities] = useState([]);
+  const [cityNames, setCityNames] = useState([]);
   const [cities, setCities] = useState([]);
   const [allStreets, setAllStreets] = useState([]);
   const [streets, setStreets] = useState([]);
@@ -75,7 +74,6 @@ export default function CityStreetAuto({
   const cityLoadedRef = useRef("");
   const selectedCityCodeRef = useRef(null);
 
-  // --- load cities (paginated) ---
   useEffect(() => {
     let cancelled = false;
     (async () => {
@@ -120,7 +118,6 @@ export default function CityStreetAuto({
     };
   }, [maxSuggestions]);
 
-  // --- filter cities locally ---
   const filterCities = useDebounce((term) => {
     const tNorm = norm(term);
     if (!tNorm) {
@@ -134,7 +131,6 @@ export default function CityStreetAuto({
     setCities([...starts, ...rest].slice(0, maxSuggestions));
   }, 150);
 
-  // --- load streets by city code (paginated) ---
   const loadStreetsForCityCode = async (cityCode) => {
     if (cityCode == null) {
       setAllStreets([]);
@@ -175,7 +171,6 @@ export default function CityStreetAuto({
     }
   };
 
-  // --- filter streets locally ---
   const filterStreets = useDebounce((term) => {
     const tNorm = norm(term);
     if (!tNorm) {
@@ -189,23 +184,19 @@ export default function CityStreetAuto({
     setStreets([...starts, ...rest].slice(0, maxSuggestions));
   }, 150);
 
-  // sync props
   useEffect(() => setCityInput(city || ""), [city]);
   useEffect(() => setStreetInput(address || ""), [address]);
 
-  // live filtering
   useEffect(() => {
     filterCities(cityInput);
   }, [cityInput, cityNames]);
 
-  // exact city match
   const exactCityObj = useMemo(() => {
     const vTrim = (cityInput ?? "").trim();
     return allCities.find((c) => c.name === vTrim) || null;
   }, [allCities, cityInput]);
   const isExactCity = !!exactCityObj;
 
-  // load streets when exact city selected
   useEffect(() => {
     if (!isExactCity) {
       setAllStreets([]);
@@ -256,7 +247,6 @@ export default function CityStreetAuto({
     }
   }, [cityNames, allStreets, cityInput, streetInput, maxSuggestions]);
 
-  // ---- RENDER ----
   const CityInput = (
     <input
       list={`${idPrefix}-cities`}
@@ -290,7 +280,6 @@ export default function CityStreetAuto({
     <div className={className}>
       {variant === "blockCube" ? (
         <>
-          {/* עיר */}
           {!onlyStreet && (
             <>
               <BlockCubeInput>{CityInput}</BlockCubeInput>
@@ -302,7 +291,6 @@ export default function CityStreetAuto({
             </>
           )}
 
-          {/* רחוב */}
           {!onlyCity && (
             <>
               <BlockCubeInput>{StreetInput}</BlockCubeInput>
@@ -316,7 +304,6 @@ export default function CityStreetAuto({
         </>
       ) : (
         <>
-          {/* עיר */}
           {!onlyStreet && (
             <>
               {CityInput}
@@ -328,7 +315,6 @@ export default function CityStreetAuto({
             </>
           )}
 
-          {/* רחוב */}
           {!onlyCity && (
             <>
               {StreetInput}

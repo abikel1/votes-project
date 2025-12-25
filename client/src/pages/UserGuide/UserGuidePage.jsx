@@ -109,7 +109,6 @@ export default function EnhancedUserGuide() {
     },
   ];
 
-  // כרגע הסקשן של tips אצלך בהערה, אבל השארתי את המערך מוכן למקרה שתחזיר אותו
   const tips = [
     {
       icon: <Zap className="icon-small" />,
@@ -180,21 +179,6 @@ export default function EnhancedUserGuide() {
           </div>
         ))}
       </section>
-
-      {/* אם תחזיר את הטיפים, זה כבר מוכן:
-      <section className="tips-section">
-        <h2 className="section-title">{t('guide.tips.sectionTitle')}</h2>
-        <div className="tips-grid">
-          {tips.map((tip, i) => (
-            <div key={i} className="tip-card">
-              <div className="tip-icon">{tip.icon}</div>
-              <h4>{tip.title}</h4>
-              <p>{tip.description}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-      */}
     </div>
   );
 }

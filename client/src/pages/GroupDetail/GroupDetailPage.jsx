@@ -1,4 +1,3 @@
-// src/pages/GroupDetail/GroupDetailPage.jsx
 import { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
@@ -48,7 +47,6 @@ import http from '../../api/http';
 import CandidateApplyForm from '../../components/CandidateApplyForm';
 import { useTranslation } from 'react-i18next';
 import '../../Tour/TourButton.css';
-// צבעים לגרפים
 const COLORS = [
   '#003366',
   '#8b5cf6',
@@ -111,10 +109,8 @@ function GroupDetailPageContent() {
   const [isChatOpen, setIsChatOpen] = useState(false);
 
 
-  // טאב פעיל במובייל: 'candidates' או 'info'
   const [activeTab, setActiveTab] = useState('candidates');
 
-  // זיהוי גודל מסך
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
 
   useEffect(() => {
@@ -125,7 +121,6 @@ function GroupDetailPageContent() {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // ===== קריאת מזהי משתמש/מייל והרשאות בסיס =====
   const gidStr = group?._id ? String(group._id) : '';
   const slug = makeSlug(group?.name || groupSlug || gidStr || '');
   const isLocked = !!group?.isLocked;
@@ -162,7 +157,6 @@ function GroupDetailPageContent() {
   const canChat = !isLocked || isOwner || isMember;
   const [candidatesWithCampaign, setCandidatesWithCampaign] = useState([]);
 
-  // מדריך המשתמש
   const { tourInitialized, openTour } = useGroupDetailTour({
     group,
     candidates,
@@ -171,7 +165,6 @@ function GroupDetailPageContent() {
     isMobile
   });
 
-  // ===== פתרון groupId לפי slug (אם נכנסו ישירות לכתובת) =====
   useEffect(() => {
     if (navGroupId) {
       setGroupId(navGroupId);
@@ -190,21 +183,11 @@ function GroupDetailPageContent() {
     })();
   }, [navGroupId, groupSlug]);
 
-  // ===== טעינת נתוני קבוצה, מועמדים =====
-  // ===== טעינת נתוני קבוצה, מועמדים =====
-
   const [barData, setBarData] = useState([]);
   const [pieData, setPieData] = useState([]);
-
-  // גרפים נפרדים לתוצאות הסופיות (votes)
   const [voteBarData, setVoteBarData] = useState([]);
   const [votePieData, setVotePieData] = useState([]);
 
-
-
-  // ב-2 useEffect נפרדים:
-
-  // 1. גרפים של לייקים (סקר תמיכה)
   useEffect(() => {
     if (!candidatesWithCampaign || candidatesWithCampaign.length === 0) return;
 
@@ -224,7 +207,6 @@ function GroupDetailPageContent() {
     setPieData(pie);
   }, [candidatesWithCampaign]);
 
-  // 2. גרפים של הצבעות (תוצאות סופיות)
   useEffect(() => {
     if (!candidates || candidates.length === 0) return;
 
@@ -244,31 +226,22 @@ function GroupDetailPageContent() {
     setVotePieData(pie);
   }, [candidates]);
 
-  // ===== לאחר טעינת הקבוצה =====
   useEffect(() => {
     console.log('Loaded group:', group);
   }, [group]);
 
-  // ===== לאחר טעינת המועמדים =====
   useEffect(() => {
     console.log('Loaded candidates:', candidates);
   }, [candidates]);
 
-  // ===== לאחר טעינת הקמפיינים לכל מועמד =====
-  // ===== State לגרפים =====
-
-
-  // ===== עדכון גרפים לאחר טעינת קמפיינים =====
   useEffect(() => {
     if (!candidatesWithCampaign || candidatesWithCampaign.length === 0) return;
 
-    // Bar chart – כל המועמדים
     const bar = candidatesWithCampaign.map(c => ({
       name: c.name ? (c.name.length > 12 ? c.name.slice(0, 12) + '...' : c.name) : 'לא ידוע',
       likeCount: Number(c.campaign?.campaign?.likeCount || 0),
     }));
 
-    // Pie chart – רק מועמדים עם לייקים
     const pie = candidatesWithCampaign
       .filter(c => Number(c.campaign?.campaign?.likeCount || 0) > 0)
       .map(c => ({
@@ -290,13 +263,13 @@ function GroupDetailPageContent() {
       dispatch(fetchGroupWithMembers(groupId));
       dispatch(fetchCandidatesByGroup(groupId));
     }
-  }, [dispatch, groupId]); // <-- סוגר את ה-useEffect הראשון
+  }, [dispatch, groupId]);
 
   useEffect(() => {
     if (isAuthed) {
       dispatch(fetchMyGroups());
     }
-  }, [dispatch, groupId, isAuthed]); // <-- useEffect השני
+  }, [dispatch, groupId, isAuthed]);
 
   useEffect(() => {
     async function loadCampaigns() {
@@ -306,7 +279,7 @@ function GroupDetailPageContent() {
         candidates.map(async (c) => {
           try {
             const result = await dispatch(fetchCampaign(c._id)).unwrap();
-            return { ...c, campaign: result }; // מחזיר את הקמפיין לכל מועמד
+            return { ...c, campaign: result };
           } catch (err) {
             console.error('Error fetching campaign for candidate', c._id, err);
             return { ...c, campaign: null };
@@ -319,8 +292,6 @@ function GroupDetailPageContent() {
 
     loadCampaigns();
   }, [candidates, dispatch]);
-
-  // ===== Resize bar =====
   useEffect(() => {
     const handleMouseMove = (e) => {
       if (!isDragging || !containerRef.current) return;
@@ -340,7 +311,6 @@ function GroupDetailPageContent() {
     };
   }, [isDragging]);
 
-  // ===== טיפול בשגיאות / מצבי טעינה =====
   if (groupError) {
     return (
       <div className="group-detail-error">
@@ -388,10 +358,7 @@ function GroupDetailPageContent() {
     return <div className="loading-wrap">{t('groups.detail.loading')}</div>;
   }
 
-  // candidateRequests מהשרת (מגיעים ב-getGroupById)
   const candidateRequests = group.candidateRequests || [];
-
-  // סוף יום ההצבעה – 23:59:59 של אותו יום
   let endAt = group?.endDate ? new Date(group.endDate) : null;
 
   if (endAt) {
@@ -405,7 +372,6 @@ function GroupDetailPageContent() {
 
   const isExpired = endAt ? endAt < new Date() : false;
 
-  // 🔒 קבוצה נעולה + לא מחובר כלל
   if (isLocked && !isAuthed) {
     return (
       <div className="page-wrap dashboard">
@@ -443,8 +409,6 @@ function GroupDetailPageContent() {
       </div>
     );
   }
-
-  // 🔒 קבוצה נעולה + משתמש מחובר אבל *לא* חבר בקבוצה (ולא מנהלת)
   if (isLocked && isAuthed && !isOwner && !isMember) {
     return (
       <div className="page-wrap dashboard">
@@ -466,9 +430,6 @@ function GroupDetailPageContent() {
       </div>
     );
   }
-
-  // ---- מכאן והלאה: או קבוצה פתוחה, או נעולה שהמשתמש חבר/מנהלת ----
-
   const goSettings = () => {
     navigate(`/groups/${slug}/settings`, {
       state: { groupId },
@@ -501,36 +462,23 @@ function GroupDetailPageContent() {
 
   return (
     <div className="page-wrap dashboard">
-      {/* כפתור הפעלת המדריך */}
-     {tourInitialized && (
-  <button onClick={openTour} className="tour-fab">
-    <HelpCircle className="tour-icon" />
-  </button>
-)}
+      {tourInitialized && (
+        <button onClick={openTour} className="tour-fab">
+          <HelpCircle className="tour-icon" />
+        </button>
+      )}
 
 
       <div id="group-detail-header" className="page-header clean-header">
         <div className="header-title">
-          {/* שם הקבוצה תמיד מלא */}
           <h2 className="group-name" title={group.name}>
             {group.name}
           </h2>
-
-          {/* תיאור עם 'קרא עוד/קרא פחות' */}
           {group.description && (
             <div className={`group-description-container ${descExpanded ? 'expanded' : ''}`}>
               <p className="group-description">{group.description}</p>
               {group.description.length > 50 && (
                 <button className="read-more-btn" onClick={toggleDesc}>
-                  {/* {descExpanded ? (
-        <>
-          פחות <BiChevronUp size={18} style={{ verticalAlign: 'middle' }} />
-        </>
-      ) : (
-        <>
-          עוד <BiChevronDown size={18} style={{ verticalAlign: 'middle' }} />
-        </>
-      )}         */}
                 </button>
               )}
             </div>
@@ -557,11 +505,6 @@ function GroupDetailPageContent() {
           </button>
         </div>
       </div>
-
-
-
-
-
       <div id="group-detail-meta" className="meta-and-button">
         <div className="group-meta">
           <div>
@@ -610,27 +553,25 @@ function GroupDetailPageContent() {
         </p>
       )}
 
-      {/* במובייל: טאבים למטה */}
       {isMobile && (
-     <div id="mobile-tabs" className="mobile-tabs">
-  <button
-    className={`mobile-tab ${activeTab === 'candidates' ? 'active' : ''}`}
-    onClick={() => setActiveTab('candidates')}
-  >
-    {t('groups.detail.tabs.candidates')}
-  </button>
+        <div id="mobile-tabs" className="mobile-tabs">
+          <button
+            className={`mobile-tab ${activeTab === 'candidates' ? 'active' : ''}`}
+            onClick={() => setActiveTab('candidates')}
+          >
+            {t('groups.detail.tabs.candidates')}
+          </button>
 
-  <button
-    className={`mobile-tab ${activeTab === 'info' ? 'active' : ''}`}
-    onClick={() => setActiveTab('info')}
-  >
-    {t('groups.detail.tabs.info')}
-  </button>
-</div>
+          <button
+            className={`mobile-tab ${activeTab === 'info' ? 'active' : ''}`}
+            onClick={() => setActiveTab('info')}
+          >
+            {t('groups.detail.tabs.info')}
+          </button>
+        </div>
       )}
 
       <div className="main-content-resizable" ref={containerRef}>
-        {/* צד שמאל – מועמדים */}
         <div
           className={`left-section ${isMobile && activeTab !== 'candidates' ? 'hidden' : ''}`}
           style={!isMobile ? { width: `${leftWidth}%` } : {}}
@@ -644,12 +585,11 @@ function GroupDetailPageContent() {
               <p>{t('groups.detail.candidates.loading')}</p>
             )}
 
-
             {!loadingCandidates && candidates.length > 0 && (
               <div className="candidates-grid">
                 {sortedCandidates.map((c, index) => {
                   const winnerIndex = winners.findIndex((w) => w._id === c._id);
-                  const hasCampaign = !!c.userId; // בדיקה אם יש קמפיין
+                  const hasCampaign = !!c.userId;
 
                   return (
                     <div
@@ -678,7 +618,6 @@ function GroupDetailPageContent() {
                         />
                       )}
 
-                      {/* אם הקבוצה נגמרה והמועמד מנצח – הצג מקום */}
                       {isGroupExpired && winnerIndex !== -1 && (
                         <div className="winner-badge">
                           {winnerIndex + 1}
@@ -689,7 +628,7 @@ function GroupDetailPageContent() {
                         <button
                           className="campaign-btn"
                           onClick={(e) => {
-                            e.stopPropagation(); // מונע את הלחיצה על הכרטיס
+                            e.stopPropagation();
                             const candidateSlug = makeCandidateSlug(c.name || '');
                             navigate(`/campaign/${slug}/${candidateSlug}`, {
                               state: { groupId },
@@ -724,7 +663,6 @@ function GroupDetailPageContent() {
           </div>
         </div>
 
-        {/* פס גרירה - רק במסכים גדולים */}
         {!isMobile && (
           <div
             className="resize-handle"
@@ -734,7 +672,6 @@ function GroupDetailPageContent() {
           </div>
         )}
 
-        {/* צד ימין – מידע / גרפים / טפסים */}
         <div
           className={`right-section ${isMobile && activeTab !== 'info' ? 'hidden' : ''}`}
           style={!isMobile ? { width: `${100 - leftWidth}%` } : {}}
@@ -751,7 +688,6 @@ function GroupDetailPageContent() {
           {isVotingPhase && (
             <div className="group-details-card">
               <div className="group-info-grid">
-                {/* Info cards */}
                 <div className="info-card">
                   <HiClock size={28} color="#1e3a8a" />
                   <p>{t('groups.detail.infoCards.timeLeft')}</p>
@@ -774,20 +710,17 @@ function GroupDetailPageContent() {
                 </div>
               </div>
 
-              {/* גרפים – מחוץ ל-grid */}
-              {/* גרפים – מחוץ ל-grid */}
               {candidatesWithCampaign &&
                 candidatesWithCampaign.length > 0 &&
                 barData.some((c) => c.likeCount > 0) && (
                   <div className="survey-card">
-                 <h3>{t('groups.detail.survey.title')}</h3>
+                    <h3>{t('groups.detail.survey.title')}</h3>
 
-  <p className="survey-note">
-    {t('groups.detail.survey.note')}
-  </p>
+                    <p className="survey-note">
+                      {t('groups.detail.survey.note')}
+                    </p>
 
                     <div className="survey-charts-container">
-                      {/* Bar Chart */}
                       <div className="survey-chart chart-bar">
                         <ResponsiveContainer width="100%" height={300}>
                           <BarChart data={barData}>
@@ -803,7 +736,6 @@ function GroupDetailPageContent() {
                         </ResponsiveContainer>
                       </div>
 
-                      {/* Pie Chart */}
                       <div className="survey-chart chart-pie">
                         <ResponsiveContainer width="100%" height={300}>
                           <PieChart>
@@ -827,13 +759,8 @@ function GroupDetailPageContent() {
                     </div>
                   </div>
                 )}
-
-
             </div>
           )}
-
-
-
 
           {isGroupExpired && totalVotes > 0 && (
             <div className="charts">
@@ -842,14 +769,14 @@ function GroupDetailPageContent() {
                 <ResponsiveContainer width="100%" height={250}>
                   <PieChart>
                     <Pie
-                      data={votePieData}  // 👈 שינוי כאן
+                      data={votePieData}
                       dataKey="value"
                       nameKey="name"
                       cx="50%"
                       cy="50%"
                       outerRadius="80%"
                     >
-                      {votePieData.map((_, i) => (  // 👈 שינוי כאן
+                      {votePieData.map((_, i) => (
                         <Cell
                           key={i}
                           fill={COLORS[i % COLORS.length]}
@@ -869,7 +796,7 @@ function GroupDetailPageContent() {
               <div className="bar-chart-container">
                 <h3>{t('groups.detail.charts.barTitle')}</h3>
                 <ResponsiveContainer width="100%" height={250}>
-                  <BarChart data={voteBarData}>  {/* 👈 שינוי כאן */}
+                  <BarChart data={voteBarData}>
                     <XAxis
                       dataKey="name"
                       angle={-45}
@@ -898,42 +825,36 @@ function GroupDetailPageContent() {
         </div>
       </div>
 
-      {/* כפתור צ'אט צף בצד ימין למטה – יוצג רק אם המשתמש מחובר */}
+      {tourInitialized && (
+        <button onClick={openTour} className="tour-fab">
+          <HelpCircle className="tour-icon" />
+        </button>
+      )}
 
-
-{/* כפתור מדריך המשתמש (סיור) - תמיד גלוי */}
-{tourInitialized && (
-  <button onClick={openTour} className="tour-fab">
-    <HelpCircle className="tour-icon" />
-  </button>
-)}
-
-{/* כפתור צ'אט צף בצד ימין למטה – יוצג רק אם המשתמש מחובר */}
-{isAuthed && (
-  <>
-    <button
-      id="chat-fab"
-      type="button"
-      className="chat-fab"
-      onClick={() => setIsChatOpen((prev) => !prev)}
-    >
-      {isChatOpen ? <FiX size={20} /> : <FiMessageSquare size={20} />}
-    </button>
-    {isChatOpen && (
-      <div className="chat-panel" id="group-chat-panel">
-        <GroupChat
-          groupId={groupId}
-          canChat={canChat}
-          currentUserId={myId}
-          isOwner={isOwner}
-        />
-      </div>
-    )}
-  </>
-)}
+      {isAuthed && (
+        <>
+          <button
+            id="chat-fab"
+            type="button"
+            className="chat-fab"
+            onClick={() => setIsChatOpen((prev) => !prev)}
+          >
+            {isChatOpen ? <FiX size={20} /> : <FiMessageSquare size={20} />}
+          </button>
+          {isChatOpen && (
+            <div className="chat-panel" id="group-chat-panel">
+              <GroupChat
+                groupId={groupId}
+                canChat={canChat}
+                currentUserId={myId}
+                isOwner={isOwner}
+              />
+            </div>
+          )}
+        </>
+      )}
     </div>
   );
-
 
 }
 export default function GroupDetailPage() {

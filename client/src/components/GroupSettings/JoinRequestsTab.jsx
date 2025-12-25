@@ -1,4 +1,3 @@
-// src/pages/GroupSettingsPage/JoinRequestsTab.jsx
 import { useTranslation } from 'react-i18next';
 
 export default function JoinRequestsTab({
@@ -32,7 +31,6 @@ export default function JoinRequestsTab({
           {reqsLoading ? (
             <div>{t('joinRequests.loading')}</div>
           ) : reqsError ? (
-            // שגיאה גולמית מהשרת – משאירים כמו שהיא, לא מנסים לתרגם
             <div className="err">{reqsError}</div>
           ) : !reqs.length ? (
             <div className="muted">{t('joinRequests.empty')}</div>

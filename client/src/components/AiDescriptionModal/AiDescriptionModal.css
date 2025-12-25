@@ -1,5 +1,3 @@
-/* רק למחלקות הקשורות ל-AI modal */
-
 .ai-modal {
   max-width: 520px;
 }
@@ -23,14 +21,12 @@
 }
 
 .ai-icon-emoji {
-  /* 22px ≈ 1.375rem */
   font-size: calc(1.375rem * var(--a11y-font-scale));
   line-height: 1;
 }
 
 .ai-modal-subtitle {
   margin-top: 4px;
-  /* 13px ≈ 0.8125rem */
   font-size: calc(0.8125rem * var(--a11y-font-scale));
   color: #5c6b7a;
 }
@@ -45,7 +41,6 @@
 
 .cg-ai-preview-label {
   margin-bottom: 4px;
-  /* 13px ≈ 0.8125rem */
   font-size: calc(0.8125rem * var(--a11y-font-scale));
   color: #003366;
   font-weight: 600;

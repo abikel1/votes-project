@@ -9,12 +9,12 @@ export const sendMail = createAsyncThunk(
       const { data } = await http.post('/mail/send', payload);
       return (
         data?.message ||
-        i18n.t('mail.sendSuccess')  // ✔ ברירת מחדל באנגלית/עברית
+        i18n.t('mail.sendSuccess')
       );
     } catch (e) {
       return rejectWithValue(
         e?.response?.data?.message ||
-        i18n.t('mail.sendFailed')  // ✔ שגיאה מתורגמת
+        i18n.t('mail.sendFailed')
       );
     }
   }
@@ -35,11 +35,11 @@ const mailSlice = createSlice({
     })
       .addCase(sendMail.fulfilled, (s, a) => {
         s.status = 'succeeded';
-        s.lastResponse = a.payload; // מחרוזת הודעה
+        s.lastResponse = a.payload;
       })
       .addCase(sendMail.rejected, (s, a) => {
         s.status = 'failed';
-        s.error = a.payload; // מחרוזת שגיאה
+        s.error = a.payload;
       });
   },
 });

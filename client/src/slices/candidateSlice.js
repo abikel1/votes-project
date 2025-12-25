@@ -1,9 +1,7 @@
-// src/slices/candidateSlice.js
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import http from '../api/http';
 import i18n from '../i18n';
 
-// טען את כל המועמדים של קבוצה
 export const fetchCandidatesByGroup = createAsyncThunk(
   'candidates/fetchByGroup',
   async (groupId, { rejectWithValue }) => {
@@ -18,7 +16,6 @@ export const fetchCandidatesByGroup = createAsyncThunk(
   }
 );
 
-// צור מועמד בקבוצה (ע"י מנהל)
 export const createCandidate = createAsyncThunk(
   'candidates/create',
   async ({ groupId, name, description, symbol, photoUrl }, { rejectWithValue }) => {
@@ -35,7 +32,6 @@ export const createCandidate = createAsyncThunk(
   }
 );
 
-// עדכון מועמד קיים
 export const updateCandidate = createAsyncThunk(
   'candidates/update',
   async ({ candidateId, groupId, patch }, { rejectWithValue }) => {
@@ -50,7 +46,6 @@ export const updateCandidate = createAsyncThunk(
   }
 );
 
-// מחיקת מועמד
 export const deleteCandidate = createAsyncThunk(
   'candidates/delete',
   async ({ candidateId, groupId }, { rejectWithValue }) => {
@@ -65,7 +60,6 @@ export const deleteCandidate = createAsyncThunk(
   }
 );
 
-// הגשת מועמדות ע"י משתמש – שולח בקשה, לא יוצר מועמד בפועל
 export const applyCandidate = createAsyncThunk(
   'candidates/apply',
   async ({ groupId, name, description, symbol, photoUrl }, { rejectWithValue }) => {
@@ -74,7 +68,6 @@ export const applyCandidate = createAsyncThunk(
         `/candidates/${groupId}/applyCandidate`,
         { name, description, symbol, photoUrl }
       );
-      // data = { ok, groupId, request }
       return { groupId: data.groupId, request: data.request };
     } catch (err) {
       return rejectWithValue(
@@ -84,7 +77,6 @@ export const applyCandidate = createAsyncThunk(
   }
 );
 
-// אישור בקשת מועמד
 export const approveCandidateRequest = createAsyncThunk(
   'candidates/approveCandidateRequest',
   async ({ groupId, requestId }, { rejectWithValue }) => {
@@ -106,7 +98,6 @@ export const approveCandidateRequest = createAsyncThunk(
   }
 );
 
-// דחיית בקשת מועמד
 export const rejectCandidateRequest = createAsyncThunk(
   'candidates/rejectCandidateRequest',
   async ({ groupId, requestId }, { rejectWithValue }) => {
@@ -127,7 +118,6 @@ export const rejectCandidateRequest = createAsyncThunk(
   }
 );
 
-// בקשות מועמדים בקבוצה (עבור המנהל)
 export const fetchCandidateRequestsByGroup = createAsyncThunk(
   'candidates/fetchRequestsByGroup',
   async (groupId, { rejectWithValue }) => {
@@ -145,21 +135,20 @@ export const fetchCandidateRequestsByGroup = createAsyncThunk(
 const candidateSlice = createSlice({
   name: 'candidates',
   initialState: {
-    listByGroup: {},              // { [groupId]: Candidate[] }
-    loadingByGroup: {},           // { [groupId]: boolean }
-    errorByGroup: {},             // { [groupId]: string|null }
-    candidateRequestsByGroup: {}, // { [groupId]: CandidateRequest[] }
+    listByGroup: {},
+    loadingByGroup: {},
+    errorByGroup: {},
+    candidateRequestsByGroup: {},
     creating: false,
     createError: null,
     applying: false,
     applyError: null,
-    updatingById: {},             // { [candidateId]: boolean }
-    updateErrorById: {},          // { [candidateId]: string|null }
+    updatingById: {},
+    updateErrorById: {},
     loadingRequests: false,
     requestsError: null,
   },
   reducers: {
-    // עדכון אופטימי לספירת ההצבעות
     optimisticIncVote: (s, { payload }) => {
       const { groupId, candidateId, delta = 1 } = payload || {};
       const list = s.listByGroup[groupId];
@@ -173,7 +162,6 @@ const candidateSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      // ===== fetch candidates =====
       .addCase(fetchCandidatesByGroup.pending, (s, a) => {
         const gid = a.meta.arg;
         s.loadingByGroup[gid] = true;
@@ -189,8 +177,6 @@ const candidateSlice = createSlice({
         s.loadingByGroup[gid] = false;
         s.errorByGroup[gid] = a.payload;
       })
-
-      // ===== create candidate (ע"י מנהל) =====
       .addCase(createCandidate.pending, (s) => {
         s.creating = true;
         s.createError = null;
@@ -205,8 +191,6 @@ const candidateSlice = createSlice({
         s.creating = false;
         s.createError = a.payload;
       })
-
-      // ===== update candidate =====
       .addCase(updateCandidate.pending, (s, a) => {
         const { candidateId } = a.meta.arg || {};
         if (candidateId) {
@@ -232,8 +216,6 @@ const candidateSlice = createSlice({
           s.updateErrorById[candidateId] = a.payload;
         }
       })
-
-      // ===== delete candidate =====
       .addCase(deleteCandidate.fulfilled, (s, a) => {
         const { groupId, candidateId } = a.payload;
         const list = s.listByGroup[groupId];
@@ -241,11 +223,7 @@ const candidateSlice = createSlice({
         s.listByGroup[groupId] = list.filter(c => String(c._id) !== String(candidateId));
         delete s.updatingById[candidateId];
         delete s.updateErrorById[candidateId];
-        // שימי לב: בקשות מועמדות מתעדכנות בצד השרת (group.candidateRequests),
-        // ויגיעו מחדש דרך fetchGroupWithMembers / fetchCandidateRequestsByGroup.
       })
-
-      // ===== apply candidate – ניהול סטטוס בקישה =====
       .addCase(applyCandidate.pending, (state) => {
         state.applying = true;
         state.applyError = null;
@@ -273,14 +251,10 @@ const candidateSlice = createSlice({
         state.applying = false;
         state.applyError = action.payload;
       })
-
-      // ===== fetch candidate requests =====
       .addCase(fetchCandidateRequestsByGroup.fulfilled, (state, action) => {
         const { groupId, requests } = action.payload;
         state.candidateRequestsByGroup[groupId] = requests;
       })
-
-      // ===== approve request =====
       .addCase(approveCandidateRequest.pending, (state) => {
         state.loadingRequests = true;
         state.requestsError = null;
@@ -288,14 +262,10 @@ const candidateSlice = createSlice({
       .addCase(approveCandidateRequest.fulfilled, (state, action) => {
         const { requestId, groupId, candidate } = action.payload;
         state.loadingRequests = false;
-
-        // מסירים את הבקשה מהטבלה
         state.candidateRequestsByGroup[groupId] =
           state.candidateRequestsByGroup[groupId]?.filter(
             (r) => String(r._id) !== String(requestId)
           ) || [];
-
-        // מוסיפים את המועמד לרשימת המועמדים הפעילים
         if (!Array.isArray(state.listByGroup[groupId])) {
           state.listByGroup[groupId] = [];
         }
@@ -305,8 +275,6 @@ const candidateSlice = createSlice({
         state.loadingRequests = false;
         state.requestsError = action.payload;
       })
-
-      // ===== reject request =====
       .addCase(rejectCandidateRequest.pending, (state) => {
         state.loadingRequests = true;
         state.requestsError = null;
@@ -328,25 +296,17 @@ const candidateSlice = createSlice({
 
 export const { optimisticIncVote } = candidateSlice.actions;
 export default candidateSlice.reducer;
-
-// selectors
 export const selectCandidatesForGroup = (groupId) => (state) =>
   state.candidates.listByGroup[groupId] || [];
-
 export const selectCandidatesLoadingForGroup = (groupId) => (state) =>
   !!state.candidates.loadingByGroup[groupId];
-
 export const selectCandidatesErrorForGroup = (groupId) =>
   (state) => state.candidates.errorByGroup[groupId] || null;
-
 export const selectCandidateUpdating = (candidateId) => (state) =>
   !!state.candidates.updatingById[candidateId];
-
 export const selectCandidateUpdateError = (candidateId) => (state) =>
   state.candidates.updateErrorById[candidateId] || null;
-
 export const selectApplyingCandidate = (state) => state.candidates.applying;
 export const selectApplyCandidateError = (state) => state.candidates.applyError;
-
 export const selectCandidateRequestsForGroup = (state, groupId) =>
   state.candidates.candidateRequestsByGroup[groupId] || [];

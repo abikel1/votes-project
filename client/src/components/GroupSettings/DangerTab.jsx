@@ -1,4 +1,3 @@
-// src/pages/GroupSettingsPage/DangerTab.jsx
 import { useTranslation } from 'react-i18next';
 
 export default function DangerTab({ onOpenDelete }) {

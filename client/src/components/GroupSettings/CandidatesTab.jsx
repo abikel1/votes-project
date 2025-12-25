@@ -1,4 +1,3 @@
-// src/pages/GroupSettingsPage/CandidatesTab.jsx
 import React, { useState } from 'react';
 import CandidateForm from '../../components/GroupSettings/CandidateForm';
 import http from '../../api/http';
@@ -21,12 +20,10 @@ export default function CandidatesTab({
 }) {
   const { t } = useTranslation();
 
-  // ✅ State מקומי להעלאת תמונה
   const [localUploading, setLocalUploading] = useState(false);
 
-  // ✅ פונקציה להעלאת תמונה
   const onUploadNew = async (file) => {
-    console.log('Uploading file:', file); // ← בדיקה
+    console.log('Uploading file:', file);
     if (!file) return;
     setLocalUploading(true);
 
@@ -53,18 +50,6 @@ export default function CandidatesTab({
 
   return (
     <section className="card">
-
-
-      {/* <div className="actions-row">
-  <button className="clean-btn clean-btn-save">שמירה</button>
-  <button className="clean-btn clean-btn-cancel">ביטול</button>
-  <button className="clean-btn clean-btn-edit">עריכה</button>
-  <button className="clean-btn clean-btn-delete">מחיקה</button>
-</div>
- */}
-
-
-      {/* רשימת מועמדים קיימים */}
       <details open className="acc">
         <summary className="acc-sum">
           {t('candidates.tab.title')}
@@ -133,7 +118,6 @@ export default function CandidatesTab({
         </div>
       </details>
 
-      {/* הוספת מועמד/ת חדש/ה */}
       <details className="acc">
         <summary className="acc-sum">
           {t('candidates.add.title')}

@@ -33,7 +33,6 @@ const PasswordField = ({ label, placeholder, value, onChange, error }) => {
           }
         >
           {show ? (
-            // עין פתוחה — הסיסמה מוצגת
             <svg
               width="20"
               height="20"
@@ -54,7 +53,6 @@ const PasswordField = ({ label, placeholder, value, onChange, error }) => {
               />
             </svg>
           ) : (
-            // עין סגורה — הסיסמה מוסתרת
             <svg
               width="20"
               height="20"
@@ -235,20 +233,19 @@ export default function ResetPasswordPage() {
             {password.length > 0 && (
               <div className="strength-indicator">
                 <div
-                  className={`strength-bar ${
-                    password.length < 6
+                  className={`strength-bar ${password.length < 6
                       ? 'weak'
                       : password.length < 10
-                      ? 'medium'
-                      : 'strong'
-                  }`}
+                        ? 'medium'
+                        : 'strong'
+                    }`}
                   style={{
                     width:
                       password.length < 6
                         ? '33%'
                         : password.length < 10
-                        ? '66%'
-                        : '100%',
+                          ? '66%'
+                          : '100%',
                   }}
                 />
               </div>

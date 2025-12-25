@@ -18,13 +18,12 @@ const store = configureStore({
         votes: votesReducer,
         joinReq: joinReqReducer,
         mail: mailReducer,
-            campaign: campaignReducer,
+        campaign: campaignReducer,
 
     },
     devTools: true,
 });
 
-// סנכרון הטוקן ל-localStorage
 let prevToken;
 store.subscribe(() => {
     const token = store.getState().auth.token;

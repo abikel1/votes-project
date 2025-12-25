@@ -1,7 +1,3 @@
-/* ======================================
-   דף בית - עיצוב מודרני ונקי
-   ====================================== */
-
 * {
   box-sizing: border-box;
   margin: 0;
@@ -15,7 +11,6 @@
   direction: rtl;
 }
 
-/* ========== Hero Section ========== */
 .hero-section {
   position: relative;
   height: 70vh;
@@ -45,7 +40,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: radial-gradient(circle at 30% 50%, rgba(255,255,255,0.1) 0%, transparent 60%);
+  background: radial-gradient(circle at 30% 50%, rgba(255, 255, 255, 0.1) 0%, transparent 60%);
 }
 
 .hero-content {
@@ -60,13 +55,13 @@
   font-weight: 700;
   color: #ffffff;
   margin-bottom: 16px;
-  text-shadow: 0 2px 20px rgba(0,0,0,0.2);
+  text-shadow: 0 2px 20px rgba(0, 0, 0, 0.2);
   animation: fadeInUp 0.8s ease;
 }
 
 .hero-subtitle {
   font-size: calc(1.5rem * var(--a11y-font-scale));
-  color: rgba(255,255,255,0.9);
+  color: rgba(255, 255, 255, 0.9);
   margin-bottom: 32px;
   font-weight: 300;
   animation: fadeInUp 1s ease;
@@ -79,19 +74,18 @@
   color: #003366;
   background: #ffffff;
   border: none;
-  /* border-radius: 50px; */
   cursor: pointer;
   display: inline-flex;
   align-items: center;
   gap: 8px;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
   animation: fadeInUp 1.2s ease;
 }
 
 .hero-cta:hover {
   transform: translateY(-3px);
-  box-shadow: 0 6px 30px rgba(0,0,0,0.3);
+  box-shadow: 0 6px 30px rgba(0, 0, 0, 0.3);
 }
 
 .btn-icon {
@@ -104,7 +98,7 @@
   left: 50%;
   transform: translateX(-50%);
   text-align: center;
-  color: rgba(255,255,255,0.8);
+  color: rgba(255, 255, 255, 0.8);
   font-size: calc(0.9rem * var(--a11y-font-scale));
   animation: bounce 2s infinite;
 }
@@ -112,8 +106,8 @@
 .scroll-arrow {
   width: 24px;
   height: 24px;
-  border-left: 2px solid rgba(255,255,255,0.8);
-  border-bottom: 2px solid rgba(255,255,255,0.8);
+  border-left: 2px solid rgba(255, 255, 255, 0.8);
+  border-bottom: 2px solid rgba(255, 255, 255, 0.8);
   transform: rotate(-45deg);
   margin: 8px auto 0;
 }
@@ -123,6 +117,7 @@
     opacity: 0;
     transform: translateY(30px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -130,18 +125,24 @@
 }
 
 @keyframes bounce {
-  0%, 20%, 50%, 80%, 100% {
+
+  0%,
+  20%,
+  50%,
+  80%,
+  100% {
     transform: translateX(-50%) translateY(0);
   }
+
   40% {
     transform: translateX(-50%) translateY(-10px);
   }
+
   60% {
     transform: translateX(-50%) translateY(-5px);
   }
 }
 
-/* ========== Main Content ========== */
 .main-content {
   padding: 60px 20px;
   max-width: 1400px;
@@ -154,7 +155,6 @@
   gap: 32px;
 }
 
-/* ========== Column Styles ========== */
 .groups-column {
   background: #ffffff;
   border: 1px solid #003366;
@@ -219,7 +219,6 @@
   color: #666;
 }
 
-/* ========== Groups List ========== */
 .groups-list {
   display: flex;
   flex-direction: column;
@@ -234,7 +233,6 @@
   transition: all 0.2s ease;
 
 }
-
 
 .group-card:hover {
   transform: translateY(-2px);
@@ -257,7 +255,7 @@
 
 .closed-card:hover {
   opacity: 1;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
 .card-content {
@@ -357,7 +355,6 @@
   transform: translateX(-3px);
 }
 
-/* ========== Empty States ========== */
 .empty-column {
   padding: 40px 20px;
   text-align: center;
@@ -409,10 +406,9 @@
 .create-btn:hover {
   background: #002244;
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0,51,102,0.3);
+  box-shadow: 0 4px 12px rgba(0, 51, 102, 0.3);
 }
 
-/* ========== Quick Actions ========== */
 .quick-actions {
   max-width: 1400px;
   margin: 0 auto;
@@ -430,7 +426,6 @@
   background: #ffffff;
   color: #333;
   border: 0.2px solid #003366;
-  /* border-radius: 4px; */
   cursor: pointer;
   transition: all 0.2s ease;
   display: flex;
@@ -441,7 +436,7 @@
 .action-btn:hover {
   background: #f5f5f5;
   transform: translateY(-2px);
-  box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
 }
 
 .primary-action {
@@ -454,7 +449,6 @@
   background: #002244;
 }
 
-/* ========== Loading & Error States ========== */
 .home-loading {
   display: flex;
   flex-direction: column;
@@ -470,8 +464,7 @@
   height: 50px;
   border: 4px solid #e5e5e5;
   border-top-color: #003366;
-    border-radius: 50%;   /* 👈 זה הקסם */
-
+  border-radius: 50%;
   animation: spin 1s linear infinite;
 }
 
@@ -521,37 +514,35 @@
   transform: translateY(-2px);
 }
 
-/* ========== Responsive ========== */
 @media (max-width: 968px) {
   .hero-title {
     font-size: calc(2.5rem * var(--a11y-font-scale));
   }
-  
+
   .hero-subtitle {
     font-size: calc(1.2rem * var(--a11y-font-scale));
   }
-  
+
   .content-wrapper {
     grid-template-columns: 1fr;
   }
-  
+
   .main-content {
     padding: 40px 16px;
   }
 }
-/* בתוך HomePage.css או קובץ CSS מתאים */
+
 .hero-content {
   display: flex;
-  flex-direction: column; /* מסדר את כל התוכן בעמודה */
-  align-items: center;    /* מרכז אופקית */
-  gap: 16px;              /* רווח בין הכפתורים והטקסט */
-/* margin-bottom: 20px; */
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
 }
-/* ===== התאמת גובה Hero לטאבלטים ===== */
+
 @media (max-width: 1024px) and (min-width: 641px) {
   .hero-section {
-    height: 55vh;        /* קטן יותר מטלפון ודסקטופ */
-    min-height: 360px;   /* מבטל את ה-500px המוגזם */
+    height: 55vh;
+    min-height: 360px;
   }
 
   .hero-title {
@@ -567,6 +558,7 @@
     font-size: calc(1rem * var(--a11y-font-scale));
   }
 }
+
 @media (max-width: 640px) {
   .hero-section {
     height: 60vh;
@@ -586,9 +578,8 @@
     font-size: calc(1rem * var(--a11y-font-scale));
   }
 
-  /* 👇 זה החלק החדש שיזיז את "גלול למטה" למעלה קצת */
   .scroll-indicator {
-    bottom: 70px;  /* במקום 30px ברגיל */
+    bottom: 70px;
   }
 
   .groups-column {
@@ -616,7 +607,8 @@
     align-items: flex-start;
     gap: 8px;
   }
-    .scroll-indicator {
-    bottom: 10px;   /* היה 30px או 70px – עכשיו יורד למטה */
+
+  .scroll-indicator {
+    bottom: 10px;
   }
 }

@@ -1,5 +1,6 @@
-/* /* ב־App.css או style גלובלי */
-body, html, #root {
+body,
+html,
+#root {
   height: 100%;
   margin: 0;
 }
@@ -7,9 +8,9 @@ body, html, #root {
 .page-wrapper {
   display: flex;
   flex-direction: column;
-  min-height: 100vh; /* מלא את כל חלון הדפדפן */
+  min-height: 100vh;
 }
 
 main {
-  flex: 1; /* התוכן מתרחב למילוי החלל */
+  flex: 1;
 }

@@ -1,10 +1,8 @@
-// src/slices/groupsSlice.js
 import { createSlice, createAsyncThunk, createSelector } from '@reduxjs/toolkit';
 import http from '../api/http';
 import { fetchUsersByIds, hydrateUsersForGroup, selectUsersMap } from './usersSlice';
 import i18n from '../i18n';
 
-/* ===== Helpers ===== */
 const pickId = (m) => {
   if (!m) return null;
   if (typeof m === 'string') return m;
@@ -30,7 +28,6 @@ const coalesceName = (u) => {
 };
 const normalizeGroup = (g) => g;
 
-/* ===== Thunks ===== */
 export const fetchGroups = createAsyncThunk(
   'groups/fetchAll',
   async (_, { rejectWithValue }) => {
@@ -106,12 +103,11 @@ export const updateGroup = createAsyncThunk(
   }
 );
 
-// אילו קבוצות שלי
 export const fetchMyGroups = createAsyncThunk(
   'groups/fetchMy',
   async (_, { rejectWithValue }) => {
     try {
-      const { data } = await http.get('/groups/my'); // { created: [], joined: [] }
+      const { data } = await http.get('/groups/my');
       return data;
     } catch (err) {
       return rejectWithValue(i18n.t('groups.errors.loadMyFailed'));
@@ -119,7 +115,6 @@ export const fetchMyGroups = createAsyncThunk(
   }
 );
 
-// ❗ הסרת משתתף
 export const removeGroupMember = createAsyncThunk(
   'groups/removeMember',
   async ({ groupId, memberId, email }, { rejectWithValue }) => {
@@ -135,7 +130,6 @@ export const removeGroupMember = createAsyncThunk(
   }
 );
 
-// ❗❗ מחיקת קבוצה
 export const deleteGroupById = createAsyncThunk(
   'groups/delete',
   async (groupId, { rejectWithValue }) => {
@@ -294,9 +288,6 @@ const groupsSlice = createSlice({
 export const { clearCreateState, clearUpdateState } = groupsSlice.actions;
 export default groupsSlice.reducer;
 
-/* ======================
-   Selectors
-   ====================== */
 const selectMyEmail = (s) => s.auth.userEmail || null;
 const selectMyId = (s) => s.auth.userId || null;
 
@@ -349,7 +340,6 @@ export const selectSelectedGroupMembersEnriched = createSelector(
   }
 );
 
-// ממואיזציה
 export const selectMyJoinedIds = createSelector(
   (s) => s.groups.myJoinedIds,
   (arr) => new Set((arr || []).map(String))

@@ -1,9 +1,3 @@
-/* ═══════════════════════════════════════════════════════════════
-   Auth.css - קובץ CSS מאוחד לכל דפי ההזדהות
-   שימוש: LoginPage, RegisterPage, ForgotPasswordPage, ResetPasswordPage
-   ═══════════════════════════════════════════════════════════════ */
-
-/* ═══ BASE RESET ═══ */
 * {
   margin: 0;
   padding: 0;
@@ -11,13 +5,11 @@
 }
 
 body {
-  /* direction: rtl; */
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
   background: #f5f7fa;
   min-height: 100vh;
 }
 
-/* ═══ MAIN CONTAINER ═══ */
 .auth-container {
   min-height: 100vh;
   display: flex;
@@ -26,7 +18,6 @@ body {
   padding: 20px;
 }
 
-/* ═══ CARD ═══ */
 .auth-card {
   background: white;
   border: 2px solid #003366;
@@ -35,22 +26,20 @@ body {
   padding: 40px 36px;
   box-shadow: 0 0 20px rgba(0, 51, 102, 0.1);
   border-radius: 0;
-  /* מרובע לחלוטין */
 }
 
-/* רחב יותר לדף הרשמה */
 .auth-card.register-card {
   max-width: 520px;
 }
 
-/* ═══ HEADER ═══ */
 .auth-header {
   text-align: center;
   margin-bottom: 28px;
 }
 
 .auth-header h1 {
-  font-size: calc(26px * var(--a11y-font-scale));;
+  font-size: calc(26px * var(--a11y-font-scale));
+  ;
   font-weight: 700;
   color: #003366;
   margin-bottom: 6px;
@@ -61,7 +50,6 @@ body {
   color: #32506a;
 }
 
-/* ═══ ICON WRAPPER (לשכחתי סיסמה ואיפוס) ═══ */
 .icon-wrapper {
   width: 80px;
   height: 80px;
@@ -74,7 +62,6 @@ body {
   box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
 }
 
-/* ═══ ALERTS ═══ */
 .alert {
   display: flex;
   align-items: center;
@@ -117,14 +104,12 @@ body {
   }
 }
 
-/* ═══ FORM ═══ */
 .auth-form {
   display: flex;
   flex-direction: column;
   gap: 20px;
 }
 
-/* ═══ FORM GROUP ═══ */
 .form-group {
   display: flex;
   flex-direction: column;
@@ -137,7 +122,6 @@ body {
   color: #003366;
 }
 
-/* ═══ INPUTS ═══ */
 .form-group input {
   width: 100%;
   padding: 12px;
@@ -162,28 +146,23 @@ body {
   color: #a0aec0;
 }
 
-/* ═══ ERROR TEXT ═══ */
 .error-text {
   font-size: calc(12px * var(--a11y-font-scale));
   color: #cc0000;
   margin-top: -2px;
 }
 
-/* ═══ PASSWORD INPUT ═══ */
 .password-input {
   position: relative;
 }
 
-/* מקום לעין בצד ה"סיום" של השורה (ימין באנגלית, שמאל בעברית) */
 .password-input input {
   padding-inline-end: 46px;
 }
 
-/* האייקון בצד ה"סיום" של השורה – זז לבד לפי RTL/LTR */
 .toggle-password {
   position: absolute;
   inset-inline-end: 12px;
-  /* במקום left/right */
   top: 50%;
   transform: translateY(-50%);
   background: none;
@@ -201,7 +180,6 @@ body {
 }
 
 
-/* ═══ PASSWORD STRENGTH (לאיפוס סיסמה) ═══ */
 .password-strength {
   margin-top: -12px;
 }
@@ -234,14 +212,12 @@ body {
   margin-top: 8px;
 }
 
-/* ═══ TWO COLUMNS (שם פרטי + משפחה בהרשמה) ═══ */
 .form-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 16px;
 }
 
-/* ═══ FORGOT LINK ═══ */
 .forgot-link {
   font-size: calc(14px * var(--a11y-font-scale));
   color: #003366;
@@ -255,7 +231,6 @@ body {
   text-decoration: underline;
 }
 
-/* ═══ BACK LINK (לשכחתי סיסמה) ═══ */
 .back-link {
   display: inline-flex;
   align-items: center;
@@ -280,7 +255,6 @@ body {
   transform: translateX(4px);
 }
 
-/* ═══ BUTTONS ═══ */
 .btn {
   width: 100%;
   padding: 14px 0;
@@ -297,7 +271,6 @@ body {
   cursor: not-allowed;
 }
 
-/* כפתור כחול ראשי */
 .btn-primary {
   background: #003366;
   color: #fff;
@@ -308,7 +281,6 @@ body {
   background: #00284d;
 }
 
-/* כפתור Google */
 .btn-google {
   background: #fff;
   color: #003366;
@@ -329,7 +301,6 @@ body {
   background: #f1f5fa;
 }
 
-/* ═══ DIVIDER (קו "או") ═══ */
 .divider {
   display: flex;
   align-items: center;
@@ -350,7 +321,6 @@ body {
   color: #738799;
 }
 
-/* ═══ FOOTER ═══ */
 .auth-footer {
   margin-top: 22px;
   text-align: center;
@@ -368,7 +338,6 @@ body {
   text-decoration: underline;
 }
 
-/* ═══ CITY STREET AUTO (לדף הרשמה) ═══ */
 .citystreet--modern {
   display: flex;
   flex-direction: column;
@@ -399,7 +368,6 @@ body {
   color: #a0aec0;
 }
 
-/* Autocomplete Dropdown */
 .citystreet--modern .autocomplete-dropdown {
   position: absolute;
   top: 100%;
@@ -431,7 +399,6 @@ body {
   font-weight: 500;
 }
 
-/* ═══ RESPONSIVE ═══ */
 @media (max-width: 640px) {
   .form-row {
     grid-template-columns: 1fr;
@@ -453,7 +420,6 @@ body {
     height: 64px;
   }
 }
-
 
 .form-group.half input {
   width: 100%;
